@@ -2,17 +2,29 @@
   box-sizing: border-box; }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
-  font-size: 14px;
-  line-height: 1.3rem; }
+  font-family: "PT Serif", "Times", "Times New Roman", -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  font-size: 16px;
+  line-height: 1.3rem;
+  letter-spacing: 0.05em; }
+
+main {
+  padding: 20px; }
 
 span {
-  display: inline;
-  margin-top: 1.3rem; }
+  display: inline; }
+
+.chordr-line {
+  padding-top: 1.3rem;
+  display: block; }
 
 .chordr-chord {
-  color: blue;
+  color: #239b32;
+  font-weight: bold;
   position: absolute;
-  margin-top: -1.3rem; }
+  margin-top: -1.1em; }
+
+.chordr-comment {
+  padding: 10px;
+  background: #d9d9d9; }
 
 /*# sourceMappingURL=main.css.map */

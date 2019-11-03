@@ -1,23 +1,53 @@
+$std-space: 20px !default;
+$std-half: $std-space / 2 !default;
 $line-height: 1.3rem !default;
+$comment-background: #d9d9d9 !default;
+$font-size: 16px !default;
+
+$chord-color: #239b32 !default;
+$chord-weight: bold !default;
 
 *, *::before, *::after {
     box-sizing: border-box;
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
-    font-size: 14px;
+    font-family: "PT Serif", "Times", "Times New Roman", -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+    font-size: $font-size;
     line-height: $line-height;
+    letter-spacing: 0.05em;
+}
+
+main {
+    padding: $std-space;
 }
 
 span {
     display: inline;
-    margin-top: $line-height;
+}
+
+h1 {
+
+}
+
+h2 {
+
+}
+
+.chordr-line {
+    padding-top: $line-height;
+    display: block;
 }
 
 .chordr-chord {
-    color: blue;
+    color: $chord-color;
+    font-weight: $chord-weight;
     position: absolute;
-    margin-top: -$line-height;
+    margin-top: -1.1em;
+}
+
+.chordr-comment {
+    padding: $std-half;
+    background: $comment-background;
 }
 

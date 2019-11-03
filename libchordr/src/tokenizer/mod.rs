@@ -15,12 +15,19 @@ impl Tokenizer {
         Self {}
     }
 
-    pub fn tokenize(&self, input: &str) -> Vec<Token> {
-        let mut tokens: Vec<Token> = vec![];
+    pub fn tokenize(&self, input: &str) -> Vec<TokenLine> {
+        let mut token_lines: Vec<TokenLine> = vec![];
+        for line in input.lines() {
+            token_lines.push(Tokenizer::tokenize_line(line))
+        }
+        token_lines
+    }
+
+    fn tokenize_line(line: &str) -> Vec<Token> {
         let mut collected_literal = String::from("");
         let mut mode = Mode::Literal;
-
-        for character in input.chars() {
+        let mut tokens: Vec<Token> = vec![];
+        for character in line.chars() {
             // If no lock is set check if the current character signals a start of a block
             if mode == Mode::Literal {
                 let new_mode = Mode::from_char(character);
@@ -52,15 +59,11 @@ impl Tokenizer {
                 continue;
             }
 
-
             collected_literal.push(character);
         }
-
         if !collected_literal.is_empty() {
             tokens.push(Token::from_mode_and_literal(mode, &collected_literal));
         }
-
-
         tokens
     }
 
@@ -81,12 +84,18 @@ mod tests {
     #[test]
     fn test_tokenize_long() {
         let content = include_str!("../../tests/resources/swing_low_sweet_chariot.cho");
-        let tokens = Tokenizer::new().tokenize(content);
-        assert_eq!(tokens.len(), 65);
+        let token_lines = Tokenizer::new().tokenize(content);
+        assert_eq!(token_lines.len(), 17);
 
-        let mut tokens_iter = tokens.iter();
-        for token in get_test_tokens() {
-            assert_eq!(&token, tokens_iter.next().unwrap());
+        let mut token_lines_iter = token_lines.iter();
+
+        for expected_line in get_test_tokens() {
+            let line = token_lines_iter.next().unwrap();
+            let mut line_iter = line.iter();
+            for expected_token in expected_line {
+                let actual_token = line_iter.next().unwrap();
+                assert_eq!(&expected_token, actual_token);
+            }
         }
     }
 }

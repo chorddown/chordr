@@ -61,59 +61,13 @@ fn main() {
     <style>{styles}</style>
 </head>
 <body>
+<main>
 {content}
+</main>
 </body>
 </html>
-
-
     "#,
         title = "",
         styles = include_str!("../resources/html/main.css"),
         content = converted);
-
-
-//    Tokenizer
-
-
-//    let filename = args.value_of("OUTPUT").unwrap_or("chords.pdf");
-//    let mut document = Pdf::create(filename)
-//        .map_err(|err| {
-//            println!("Failed to open {}: {}", filename, err);
-//            exit(1);
-//        })
-//        .unwrap();
-//    document.set_title(args.value_of("TITLE").unwrap_or("Songbook"));
-//    if let Some(author) = args.value_of("AUTHOR") {
-//        document.set_author(author);
-//    }
-//    document.set_producer(concat!(
-//    "chord3 version ",
-//    env!("CARGO_PKG_VERSION"),
-//    "\nhttps://github.com/kaj/chord3"
-//    ));
-//
-//    let show_sourcenames = args.is_present("SOURCENAMES");
-//    let instrument =
-//        value_t!(args, "INSTRUMENT", Instrument).unwrap_or_default();
-//
-//    let mut page = PageDim::a4(1);
-//    if let Some(inputs) = args.values_of("INPUT") {
-//        for name in inputs {
-//            match render_song(
-//                &mut document,
-//                name,
-//                show_sourcenames,
-//                page,
-//                instrument,
-//            ) {
-//                Ok(p) => page = p.next(),
-//                Err(e) => println!("Failed to handle {}: {}", name, e),
-//            }
-//        }
-//    }
-//    if args.is_present("CHORDS") {
-//        render_chordlist(&mut document, page, instrument)
-//            .expect("Render chordlist");
-//    }
-//    document.finish().unwrap();
 }

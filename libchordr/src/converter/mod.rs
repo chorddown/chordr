@@ -1,13 +1,12 @@
 use crate::prelude::*;
-use crate::error::Error;
 use crate::error::Result;
 use crate::converter::html::HtmlConverter;
-use crate::tokenizer::{Token, TokenLine};
+use crate::tokenizer::TokenLine;
 
 mod html;
 
 pub trait ConverterTrait {
-    fn convert(&self, tokens: &Vec<Token>, format: Format) -> Result<String>;
+    fn convert(&self, token_lines: &Vec<TokenLine>, format: Format) -> Result<String>;
 }
 
 pub struct Converter {}
@@ -24,8 +23,8 @@ impl Converter {
 }
 
 impl ConverterTrait for Converter {
-    fn convert(&self, tokens: &Vec<Token>, format: Format) -> Result<String> {
-        Converter::get_converter(format).convert(tokens, format)
+    fn convert(&self, token_lines: &Vec<TokenLine>, format: Format) -> Result<String> {
+        Converter::get_converter(format).convert(token_lines, format)
     }
 }
 
@@ -41,6 +40,6 @@ mod tests {
         let result = converter.convert(&get_test_tokens(), Format::HTML);
 
         assert!(result.is_ok());
-        assert_eq!(content, result.unwrap())
+        assert_eq!(result.unwrap(), content.trim())
     }
 }
