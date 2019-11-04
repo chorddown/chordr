@@ -50,7 +50,7 @@ impl TagBuilder {
         }
     }
 
-    fn content_for_directive(&self, directive: &Directive) -> String {
+    fn tag_for_directive(&self, directive: &Directive) -> String {
         let es = "".to_owned();
         let class = self.css_class_for_directive(directive);
 
@@ -99,14 +99,14 @@ impl TagBuilder {
                 format!("<img class=\"{class}\" {content} />", class = class, content = escape_html(c)),
 
             // Environment directives
-            Directive::StartOfChorus(c) => escape_html(c),
+            Directive::StartOfChorus(c) => format!("<h3 class=\"{class}\">{content}</h3>", class = class, content = escape_html(c)),
             Directive::EndOfChorus => es,
-            Directive::Chorus(c) => escape_html(c),
-            Directive::StartOfVerse(c) => escape_html(c),
+            Directive::Chorus(c) => format!("<h3 class=\"{class}\"><!-- Insert chorus -->{content}</h3>", class = class, content = escape_html(c)),
+            Directive::StartOfVerse(c) => format!("<h3 class=\"{class}\">{content}</h3>", class = class, content = escape_html(c)),
             Directive::EndOfVerse => es,
-            Directive::StartOfTab(c) => escape_html(c),
+            Directive::StartOfTab(c) => format!("<h3 class=\"{class}\">{content}</h3>", class = class, content = escape_html(c)),
             Directive::EndOfTab => es,
-            Directive::StartOfGrid(c) => escape_html(c),
+            Directive::StartOfGrid(c) => format!("<h3 class=\"{class}\">{content}</h3>", class = class, content = escape_html(c)),
             Directive::EndOfGrid => es,
 
             // Chord diagrams
@@ -146,7 +146,7 @@ impl TagBuilder {
 
     fn content_for_token(&self, token: &Token) -> String {
         match token {
-            Token::Directive(ref d) => self.content_for_directive(d),
+            Token::Directive(ref d) => self.tag_for_directive(d),
             Token::Newline => "<br/>\n".to_owned(),
             Token::Chord(c) => escape_html(c),
             Token::Literal(c) => escape_html(c),
