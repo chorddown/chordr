@@ -1,19 +1,13 @@
-use crate::tokenizer::{Token, Directive, TokenLine};
+use crate::tokenizer::{Token, TokenLine};
 
 #[cfg(test)]
 pub fn get_test_tokens() -> Vec<TokenLine> {
     vec![
         vec![
-            Token::comment("A simple ChordPro song."),
+            Token::headline(1, "Swing Low Sweet Chariot"),
         ],
-        vec![],
-        vec![
-            Token::Directive(Directive::title("Swing Low Sweet Chariot")),
-        ],
-        vec![],
-        vec![
-            Token::Directive(Directive::start_of_chorus("")),
-        ],
+        vec![Token::newline()],
+        vec![Token::headline(2, "Chorus"), ],
         vec![
             Token::literal("Swing "),
             Token::chord("D"),
@@ -44,10 +38,9 @@ pub fn get_test_tokens() -> Vec<TokenLine> {
             Token::chord("D"),
             Token::literal("home."),
         ],
-        vec![
-            Token::Directive(Directive::EndOfChorus),
-        ],
-        vec![],
+        vec![Token::newline()],
+        vec![Token::headline(2, "Verse 1"), ],
+        vec![Token::newline()],
         vec![
             Token::literal("I "),
             Token::chord("D"),
@@ -78,9 +71,9 @@ pub fn get_test_tokens() -> Vec<TokenLine> {
             Token::chord("D"),
             Token::literal("home."),
         ],
-        vec![],
+        vec![Token::newline()],
         vec![
-            Token::Directive(Directive::comment("Chorus")),
+            Token::quote("Chorus"),
         ],
     ]
 }

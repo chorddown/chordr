@@ -1,35 +1,32 @@
-use super::mode::Mode;
-use super::directive::Directive;
-
 #[derive(Debug, PartialEq)]
 pub enum Token {
-    Chord(String),
-    Directive(Directive),
+    Headline { level: u8, text: String },
     Literal(String),
+    Chord(String),
+    // FormattedLiteral(String),
+    // Meta { key: String, text: String },
+    Quote(String),
     Newline,
-    Comment(String),
 }
 
 impl Token {
-    pub fn from_mode_and_literal(mode: Mode, literal: &str) -> Token {
-        match mode {
-            Mode::Chord => Token::Chord(literal.trim().to_owned()),
-            Mode::Comment => Token::Comment(literal.trim().to_owned()),
-            Mode::Literal => Token::Literal(literal.to_owned()),
-            Mode::Newline => Token::Newline,
-            Mode::Directive => Token::Directive(literal.into())
-        }
+    pub fn headline<S: Into<String>>(level: u8, value: S) -> Self {
+        Token::Headline { level, text: value.into() }
     }
 
     pub fn chord<S: Into<String>>(value: S) -> Self {
         Token::Chord(value.into())
     }
 
+    pub fn newline() -> Self {
+        Token::Newline
+    }
+
     pub fn literal<S: Into<String>>(value: S) -> Self {
         Token::Literal(value.into())
     }
 
-    pub fn comment<S: Into<String>>(value: S) -> Self {
-        Token::Comment(value.into())
+    pub fn quote<S: Into<String>>(value: S) -> Self {
+        Token::Quote(value.into())
     }
 }

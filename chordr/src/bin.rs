@@ -5,6 +5,7 @@ use clap::{Arg, App};
 use std::fs;
 
 use libchordr::prelude::*;
+use libchordr::prelude::build_tokenizer;
 
 fn main() {
     let args = App::new("chordr")
@@ -47,9 +48,9 @@ fn main() {
     let contents = fs::read_to_string(file_path)
         .expect(&format!("File '{}' could not be read", file_path));
 
-    let tokens = Tokenizer::new().tokenize(&contents);
+    let tokens = build_tokenizer().tokenize(&contents);
 
-    let converted = Converter::new().convert(&tokens, Format::HTML).unwrap();
+    let converted = ""; //Converter::new().convert(&tokens, Format::HTML).unwrap();
 
     println!(
         r#"
