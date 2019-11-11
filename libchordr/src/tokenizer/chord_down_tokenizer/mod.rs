@@ -64,14 +64,6 @@ impl Tokenizer for ChordDownTokenizer {
 
 fn from_mode_and_literal(mode: Mode, literal: &str, header_level: u8) -> Token {
     match mode {
-//        Title { level: u8, text: String },
-//        Literal(String),
-//        Chord(String),
-//        FormattedLiteral(String),
-//        Meta { key: String, text: String },
-//        Comment(String),
-//        Newline,
-
         Mode::Header => Token::Headline { level: header_level, text: literal.trim().to_owned() },
         Mode::Literal => Token::Literal(literal.to_owned()),
         Mode::Chord => Token::Chord(literal.trim().to_owned()),
@@ -84,9 +76,7 @@ fn from_mode_and_literal(mode: Mode, literal: &str, header_level: u8) -> Token {
 
 fn build_and_add_token(tokens: &mut Vec<Token>, collected_literal: &mut String, mode: Mode, header_level: u8) {
     if !collected_literal.is_empty() {
-        let token = from_mode_and_literal(mode, &collected_literal, header_level);
-        println!("Save {:?}", token);
-        add_token(tokens, token);
+        add_token(tokens, from_mode_and_literal(mode, &collected_literal, header_level));
         collected_literal.clear();
     }
 }
@@ -104,7 +94,6 @@ mod tests {
     fn test_tokenize_long() {
         let content = include_str!("../../../tests/resources/swing_low_sweet_chariot.chorddown");
         let token_lines = ChordDownTokenizer::new().tokenize(content);
-        println!("{:#?}", token_lines);
         assert_eq!(token_lines.len(), 16);
 
         let mut token_lines_iter = token_lines.iter();

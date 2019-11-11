@@ -50,7 +50,7 @@ fn main() {
 
     let tokens = build_tokenizer().tokenize(&contents);
 
-    let converted = ""; //Converter::new().convert(&tokens, Format::HTML).unwrap();
+    let converted = Converter::new().convert(&tokens, Format::HTML).unwrap();
 
     println!(
         r#"

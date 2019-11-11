@@ -4,5 +4,5 @@ pub use crate::error::Result;
 pub use crate::tokenizer::Tokenizer;
 pub use crate::tokenizer::build_tokenizer;
 pub use crate::tokenizer::Token;
-//pub use crate::converter::Converter;
-//pub use crate::converter::ConverterTrait;
+pub use crate::converter::Converter;
+pub use crate::converter::ConverterTrait;
