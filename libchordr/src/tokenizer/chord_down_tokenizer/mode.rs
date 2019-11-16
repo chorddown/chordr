@@ -17,7 +17,7 @@ const QUOTE_END: char = NEWLINE;
 
 pub(crate) trait ModePartner {
     fn is_end_of(&self, mode: Mode) -> bool;
-    fn is_signal(&self) -> bool;
+    fn is_signal(&self, last_mode: Mode) -> bool;
     fn is_terminator(&self, mode: Mode) -> bool;
 }
 
@@ -33,7 +33,11 @@ impl ModePartner for char {
     }
 
     #[allow(unreachable_patterns)]
-    fn is_signal(&self) -> bool {
+    fn is_signal(&self, last_mode: Mode) -> bool {
+        // If the last mode was Chord the # should not be treated as signal
+        if last_mode == Mode::Chord && *self == HEADER_START {
+            return false;
+        }
         match *self {
             NEWLINE => true,
             CHORD_START => true,
