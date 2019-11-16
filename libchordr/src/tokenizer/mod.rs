@@ -13,12 +13,15 @@ pub trait Tokenizer {
     fn tokenize(&self, input: &str) -> Vec<TokenLine> {
         let mut token_lines: Vec<TokenLine> = vec![];
         for line in input.lines() {
-            token_lines.push(self.tokenize_line(&(line.to_owned() + "\n")))
+            let token_line = self.tokenize_line(&(line.to_owned() + "\n"));
+            if let Some(token_line) = token_line {
+                token_lines.push(token_line);
+            }
         }
         token_lines
     }
 
-    fn tokenize_line(&self, line: &str) -> Vec<Token>;
+    fn tokenize_line(&self, line: &str) -> Option<Vec<Token>>;
 }
 
 /// Build a new Tokenizer instance

@@ -14,7 +14,11 @@ impl ChordDownTokenizer {
 
 
 impl Tokenizer for ChordDownTokenizer {
-    fn tokenize_line(&self, line: &str) -> Vec<Token> {
+    fn tokenize_line(&self, line: &str) -> Option<Vec<Token>> {
+        if line.trim().is_empty() {
+            return None;
+        }
+
         let mut tokens: Vec<Token> = vec![];
 
         let mut literal_buffer = String::from("");
@@ -41,7 +45,7 @@ impl Tokenizer for ChordDownTokenizer {
             let next_character = *chars.peek().unwrap_or(&'\n');
             let next_mode = Mode::from_char(next_character);
 
-            if !current_character.is_signal() {
+            if !current_character.is_signal(last_mode) {
                 literal_buffer.push(current_character);
             }
 
@@ -54,11 +58,7 @@ impl Tokenizer for ChordDownTokenizer {
             }
         }
 
-//        if !literal_buffer.is_empty() {
-//            build_and_add_token(&mut tokens, &mut literal_buffer, current_frame.mode, header_level);
-//        }
-
-        tokens
+        Some(tokens)
     }
 }
 
@@ -94,7 +94,7 @@ mod tests {
     fn test_tokenize_long() {
         let content = include_str!("../../../tests/resources/swing_low_sweet_chariot.chorddown");
         let token_lines = ChordDownTokenizer::new().tokenize(content);
-        assert_eq!(token_lines.len(), 16);
+        assert_eq!(token_lines.len(), 12);
 
         let mut token_lines_iter = token_lines.iter();
 
