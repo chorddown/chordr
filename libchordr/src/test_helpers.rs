@@ -6,7 +6,6 @@ pub fn get_test_tokens() -> Vec<TokenLine> {
         vec![
             Token::headline(1, "Swing Low Sweet Chariot"),
         ],
-        vec![Token::newline()],
         vec![Token::headline(2, "Chorus"), ],
         vec![
             Token::literal("Swing "),
@@ -38,9 +37,7 @@ pub fn get_test_tokens() -> Vec<TokenLine> {
             Token::chord("D"),
             Token::literal("home."),
         ],
-        vec![Token::newline()],
         vec![Token::headline(2, "Verse 1"), ],
-        vec![Token::newline()],
         vec![
             Token::literal("I "),
             Token::chord("D"),
@@ -71,7 +68,6 @@ pub fn get_test_tokens() -> Vec<TokenLine> {
             Token::chord("D"),
             Token::literal("home."),
         ],
-        vec![Token::newline()],
         vec![
             Token::quote("Chorus"),
         ],

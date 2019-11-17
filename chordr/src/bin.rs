@@ -50,7 +50,9 @@ fn main() {
 
     let tokens = build_tokenizer().tokenize(&contents);
 
-    let converted = Converter::new().convert(&tokens, Format::HTML).unwrap();
+    // token_lines_to_tokens
+    let node = Parser::new().parse(token_lines_to_tokens(tokens));
+    let converted = Converter::new().convert(&node, Format::HTML).unwrap();
 
     println!(
         r#"
@@ -61,7 +63,7 @@ fn main() {
     <title>{title}</title>
     <style>{styles}</style>
 </head>
-<body>
+<body class="chordr">
 <main>
 {content}
 </main>

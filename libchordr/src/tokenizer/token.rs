@@ -1,4 +1,4 @@
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialOrd, PartialEq, Clone)]
 pub enum Token {
     Headline { level: u8, text: String },
     Literal(String),

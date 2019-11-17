@@ -107,5 +107,26 @@ mod tests {
             }
         }
     }
+
+//    #[test]
+//    fn test_tokenize_half_tone() {
+//        let content = r#"
+//        > Chorus
+//[D#] [A#7] [C#m7]
+//        "#;
+//        let token_lines = ChordDownTokenizer::new().tokenize(content);
+//        assert_eq!(token_lines.len(), 4);
+//
+//        let mut token_lines_iter = token_lines.iter();
+//
+//        for expected_line in get_test_tokens() {
+//            let line = token_lines_iter.next().unwrap();
+//            let mut line_iter = line.iter();
+//            for expected_token in expected_line {
+//                let actual_token = line_iter.next().unwrap();
+//                assert_eq!(&expected_token, actual_token);
+//            }
+//        }
+//    }
 }
 

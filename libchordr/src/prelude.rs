@@ -6,3 +6,6 @@ pub use crate::tokenizer::build_tokenizer;
 pub use crate::tokenizer::Token;
 pub use crate::converter::Converter;
 pub use crate::converter::ConverterTrait;
+pub use crate::parser::Parser;
+pub use crate::parser::Node;
+pub use crate::helper::token_lines_to_tokens;

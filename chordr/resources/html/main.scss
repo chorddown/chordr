@@ -1,53 +1,113 @@
-$std-space: 20px !default;
+$std-space: 14px !default;
 $std-half: $std-space / 2 !default;
-$line-height: 1.3rem !default;
-$comment-background: #d9d9d9 !default;
-$font-size: 16px !default;
+
+$font: "PT Serif", "Times", "Times New Roman", -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji !default;
+$font-size: 10px !default;
+$font-size-h1: $font-size * 1.8 !default;
+$font-size-h2: $font-size * 1.2 !default;
+$font-size-h3: $font-size * 1 !default;
+$line-height: 1.3em !default;
 
 $chord-color: #239b32 !default;
 $chord-weight: bold !default;
 
-*, *::before, *::after {
-    box-sizing: border-box;
-}
+$blockquote-background: transparent !default;
+$blockquote-weight: bold !default;
+$blockquote-block-width: 10px !default;
+$blockquote-block-color: #777 !default;
 
-body {
-    font-family: "PT Serif", "Times", "Times New Roman", -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+body.chordr {
+    font-family: $font;
     font-size: $font-size;
     line-height: $line-height;
     letter-spacing: 0.05em;
+
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+        margin: 0;
+    }
+
+    main {
+        padding: $std-space;
+
+        @media print {
+            padding: 0;
+        }
+    }
+
+    h1,
+    h2,
+    h3 {
+        line-height: 1.3em;
+    }
+
+    h1 {
+        font-size: $font-size-h1;
+        margin-bottom: $std-space;
+    }
+
+    h2 {
+        font-size: $font-size-h2;
+        margin-bottom: $std-half/2;
+    }
+
+    h3 {
+        font-size: $font-size-h3;
+    }
+
+    span {
+        display: inline;
+        white-space: pre;
+    }
+
+    table {
+        //border: 1px solid red;
+        padding: 0;
+        border-collapse: collapse;
+
+        th,
+        td {
+            padding: 0;
+            vertical-align: bottom;
+        }
+    }
+
+    .chordr-line {
+        padding-top: $line-height;
+        display: block;
+    }
+
+    .chordr-chord {
+        color: $chord-color;
+        font-weight: $chord-weight;
+        margin-right: .3em;
+    }
+
+    .col {
+        float: left;
+    }
+
+    blockquote {
+        margin: $std-half 0;
+        padding: 0 $std-half;
+        font-weight: $blockquote-weight;
+        background: $blockquote-background;
+        border-left: $blockquote-block-width $blockquote-block-color solid;
+    }
+
+    section {
+        //padding: 1rem 0;
+        margin: $std-space 0;
+
+        &:first-child {
+            margin-top: 0;
+        }
+    }
+
+    hr {
+        clear: both;
+        border: none;
+    }
 }
-
-main {
-    padding: $std-space;
-}
-
-span {
-    display: inline;
-}
-
-h1 {
-
-}
-
-h2 {
-
-}
-
-.chordr-line {
-    padding-top: $line-height;
-    display: block;
-}
-
-.chordr-chord {
-    color: $chord-color;
-    font-weight: $chord-weight;
-    position: absolute;
-    margin-top: -1.1em;
-}
-
-.chordr-comment {
-    padding: $std-half;
-    background: $comment-background;
-}
-
