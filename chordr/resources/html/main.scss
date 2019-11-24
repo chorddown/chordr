@@ -2,10 +2,11 @@ $std-space: 14px !default;
 $std-half: $std-space / 2 !default;
 
 $font: "PT Serif", "Times", "Times New Roman", -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji !default;
-$font-size: 10px !default;
-$font-size-h1: $font-size * 1.8 !default;
-$font-size-h2: $font-size * 1.2 !default;
-$font-size-h3: $font-size * 1 !default;
+$font-size-web: 16px !default;
+$font-size-print: 10px !default;
+$font-size-h1: 1.8em !default;
+$font-size-h2: 1em !default;
+$font-size-h3: 1em !default;
 $line-height: 1.3em !default;
 
 $chord-color: #239b32 !default;
@@ -18,9 +19,13 @@ $blockquote-block-color: #777 !default;
 
 body.chordr {
     font-family: $font;
-    font-size: $font-size;
+    font-size: $font-size-web;
     line-height: $line-height;
     letter-spacing: 0.05em;
+
+    @media print {
+        font-size: $font-size-print;
+    }
 
     *,
     *::before,
@@ -83,6 +88,10 @@ body.chordr {
         color: $chord-color;
         font-weight: $chord-weight;
         margin-right: .3em;
+    }
+
+    .text-row {
+        white-space: pre;
     }
 
     .col {

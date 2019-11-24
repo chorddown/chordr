@@ -1,8 +1,11 @@
 body.chordr {
   font-family: "PT Serif", "Times", "Times New Roman", -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
-  font-size: 10px;
+  font-size: 16px;
   line-height: 1.3em;
   letter-spacing: 0.05em; }
+  @media print {
+    body.chordr {
+      font-size: 10px; } }
   body.chordr *,
   body.chordr *::before,
   body.chordr *::after {
@@ -18,13 +21,13 @@ body.chordr {
   body.chordr h3 {
     line-height: 1.3em; }
   body.chordr h1 {
-    font-size: 18px;
+    font-size: 1.8em;
     margin-bottom: 14px; }
   body.chordr h2 {
-    font-size: 12px;
+    font-size: 1em;
     margin-bottom: 3.5px; }
   body.chordr h3 {
-    font-size: 10px; }
+    font-size: 1em; }
   body.chordr span {
     display: inline;
     white-space: pre; }
@@ -42,6 +45,8 @@ body.chordr {
     color: #239b32;
     font-weight: bold;
     margin-right: .3em; }
+  body.chordr .text-row {
+    white-space: pre; }
   body.chordr .col {
     float: left; }
   body.chordr blockquote {

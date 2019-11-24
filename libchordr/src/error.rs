@@ -15,6 +15,9 @@ impl Error {
     pub fn parser_error<S: Into<String>>(description: S) -> Self {
         Error::new(Kind::ParserError(description.into()))
     }
+    pub fn tag_builder_error<S: Into<String>>(description: S) -> Self {
+        Error::new(Kind::TagBuilderError(description.into()))
+    }
 
     pub fn from_error<E: StdError + 'static>(error: E) -> Self {
         Error { inner: Box::new(error) }
@@ -46,6 +49,7 @@ impl From<::std::io::Error> for Error {
 #[derive(Debug)]
 enum Kind {
     ParserError(String),
+    TagBuilderError(String),
 }
 
 impl StdError for Kind {}
@@ -54,6 +58,7 @@ impl Display for Kind {
     fn fmt(&self, f: &mut Formatter) -> Result<(), FmtError> {
         match self {
             Kind::ParserError(s) => write!(f, "Parser error: {}", s),
+            Kind::TagBuilderError(s) => write!(f, "TagBuilder error: {}", s),
         }
     }
 }
