@@ -47,6 +47,13 @@ impl<'a> TagBuilder<'a> {
         self
     }
 
+    pub fn set_id(&mut self, id: &'a str) -> &mut Self {
+        let attribute = Attribute::new("id", id).unwrap();
+        self.set_attribute(attribute);
+
+        self
+    }
+
     pub fn set_attribute(&mut self, attribute: Attribute/*<'a>*/) -> &mut Self {
         self.attributes.replace(attribute);
 
