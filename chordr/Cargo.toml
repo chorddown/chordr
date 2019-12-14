@@ -11,3 +11,4 @@ path = "src/bin.rs"
 [dependencies]
 libchordr = { path = "../libchordr" }
 clap = "2.33.0"
+serde_json = "^1.0"
