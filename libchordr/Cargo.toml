@@ -12,3 +12,9 @@ path = "src/lib.rs"
 pdf = ["printpdf"]
 
 [dependencies]
+serde = {version ="^1.0", features = ["derive"]}
+serde_derive = "^1.0"
+printpdf = { version = "0.2.8", optional = true }
+
+[dev-dependencies]
+serde_json = "^1.0"
