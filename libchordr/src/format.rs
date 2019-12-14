@@ -1,4 +1,6 @@
 #[derive(Copy, Clone)]
 pub enum Format {
-    HTML
+    HTML,
+    #[cfg(feature = "pdf")]
+    PDF,
 }

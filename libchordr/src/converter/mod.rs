@@ -1,8 +1,12 @@
 use crate::prelude::*;
 use crate::error::Result;
 use crate::converter::html::HtmlConverter;
+#[cfg(feature = "pdf")]
+use self::pdf::PdfConverter;
 
 mod html;
+#[cfg(feature = "pdf")]
+mod pdf;
 
 pub trait ConverterTrait {
     fn convert(&self, node: &Node, format: Format) -> Result<String>;
@@ -14,9 +18,11 @@ impl Converter {
     pub fn new() -> Self {
         Self {}
     }
-    pub fn get_converter(format: Format) -> impl ConverterTrait {
+    pub fn get_converter(format: Format) -> Box<dyn ConverterTrait> {
         match format {
-            Format::HTML => HtmlConverter {}
+            Format::HTML => Box::new(HtmlConverter {}),
+            #[cfg(feature = "pdf")]
+            Format::PDF => Box::new(PdfConverter {})
         }
     }
 }
@@ -33,12 +39,12 @@ mod tests {
     use crate::test_helpers::get_test_tokens;
 
     #[test]
-    fn test_tokenize_long() {
+    fn test_convert() {
         let content = include_str!("../../tests/resources/swing_low_sweet_chariot.html");
-        let node = Parser::new().parse(token_lines_to_tokens(get_test_tokens()));
-        let result = Converter::new().convert(&node, Format::HTML);
+        let parser_result = Parser::new().parse(token_lines_to_tokens(get_test_tokens()));
+        let result = Converter::new().convert(parser_result.node_as_ref(), Format::HTML);
 
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), content)
+        assert_eq!(result.unwrap(), content.trim())
     }
 }

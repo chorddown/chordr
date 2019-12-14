@@ -8,4 +8,7 @@ edition = "2018"
 name = "libchordr"
 path = "src/lib.rs"
 
+[features]
+pdf = ["printpdf"]
+
 [dependencies]
