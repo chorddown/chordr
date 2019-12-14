@@ -92,7 +92,7 @@ mod tests {
 
     #[test]
     fn test_tokenize_long() {
-        let content = include_str!("../../../tests/resources/swing_low_sweet_chariot.chorddown");
+        let content = include_str!("../../../../webchordr/static/songs/swing_low_sweet_chariot.chorddown");
         let token_lines = ChordDownTokenizer::new().tokenize(content);
         assert_eq!(token_lines.len(), 12);
 

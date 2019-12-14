@@ -1,0 +1,99 @@
+@font-face {
+  font-family: 'Libre Baskerville';
+  font-style: normal;
+  font-weight: 400;
+  src: local("Libre Baskerville"), local("LibreBaskerville-Regular"), url("/fonts/libre-baskerville-v7-latin_latin-ext-regular.woff2") format("woff2"), url("/fonts/libre-baskerville-v7-latin_latin-ext-regular.woff") format("woff"); }
+
+@font-face {
+  font-family: 'Libre Baskerville';
+  font-style: italic;
+  font-weight: 400;
+  src: local("Libre Baskerville Italic"), local("LibreBaskerville-Italic"), url("/fonts/libre-baskerville-v7-latin_latin-ext-italic.woff2") format("woff2"), url("/fonts/libre-baskerville-v7-latin_latin-ext-italic.woff") format("woff"); }
+
+@font-face {
+  font-family: 'Libre Baskerville';
+  font-style: normal;
+  font-weight: 700;
+  src: local("Libre Baskerville Bold"), local("LibreBaskerville-Bold"), url("/fonts/libre-baskerville-v7-latin_latin-ext-700.woff2") format("woff2"), url("/fonts/libre-baskerville-v7-latin_latin-ext-700.woff") format("woff"); }
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box; }
+
+body {
+  font-family: "Libre Baskerville", "Times", "Times New Roman", -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  font-size: 16px;
+  line-height: 1.3em;
+  letter-spacing: 0.05em;
+  margin: 0; }
+
+main {
+  display: flex;
+  flex-flow: row wrap; }
+
+button {
+  display: block;
+  appearance: none;
+  background: #b7b7b0;
+  color: #62625e;
+  width: 100%;
+  padding: 7px 14px;
+  line-height: 26px;
+  font-size: 1em;
+  border: none;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji; }
+  button:focus, button:hover {
+    color: #62625e;
+    background: #8d8d88;
+    outline: none; }
+
+nav {
+  background: beige;
+  order: 2;
+  display: flex;
+  flex-flow: column;
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  overflow: scroll; }
+  nav.-visible {
+    width: 300px; }
+  nav .song-list {
+    display: flex;
+    flex-flow: column;
+    overflow: scroll;
+    height: calc(100vh - 42px); }
+  nav button {
+    margin-bottom: 2px; }
+  nav footer {
+    margin-top: auto;
+    justify-self: flex-end;
+    order: 200;
+    border-top: 2px solid #62625e; }
+    nav footer button {
+      float: left;
+      width: 50%;
+      margin-bottom: 0;
+      height: 40px; }
+      nav footer button:only-child {
+        width: 100%; }
+    nav footer button.reload-songs {
+      margin-bottom: 0; }
+  nav.-hidden footer button {
+    width: 100%; }
+
+.content {
+  order: 1;
+  width: calc(100% - 300px);
+  padding: 14px; }
+  .content .song-image {
+    height: auto;
+    width: auto;
+    max-width: 100%; }
+
+main.-menu-hidden .content {
+  width: calc(100% - 40px); }
+
+/*# sourceMappingURL=chordr-app.css.map */

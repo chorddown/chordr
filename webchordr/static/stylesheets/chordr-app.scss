@@ -1,0 +1,136 @@
+@import "variables";
+@import "fonts";
+
+$gray: #b7b7b0 !default;
+$gray-medium: #a8a8a2 !default;
+$gray-dark: #8d8d88 !default;
+$gray-darker: #62625e !default;
+$ui-font: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji !default;
+
+$button-line-height: 26px !default;
+$button-font-size: $font-size-h3 !default;
+$button-padding: $std-half $std-space !default;
+$button-bg: $gray !default;
+$button-color: $gray-darker !default;
+$button-hover-bg: $gray-dark !default;
+$button-hover-color: $gray-darker !default;
+
+$nav-bg: beige !default;
+$nav-button-height: 40px !default;
+$nav-footer-border-width: 2px !default;
+$nav-width: 300px !default;
+$nav-collapsed-width: $nav-button-height !default;
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: $font;
+    font-size: $font-size-web;
+    line-height: $line-height;
+    letter-spacing: 0.05em;
+    margin: 0;
+}
+
+main {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+button {
+    display: block;
+    appearance: none;
+    background: $button-bg;
+    color: $button-color;
+    width: 100%;
+    padding: $button-padding;
+    line-height: $button-line-height;
+    font-size: $button-font-size;
+    border: none;
+    font-family: $ui-font;
+
+    &:focus,
+    &:hover {
+        color: $button-hover-color;
+        background: $button-hover-bg;
+        outline: none;
+    }
+}
+
+nav {
+    background: $nav-bg;
+    order: 2;
+    display: flex;
+    flex-flow: column;
+    position: fixed;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    overflow: scroll;
+
+    &.-visible {
+        width: $nav-width;
+    }
+
+    .song-list {
+        display: flex;
+        flex-flow: column;
+        //position: fixed;
+        //right: 0;
+        //top: 0;
+        //bottom: 0;
+        overflow: scroll;
+
+        height: calc(100vh - #{$nav-button-height + $nav-footer-border-width});
+    }
+
+    button {
+        margin-bottom: 2px;
+    }
+
+    footer {
+        margin-top: auto;
+        justify-self: flex-end;
+        order: 200;
+        border-top: $nav-footer-border-width solid $gray-darker;
+
+        button {
+            float: left;
+            width: 50%;
+            margin-bottom: 0;
+            height: $nav-button-height;
+
+            &:only-child {
+                width: 100%;
+            }
+        }
+
+        button.reload-songs {
+            margin-bottom: 0;
+
+        }
+    }
+
+    &.-hidden footer button {
+        width: 100%;
+    }
+}
+
+.content {
+    order: 1;
+    width: calc(100% - #{$nav-width});
+    padding: $std-space;
+
+    .song-image {
+        height: auto;
+        width: auto;
+        max-width: 100%;
+    }
+}
+
+main.-menu-hidden .content {
+    width: calc(100% - #{$nav-collapsed-width});
+}
