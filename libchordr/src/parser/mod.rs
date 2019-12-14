@@ -1,18 +1,25 @@
 mod node;
+mod meta;
+mod parser_result;
 
 use std::iter::Peekable;
 use std::vec::IntoIter;
 use crate::tokenizer::Token;
-pub use node::Node;
+pub use self::node::Node;
+pub use self::meta::Meta;
+pub use self::parser_result::ParserResult;
 
-pub struct Parser {}
+
+pub struct Parser {
+    meta: Meta
+}
 
 impl Parser {
     pub fn new() -> Self {
-        Self {}
+        Self { meta: Meta::default() }
     }
 
-    pub fn parse(&self, tokens: Vec<Token>) -> Node {
+    pub fn parse(&mut self, tokens: Vec<Token>) -> ParserResult {
         let mut tokens_iterator = tokens.into_iter().peekable();
 
         let mut elements = vec![];
@@ -21,10 +28,10 @@ impl Parser {
             elements.push(self.visit(token, &mut tokens_iterator));
         }
 
-        Node::Document(elements)
+        ParserResult::new(Node::Document(elements), self.meta.clone())
     }
 
-    fn visit(&self, token: Token, tokens: &mut Peekable<IntoIter<Token>>) -> Node {
+    fn visit(&mut self, token: Token, tokens: &mut Peekable<IntoIter<Token>>) -> Node {
         match token {
             Token::Chord(_) => {
                 if let Some(next) = tokens.peek() {
@@ -37,7 +44,10 @@ impl Parser {
                 }
                 return Node::ChordStandalone(token);
             }
-            Token::Headline { level: _, text: _ } => {
+            Token::Headline { level, ref text } => {
+                if level == 1 {
+                    self.meta.title = Some(text.clone())
+                }
                 let head = Some(Box::new(Node::Headline(token)));
 
                 if tokens.peek().is_some() {
@@ -80,8 +90,8 @@ mod tests {
 
     #[test]
     fn test_parse() {
-        let parser = Parser::new();
-        let ast = parser.parse(vec![
+        let mut parser = Parser::new();
+        let result = parser.parse(vec![
             Token::headline(1, "Swing Low Sweet Chariot"),
             Token::newline(),
             Token::headline(2, "Chorus"),
@@ -110,6 +120,10 @@ mod tests {
             Token::chord("B"),
             Token::chord("H"),
         ]);
+
+        assert_eq!(Some("Swing Low Sweet Chariot".to_string()), result.meta().title);
+
+        let ast = result.node();
 
         let expected_ast = Node::Document(vec![
             Node::section(1, "Swing Low Sweet Chariot", vec![
