@@ -1,0 +1,63 @@
+use crate::error::Error;
+use crate::models::file_type::FileType;
+use crate::models::song::Song;
+use crate::models::song_meta::SongMeta;
+use std::convert::TryFrom;
+use std::fs;
+use std::fs::DirEntry;
+use std::path::Path;
+use crate::helper::parse_content;
+
+impl TryFrom<&Path> for Song {
+    type Error = Error;
+
+    fn try_from(path: &Path) -> Result<Self, Self::Error> {
+        if !path.is_file() {
+            return Err(Error::catalog_builder_error(
+                "Given entry is not a file",
+                path.to_path_buf(),
+            ));
+        }
+
+        let src = match fs::read_to_string(path) {
+            Ok(c) => c,
+            Err(e) => return Err(Error::catalog_builder_error(format!("{}", e), path.to_path_buf())),
+        };
+
+        let song_id = path.file_name().unwrap().to_str().unwrap().to_owned();
+        let parser_result = parse_content(&src);
+        let title = parser_result.meta().title.unwrap_or(song_id.clone());
+        let file_type = FileType::try_from(path)?;
+        let meta = SongMeta::new(song_id, title, file_type);
+        Ok(Song::new(meta, src))
+    }
+}
+
+impl TryFrom<DirEntry> for Song {
+    type Error = Error;
+
+    fn try_from(entry: DirEntry) -> Result<Self, Self::Error> {
+        TryFrom::try_from(entry.path().as_path())
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::models::song_data::SongData;
+
+
+    #[test]
+    fn test_try_from() {
+        let song_path = format!("{}/../webchordr/static/songs/swing_low_sweet_chariot.chorddown", env!("CARGO_MANIFEST_DIR"));
+        let song_path = Path::new(&song_path);
+        let result = Song::try_from(song_path);
+        assert!(result.is_ok());
+        let song = result.unwrap();
+        assert_eq!("swing_low_sweet_chariot.chorddown", &song.id());
+        assert_eq!("Swing Low Sweet Chariot", &song.title());
+        assert_eq!(FileType::Chorddown, song.file_type());
+        assert!(!song.src().is_empty());
+    }
+}
