@@ -2,6 +2,7 @@ use crate::models::song::Song;
 use crate::models::song_data::SongData;
 use serde::{Deserialize, Serialize};
 use crate::models::song_id::SongId;
+use std::slice::Iter;
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
 pub struct Catalog {
@@ -24,5 +25,9 @@ impl Catalog {
     pub fn get<S: Into<SongId>>(&self, song_id: S) -> Option<&Song> {
         let song_id = song_id.into();
         self.songs.iter().find(|s| s.id() == song_id)
+    }
+
+    pub fn iter(&self) -> Iter<Song> {
+        self.songs.iter()
     }
 }
