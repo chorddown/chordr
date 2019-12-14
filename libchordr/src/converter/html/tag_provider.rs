@@ -27,7 +27,7 @@ impl TagProvider {
                 Tag::blank(),
                 self.build_tag_for_token(text),
             ),
-            Node::Document(children) => self.build_tag_for_children(children),
+            Node::Document(children) => gtb.set_tag_name("div").set_id("chordr").set_content_tag(self.build_tag_for_children(children)).build(),
             Node::Headline(token) => self.build_tag_for_token(token),
             Node::Quote(token) => self.build_tag_for_token(token),
             Node::Newline => {
