@@ -1,0 +1,28 @@
+use crate::models::song::Song;
+use crate::models::song_data::SongData;
+use serde::{Deserialize, Serialize};
+use crate::models::song_id::SongId;
+
+#[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
+pub struct Catalog {
+    songs: Vec<Song>,
+}
+
+impl Catalog {
+    pub fn new(songs: Vec<Song>) -> Self {
+        Self { songs }
+    }
+
+    pub fn len(&self) -> usize {
+        self.songs.len()
+    }
+
+    pub fn contains_id<S: Into<SongId>>(&self, song_id: S) -> bool {
+        self.get(song_id).is_some()
+    }
+
+    pub fn get<S: Into<SongId>>(&self, song_id: S) -> Option<&Song> {
+        let song_id = song_id.into();
+        self.songs.iter().find(|s| s.id() == song_id)
+    }
+}
