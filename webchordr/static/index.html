@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>Chordr Web</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="/stylesheets/chordr-default-styles.css"/>
+    <link rel="stylesheet" href="/stylesheets/chordr-app.css"/>
+</head>
+<body>
+<script src="/webchordr.js"></script>
+<script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker
+            .register('/sw.js')
+            .then(function () {
+                console.log('Service Worker Registered');
+            });
+    }
+</script>
+</body>
+</html>

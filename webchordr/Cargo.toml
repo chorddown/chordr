@@ -1,0 +1,18 @@
+[package]
+name = "webchordr"
+version = "0.1.0"
+authors = ["Daniel Corn <info@cundd.net>"]
+edition = "2018"
+
+[dependencies]
+log = "0.4"
+web_logger = "0.2"
+serde = "1"
+serde_derive = "1"
+stdweb = "0.4.20"
+libchordr = { path = "../libchordr" }
+failure = "0.1"
+
+[dependencies.yew]
+version = "0.10.0"
+features = ["toml"]
