@@ -7,6 +7,7 @@ use crate::models::song::Song;
 use std::convert::TryFrom;
 use std::fs::{self, DirEntry};
 use std::path::Path;
+use crate::models::song_data::SongData;
 
 /// Catalog Builder provides functions to build a Song Catalog from a given directory
 pub struct CatalogBuilder;
@@ -22,9 +23,11 @@ impl CatalogBuilder {
         file_type: FileType,
         recursive: bool,
     ) -> Result<Catalog> {
-        Ok(Catalog::new(
-            self.collect_songs(path.as_ref(), file_type, recursive)?,
-        ))
+        let mut songs: Vec<Song> = self.collect_songs(path.as_ref(), file_type, recursive)?;
+
+        songs.sort_by(|a, b| a.id().cmp(&b.id()));
+
+        Ok(Catalog::new(songs))
     }
 
     fn collect_songs(
