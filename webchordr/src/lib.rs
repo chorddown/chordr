@@ -3,6 +3,7 @@ extern crate stdweb;
 
 mod components;
 
+use stdweb::js;
 use log::info;
 use log::error;
 
@@ -46,6 +47,7 @@ pub enum Msg {
     OpenSongInMainView(SongId),
     FetchCatalogReady(Result<Catalog, Error>),
     ToggleMenu,
+    Reload,
     Ignore,
 }
 
@@ -58,7 +60,7 @@ pub struct SongListResponse {
 }
 
 impl Model {
-    fn view_data(&self) -> Html<Self> {
+    fn view_data(&self) -> Html {
         if let Some(song) = &self.current_song {
             match song.file_type() {
                 FileType::Jpeg => self.view_image(song),
@@ -72,20 +74,20 @@ impl Model {
     }
 
 
-    fn view_image(&self, song: &Song) -> Html<Self> {
+    fn view_image(&self, song: &Song) -> Html {
         let image_uri = format!("/songs/{}.{}", song.id(), song.file_type());
 
         html! {<img src=image_uri class="song-image" />}
     }
 
-    fn view_chorddown(&self, song: &Song) -> Html<Self> {
+    fn view_chorddown(&self, song: &Song) -> Html {
         html! {<SongView song=song />}
     }
 
-    fn view_song_list(&self) -> Html<Self> {
+    fn view_song_list(&self) -> Html {
         let render = |song: &Song| {
             let song = song.clone();
-            let onclick = |song_id: SongId| Msg::OpenSongInMainView(song_id);
+            let onclick = self.link.callback(|song_id: SongId| Msg::OpenSongInMainView(song_id));
             html! { <Item song=song onclick=onclick/> }
         };
 
@@ -98,30 +100,33 @@ impl Model {
                 }
             }
             None => html! {}
-        }) as Html<Self>;
+        }) as Html;
     }
 
-    fn view_nav_footer(&self) -> Html<Self> {
+    fn view_nav_footer(&self) -> Html {
+        let toggle_menu = self.link.callback(|_| Msg::ToggleMenu);
+        let reload_songs = self.link.callback(|_| Msg::Reload);
+
         (if self.show_menu {
             html! {
                 <footer>
-                    <button class="toggle-menu" onclick=|_| Msg::ToggleMenu >{ "→" }</button>
-                    //<button class="reload-songs" onclick=|_| Msg::FetchSongList>{ "⟲ Reload Songs" }</button>
+                    <button class="toggle-menu" onclick=toggle_menu>{ "→" }</button>
+                    <button class="reload-songs" onclick=reload_songs>{ "⟲ Reload2 Songs" }</button>
                 </footer>
             }
         } else {
             html! {
                 <footer>
-                    <button class="toggle-menu" onclick=|_| Msg::ToggleMenu >{ "︎←" }</button>
+                    <button class="toggle-menu" onclick=toggle_menu>{ "︎←" }</button>
                 </footer>
             }
-        }) as Html<Self>
+        }) as Html
     }
 
     fn fetch_catalog(&mut self, no_cache: bool) {
         use stdweb::web::Date;
 
-        let callback = self.link.send_back(
+        let callback = self.link.callback(
             move |response: Response<Json<Result<Catalog, Error>>>| {
                 let (meta, Json(data)) = response.into_parts();
                 if meta.status.is_success() {
@@ -134,10 +139,9 @@ impl Model {
         );
 
         info!("Fetch catalog");
-
         let uri_base = "/catalog.json".to_owned();
-        let uri = if no_cache {
-            uri_base + &format!("{}", Date::now())
+        let uri = if no_cache || true {
+            uri_base + &format!("?{}", Date::now())
         } else {
             uri_base
         };
@@ -195,11 +199,16 @@ impl Component for Model {
             Msg::ToggleMenu => {
                 self.show_menu = !self.show_menu;
             }
+            Msg::Reload => {
+                js! {
+                    top.frames.location.reload()
+                }
+            }
         }
         true
     }
 
-    fn view(&self) -> Html<Self> {
+    fn view(&self) -> Html {
         let mut menu_classes = vec!["menu"];
         let _ = if self.show_menu {
             menu_classes.push("-visible");

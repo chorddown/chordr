@@ -45,11 +45,12 @@ impl Component for Item {
         false
     }
 
-    fn view(&self) -> VNode<Self> {
+    fn view(&self) -> VNode {
         let title = &self.props.song.title();
+        let c=self.link.callback(|_| Msg::Clicked);
 
         html! {
-            <button onclick=|_| Msg::Clicked>{ title }</button>
+            <button onclick=c>{ title }</button>
         }
     }
 }

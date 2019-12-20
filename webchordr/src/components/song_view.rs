@@ -49,7 +49,7 @@ impl Component for SongView {
         }
     }
 
-    fn view(&self) -> VNode<Self> {
+    fn view(&self) -> VNode {
         info!("View song {}", self.props.song.id());
         let html = match convert_to_format(&self.props.song.src(), LibchordrFormat::HTML) {
             Ok(s) => s,
