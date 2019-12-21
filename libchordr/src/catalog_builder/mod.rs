@@ -12,6 +12,10 @@ use crate::models::song_data::SongData;
 /// Catalog Builder provides functions to build a Song Catalog from a given directory
 pub struct CatalogBuilder;
 
+use rand::{thread_rng, Rng};
+use rand::distributions::Alphanumeric;
+
+
 impl CatalogBuilder {
     pub fn new() -> Self {
         Self {}
@@ -27,7 +31,11 @@ impl CatalogBuilder {
 
         songs.sort_by(|a, b| a.id().cmp(&b.id()));
 
-        Ok(Catalog::new(songs))
+        let rand_string: String = thread_rng()
+            .sample_iter(&Alphanumeric)
+            .take(30)
+            .collect();
+        Ok(Catalog::new(rand_string, songs))
     }
 
     fn collect_songs(

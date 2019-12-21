@@ -33,4 +33,3 @@ impl SongData for Song {
         self.meta.file_type()
     }
 }
-

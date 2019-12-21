@@ -6,16 +6,21 @@ use std::slice::Iter;
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
 pub struct Catalog {
+    revision: String,
     songs: Vec<Song>,
 }
 
 impl Catalog {
-    pub fn new(songs: Vec<Song>) -> Self {
-        Self { songs }
+    pub fn new<S: Into<String>>(revision: S, songs: Vec<Song>) -> Self {
+        Self { revision: revision.into(), songs }
     }
 
     pub fn len(&self) -> usize {
         self.songs.len()
+    }
+
+    pub fn revision(&self) -> String {
+        self.revision.clone()
     }
 
     pub fn contains_id<S: Into<SongId>>(&self, song_id: S) -> bool {

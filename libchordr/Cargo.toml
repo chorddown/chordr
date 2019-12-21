@@ -15,6 +15,7 @@ pdf = ["printpdf"]
 serde = {version ="^1.0", features = ["derive"]}
 serde_derive = "^1.0"
 printpdf = { version = "0.2.8", optional = true }
+rand = "0.7.2"
 
 [dev-dependencies]
 serde_json = "^1.0"
