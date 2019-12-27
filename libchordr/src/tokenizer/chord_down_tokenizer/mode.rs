@@ -59,7 +59,7 @@ impl Mode {
     pub fn is_self_closing(&self) -> bool {
         match self {
             Mode::Newline => true,
-            _ => false
+            _ => false,
         }
     }
 

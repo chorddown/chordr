@@ -1,5 +1,5 @@
 use crate::html::attribute::Attribute;
-use crate::html::tag::{Tag, Content};
+use crate::html::tag::{Content, Tag};
 use crate::html::validate_xml_identifier;
 use std::collections::HashSet;
 
@@ -7,9 +7,8 @@ use std::collections::HashSet;
 pub struct TagBuilder<'a> {
     tag_name: &'a str,
     content: Content,
-    attributes: HashSet<Attribute/*<'a>*/>,
+    attributes: HashSet<Attribute /*<'a>*/>,
 }
-
 
 impl<'a> TagBuilder<'a> {
     pub fn new() -> Self {
@@ -54,7 +53,7 @@ impl<'a> TagBuilder<'a> {
         self
     }
 
-    pub fn set_attribute(&mut self, attribute: Attribute/*<'a>*/) -> &mut Self {
+    pub fn set_attribute(&mut self, attribute: Attribute /*<'a>*/) -> &mut Self {
         self.attributes.replace(attribute);
 
         self
@@ -77,11 +76,14 @@ impl<'a> TagBuilder<'a> {
         if self.attributes.is_empty() {
             Tag::new(self.tag_name.to_owned().clone(), self.content.clone(), None)
         } else {
-            Tag::new(self.tag_name.to_owned().clone(), self.content.clone(), Some(self.attributes.clone()))
+            Tag::new(
+                self.tag_name.to_owned().clone(),
+                self.content.clone(),
+                Some(self.attributes.clone()),
+            )
         }
     }
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -94,7 +96,10 @@ mod tests {
         gtb.set_attribute(Attribute::new("href", "https://cundd.net").unwrap());
         gtb.set_content_str("Homepage link");
 
-        assert_eq!("<a href='https://cundd.net'>Homepage link</a>", &gtb.build().to_string());
+        assert_eq!(
+            "<a href='https://cundd.net'>Homepage link</a>",
+            &gtb.build().to_string()
+        );
     }
 
     #[test]
@@ -104,7 +109,10 @@ mod tests {
         gtb.set_content_str("Some content");
         gtb.set_class_name("some-nice-class' try to hack you");
 
-        assert_eq!(&gtb.build().to_string(), "<div class='some-nice-class&#39; try to hack you'>Some content</div>");
+        assert_eq!(
+            &gtb.build().to_string(),
+            "<div class='some-nice-class&#39; try to hack you'>Some content</div>"
+        );
     }
 
     #[test]
@@ -114,7 +122,10 @@ mod tests {
         gtb.set_attribute(Attribute::new("href", "https://cundd.net' try to hack you").unwrap());
         gtb.set_content_str("Homepage link");
 
-        assert_eq!(&gtb.build().to_string(), "<a href='https://cundd.net&#39; try to hack you'>Homepage link</a>");
+        assert_eq!(
+            &gtb.build().to_string(),
+            "<a href='https://cundd.net&#39; try to hack you'>Homepage link</a>"
+        );
     }
 
     #[test]
@@ -125,7 +136,10 @@ mod tests {
         gtb.set_class_name("some-nice-class");
         gtb.set_attribute(Attribute::new("class", "another-nice-class").unwrap());
 
-        assert_eq!(&gtb.build().to_string(), "<div class='another-nice-class'>Some content</div>");
+        assert_eq!(
+            &gtb.build().to_string(),
+            "<div class='another-nice-class'>Some content</div>"
+        );
     }
 
     #[test]
@@ -136,7 +150,10 @@ mod tests {
         gtb.set_attribute(Attribute::new("id", "some-nice-id").unwrap());
         gtb.set_attribute(Attribute::new("id", "another-nice-id").unwrap());
 
-        assert_eq!(&gtb.build().to_string(), "<div id='another-nice-id'>Some content</div>");
+        assert_eq!(
+            &gtb.build().to_string(),
+            "<div id='another-nice-id'>Some content</div>"
+        );
     }
 
     #[test]
@@ -147,7 +164,10 @@ mod tests {
         gtb.set_attribute(Attribute::new("id", "a-nice-id").unwrap());
         gtb.set_attribute(Attribute::new("class", "some-nice-class").unwrap());
 
-        assert_eq!(&gtb.build().to_string(), "<div class='some-nice-class' id='a-nice-id'>Some content</div>");
+        assert_eq!(
+            &gtb.build().to_string(),
+            "<div class='some-nice-class' id='a-nice-id'>Some content</div>"
+        );
 
         gtb.reset();
         gtb.set_tag_name("div");
@@ -155,7 +175,10 @@ mod tests {
         gtb.set_attribute(Attribute::new("id", "a-nice-id-that-is-longer").unwrap());
         gtb.set_attribute(Attribute::new("class", "some-nice-class").unwrap());
 
-        assert_eq!(&gtb.build().to_string(), "<div class='some-nice-class' id='a-nice-id-that-is-longer'>Some content</div>");
+        assert_eq!(
+            &gtb.build().to_string(),
+            "<div class='some-nice-class' id='a-nice-id-that-is-longer'>Some content</div>"
+        );
     }
 
     #[test]
@@ -164,7 +187,10 @@ mod tests {
         gtb.set_tag_name("span");
         gtb.set_content_str("My content");
         gtb.set_attribute(Attribute::new("class", "some-nice-class").unwrap());
-        assert_eq!(&gtb.build().to_string(), "<span class='some-nice-class'>My content</span>");
+        assert_eq!(
+            &gtb.build().to_string(),
+            "<span class='some-nice-class'>My content</span>"
+        );
 
         gtb.reset();
         assert_eq!(&gtb.build().to_string(), "</>");

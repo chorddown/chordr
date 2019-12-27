@@ -1,15 +1,15 @@
-use std::collections::HashSet;
-use crate::error::Result;
-use super::escape::Escape;
 use super::attribute::Attribute;
-use std::fmt::{Display, Formatter, Error};
+use super::escape::Escape;
 use super::validate_xml_identifier;
+use crate::error::Result;
+use std::collections::HashSet;
+use std::fmt::{Display, Error, Formatter};
 
 #[derive(Clone, Debug)]
 pub enum Content {
     None,
     Some(String),
-    Tag(Box<Tag/*<'a>*/>),
+    Tag(Box<Tag /*<'a>*/>),
     Raw(String),
 }
 
@@ -19,7 +19,7 @@ impl Content {
             Content::None => true,
             Content::Some(s) => s.is_empty(),
             Content::Raw(s) => s.is_empty(),
-            Content::Tag(_) => false
+            Content::Tag(_) => false,
         }
     }
 }
@@ -30,21 +30,25 @@ impl Display for Content {
             Content::Some(c) => write!(f, "{}", Escape(c)),
             Content::None => Ok(()),
             Content::Raw(c) => write!(f, "{}", c),
-            Content::Tag(t) => write!(f, "{}", *t)
+            Content::Tag(t) => write!(f, "{}", *t),
         }
     }
 }
 
 #[derive(Clone, Debug)]
-pub struct Tag/*<'a>*/ {
+pub struct Tag /*<'a>*/ {
     blank: bool,
     tag_name: Option<String>,
     content: Content,
-    attributes: Option<HashSet<Attribute/*<'a>*/>>,
+    attributes: Option<HashSet<Attribute /*<'a>*/>>,
 }
 
-impl<'a> Tag/*<'a>*/ {
-    pub fn new<S: Into<String>>(tag_name: S, content: Content, attributes: Option<HashSet<Attribute/*<'a>*/>>) -> Self {
+impl<'a> Tag /*<'a>*/ {
+    pub fn new<S: Into<String>>(
+        tag_name: S,
+        content: Content,
+        attributes: Option<HashSet<Attribute /*<'a>*/>>,
+    ) -> Self {
         let tag_name_string = tag_name.into();
         match validate_xml_identifier(&tag_name_string) {
             Err(e) => panic!(e.to_string()),
@@ -108,7 +112,7 @@ impl<'a> Tag/*<'a>*/ {
     pub fn tag_name(&self) -> Option<String> {
         match self.tag_name {
             Some(ref t) => Some(t.clone()),
-            None => None
+            None => None,
         }
     }
 
@@ -121,7 +125,7 @@ impl<'a> Tag/*<'a>*/ {
     }
 }
 
-impl<'a> Display for Tag/*<'a>*/ {
+impl<'a> Display for Tag /*<'a>*/ {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
         if self.is_blank() {
             return write!(f, "");
@@ -145,7 +149,14 @@ impl<'a> Display for Tag/*<'a>*/ {
             if let Some(attributes) = &self.attributes {
                 let mut attributes_sorted = attributes.iter().collect::<Vec<_>>();
                 attributes_sorted.sort();
-                node.push_str(&format!(" {}", attributes_sorted.iter().map(|a| a.to_string()).collect::<Vec<String>>().join(" ")));
+                node.push_str(&format!(
+                    " {}",
+                    attributes_sorted
+                        .iter()
+                        .map(|a| a.to_string())
+                        .collect::<Vec<String>>()
+                        .join(" ")
+                ));
             }
 
             node.push_str(&format!(">{}", self.content));

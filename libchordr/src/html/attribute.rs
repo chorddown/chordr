@@ -1,9 +1,9 @@
-use crate::error::Result;
 use super::validate_xml_identifier;
-use std::hash::{Hash, Hasher};
-use std::cmp::Ordering;
-use std::fmt::{Display, Formatter, Error};
+use crate::error::Result;
 use crate::html::escape::Escape;
+use std::cmp::Ordering;
+use std::fmt::{Display, Error, Formatter};
+use std::hash::{Hash, Hasher};
 
 #[derive(Clone, Debug, Ord)]
 pub struct Attribute {
@@ -28,21 +28,21 @@ impl<'a> Attribute {
     }
 }
 
-impl<'a> Hash for Attribute/*<'a>*/ {
+impl<'a> Hash for Attribute /*<'a>*/ {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.name.hash(state);
     }
 }
 
-impl<'a> PartialEq for Attribute/*<'a>*/ {
+impl<'a> PartialEq for Attribute /*<'a>*/ {
     fn eq(&self, other: &Self) -> bool {
         self.name == other.name
     }
 }
 
-impl<'a> Eq for Attribute/*<'a>*/ {}
+impl<'a> Eq for Attribute /*<'a>*/ {}
 
-impl<'a> PartialOrd for Attribute/*<'a>*/ {
+impl<'a> PartialOrd for Attribute /*<'a>*/ {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.name().partial_cmp(other.name())
     }
@@ -59,7 +59,10 @@ mod tests {
     use super::*;
     use std::collections::hash_map::DefaultHasher;
 
-    fn get_hash<T>(obj: T) -> u64 where T: Hash {
+    fn get_hash<T>(obj: T) -> u64
+    where
+        T: Hash,
+    {
         let mut hasher = DefaultHasher::new();
         obj.hash(&mut hasher);
         hasher.finish()

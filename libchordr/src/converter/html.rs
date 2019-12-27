@@ -1,7 +1,7 @@
 mod tag_provider;
 
-use crate::prelude::*;
 use crate::converter::ConverterTrait;
+use crate::prelude::*;
 use tag_provider::TagProvider;
 
 pub struct HtmlConverter {}
@@ -11,7 +11,6 @@ impl HtmlConverter {
         Ok(tag_builder.build_tag_for_node(node).to_string())
     }
 }
-
 
 impl ConverterTrait for HtmlConverter {
     fn convert(&self, node: &Node, _format: Format) -> Result<String> {

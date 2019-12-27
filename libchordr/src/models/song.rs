@@ -1,5 +1,5 @@
-use crate::models::song_data::SongData;
 use crate::models::file_type::FileType;
+use crate::models::song_data::SongData;
 use crate::models::song_meta::SongMeta;
 use serde::Deserialize;
 use serde::Serialize;
@@ -12,7 +12,10 @@ pub struct Song {
 
 impl Song {
     pub fn new<S: Into<String>>(meta: SongMeta, src: S) -> Self {
-        Self { meta, src: src.into() }
+        Self {
+            meta,
+            src: src.into(),
+        }
     }
 
     pub fn src(&self) -> &str {

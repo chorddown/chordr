@@ -1,5 +1,5 @@
 use std::error::Error as StdError;
-use std::fmt::{Formatter, Display, Error as FmtError};
+use std::fmt::{Display, Error as FmtError, Formatter};
 use std::path::PathBuf;
 
 /// Shorthand for chord library results
@@ -8,7 +8,7 @@ pub type Result<T, E = Error> = ::std::result::Result<T, E>;
 /// Error type for errors raised in the chord library
 #[derive(Debug)]
 pub struct Error {
-    inner: Box<dyn StdError>
+    inner: Box<dyn StdError>,
 }
 
 #[doc(hidden)]
@@ -34,11 +34,15 @@ impl Error {
     }
 
     pub fn from_error<E: StdError + 'static>(error: E) -> Self {
-        Error { inner: Box::new(error) }
+        Error {
+            inner: Box::new(error),
+        }
     }
 
     fn new(kind: Kind) -> Self {
-        Error { inner: Box::new(kind) }
+        Error {
+            inner: Box::new(kind),
+        }
     }
 }
 
@@ -76,7 +80,9 @@ impl Display for Kind {
         match self {
             Kind::ParserError(s) => write!(f, "Parser error: {}", s),
             Kind::TagBuilderError(s) => write!(f, "TagBuilder error: {}", s),
-            Kind::CatalogBuilderError(s, p) => write!(f, "catalog_builder_error error: {} for path {:?}", s, p),
+            Kind::CatalogBuilderError(s, p) => {
+                write!(f, "catalog_builder_error error: {} for path {:?}", s, p)
+            }
             Kind::FileTypeError(s) => write!(f, "FileTypeError error: {}", s),
             Kind::UnknownError(s) => write!(f, "Unknown error: {}", s),
         }

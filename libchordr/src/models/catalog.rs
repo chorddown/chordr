@@ -1,7 +1,7 @@
 use crate::models::song::Song;
 use crate::models::song_data::SongData;
-use serde::{Deserialize, Serialize};
 use crate::models::song_id::SongId;
+use serde::{Deserialize, Serialize};
 use std::slice::Iter;
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
@@ -12,7 +12,10 @@ pub struct Catalog {
 
 impl Catalog {
     pub fn new<S: Into<String>>(revision: S, songs: Vec<Song>) -> Self {
-        Self { revision: revision.into(), songs }
+        Self {
+            revision: revision.into(),
+            songs,
+        }
     }
 
     pub fn len(&self) -> usize {

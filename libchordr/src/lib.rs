@@ -1,14 +1,14 @@
-mod format;
+mod catalog_builder;
 mod converter;
 mod error;
-mod tokenizer;
-mod parser;
+mod format;
 mod helper;
 mod html;
-mod catalog_builder;
+pub mod models;
+mod parser;
 #[cfg(feature = "pdf")]
 mod pdf;
-pub mod models;
 pub mod prelude;
 #[cfg(test)]
 mod test_helpers;
+mod tokenizer;

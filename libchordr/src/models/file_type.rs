@@ -49,7 +49,10 @@ impl TryFrom<&Path> for FileType {
             }
         }
 
-        Err(Error::file_type_error(format!("Could not detect file extension for path {:?}", value)))
+        Err(Error::file_type_error(format!(
+            "Could not detect file extension for path {:?}",
+            value
+        )))
     }
 }
 
@@ -60,7 +63,7 @@ impl TryFrom<&str> for FileType {
         match value {
             "Chorddown" | "chorddown" => Ok(FileType::Chorddown),
             "Jpeg" | "jpeg" => Ok(FileType::Jpeg),
-            _ => Err(Error::unknown_error(format!("Invalid FileType {}", value)))
+            _ => Err(Error::unknown_error(format!("Invalid FileType {}", value))),
         }
     }
 }
@@ -72,7 +75,6 @@ impl TryFrom<String> for FileType {
         TryFrom::<&str>::try_from(&value)
     }
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -86,7 +88,6 @@ mod tests {
         let serialized = serde_json::to_string(&FileType::Jpeg).unwrap();
         assert_eq!("\"jpeg\"", serialized);
     }
-
 
     #[test]
     fn test_deserialize() {

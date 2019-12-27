@@ -1,12 +1,12 @@
 extern crate clap;
 extern crate libchordr;
 
-use clap::{Arg, App, SubCommand, ArgMatches};
+use clap::{App, Arg, ArgMatches, SubCommand};
 use std::fs;
 
-use libchordr::prelude::*;
-use libchordr::prelude::Result;
 use libchordr::prelude::Error;
+use libchordr::prelude::Result;
+use libchordr::prelude::*;
 
 fn main() {
     let output_arg = Arg::with_name("OUTPUT")
@@ -19,23 +19,28 @@ fn main() {
         .subcommand(
             SubCommand::with_name("convert")
                 .about("Convert chorddown files")
-                .arg(Arg::with_name("INPUT")
-                    .required(true)
-                    .help("Chorddown file to parse"))
-                .arg(output_arg.clone())
+                .arg(
+                    Arg::with_name("INPUT")
+                        .required(true)
+                        .help("Chorddown file to parse"),
+                )
+                .arg(output_arg.clone()),
         )
         .subcommand(
             SubCommand::with_name("build-catalog")
                 .about("Build a catalog from chorddown files")
-                .arg(Arg::with_name("DIR")
-                    .required(true)
-                    .help("Path to the directory of chorddown files"))
-                .arg(output_arg.clone())
-                .arg(Arg::with_name("pretty")
-                    .long("pretty")
-                    .short("p")
-                    .help("Output indented JSON")
+                .arg(
+                    Arg::with_name("DIR")
+                        .required(true)
+                        .help("Path to the directory of chorddown files"),
                 )
+                .arg(output_arg.clone())
+                .arg(
+                    Arg::with_name("pretty")
+                        .long("pretty")
+                        .short("p")
+                        .help("Output indented JSON"),
+                ),
         )
         .get_matches();
 
@@ -76,7 +81,8 @@ fn convert(args: &ArgMatches) -> Result<()> {
     "#,
         title = parser_result.meta().title.unwrap_or("".to_owned()),
         styles = include_str!("../../webchordr/static/stylesheets/chordr-default-styles.css"),
-        content = converted);
+        content = converted
+    );
 
     handle_output(args, output)
 }
@@ -85,7 +91,8 @@ fn build_catalog(args: &ArgMatches) -> Result<()> {
     let dir_path = args.value_of("DIR").unwrap();
     let pretty = args.is_present("pretty");
 
-    let catalog = CatalogBuilder::new().build_catalog_for_directory(dir_path, FileType::Chorddown, true)?;
+    let catalog =
+        CatalogBuilder::new().build_catalog_for_directory(dir_path, FileType::Chorddown, true)?;
 
     let serialization_result = if pretty {
         serde_json::to_string_pretty(&catalog)
@@ -95,7 +102,7 @@ fn build_catalog(args: &ArgMatches) -> Result<()> {
 
     let output = match serialization_result {
         Ok(s) => s,
-        Err(e) => return Err(Error::unknown_error(format!("{}", e)))
+        Err(e) => return Err(Error::unknown_error(format!("{}", e))),
     };
 
     handle_output(args, output)

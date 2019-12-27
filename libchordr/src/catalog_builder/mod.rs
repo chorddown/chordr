@@ -4,17 +4,16 @@ use crate::error::{Error, Result};
 use crate::models::catalog::Catalog;
 use crate::models::file_type::FileType;
 use crate::models::song::Song;
+use crate::models::song_data::SongData;
 use std::convert::TryFrom;
 use std::fs::{self, DirEntry};
 use std::path::Path;
-use crate::models::song_data::SongData;
 
 /// Catalog Builder provides functions to build a Song Catalog from a given directory
 pub struct CatalogBuilder;
 
-use rand::{thread_rng, Rng};
 use rand::distributions::Alphanumeric;
-
+use rand::{thread_rng, Rng};
 
 impl CatalogBuilder {
     pub fn new() -> Self {
@@ -31,10 +30,7 @@ impl CatalogBuilder {
 
         songs.sort_by(|a, b| a.id().cmp(&b.id()));
 
-        let rand_string: String = thread_rng()
-            .sample_iter(&Alphanumeric)
-            .take(30)
-            .collect();
+        let rand_string: String = thread_rng().sample_iter(&Alphanumeric).take(30).collect();
         Ok(Catalog::new(rand_string, songs))
     }
 
@@ -95,16 +91,12 @@ mod tests {
     use super::*;
     use crate::models::song_data::SongData;
 
-
     #[test]
     fn test_build_catalog_for_directory() {
         let songs_dir = format!("{}/../webchordr/static/songs", env!("CARGO_MANIFEST_DIR"));
         let songs_dir = Path::new(&songs_dir);
-        let result = CatalogBuilder::new().build_catalog_for_directory(
-            songs_dir,
-            FileType::Chorddown,
-            true,
-        );
+        let result =
+            CatalogBuilder::new().build_catalog_for_directory(songs_dir, FileType::Chorddown, true);
         assert!(result.is_ok());
         let catalog = result.unwrap();
         assert!(2 <= catalog.len());

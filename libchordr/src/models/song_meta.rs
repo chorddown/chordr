@@ -14,7 +14,11 @@ pub struct SongMeta {
 
 impl SongMeta {
     pub fn new(id: SongId, title: String, file_type: FileType) -> Self {
-        Self { id, title, file_type }
+        Self {
+            id,
+            title,
+            file_type,
+        }
     }
 }
 

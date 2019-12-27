@@ -1,8 +1,8 @@
-use crate::tokenizer::{Token, TokenLine, build_tokenizer, Tokenizer};
 use crate::converter::{Converter, ConverterTrait};
-use crate::parser::{Parser, ParserResult};
-use crate::format::Format;
 use crate::error::Result;
+use crate::format::Format;
+use crate::parser::{Parser, ParserResult};
+use crate::tokenizer::{build_tokenizer, Token, TokenLine, Tokenizer};
 
 pub fn token_lines_to_tokens(token_lines: Vec<TokenLine>) -> Vec<Token> {
     let mut stream = vec![];

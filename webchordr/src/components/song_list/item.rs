@@ -1,8 +1,7 @@
-use yew::{ComponentLink, Component, Callback};
-use yew::virtual_dom::VNode;
-use yew::prelude::*;
 use libchordr::prelude::*;
-
+use yew::prelude::*;
+use yew::virtual_dom::VNode;
+use yew::{Callback, Component, ComponentLink};
 
 #[derive(Properties, PartialEq)]
 pub struct SongListItemProps {
@@ -14,7 +13,7 @@ pub struct SongListItemProps {
 }
 
 pub enum Msg {
-    Clicked
+    Clicked,
 }
 
 #[allow(dead_code)]
@@ -30,10 +29,7 @@ impl Component for Item {
     type Properties = SongListItemProps;
 
     fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        Self {
-            link,
-            props,
-        }
+        Self { link, props }
     }
 
     fn update(&mut self, msg: Self::Message) -> bool {
@@ -47,7 +43,7 @@ impl Component for Item {
 
     fn view(&self) -> VNode {
         let title = &self.props.song.title();
-        let c=self.link.callback(|_| Msg::Clicked);
+        let c = self.link.callback(|_| Msg::Clicked);
 
         html! {
             <button onclick=c>{ title }</button>

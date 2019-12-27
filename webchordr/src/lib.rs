@@ -3,15 +3,15 @@ extern crate stdweb;
 
 mod components;
 
-use stdweb::js;
-use log::info;
 use log::error;
+use log::info;
+use stdweb::js;
 
 use failure::Error;
 use serde_derive::Deserialize;
-use yew::format::{Nothing, Json};
+use yew::format::{Json, Nothing};
 use yew::services::fetch::{FetchService, FetchTask, Request, Response};
-use yew::services::storage::{StorageService, Area};
+use yew::services::storage::{Area, StorageService};
 
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
 
@@ -29,34 +29,31 @@ pub enum Format {
 pub struct Model {
     fetch_service: FetchService,
     storage_service: StorageService,
-    //    ws_service: WebSocketService,
     link: ComponentLink<Model>,
     fetching: bool,
     song_list: Option<SongList>,
-    //    data: Option<u32>,
     song_meta: Option<SongMeta>,
     song_data: Option<String>,
     catalog: Option<Catalog>,
     current_song: Option<Song>,
     show_menu: bool,
     ft: Option<FetchTask>,
-//    ws: Option<WebSocketTask>,
 }
 
 pub enum Msg {
     OpenSongInMainView(SongId),
     FetchCatalogReady(Result<Catalog, Error>),
+    FetchCatalog(bool),
     ToggleMenu,
     Reload,
     Ignore,
 }
 
-
 /// This type is used to parse data from `./static/songs.json` file and
 /// have to correspond the data layout from that file.
 #[derive(Deserialize, Debug)]
 pub struct SongListResponse {
-    song_list: Vec<SongMeta>
+    song_list: Vec<SongMeta>,
 }
 
 impl Model {
@@ -64,7 +61,7 @@ impl Model {
         if let Some(song) = &self.current_song {
             match song.file_type() {
                 FileType::Jpeg => self.view_image(song),
-                FileType::Chorddown => self.view_chorddown(song)
+                FileType::Chorddown => self.view_chorddown(song),
             }
         } else {
             html! {
@@ -87,7 +84,9 @@ impl Model {
     fn view_song_list(&self) -> Html {
         let render = |song: &Song| {
             let song = song.clone();
-            let onclick = self.link.callback(|song_id: SongId| Msg::OpenSongInMainView(song_id));
+            let onclick = self
+                .link
+                .callback(|song_id: SongId| Msg::OpenSongInMainView(song_id));
             html! { <Item song=song onclick=onclick/> }
         };
 
@@ -99,7 +98,7 @@ impl Model {
                      </div>
                 }
             }
-            None => html! {}
+            None => html! {},
         }) as Html;
     }
 
@@ -111,7 +110,7 @@ impl Model {
             html! {
                 <footer>
                     <button class="toggle-menu" onclick=toggle_menu>{ "→" }</button>
-                    <button class="reload-songs" onclick=reload_songs>{ "⟲ Reload2 Songs" }</button>
+                    <button class="reload-songs" onclick=reload_songs>{ "⟲ Reload Songs" }</button>
                 </footer>
             }
         } else {
@@ -126,21 +125,23 @@ impl Model {
     fn fetch_catalog(&mut self, no_cache: bool) {
         use stdweb::web::Date;
 
-        let callback = self.link.callback(
-            move |response: Response<Json<Result<Catalog, Error>>>| {
-                let (meta, Json(data)) = response.into_parts();
-                if meta.status.is_success() {
-                    Msg::FetchCatalogReady(data)
-                } else {
-                    error!("Could not fetch catalog: {:?}", meta);
-                    Msg::Ignore
-                }
-            },
-        );
+        let callback =
+            self.link
+                .callback(move |response: Response<Json<Result<Catalog, Error>>>| {
+                    let (meta, Json(data)) = response.into_parts();
+                    if meta.status.is_success() {
+                        Msg::FetchCatalogReady(data)
+                    } else if no_cache {
+                        info!("Could not fetch catalog without cache. Try again");
+                        Msg::FetchCatalog(false)
+                    } else {
+                        error!("Could not fetch catalog: {:?}", meta);
+                        Msg::Ignore
+                    }
+                });
 
-        info!("Fetch catalog");
         let uri_base = "/catalog.json".to_owned();
-        let uri = if no_cache || true {
+        let uri = if no_cache {
             uri_base + &format!("?{}", Date::now())
         } else {
             uri_base
@@ -171,11 +172,10 @@ impl Component for Model {
     }
 
     fn mounted(&mut self) -> ShouldRender {
-        self.fetch_catalog(false);
+        self.fetch_catalog(true);
 
         false
     }
-
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
@@ -193,6 +193,7 @@ impl Component for Model {
                 self.fetching = false;
                 self.catalog = response.ok();
             }
+            Msg::FetchCatalog(no_cache) => self.fetch_catalog(no_cache),
             Msg::Ignore => {
                 return false;
             }

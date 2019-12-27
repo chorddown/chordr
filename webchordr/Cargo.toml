@@ -10,6 +10,7 @@ web_logger = "0.2"
 serde = "1"
 serde_derive = "1"
 stdweb = "0.4.20"
+rand = "0.7.2"
 libchordr = { path = "../libchordr" }
 failure = "0.1"
 yew = {git = "https://github.com/yewstack/yew", branch = "master"}

@@ -17,7 +17,6 @@ impl Style {
     }
 }
 
-
 #[derive(Clone)]
 pub struct PageSize {
     width: Mm,
@@ -26,10 +25,7 @@ pub struct PageSize {
 
 impl PageSize {
     pub fn new(width: Mm, height: Mm) -> Self {
-        Self {
-            width,
-            height,
-        }
+        Self { width, height }
     }
 }
 

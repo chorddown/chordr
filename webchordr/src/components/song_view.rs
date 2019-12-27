@@ -1,13 +1,13 @@
-use yew::{ComponentLink, Component};
-use yew::virtual_dom::VNode;
-use yew::prelude::*;
 use libchordr::prelude::*;
+use yew::prelude::*;
+use yew::virtual_dom::VNode;
+use yew::{Component, ComponentLink};
 
 use libchordr::prelude::Format as LibchordrFormat;
 use stdweb::web::Node;
 
-use log::info;
 use log::error;
+use log::info;
 
 #[derive(Properties, PartialEq)]
 pub struct SongViewProps {
@@ -30,10 +30,7 @@ impl Component for SongView {
     type Properties = SongViewProps;
 
     fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        Self {
-            link,
-            props,
-        }
+        Self { link, props }
     }
 
     fn update(&mut self, _msg: Self::Message) -> bool {

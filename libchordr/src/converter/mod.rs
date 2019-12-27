@@ -1,8 +1,8 @@
-use crate::prelude::*;
-use crate::error::Result;
-use crate::converter::html::HtmlConverter;
 #[cfg(feature = "pdf")]
 use self::pdf::PdfConverter;
+use crate::converter::html::HtmlConverter;
+use crate::error::Result;
+use crate::prelude::*;
 
 mod html;
 #[cfg(feature = "pdf")]
@@ -22,7 +22,7 @@ impl Converter {
         match format {
             Format::HTML => Box::new(HtmlConverter {}),
             #[cfg(feature = "pdf")]
-            Format::PDF => Box::new(PdfConverter {})
+            Format::PDF => Box::new(PdfConverter {}),
         }
     }
 }
