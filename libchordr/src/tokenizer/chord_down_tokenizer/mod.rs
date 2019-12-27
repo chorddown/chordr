@@ -1,8 +1,9 @@
 mod mode;
 
-use crate::tokenizer::{Tokenizer, Token};
-use mode::Mode;
 use crate::tokenizer::chord_down_tokenizer::mode::ModePartner;
+use crate::tokenizer::modifier::Modifier;
+use crate::tokenizer::{Token, Tokenizer};
+use mode::Mode;
 
 pub(crate) struct ChordDownTokenizer {}
 
@@ -11,7 +12,6 @@ impl ChordDownTokenizer {
         Self {}
     }
 }
-
 
 impl Tokenizer for ChordDownTokenizer {
     fn tokenize_line(&self, line: &str) -> Option<Vec<Token>> {
@@ -50,10 +50,20 @@ impl Tokenizer for ChordDownTokenizer {
             }
 
             if reference_mode.is_self_closing() {
-                add_token(&mut tokens, from_mode_and_literal(reference_mode, &mut literal_buffer, header_level));
-            } else if current_character.is_end_of(reference_mode) || reference_mode.is_terminated_by_char(next_character) {
+                add_token(
+                    &mut tokens,
+                    from_mode_and_literal(reference_mode, &mut literal_buffer, header_level),
+                );
+            } else if current_character.is_end_of(reference_mode)
+                || reference_mode.is_terminated_by_char(next_character)
+            {
                 // Mode changed => build and append a new token
-                build_and_add_token(&mut tokens, &mut literal_buffer, reference_mode, header_level);
+                build_and_add_token(
+                    &mut tokens,
+                    &mut literal_buffer,
+                    reference_mode,
+                    header_level,
+                );
                 reference_mode = next_mode;
             }
         }
@@ -64,19 +74,31 @@ impl Tokenizer for ChordDownTokenizer {
 
 fn from_mode_and_literal(mode: Mode, literal: &str, header_level: u8) -> Token {
     match mode {
-        Mode::Header => Token::Headline { level: header_level, text: literal.trim().to_owned() },
+        Mode::Header => build_headline_token(header_level, literal.trim().to_owned()),
         Mode::Literal => Token::Literal(literal.to_owned()),
         Mode::Chord => Token::Chord(literal.trim().to_owned()),
-        // FormattedLiteral(String),
-        // Meta { key: String, text: String },
         Mode::Quote => Token::Quote(literal.trim().to_owned()),
         Mode::Newline => Token::Newline,
     }
 }
 
-fn build_and_add_token(tokens: &mut Vec<Token>, collected_literal: &mut String, mode: Mode, header_level: u8) {
+fn build_headline_token<S: AsRef<str>>(level: u8, value: S) -> Token {
+    let (modifier, text) = Modifier::split(value.as_ref());
+
+    Token::headline(level, text.trim(), modifier)
+}
+
+fn build_and_add_token(
+    tokens: &mut Vec<Token>,
+    collected_literal: &mut String,
+    mode: Mode,
+    header_level: u8,
+) {
     if !collected_literal.is_empty() {
-        add_token(tokens, from_mode_and_literal(mode, &collected_literal, header_level));
+        add_token(
+            tokens,
+            from_mode_and_literal(mode, &collected_literal, header_level),
+        );
         collected_literal.clear();
     }
 }
@@ -92,7 +114,8 @@ mod tests {
 
     #[test]
     fn test_tokenize_long() {
-        let content = include_str!("../../../../webchordr/static/songs/swing_low_sweet_chariot.chorddown");
+        let content =
+            include_str!("../../../../webchordr/static/songs/swing_low_sweet_chariot.chorddown");
         let token_lines = ChordDownTokenizer::new().tokenize(content);
         assert_eq!(token_lines.len(), 12);
 
@@ -108,25 +131,24 @@ mod tests {
         }
     }
 
-//    #[test]
-//    fn test_tokenize_half_tone() {
-//        let content = r#"
-//        > Chorus
-//[D#] [A#7] [C#m7]
-//        "#;
-//        let token_lines = ChordDownTokenizer::new().tokenize(content);
-//        assert_eq!(token_lines.len(), 4);
-//
-//        let mut token_lines_iter = token_lines.iter();
-//
-//        for expected_line in get_test_tokens() {
-//            let line = token_lines_iter.next().unwrap();
-//            let mut line_iter = line.iter();
-//            for expected_token in expected_line {
-//                let actual_token = line_iter.next().unwrap();
-//                assert_eq!(&expected_token, actual_token);
-//            }
-//        }
-//    }
+    //    #[test]
+    //    fn test_tokenize_half_tone() {
+    //        let content = r#"
+    //        > Chorus
+    //[D#] [A#7] [C#m7]
+    //        "#;
+    //        let token_lines = ChordDownTokenizer::new().tokenize(content);
+    //        assert_eq!(token_lines.len(), 4);
+    //
+    //        let mut token_lines_iter = token_lines.iter();
+    //
+    //        for expected_line in get_test_tokens() {
+    //            let line = token_lines_iter.next().unwrap();
+    //            let mut line_iter = line.iter();
+    //            for expected_token in expected_line {
+    //                let actual_token = line_iter.next().unwrap();
+    //                assert_eq!(&expected_token, actual_token);
+    //            }
+    //        }
+    //    }
 }
-

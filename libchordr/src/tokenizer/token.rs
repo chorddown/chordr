@@ -1,17 +1,27 @@
+use crate::tokenizer::modifier::Modifier;
+
 #[derive(Debug, PartialOrd, PartialEq, Clone)]
 pub enum Token {
-    Headline { level: u8, text: String },
+    Headline {
+        level: u8,
+        text: String,
+        modifier: Modifier,
+    },
     Literal(String),
     Chord(String),
-    // FormattedLiteral(String),
-    // Meta { key: String, text: String },
     Quote(String),
     Newline,
 }
 
 impl Token {
-    pub fn headline<S: Into<String>>(level: u8, value: S) -> Self {
-        Token::Headline { level, text: value.into() }
+    pub fn headline<S: Into<String>>(level: u8, value: S, modifier: Modifier) -> Self {
+        let text = value.into();
+
+        Token::Headline {
+            level,
+            text,
+            modifier,
+        }
     }
 
     pub fn chord<S: Into<String>>(value: S) -> Self {

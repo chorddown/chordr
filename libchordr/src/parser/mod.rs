@@ -1,22 +1,25 @@
-mod node;
 mod meta;
+mod node;
 mod parser_result;
+mod section_type;
 
+pub use self::meta::Meta;
+pub use self::node::Node;
+pub use self::parser_result::ParserResult;
+pub use self::section_type::SectionType;
+use crate::tokenizer::Token;
 use std::iter::Peekable;
 use std::vec::IntoIter;
-use crate::tokenizer::Token;
-pub use self::node::Node;
-pub use self::meta::Meta;
-pub use self::parser_result::ParserResult;
-
 
 pub struct Parser {
-    meta: Meta
+    meta: Meta,
 }
 
 impl Parser {
     pub fn new() -> Self {
-        Self { meta: Meta::default() }
+        Self {
+            meta: Meta::default(),
+        }
     }
 
     pub fn parse(&mut self, tokens: Vec<Token>) -> ParserResult {
@@ -44,7 +47,11 @@ impl Parser {
                 }
                 return Node::ChordStandalone(token);
             }
-            Token::Headline { level, ref text } => {
+            Token::Headline {
+                level,
+                ref text,
+                modifier,
+            } => {
                 if level == 1 {
                     self.meta.title = Some(text.clone())
                 }
@@ -60,11 +67,16 @@ impl Parser {
                         children.push(self.visit(tokens.next().unwrap(), tokens));
                     }
 
-                    Node::Section { head, children }
+                    Node::Section {
+                        head,
+                        children,
+                        section_type: modifier.into(),
+                    }
                 } else {
                     Node::Section {
                         head,
                         children: vec![],
+                        section_type: modifier.into(),
                     }
                 }
             }
@@ -78,23 +90,28 @@ impl Parser {
 
 fn token_is_start_of_section(token: &Token) -> bool {
     match token {
-        Token::Headline { level: _, text: _ } => true,
+        Token::Headline {
+            level: _,
+            text: _,
+            modifier: _,
+        } => true,
         Token::Quote(_) => true,
-        _ => false
+        _ => false,
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::tokenizer::Modifier;
 
     #[test]
     fn test_parse() {
         let mut parser = Parser::new();
         let result = parser.parse(vec![
-            Token::headline(1, "Swing Low Sweet Chariot"),
+            Token::headline(1, "Swing Low Sweet Chariot", Modifier::None),
             Token::newline(),
-            Token::headline(2, "Chorus"),
+            Token::headline(2, "Chorus", Modifier::Chorus),
             Token::literal("Swing "),
             Token::chord("D"),
             Token::literal("low, sweet "),
@@ -107,7 +124,7 @@ mod tests {
             Token::literal("home."),
             Token::literal("Swing "),
             Token::chord("D7"),
-            Token::headline(2, "Verse"),
+            Token::headline(2, "Verse", Modifier::None),
             Token::chord("E"),
             Token::literal("low, sweet "),
             Token::chord("G"),
@@ -121,34 +138,50 @@ mod tests {
             Token::chord("H"),
         ]);
 
-        assert_eq!(Some("Swing Low Sweet Chariot".to_string()), result.meta().title);
+        assert_eq!(
+            Some("Swing Low Sweet Chariot".to_string()),
+            result.meta().title
+        );
 
         let ast = result.node();
 
         let expected_ast = Node::Document(vec![
-            Node::section(1, "Swing Low Sweet Chariot", vec![
-                Node::newline()
-            ]),
-            Node::section(2, "Chorus", vec![
-                Node::text("Swing "),
-                Node::chord_text_pair("D", "low, sweet "),
-                Node::chord_text_pair("G", "chari"),
-                Node::chord_text_pair("D", "ot,"),
-                Node::text("Comin’ for to carry me "),
-                Node::chord_text_pair("A7", "home."),
-                Node::text("Swing "),
-                Node::chord_standalone("D7"),
-            ]),
-            Node::section(2, "Verse", vec![
-                Node::chord_text_pair("E", "low, sweet "),
-                Node::chord_text_pair("G", "chari"),
-                Node::chord_text_pair("D", "ot,"),
-                Node::chord_standalone("E"),
-                Node::chord_standalone("A"),
-                Node::newline(),
-                Node::chord_standalone("B"),
-                Node::chord_standalone("H"),
-            ]),
+            Node::section(
+                1,
+                "Swing Low Sweet Chariot",
+                Modifier::None,
+                vec![Node::newline()],
+            ),
+            Node::section(
+                2,
+                "Chorus",
+                Modifier::Chorus,
+                vec![
+                    Node::text("Swing "),
+                    Node::chord_text_pair("D", "low, sweet "),
+                    Node::chord_text_pair("G", "chari"),
+                    Node::chord_text_pair("D", "ot,"),
+                    Node::text("Comin’ for to carry me "),
+                    Node::chord_text_pair("A7", "home."),
+                    Node::text("Swing "),
+                    Node::chord_standalone("D7"),
+                ],
+            ),
+            Node::section(
+                2,
+                "Verse",
+                Modifier::None,
+                vec![
+                    Node::chord_text_pair("E", "low, sweet "),
+                    Node::chord_text_pair("G", "chari"),
+                    Node::chord_text_pair("D", "ot,"),
+                    Node::chord_standalone("E"),
+                    Node::chord_standalone("A"),
+                    Node::newline(),
+                    Node::chord_standalone("B"),
+                    Node::chord_standalone("H"),
+                ],
+            ),
         ]);
 
         assert_eq!(expected_ast, ast);

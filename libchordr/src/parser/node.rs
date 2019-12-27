@@ -1,4 +1,5 @@
-use crate::tokenizer::Token;
+use crate::parser::section_type::SectionType;
+use crate::tokenizer::{Modifier, Token};
 
 #[derive(PartialOrd, PartialEq, Debug)]
 pub enum Node {
@@ -13,21 +14,30 @@ pub enum Node {
     Quote(Token),
     Section {
         head: Option<Box<Node>>,
+        section_type: SectionType,
         children: Vec<Node>,
     },
     Newline,
 }
 
 impl Node {
-    pub fn section<S: Into<String>>(level: u8, value: S, children: Vec<Node>) -> Self {
+    pub fn section<S: Into<String>, T: Into<SectionType> + Into<Modifier>>(
+        level: u8,
+        value: S,
+        section_type: T,
+        children: Vec<Node>,
+    ) -> Self {
+        let section_type: SectionType = section_type.into();
+
         Node::Section {
-            head: Some(Box::new(Node::headline(level, value))),
+            head: Some(Box::new(Node::headline(level, value, section_type.into()))),
+            section_type,
             children,
         }
     }
 
-    pub fn headline<S: Into<String>>(level: u8, value: S) -> Self {
-        Node::Headline(Token::headline(level, value.into()))
+    pub fn headline<S: Into<String>>(level: u8, value: S, modifier: Modifier) -> Self {
+        Node::Headline(Token::headline(level, value.into(), modifier))
     }
 
     pub fn chord_standalone<S: Into<String>>(value: S) -> Self {

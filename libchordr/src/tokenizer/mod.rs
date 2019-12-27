@@ -1,9 +1,11 @@
+mod modifier;
 mod token;
 //mod meta;
 mod chord_down_tokenizer;
 
-pub use self::token::Token;
 use self::chord_down_tokenizer::ChordDownTokenizer;
+pub use self::modifier::Modifier;
+pub use self::token::Token;
 //pub use self::directive::Directive;
 //use crate::tokenizer::chord_pro_tokenizer::ChordProTokenizer;
 

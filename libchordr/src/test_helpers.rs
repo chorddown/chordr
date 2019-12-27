@@ -1,12 +1,14 @@
-use crate::tokenizer::{Token, TokenLine};
+use crate::tokenizer::{Modifier, Token, TokenLine};
 
 #[cfg(test)]
 pub fn get_test_tokens() -> Vec<TokenLine> {
     vec![
-        vec![
-            Token::headline(1, "Swing Low Sweet Chariot"),
-        ],
-        vec![Token::headline(2, "Chorus"), ],
+        vec![Token::headline(
+            1,
+            "Swing Low Sweet Chariot",
+            Modifier::None,
+        )],
+        vec![Token::headline(2, "Chorus", Modifier::Chorus)],
         vec![
             Token::literal("Swing "),
             Token::chord("D"),
@@ -37,7 +39,7 @@ pub fn get_test_tokens() -> Vec<TokenLine> {
             Token::chord("D"),
             Token::literal("home."),
         ],
-        vec![Token::headline(2, "Verse 1"), ],
+        vec![Token::headline(2, "Verse 1", Modifier::None)],
         vec![
             Token::literal("I "),
             Token::chord("D"),
@@ -68,8 +70,6 @@ pub fn get_test_tokens() -> Vec<TokenLine> {
             Token::chord("D"),
             Token::literal("home."),
         ],
-        vec![
-            Token::quote("Chorus"),
-        ],
+        vec![Token::quote("Chorus")],
     ]
 }
