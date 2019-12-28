@@ -1,10 +1,6 @@
-@import "variables";
+@import "prelude";
 @import "fonts";
 
-$gray: #b7b7b0 !default;
-$gray-medium: #a8a8a2 !default;
-$gray-dark: #8d8d88 !default;
-$gray-darker: #62625e !default;
 $ui-font: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji !default;
 
 $button-line-height: 26px !default;
@@ -14,10 +10,16 @@ $button-bg: $gray !default;
 $button-color: $gray-darker !default;
 $button-hover-bg: $gray-dark !default;
 $button-hover-color: $gray-darker !default;
+$dark-mode-button-bg: $dark-mode-background !default;
+$dark-mode-button-color: $text-color-dark-mode !default;
+$dark-mode-button-hover-bg: $gray-darker !default;
+$dark-mode-button-hover-color: $text-color-dark-mode !default;
 
-$nav-bg: beige !default;
+$nav-bg: $gray-light !default;
+$dark-mode-nav-bg: $gray-dark !default;
 $nav-button-height: 40px !default;
 $nav-footer-border-width: 2px !default;
+$nav-footer-border-color: $gray-dark !default;
 $nav-width: 300px !default;
 $nav-collapsed-width: $nav-button-height !default;
 
@@ -27,12 +29,22 @@ $nav-collapsed-width: $nav-button-height !default;
     box-sizing: border-box;
 }
 
+img {
+    display: block;
+}
+
 body {
     font-family: $font;
     font-size: $font-size-web;
     line-height: $line-height;
     letter-spacing: 0.05em;
     margin: 0;
+    color: $text-color;
+
+    @include if-dark-mode {
+        background: $dark-mode-background;
+        color: $text-color-dark-mode;
+    }
 }
 
 main {
@@ -58,6 +70,17 @@ button {
         background: $button-hover-bg;
         outline: none;
     }
+
+    @include if-dark-mode {
+        background: $dark-mode-button-bg;
+        color: $dark-mode-button-color;
+
+        &:focus,
+        &:hover {
+            color: $dark-mode-button-hover-color;
+            background: $dark-mode-button-hover-bg;
+        }
+    }
 }
 
 nav {
@@ -70,6 +93,11 @@ nav {
     top: 0;
     bottom: 0;
     overflow: scroll;
+    padding-left: 2px;
+    @include print-hidden;
+    @include if-dark-mode {
+        background: $dark-mode-nav-bg;
+    }
 
     &.-visible {
         width: $nav-width;
@@ -78,12 +106,7 @@ nav {
     .song-list {
         display: flex;
         flex-flow: column;
-        //position: fixed;
-        //right: 0;
-        //top: 0;
-        //bottom: 0;
         overflow: scroll;
-
         height: calc(100vh - #{$nav-button-height + $nav-footer-border-width});
     }
 
@@ -95,7 +118,10 @@ nav {
         margin-top: auto;
         justify-self: flex-end;
         order: 200;
-        border-top: $nav-footer-border-width solid $gray-darker;
+        border-top: $nav-footer-border-width solid $nav-footer-border-color;
+        @include if-dark-mode {
+            border-top: $nav-footer-border-width solid $gray-darker;
+        }
 
         button {
             float: left;
@@ -110,7 +136,6 @@ nav {
 
         button.reload-songs {
             margin-bottom: 0;
-
         }
     }
 
@@ -120,9 +145,17 @@ nav {
 }
 
 .content {
+    background: $background;
     order: 1;
     width: calc(100% - #{$nav-width});
     padding: $std-space;
+    @include if-dark-mode {
+        background: $dark-mode-background;
+    }
+    @media print {
+        width: 100%;
+        padding: 0;
+    }
 
     .song-image {
         height: auto;
@@ -134,3 +167,5 @@ nav {
 main.-menu-hidden .content {
     width: calc(100% - #{$nav-collapsed-width});
 }
+
+@import "components/start-screen";

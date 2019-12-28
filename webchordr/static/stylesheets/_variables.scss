@@ -1,18 +1,148 @@
+$gray-light: #d8d8d0 !default;
+$gray: #b7b7b0 !default;
+$gray-medium: #a8a8a2 !default;
+$gray-dark: #8d8d88 !default;
+$gray-darker: #62625e !default;
+$gray-ultra-dark: #221d1c !default;
+
+$green: #239b32 !default;
+$green-dark: #187123 !default;
+$green-darker: #17541e !default;
+$blue: #14949b !default;
+
 $std-space: 14px !default;
 $std-half: $std-space / 2 !default;
 
+$background: white !default;
+$dark-mode-background: $gray-ultra-dark !default;
+$text-color: $gray-ultra-dark !default;
+$text-color-dark-mode: white !default;
+
 $font: "Libre Baskerville", "Times", "Times New Roman", -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji !default;
 $font-size-web: 16px !default;
-$font-size-print: 10px !default;
+$font-size-print: 12px !default;
 $font-size-h1: 1.8em !default;
 $font-size-h2: 1em !default;
 $font-size-h3: 1em !default;
 $line-height: 1.3em !default;
 
-$chord-color: #239b32 !default;
-$chord-weight: bold !default;
+$_block-style: (
+    font-color: $text-color,
+    font-weight: normal,
+    font-style: normal,
+    background: transparent,
+    block-width: 10px,
+    block-color: #777,
+) !default;
 
-$blockquote-background: transparent !default;
-$blockquote-weight: bold !default;
-$blockquote-block-width: 10px !default;
-$blockquote-block-color: #777 !default;
+$chord: (
+    font-color: $green,
+    font-weight: bold,
+    font-style: normal,
+    background: transparent,
+    block-width: 0,
+    block-color: none,
+    margin: 0 1em 0 0,
+) !default;
+
+$chord-dark: map-merge(
+        $chord,
+            (
+                // font-color: value,
+                // font-weight: value,
+                // font-style: value,
+                // background: value,
+                // block-width: value,
+                // block-color: value,
+            )
+) !default;
+
+$chorus: (
+    font-color: $text-color,
+    font-weight: normal,
+    font-style: normal,
+    background: transparent,
+    block-width: .3em,
+    block-color: $green,
+) !default;
+
+$chorus-dark: map-merge(
+        $chorus,
+        (
+            font-color: $text-color-dark-mode,
+            // font-weight: value,
+            // font-style: value,
+            // background: value,
+            // block-width: value,
+            // block-color: value,
+        )
+) !default;
+
+//$verse: (
+//    font-color: $text-color,
+//    font-weight: normal,
+//    font-style: normal,
+//    background: transparent,
+//    block-width: .3em,
+//    block-color: #777,
+//) !default;
+//
+//$verse-dark: map-merge(
+//        $verse,
+//        (
+//            font-color: $text-color-dark-mode,
+//            // font-weight: value,
+//            // font-style: value,
+//            // background: value,
+//            // block-width: value,
+//            // block-color: value,
+//        )
+//) !default;
+
+$bridge: (
+    font-color: $text-color,
+    font-weight: normal,
+    font-style: normal,
+    background: transparent,
+    block-width: .3em,
+    block-color: $green-darker,
+) !default;
+
+$bridge-dark: map-merge(
+        $bridge,
+        (
+            font-color: $text-color-dark-mode,
+            // font-weight: value,
+            // font-style: value,
+            // background: value,
+            // block-width: value,
+            // block-color: value,
+        )
+) !default;
+
+$blockquote: (
+    font-color: $text-color,
+    font-weight: bold,
+    font-style: normal,
+    background: transparent,
+    block-width: .3em,
+    block-color: $gray-dark,
+) !default;
+
+$blockquote-dark: map-merge(
+        $blockquote,
+        (
+            font-color: $text-color-dark-mode,
+            // font-weight: value,
+            // font-style: value,
+            // background: value,
+            // block-width: value,
+            // block-color: value,
+        )
+) !default;
+
+$section-border-color: $gray-medium !default;
+$section-border-width: 1px !default;
+$section-border: $section-border-width solid $section-border-color !default;
+$section-border-length: 200px !default;
+$dark-mode-section-border-color: $section-border-color !default;

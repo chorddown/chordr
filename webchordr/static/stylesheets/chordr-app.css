@@ -21,12 +21,23 @@
 *::after {
   box-sizing: border-box; }
 
+img {
+  display: block; }
+
 body {
   font-family: "Libre Baskerville", "Times", "Times New Roman", -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
   font-size: 16px;
   line-height: 1.3em;
   letter-spacing: 0.05em;
-  margin: 0; }
+  margin: 0;
+  color: #221d1c; }
+  @media screen and (prefers-color-scheme: dark) {
+    body {
+      background: #221d1c;
+      color: white; } }
+  html.dark-mode body {
+    background: #221d1c;
+    color: white; }
 
 main {
   display: flex;
@@ -47,9 +58,22 @@ button {
     color: #62625e;
     background: #8d8d88;
     outline: none; }
+  @media screen and (prefers-color-scheme: dark) {
+    button {
+      background: #221d1c;
+      color: white; }
+      button:focus, button:hover {
+        color: white;
+        background: #62625e; } }
+  html.dark-mode button {
+    background: #221d1c;
+    color: white; }
+    html.dark-mode button:focus, html.dark-mode button:hover {
+      color: white;
+      background: #62625e; }
 
 nav {
-  background: beige;
+  background: #d8d8d0;
   order: 2;
   display: flex;
   flex-flow: column;
@@ -57,7 +81,16 @@ nav {
   right: 0;
   top: 0;
   bottom: 0;
-  overflow: scroll; }
+  overflow: scroll;
+  padding-left: 2px; }
+  @media print {
+    nav {
+      display: none !important; } }
+  @media screen and (prefers-color-scheme: dark) {
+    nav {
+      background: #8d8d88; } }
+  html.dark-mode nav {
+    background: #8d8d88; }
   nav.-visible {
     width: 300px; }
   nav .song-list {
@@ -71,7 +104,12 @@ nav {
     margin-top: auto;
     justify-self: flex-end;
     order: 200;
-    border-top: 2px solid #62625e; }
+    border-top: 2px solid #8d8d88; }
+    @media screen and (prefers-color-scheme: dark) {
+      nav footer {
+        border-top: 2px solid #62625e; } }
+    html.dark-mode nav footer {
+      border-top: 2px solid #62625e; }
     nav footer button {
       float: left;
       width: 50%;
@@ -85,9 +123,19 @@ nav {
     width: 100%; }
 
 .content {
+  background: white;
   order: 1;
   width: calc(100% - 300px);
   padding: 14px; }
+  @media screen and (prefers-color-scheme: dark) {
+    .content {
+      background: #221d1c; } }
+  html.dark-mode .content {
+    background: #221d1c; }
+  @media print {
+    .content {
+      width: 100%;
+      padding: 0; } }
   .content .song-image {
     height: auto;
     width: auto;
@@ -95,5 +143,16 @@ nav {
 
 main.-menu-hidden .content {
   width: calc(100% - 40px); }
+
+.start-screen {
+  display: flex;
+  width: 100%;
+  height: calc(100vh - 28px);
+  align-items: center;
+  justify-content: center; }
+  .start-screen img {
+    max-width: 100%;
+    width: 256px;
+    margin: 0 auto; }
 
 /*# sourceMappingURL=chordr-app.css.map */

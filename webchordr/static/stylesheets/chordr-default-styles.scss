@@ -1,10 +1,20 @@
-@import "variables";
+@import "prelude";
+
+@page {
+    size: auto;   //* auto is the initial value */
+    //margin: 0mm;  //* this affects the margin in the printer settings */
+}
 
 #chordr {
     font-family: $font;
     font-size: $font-size-web;
     line-height: $line-height;
     letter-spacing: 0.05em;
+
+    @include if-dark-mode {
+        background: $dark-mode-background;
+        color: $text-color-dark-mode;
+    }
 
     @media print {
         font-size: $font-size-print;
@@ -51,7 +61,6 @@
     }
 
     table {
-        //border: 1px solid red;
         padding: 0;
         border-collapse: collapse;
 
@@ -68,9 +77,10 @@
     }
 
     .chordr-chord {
-        color: $chord-color;
-        font-weight: $chord-weight;
-        margin-right: .3em;
+        @include apply-styles($chord);
+        @include if-dark-mode {
+            @include apply-styles($chord-dark);
+        }
     }
 
     .text-row {
@@ -83,18 +93,56 @@
 
     blockquote {
         margin: $std-half 0;
-        padding: 0 $std-half;
-        font-weight: $blockquote-weight;
-        background: $blockquote-background;
-        border-left: $blockquote-block-width $blockquote-block-color solid;
+        @include apply-styles($blockquote);
+        @include if-dark-mode {
+            @include apply-styles($blockquote-dark);
+        }
     }
 
     section {
-        //padding: 1rem 0;
         margin: $std-space 0;
+        page-break-inside: avoid;
+        @if $section-border-length == 100% {
+            border-bottom: $section-border;
+        } @else {
+            &::after {
+                display: block;
+                content: "";
+                width: $section-border-length;
+                border-bottom: $section-border;
+                position: absolute;
+                margin-top: -$section-border-width;
+            }
+        }
+
+        @include if-dark-mode {
+            border-bottom-color: $dark-mode-section-border-color;
+        }
 
         &:first-child {
             margin-top: 0;
+        }
+
+        &.chorus {
+            @include apply-styles($chorus);
+            @include if-dark-mode {
+                @include apply-styles($chorus-dark);
+            }
+        }
+
+        // Not implemented
+        //&.verse {
+        //    @include apply-styles($verse);
+        //    @include if-dark-mode {
+        //        @include apply-styles($verse-dark);
+        //    }
+        //}
+
+        &.bridge {
+            @include apply-styles($bridge);
+            @include if-dark-mode {
+                @include apply-styles($bridge-dark);
+            }
         }
     }
 

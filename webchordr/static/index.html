@@ -4,6 +4,8 @@
     <meta charset="utf-8"/>
     <title>Chordr Web</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="icon" href="assets/images/logo-32-light.png">
+    <link rel="apple-touch-icon" href="assets/images/logo-120.png">
     <link rel="manifest" href="/manifest.json">
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="/stylesheets/chordr-default-styles.css"/>
@@ -16,8 +18,13 @@
         navigator.serviceWorker
             .register('/sw.js')
             .then(function () {
-                console.log('Service Worker Registered');
-            });
+                console.log('INFO:webchordr -- Service Worker registered');
+            }).catch(function (e) {
+                console.error('ERROR:webchordr -- Service Worker could not be registered', e);
+            }
+        );
+    } else {
+        console.error('ERROR:webchordr -- Service Worker not supported');
     }
 </script>
 </body>
