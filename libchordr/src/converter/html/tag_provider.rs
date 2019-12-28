@@ -111,6 +111,7 @@ impl TagProvider {
 fn class_name_for_type(section_type: &SectionType) -> Option<&'static str> {
     match section_type {
         SectionType::Chorus => Some("chorus"),
-        SectionType::Verse => None,
+        SectionType::Unknown => None,
+        SectionType::Bridge => Some("bridge"),
     }
 }
