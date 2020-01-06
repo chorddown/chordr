@@ -15,7 +15,10 @@ impl HtmlConverter {
         tag_builder: &TagProvider,
     ) -> Result<String> {
         Ok(format!(
-            "{}{}",
+            r#"<div id="chordr">
+{}
+{}
+</div>"#,
             tag_builder.build_tag_for_node(node),
             self.format_meta(meta)
         ))

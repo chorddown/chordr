@@ -25,7 +25,7 @@ impl TagProvider {
             Node::Text(text) => self.build_column(Tag::blank(), self.build_tag_for_token(text)),
             Node::Document(children) => gtb
                 .set_tag_name("div")
-                .set_id("chordr")
+                .set_id("chordr-song")
                 .set_content_tag(self.build_tag_for_children(children))
                 .build(),
             Node::Headline(token) => self.build_tag_for_token(token),
