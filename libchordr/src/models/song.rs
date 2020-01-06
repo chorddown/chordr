@@ -21,6 +21,10 @@ impl Song {
     pub fn src(&self) -> &str {
         &self.src
     }
+
+    pub fn meta(&self) -> &SongMeta {
+        &self.meta
+    }
 }
 
 impl SongData for Song {

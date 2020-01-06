@@ -1,18 +1,11 @@
-use std::convert::From;
+use std::convert::TryFrom;
 
-
-#[derive(Debug, PartialEq)]
+/// Meta information gathered during tokenization
+///
+/// Some, but not all meta information can be retrieved during tokenization. The song title e.g.
+/// will be determined by the Parser
+#[derive(Clone, Debug, PartialOrd, PartialEq)]
 pub enum Meta {
-    /// Preamble directives
-    ///
-    /// https://www.chordpro.org/chordpro/ChordPro-Directives.html#preamble-directives
-    NewSong,
-
-    /// Meta data
-    ///
-    /// https://www.chordpro.org/chordpro/ChordPro-Directives.html#meta-data-directives
-    Title(String),
-    Subtitle(String),
     Artist(String),
     Composer(String),
     Lyricist(String),
@@ -24,157 +17,118 @@ pub enum Meta {
     Tempo(String),
     Duration(String),
     Capo(String),
-    Meta(String),
-
-    /// Formatting
-    ///
-    /// https://www.chordpro.org/chordpro/ChordPro-Directives.html#formatting-directives
-    Comment(String),
-    CommentItalic(String),
-    CommentBox(String),
-    Image(String),
-
-    /// Environment directives
-    ///
-    /// https://www.chordpro.org/chordpro/ChordPro-Directives.html#environment-directives
-    StartOfChorus(String),
-    EndOfChorus,
-    Chorus(String),
-    StartOfVerse(String),
-    EndOfVerse,
-    StartOfTab(String),
-    EndOfTab,
-    StartOfGrid(String),
-    EndOfGrid,
-
-    /// Chord diagrams
-    ///
-    /// https://www.chordpro.org/chordpro/ChordPro-Directives.html#chord-diagrams
-    Define(String),
-    Chord(String),
-
-    /// Fonts, sizes and colours
-    ///
-    /// https://www.chordpro.org/chordpro/ChordPro-Directives.html#fonts-sizes-and-colours
-    Textfont(String),
-    Textsize(String),
-    Textcolour(String),
-    Chordfont(String),
-    Chordsize(String),
-    Chordcolour(String),
-    Tabfont(String),
-    Tabsize(String),
-    Tabcolour(String),
-
-    /// Output related directives
-    ///
-    /// https://www.chordpro.org/chordpro/ChordPro-Directives.html#output-related-directives
-    NewPage,
-    NewPhysicalPage,
-    ColumnBreak,
-
-    /// Custom extensions
-    ///
-    /// https://www.chordpro.org/chordpro/ChordPro-Directives.html#custom-extensions
-    Custom(String),
 }
 
 impl Meta {
-    pub fn from_keyword<S: Into<String>>(keyword: &str, data: S) -> Self {
-        match keyword {
-            // Preamble directives
-            "new_song" | "ns" => Meta::NewSong,
-
-            // Meta data
-            "title" | "t" => Meta::Title(data.into()),
-            "subtitle" | "st" => Meta::Subtitle(data.into()),
-            "artist" => Meta::Artist(data.into()),
-            "composer" => Meta::Composer(data.into()),
-            "lyricist" => Meta::Lyricist(data.into()),
-            "copyright" => Meta::Copyright(data.into()),
-            "album" => Meta::Album(data.into()),
-            "year" => Meta::Year(data.into()),
-            "key" => Meta::Key(data.into()),
-            "time" => Meta::Time(data.into()),
-            "tempo" => Meta::Tempo(data.into()),
-            "duration" => Meta::Duration(data.into()),
-            "capo" => Meta::Capo(data.into()),
-            "meta" => Meta::Meta(data.into()),
-
-            // Formatting
-            "comment" | "c" => Meta::Comment(data.into()),
-            "comment_italic" | "ci" => Meta::CommentItalic(data.into()),
-            "comment_box" | "cb" => Meta::CommentBox(data.into()),
-            "image" => Meta::Image(data.into()),
-
-
-            // Environment directives
-            "start_of_chorus" | "soc" => Meta::StartOfChorus(data.into()),
-            "end_of_chorus" | "eoc" => Meta::EndOfChorus,
-            "chorus" => Meta::Chorus(data.into()),
-            "start_of_verse" => Meta::StartOfVerse(data.into()),
-            "end_of_verse" => Meta::EndOfVerse,
-            "start_of_tab" | "sot" => Meta::StartOfTab(data.into()),
-            "end_of_tab" | "eot" => Meta::EndOfTab,
-            "start_of_grid" => Meta::StartOfGrid(data.into()),
-            "end_of_grid" => Meta::EndOfGrid,
-
-            // Chord diagrams
-            "define" => Meta::Define(data.into()),
-            "chord" => Meta::Chord(data.into()),
-
-            // Fonts, sizes and colours
-            "textfont" => Meta::Textfont(data.into()),
-            "textsize" => Meta::Textsize(data.into()),
-            "textcolour" => Meta::Textcolour(data.into()),
-            "chordfont" => Meta::Chordfont(data.into()),
-            "chordsize" => Meta::Chordsize(data.into()),
-            "chordcolour" => Meta::Chordcolour(data.into()),
-            "tabfont" => Meta::Tabfont(data.into()),
-            "tabsize" => Meta::Tabsize(data.into()),
-            "tabcolour" => Meta::Tabcolour(data.into()),
-
-            // Output related directives
-            "new_page" | "np" => Meta::NewPage,
-            "new_physical_page" | "npp" => Meta::NewPhysicalPage,
-            "column_break" /*| "cb" */ => Meta::ColumnBreak,
-
-            // Custom extensions
-            _ => Meta::Custom(data.into())
+    fn from_keyword_and_content(word: &str, content: &str) -> Option<Self> {
+        let content = content.trim();
+        match word.trim().to_lowercase().as_str() {
+            "artist" => Some(Self::artist(content)),
+            "composer" => Some(Self::composer(content)),
+            "lyricist" => Some(Self::lyricist(content)),
+            "copyright" => Some(Self::copyright(content)),
+            "album" => Some(Self::album(content)),
+            "year" => Some(Self::year(content)),
+            "key" => Some(Self::key(content)),
+            "time" => Some(Self::time(content)),
+            "tempo" => Some(Self::tempo(content)),
+            "duration" => Some(Self::duration(content)),
+            "capo" => Some(Self::capo(content)),
+            _ => None,
         }
     }
 
-    fn from_str<S: Into<String>>(input: S) -> Self {
-        let input_string = input.into();
-        let parts: Vec<&str> = input_string.splitn(2, ':').collect();
-        if parts.len() > 1 {
-            Meta::from_keyword(parts[0].trim(), parts[1].trim())
-        } else {
-            Meta::from_keyword(parts[0].trim(), "")
+    pub fn keyword(&self) -> &'static str {
+        match self {
+            Self::Artist(_) => "Artist",
+            Self::Composer(_) => "Composer",
+            Self::Lyricist(_) => "Lyricist",
+            Self::Copyright(_) => "Copyright",
+            Self::Album(_) => "Album",
+            Self::Year(_) => "Year",
+            Self::Key(_) => "Key",
+            Self::Time(_) => "Time",
+            Self::Tempo(_) => "Tempo",
+            Self::Duration(_) => "Duration",
+            Self::Capo(_) => "Capo",
         }
     }
 
-    pub fn comment<S: Into<String>>(value: S) -> Self {
-        Meta::Comment(value.into())
+    pub fn content(&self) -> &str {
+        match self {
+            Self::Artist(c) => c,
+            Self::Composer(c) => c,
+            Self::Lyricist(c) => c,
+            Self::Copyright(c) => c,
+            Self::Album(c) => c,
+            Self::Year(c) => c,
+            Self::Key(c) => c,
+            Self::Time(c) => c,
+            Self::Tempo(c) => c,
+            Self::Duration(c) => c,
+            Self::Capo(c) => c,
+        }
     }
 
-    pub fn title<S: Into<String>>(value: S) -> Self {
-        Meta::Title(value.into())
+    pub fn artist<S: Into<String>>(content: S) -> Self {
+        Self::Artist(content.into())
     }
 
-    pub fn start_of_chorus<S: Into<String>>(value: S) -> Self {
-        Meta::StartOfChorus(value.into())
+    pub fn composer<S: Into<String>>(content: S) -> Self {
+        Self::Composer(content.into())
+    }
+
+    pub fn lyricist<S: Into<String>>(content: S) -> Self {
+        Self::Lyricist(content.into())
+    }
+
+    pub fn copyright<S: Into<String>>(content: S) -> Self {
+        Self::Copyright(content.into())
+    }
+
+    pub fn album<S: Into<String>>(content: S) -> Self {
+        Self::Album(content.into())
+    }
+
+    pub fn year<S: Into<String>>(content: S) -> Self {
+        Self::Year(content.into())
+    }
+
+    pub fn key<S: Into<String>>(content: S) -> Self {
+        Self::Key(content.into())
+    }
+
+    pub fn time<S: Into<String>>(content: S) -> Self {
+        Self::Time(content.into())
+    }
+
+    pub fn tempo<S: Into<String>>(content: S) -> Self {
+        Self::Tempo(content.into())
+    }
+
+    pub fn duration<S: Into<String>>(content: S) -> Self {
+        Self::Duration(content.into())
+    }
+
+    pub fn capo<S: Into<String>>(content: S) -> Self {
+        Self::Capo(content.into())
     }
 }
 
-impl From<&str> for Meta {
-    fn from(input: &str) -> Self {
-        Meta::from_str(input)
-    }
-}
+impl TryFrom<&str> for Meta {
+    type Error = ();
 
-impl From<String> for Meta {
-    fn from(input: String) -> Self {
-        Meta::from_str(input)
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        let parts = value.split(':').collect::<Vec<&str>>();
+        if parts.len() < 2 {
+            return Err(());
+        }
+
+        match Self::from_keyword_and_content(
+            parts.get(0).unwrap(),
+            parts.get(1).unwrap()) {
+            Some(p) => Ok(p),
+            None => Err(())
+        }
     }
 }

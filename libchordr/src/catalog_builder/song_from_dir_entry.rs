@@ -25,7 +25,7 @@ impl TryFrom<&Path> for Song {
                 return Err(Error::catalog_builder_error(
                     format!("{}", e),
                     path.to_path_buf(),
-                ))
+                ));
             }
         };
 
@@ -33,7 +33,8 @@ impl TryFrom<&Path> for Song {
         let parser_result = parse_content(&src);
         let title = parser_result.meta().title.unwrap_or(song_id.clone());
         let file_type = FileType::try_from(path)?;
-        let meta = SongMeta::new(song_id, title, file_type);
+//        let meta = SongMeta::new(song_id, title, file_type);
+        let meta = SongMeta::new_with_meta_information(song_id, title, file_type, parser_result.meta_as_ref());
         Ok(Song::new(meta, src))
     }
 }

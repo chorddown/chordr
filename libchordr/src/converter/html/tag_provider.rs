@@ -30,12 +30,31 @@ impl TagProvider {
                 .build(),
             Node::Headline(token) => self.build_tag_for_token(token),
             Node::Quote(token) => self.build_tag_for_token(token),
+            Node::Meta(m) => {
+                let inner = format!(
+                    "{} {}",
+                    gtb.set_tag_name("span")
+                        .set_class_name("meta-keyword")
+                        .set_content_str(&format!("{}:", m.keyword()))
+                        .build(),
+                    gtb.set_tag_name("span")
+                        .set_class_name("meta-value")
+                        .set_content_str(m.content())
+                        .build()
+                );
+
+                gtb.set_content(Content::Raw(inner)).build()
+            }
             Node::Newline => {
                 let inner = format!("{}\n", Tag::with_name("hr"));
 
                 Tag::raw(Content::Raw(inner))
             }
-            Node::Section { head, children, section_type } => {
+            Node::Section {
+                head,
+                children,
+                section_type,
+            } => {
                 gtb.set_tag_name("section");
                 if let Some(class_name) = class_name_for_type(section_type) {
                     gtb.set_class_name(class_name);
@@ -74,12 +93,15 @@ impl TagProvider {
                 Tag::raw(Content::Raw(inner))
             }
             Token::Quote(c) => gtb.set_tag_name("blockquote").set_content_str(c).build(),
-            Token::Headline { level, text: c, modifier: _, } => {
-                gtb
-                    .set_tag_name(&format!("h{}", level))
-                    .set_content_str(c)
-                    .build()
-            }
+            Token::Headline {
+                level,
+                text: c,
+                modifier: _,
+            } => gtb
+                .set_tag_name(&format!("h{}", level))
+                .set_content_str(c)
+                .build(),
+            Token::Meta(_) => unreachable!(),
         }
     }
 
@@ -95,10 +117,21 @@ impl TagProvider {
     }
 
     fn build_column(&self, chord: Tag, lyric: Tag) -> Tag {
-        let chord_text = if chord.is_blank() { "&nbsp;".to_owned() } else { chord.to_string() };
-        let lyric_text = if lyric.is_blank() { "".to_owned() } else { lyric.to_string() };
+        let chord_text = if chord.is_blank() {
+            "&nbsp;".to_owned()
+        } else {
+            chord.to_string()
+        };
+        let lyric_text = if lyric.is_blank() {
+            "".to_owned()
+        } else {
+            lyric.to_string()
+        };
 
-        let string = format!("<div class='chord-row'>{}</div><div class='text-row'>{}</div>", chord_text, lyric_text);
+        let string = format!(
+            "<div class='chord-row'>{}</div><div class='text-row'>{}</div>",
+            chord_text, lyric_text
+        );
 
         TagBuilder::new()
             .set_tag_name("div")

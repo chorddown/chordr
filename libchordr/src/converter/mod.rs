@@ -3,13 +3,14 @@ use self::pdf::PdfConverter;
 use crate::converter::html::HtmlConverter;
 use crate::error::Result;
 use crate::prelude::*;
+use crate::models::song_meta_trait::SongMetaTrait;
 
 mod html;
 #[cfg(feature = "pdf")]
 mod pdf;
 
 pub trait ConverterTrait {
-    fn convert(&self, node: &Node, format: Format) -> Result<String>;
+    fn convert(&self, node: &Node, meta: &dyn SongMetaTrait, format: Format) -> Result<String>;
 }
 
 pub struct Converter {}
@@ -28,8 +29,8 @@ impl Converter {
 }
 
 impl ConverterTrait for Converter {
-    fn convert(&self, node: &Node, format: Format) -> Result<String> {
-        Converter::get_converter(format).convert(node, format)
+    fn convert(&self, node: &Node, meta: &dyn SongMetaTrait, format: Format) -> Result<String> {
+        Converter::get_converter(format).convert(node, meta, format)
     }
 }
 
@@ -42,7 +43,10 @@ mod tests {
     fn test_convert() {
         let content = include_str!("../../tests/resources/swing_low_sweet_chariot.html");
         let parser_result = Parser::new().parse(token_lines_to_tokens(get_test_tokens()));
-        let result = Converter::new().convert(parser_result.node_as_ref(), Format::HTML);
+        let result = Converter::new().convert(
+            parser_result.node_as_ref(),
+            parser_result.meta_as_ref(),
+            Format::HTML);
 
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), content.trim())

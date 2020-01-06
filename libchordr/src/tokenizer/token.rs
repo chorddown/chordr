@@ -1,4 +1,5 @@
 use crate::tokenizer::modifier::Modifier;
+use super::meta::Meta;
 
 #[derive(Debug, PartialOrd, PartialEq, Clone)]
 pub enum Token {
@@ -8,6 +9,7 @@ pub enum Token {
         modifier: Modifier,
     },
     Literal(String),
+    Meta(Meta),
     Chord(String),
     Quote(String),
     Newline,

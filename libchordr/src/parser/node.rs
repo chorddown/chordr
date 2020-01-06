@@ -1,5 +1,5 @@
 use crate::parser::section_type::SectionType;
-use crate::tokenizer::{Modifier, Token};
+use crate::tokenizer::{Modifier, Token, Meta};
 
 #[derive(PartialOrd, PartialEq, Debug)]
 pub enum Node {
@@ -9,6 +9,8 @@ pub enum Node {
     },
     ChordStandalone(Token),
     Text(Token),
+    Meta(Meta),
+
     Document(Vec<Node>),
     Headline(Token),
     Quote(Token),

@@ -1,9 +1,9 @@
-mod meta;
+mod meta_information;
 mod node;
 mod parser_result;
 mod section_type;
 
-pub use self::meta::Meta;
+pub use self::meta_information::MetaInformation;
 pub use self::node::Node;
 pub use self::parser_result::ParserResult;
 pub use self::section_type::SectionType;
@@ -12,13 +12,13 @@ use std::iter::Peekable;
 use std::vec::IntoIter;
 
 pub struct Parser {
-    meta: Meta,
+    meta: MetaInformation,
 }
 
 impl Parser {
     pub fn new() -> Self {
         Self {
-            meta: Meta::default(),
+            meta: MetaInformation::default(),
         }
     }
 
@@ -80,7 +80,10 @@ impl Parser {
                     }
                 }
             }
-
+            Token::Meta(meta) => {
+                self.meta.assign_from_token(&meta);
+                Node::Meta(meta)
+            }
             Token::Literal(_) => Node::Text(token),
             Token::Quote(_) => Node::Quote(token),
             Token::Newline => Node::Newline,
