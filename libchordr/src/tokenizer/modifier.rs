@@ -13,14 +13,17 @@ impl Modifier {
             return (Modifier::None, input);
         }
 
-        let (first, rest) = input.split_at(1);
+        // If the input can safely be split at index 1
+        if input.is_char_boundary(1) {
+            let (first, rest) = input.split_at(1);
 
-        let modifier = Modifier::from(first);
-        if modifier != Modifier::None {
-            (modifier, rest)
-        } else {
-            (modifier, input)
+            let modifier = Modifier::from(first);
+            if modifier != Modifier::None {
+                return (modifier, rest);
+            }
         }
+
+        (Modifier::None, input)
     }
 }
 
@@ -79,6 +82,21 @@ mod tests {
         assert_eq!(Modifier::split("! "), (Modifier::Chorus, " "));
 
         assert_eq!(Modifier::split("- Bridge"), (Modifier::Bridge, " Bridge"));
+        assert_eq!(Modifier::split("-"), (Modifier::Bridge, ""));
+        assert_eq!(Modifier::split("- "), (Modifier::Bridge, " "));
+    }
+
+    #[test]
+    fn test_split_umlauts() {
+        assert_eq!(Modifier::split(" Überschrift"), (Modifier::None, " Überschrift"));
+        assert_eq!(Modifier::split("Überschrift"), (Modifier::None, "Überschrift"));
+        assert_eq!(Modifier::split(""), (Modifier::None, ""));
+
+        assert_eq!(Modifier::split("! Überschrift"), (Modifier::Chorus, " Überschrift"));
+        assert_eq!(Modifier::split("!"), (Modifier::Chorus, ""));
+        assert_eq!(Modifier::split("! "), (Modifier::Chorus, " "));
+
+        assert_eq!(Modifier::split("- Brücke"), (Modifier::Bridge, " Brücke"));
         assert_eq!(Modifier::split("-"), (Modifier::Bridge, ""));
         assert_eq!(Modifier::split("- "), (Modifier::Bridge, " "));
     }

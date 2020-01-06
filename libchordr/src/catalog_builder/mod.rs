@@ -108,4 +108,22 @@ mod tests {
         assert_eq!("Swing Low Sweet Chariot", song.title());
         assert_eq!(song_id, song.id());
     }
+
+    #[test]
+    fn test_build_catalog_for_test_directory() {
+        let songs_dir = format!("{}/tests/resources", env!("CARGO_MANIFEST_DIR"));
+        let songs_dir = Path::new(&songs_dir);
+        let result =
+            CatalogBuilder::new().build_catalog_for_directory(songs_dir, FileType::Chorddown, true);
+        assert!(result.is_ok());
+        let catalog = result.unwrap();
+        assert_eq!(2, catalog.len());
+
+        let song_id = "german-test.chorddown";
+        assert!(catalog.contains_id(song_id));
+        assert!(catalog.get(song_id).is_some());
+        let song = catalog.get(song_id).unwrap();
+        assert_eq!("Überschrift", song.title());
+        assert_eq!(song_id, song.id());
+    }
 }
