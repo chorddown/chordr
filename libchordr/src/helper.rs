@@ -10,8 +10,6 @@ pub fn token_lines_to_tokens(token_lines: Vec<TokenLine>) -> Vec<Token> {
         for token in line {
             stream.push(token);
         }
-
-        stream.push(Token::Newline);
     }
 
     stream
