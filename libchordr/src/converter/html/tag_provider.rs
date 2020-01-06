@@ -94,11 +94,11 @@ impl TagProvider {
         gtb.set_content(Content::Raw(inner)).build()
     }
 
-    fn build_column(&self, row1: Tag, row2: Tag) -> Tag {
-        let row1text = if row1.is_blank() { "&nbsp;".to_owned() } else { row1.to_string() };
-        let row2text = if row2.is_blank() { "&nbsp;".to_owned() } else { row2.to_string() };
+    fn build_column(&self, chord: Tag, lyric: Tag) -> Tag {
+        let chord_text = if chord.is_blank() { "&nbsp;".to_owned() } else { chord.to_string() };
+        let lyric_text = if lyric.is_blank() { "".to_owned() } else { lyric.to_string() };
 
-        let string = format!("<div class='chord-row'>{}</div><div class='text-row'>{}</div>", row1text, row2text);
+        let string = format!("<div class='chord-row'>{}</div><div class='text-row'>{}</div>", chord_text, lyric_text);
 
         TagBuilder::new()
             .set_tag_name("div")
