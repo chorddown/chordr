@@ -7,6 +7,7 @@ pub use self::meta_information::MetaInformation;
 pub use self::node::Node;
 pub use self::parser_result::ParserResult;
 pub use self::section_type::SectionType;
+use crate::models::meta::*;
 use crate::tokenizer::Token;
 use std::iter::Peekable;
 use std::vec::IntoIter;
@@ -36,17 +37,7 @@ impl Parser {
 
     fn visit(&mut self, token: Token, tokens: &mut Peekable<IntoIter<Token>>) -> Node {
         match token {
-            Token::Chord(_) => {
-                if let Some(next) = tokens.peek() {
-                    if let Token::Literal(_) = next {
-                        return Node::ChordTextPair {
-                            chord: token,
-                            text: tokens.next().unwrap(),
-                        };
-                    }
-                }
-                return Node::ChordStandalone(token);
-            }
+            Token::Chord(_) => self.visit_chord(token, tokens),
             Token::Headline {
                 level,
                 ref text,
@@ -88,6 +79,28 @@ impl Parser {
             Token::Quote(_) => Node::Quote(token),
             Token::Newline => Node::Newline,
         }
+    }
+
+    fn visit_chord(&mut self, token: Token, tokens: &mut Peekable<IntoIter<Token>>) -> Node {
+        let chords = if let Token::Chord(c) = token { c } else { unreachable!("Invalid Token given") };
+
+        if BNotation::is_european_chord(&chords) {
+            self.meta.b_notation = BNotation::H;
+        }
+
+        if let Some(next) = tokens.peek() {
+            if let Token::Literal(_) = next {
+                // Consume the next token
+                let text = tokens.next().unwrap();
+
+                return Node::ChordTextPair {
+                    chord: Token::Chord(chords),
+                    text,
+                };
+            }
+        }
+
+        return Node::ChordStandalone(Token::Chord(chords));
     }
 }
 
@@ -188,5 +201,48 @@ mod tests {
         ]);
 
         assert_eq!(expected_ast, ast);
+    }
+
+    #[test]
+    fn test_detect_b_notation() {
+        let mut parser = Parser::new();
+        {
+            let result = parser.parse(vec![
+                Token::headline(1, "Test with standard B notation w/ text", Modifier::None),
+                Token::newline(),
+                Token::chord("E"),
+                Token::literal("A text"),
+            ]);
+
+            assert_eq!(result.meta_as_ref().b_notation, BNotation::B);
+        }
+        {
+            let result = parser.parse(vec![
+                Token::headline(1, "Test with standard B notation w/o text", Modifier::None),
+                Token::newline(),
+                Token::chord("E"),
+            ]);
+
+            assert_eq!(result.meta_as_ref().b_notation, BNotation::B);
+        }
+        {
+            let result = parser.parse(vec![
+                Token::headline(1, "Test with european B notation w/ text", Modifier::None),
+                Token::newline(),
+                Token::chord("H"),
+                Token::literal("A text"),
+            ]);
+
+            assert_eq!(result.meta_as_ref().b_notation, BNotation::H);
+        }
+        {
+            let result = parser.parse(vec![
+                Token::headline(1, "Test with european B notation w/o text", Modifier::None),
+                Token::newline(),
+                Token::chord("H"),
+            ]);
+
+            assert_eq!(result.meta_as_ref().b_notation, BNotation::H);
+        }
     }
 }

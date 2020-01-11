@@ -1,6 +1,7 @@
 use std::fmt::Debug;
+use super::b_notation::BNotation;
 
-pub trait SongMetaTrait : Debug{
+pub trait MetaTrait : Debug{
     fn title(&self) -> Option<String>;
     fn subtitle(&self) -> Option<String>;
     fn artist(&self) -> Option<String>;
@@ -14,4 +15,8 @@ pub trait SongMetaTrait : Debug{
     fn tempo(&self) -> Option<String>;
     fn duration(&self) -> Option<String>;
     fn capo(&self) -> Option<String>;
+    fn b_notation(&self) -> BNotation;
 }
+
+#[deprecated(note = "Please use meta::MetaTrait instead")]
+pub use MetaTrait as SongMetaTrait;

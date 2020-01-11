@@ -3,7 +3,7 @@ use super::song_data::SongData;
 use super::song_id::SongId;
 use serde;
 use serde::{Deserialize, Serialize};
-use crate::models::song_meta_trait::SongMetaTrait;
+use crate::models::meta::*;
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
 pub struct SongMeta {
@@ -24,6 +24,7 @@ pub struct SongMeta {
     tempo: Option<String>,
     duration: Option<String>,
     capo: Option<String>,
+    b_notation: BNotation,
 }
 
 impl SongMeta {
@@ -44,10 +45,11 @@ impl SongMeta {
             tempo: None,
             duration: None,
             capo: None,
+            b_notation: Default::default()
         }
     }
 
-    pub fn new_with_meta_information(id: SongId, title: String, file_type: FileType, meta: &dyn SongMetaTrait) -> Self {
+    pub fn new_with_meta_information(id: SongId, title: String, file_type: FileType, meta: &dyn MetaTrait) -> Self {
         Self {
             id,
             title,
@@ -64,11 +66,12 @@ impl SongMeta {
             tempo: meta.tempo(),
             duration: meta.duration(),
             capo: meta.capo(),
+            b_notation: meta.b_notation(),
         }
     }
 }
 
-impl SongMetaTrait for SongMeta {
+impl MetaTrait for SongMeta {
     fn title(&self) -> Option<String> {
         Some(self.title.clone())
     }
@@ -119,6 +122,10 @@ impl SongMetaTrait for SongMeta {
 
     fn capo(&self) -> Option<String> {
         self.capo.as_ref().cloned()
+    }
+
+    fn b_notation(&self) -> BNotation {
+        self.b_notation
     }
 }
 

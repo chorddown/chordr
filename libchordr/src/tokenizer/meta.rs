@@ -1,4 +1,5 @@
 use std::convert::TryFrom;
+use crate::models::meta::BNotation;
 
 /// Meta information gathered during tokenization
 ///
@@ -17,6 +18,7 @@ pub enum Meta {
     Tempo(String),
     Duration(String),
     Capo(String),
+    BNotation(BNotation),
 }
 
 impl Meta {
@@ -34,6 +36,7 @@ impl Meta {
             "tempo" => Some(Self::tempo(content)),
             "duration" => Some(Self::duration(content)),
             "capo" => Some(Self::capo(content)),
+            "bnotation" | "b_notation" | "b notation" => Some(Self::b_notation(content)),
             _ => None,
         }
     }
@@ -51,6 +54,7 @@ impl Meta {
             Self::Tempo(_) => "Tempo",
             Self::Duration(_) => "Duration",
             Self::Capo(_) => "Capo",
+            Self::BNotation(_) => "BNotation",
         }
     }
 
@@ -67,6 +71,7 @@ impl Meta {
             Self::Tempo(c) => c,
             Self::Duration(c) => c,
             Self::Capo(c) => c,
+            Self::BNotation(_) => ""
         }
     }
 
@@ -112,6 +117,15 @@ impl Meta {
 
     pub fn capo<S: Into<String>>(content: S) -> Self {
         Self::Capo(content.into())
+    }
+
+    pub fn b_notation<S: AsRef<str>>(content: S) -> Self {
+        Self::BNotation(
+            match BNotation::try_from(content.as_ref()) {
+                Ok(n) => n,
+                Err(_) => Default::default()
+            }
+        )
     }
 }
 

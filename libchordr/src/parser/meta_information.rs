@@ -1,5 +1,6 @@
 use crate::tokenizer::Meta;
 use crate::models::song_meta_trait::SongMetaTrait;
+use crate::models::meta::b_notation::BNotation;
 
 /// Meta Information for a parsed song
 #[derive(Clone, Debug)]
@@ -17,6 +18,7 @@ pub struct MetaInformation {
     pub tempo: Option<String>,
     pub duration: Option<String>,
     pub capo: Option<String>,
+    pub b_notation: BNotation,
 }
 
 impl MetaInformation {
@@ -45,6 +47,8 @@ impl MetaInformation {
                 self.duration = Some(content.clone()),
             Meta::Capo(content) =>
                 self.capo = Some(content.clone()),
+            Meta::BNotation(notation) =>
+                self.b_notation = notation.clone(),
         }
     }
 }
@@ -101,6 +105,10 @@ impl SongMetaTrait for MetaInformation {
     fn capo(&self) -> Option<String> {
         self.capo.as_ref().cloned()
     }
+
+    fn b_notation(&self) -> BNotation {
+        self.b_notation
+    }
 }
 
 impl Default for MetaInformation {
@@ -119,6 +127,7 @@ impl Default for MetaInformation {
             tempo: None,
             duration: None,
             capo: None,
+            b_notation: Default::default()
         }
     }
 }
