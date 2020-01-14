@@ -66,7 +66,6 @@ impl ConverterTrait for HtmlConverter {
     fn convert(&self, node: &Node, meta: &dyn SongMetaTrait, _format: Format) -> Result<String> {
         let tag_builder = TagProvider::new();
 
-        println!("{:?}", meta);
         self.html_for_node(node, meta, &tag_builder)
     }
 }
