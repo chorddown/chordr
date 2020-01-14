@@ -84,6 +84,7 @@ impl Parser {
     fn visit_chord(&mut self, token: Token, tokens: &mut Peekable<IntoIter<Token>>) -> Node {
         let chords = if let Token::Chord(c) = token { c } else { unreachable!("Invalid Token given") };
 
+        // TODO: The B-Notation must be detected before the actual parsing. Otherwise it is not possible to create a real Chord instance
         if BNotation::is_european_chord(&chords) {
             self.meta.b_notation = BNotation::H;
         }
