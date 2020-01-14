@@ -1,28 +1,6 @@
 @import "prelude";
 @import "fonts";
 
-$ui-font: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji !default;
-
-$button-line-height: 26px !default;
-$button-font-size: $font-size-h3 !default;
-$button-padding: $std-half $std-space !default;
-$button-bg: $gray !default;
-$button-color: $gray-darker !default;
-$button-hover-bg: $gray-dark !default;
-$button-hover-color: $gray-darker !default;
-$dark-mode-button-bg: $dark-mode-background !default;
-$dark-mode-button-color: $text-color-dark-mode !default;
-$dark-mode-button-hover-bg: $gray-darker !default;
-$dark-mode-button-hover-color: $text-color-dark-mode !default;
-
-$nav-bg: $gray-light !default;
-$dark-mode-nav-bg: $gray-dark !default;
-$nav-button-height: 40px !default;
-$nav-footer-border-width: 2px !default;
-$nav-footer-border-color: $gray-dark !default;
-$nav-width: 300px !default;
-$nav-collapsed-width: $nav-button-height !default;
-
 *,
 *::before,
 *::after {
@@ -34,7 +12,7 @@ img {
 }
 
 body {
-    font-family: $font;
+    font-family: $ui-font;
     font-size: $font-size-web;
     line-height: $line-height;
     letter-spacing: 0.05em;
@@ -52,36 +30,15 @@ main {
     flex-flow: row wrap;
 }
 
-button {
-    display: block;
-    appearance: none;
-    background: $button-bg;
-    color: $button-color;
-    width: 100%;
-    padding: $button-padding;
-    line-height: $button-line-height;
-    font-size: $button-font-size;
-    border: none;
-    font-family: $ui-font;
-
-    &:focus,
-    &:hover {
-        color: $button-hover-color;
-        background: $button-hover-bg;
-        outline: none;
-    }
-
-    @include if-dark-mode {
-        background: $dark-mode-button-bg;
-        color: $dark-mode-button-color;
-
-        &:focus,
-        &:hover {
-            color: $dark-mode-button-hover-color;
-            background: $dark-mode-button-hover-bg;
-        }
-    }
+.im {
+    font-size: .8em;
 }
+
+@import "components/grid";
+@import "components/link";
+@import "components/button";
+@import "components/start-screen";
+@import "components/song-browser";
 
 nav {
     background: $nav-bg;
@@ -110,6 +67,7 @@ nav {
         height: calc(100vh - #{$nav-button-height + $nav-footer-border-width});
     }
 
+    a[role=button],
     button {
         margin-bottom: 2px;
     }
@@ -117,12 +75,22 @@ nav {
     footer {
         margin-top: auto;
         justify-self: flex-end;
+        display: flex;
         order: 200;
         border-top: $nav-footer-border-width solid $nav-footer-border-color;
         @include if-dark-mode {
             border-top: $nav-footer-border-width solid $gray-darker;
         }
 
+        .im {
+            vertical-align: middle;
+        }
+
+        .im + span {
+            margin-left: .3em;
+        }
+
+        a[role=button],
         button {
             float: left;
             width: 50%;
@@ -134,8 +102,15 @@ nav {
             }
         }
 
+        a[role=button].reload-songs,
         button.reload-songs {
             margin-bottom: 0;
+
+            .im {
+                font-size: 1em;
+                float: left;
+                line-height: 30px;
+            }
         }
     }
 
@@ -167,5 +142,3 @@ nav {
 main.-menu-hidden .content {
     width: calc(100% - #{$nav-collapsed-width});
 }
-
-@import "components/start-screen";

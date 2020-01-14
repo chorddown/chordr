@@ -1,0 +1,21 @@
+@import "prelude";
+
+a {
+    color: $link-color;
+    text-decoration: none;
+
+    &:focus,
+    &:hover {
+        color: $link-hover-color;
+        outline: none;
+    }
+
+    @include if-dark-mode {
+        color: $dark-mode-link-color;
+
+        &:focus,
+        &:hover {
+            color: $dark-mode-link-hover-color;
+        }
+    }
+}

@@ -2,18 +2,14 @@ use libchordr::prelude::*;
 use yew::prelude::*;
 use yew::virtual_dom::VNode;
 use yew::{Callback, Component, ComponentLink};
+use crate::helpers::Class;
 
 #[derive(Properties, PartialEq)]
 pub struct SongListItemProps {
     #[props(required)]
     pub song: Song,
 
-    #[props(required)]
-    pub onclick: Callback<SongId>,
-}
-
-pub enum Msg {
-    Clicked,
+    pub class: Class,
 }
 
 #[allow(dead_code)]
@@ -25,28 +21,23 @@ pub struct Item {
 }
 
 impl Component for Item {
-    type Message = Msg;
+    type Message = ();
     type Properties = SongListItemProps;
 
     fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
         Self { link, props }
     }
 
-    fn update(&mut self, msg: Self::Message) -> bool {
-        match msg {
-            Msg::Clicked => {
-                self.props.onclick.emit(self.props.song.id());
-            }
-        }
-        false
+    fn update(&mut self, _msg: Self::Message) -> bool {
+        true
     }
 
     fn view(&self) -> VNode {
         let title = &self.props.song.title();
-        let c = self.link.callback(|_| Msg::Clicked);
+        let href = format!("#/song/{}", self.props.song.id());
+        let class = self.props.class.or("song-item");
+        //("song-item".into());
 
-        html! {
-            <button onclick=c>{ title }</button>
-        }
+        html! { <a role="button" class=class href=href>{ title }</a> }
     }
 }

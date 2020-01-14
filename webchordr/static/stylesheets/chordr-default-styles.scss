@@ -101,6 +101,7 @@
 
     section {
         margin: $std-space 0;
+        clear: both;
         page-break-inside: avoid;
         @if $section-border-length == 100% {
             border-bottom: $section-border;

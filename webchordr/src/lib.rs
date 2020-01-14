@@ -1,24 +1,25 @@
-#![recursion_limit = "256"]
+#![recursion_limit = "128000"]
 extern crate stdweb;
 
 mod components;
+mod route;
+mod helpers;
 
 use log::error;
 use log::info;
 use stdweb::js;
-
 use failure::Error;
-use serde_derive::Deserialize;
 use yew::format::{Json, Nothing};
 use yew::services::fetch::{FetchService, FetchTask, Request, Response};
 use yew::services::storage::{Area, StorageService};
-
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
-
+use yew_router::prelude::*;
 use libchordr::prelude::*;
-
 use crate::components::song_list::Item;
 use crate::components::song_view::SongView;
+use crate::components::start_screen::StartScreen;
+use crate::components::song_browser::{SongBrowser, SongBrowserProps};
+use crate::route::AppRoute;
 
 pub enum Format {
     Json,
@@ -38,6 +39,9 @@ pub struct Model {
     current_song: Option<Song>,
     show_menu: bool,
     ft: Option<FetchTask>,
+
+    route_service: RouteService<()>,
+    route: Route<()>,
 }
 
 pub enum Msg {
@@ -47,47 +51,46 @@ pub enum Msg {
     ToggleMenu,
     Reload,
     Ignore,
-}
-
-/// This type is used to parse data from `./static/songs.json` file and
-/// have to correspond the data layout from that file.
-#[derive(Deserialize, Debug)]
-pub struct SongListResponse {
-    song_list: Vec<SongMeta>,
+    RouteChanged(Route<()>),
 }
 
 impl Model {
-    fn view_data(&self) -> Html {
-        if let Some(song) = &self.current_song {
-            match song.file_type() {
-                FileType::Jpeg => self.view_image(song),
-                FileType::Chorddown => self.view_chorddown(song),
-            }
-        } else {
-            html! {
-                <p>{ "Select a song" }</p>
-            }
+    fn route(&self) -> Html {
+        match AppRoute::switch(self.route.clone()) {
+            Some(AppRoute::Song(id)) => self.view_song(id),
+            Some(AppRoute::SongBrowser(chars)) => self.view_song_browser(chars),
+            Some(AppRoute::Index) => html! {<><StartScreen/>{self.view_song_browser("".to_owned())}</>},
+            None => html! {<><StartScreen/>{self.view_song_browser("".to_owned())}</>},
         }
     }
 
-
-    fn view_image(&self, song: &Song) -> Html {
-        let image_uri = format!("/songs/{}.{}", song.id(), song.file_type());
-
-        html! {<img src=image_uri class="song-image" />}
+    fn view_song(&self, song_id: SongId) -> Html {
+        match &self.catalog {
+            Some(catalog) => {
+                match catalog.get(song_id) {
+                    Some(song) => html! {<SongView song=song/>},
+                    None => html! {},
+                }
+            }
+            None => html! {}
+        }
     }
 
-    fn view_chorddown(&self, song: &Song) -> Html {
-        html! {<SongView song=song />}
+    fn view_song_browser(&self, chars: String) -> Html {
+        (match &self.catalog {
+//            Some(catalog) => SongBrowser::create(SongBrowserProps{}).view()
+            Some(catalog) => {
+                info!("New chars from router: {}", chars);
+                html! {<SongBrowser chars=chars catalog=catalog/>}
+            }
+            None => html! {},
+        }) as Html
     }
 
     fn view_song_list(&self) -> Html {
         let render = |song: &Song| {
             let song = song.clone();
-            let onclick = self
-                .link
-                .callback(|song_id: SongId| Msg::OpenSongInMainView(song_id));
-            html! { <Item song=song onclick=onclick/> }
+            html! { <Item song=song/> }
         };
 
         return (match &self.catalog {
@@ -104,13 +107,15 @@ impl Model {
 
     fn view_nav_footer(&self) -> Html {
         let toggle_menu = self.link.callback(|_| Msg::ToggleMenu);
-        let reload_songs = self.link.callback(|_| Msg::Reload);
 
         (if self.show_menu {
             html! {
                 <footer>
                     <button class="toggle-menu" onclick=toggle_menu>{ "→" }</button>
-                    <button class="reload-songs" onclick=reload_songs>{ "⟲ Reload Songs" }</button>
+                    <a role="button" class="home" href="/" title="Reload the song catalog and go to home screen">
+                        <i class="im im-home"></i>
+                        <span>{ "Home" }</span>
+                    </a>
                 </footer>
             }
         } else {
@@ -146,7 +151,7 @@ impl Model {
         } else {
             uri_base
         };
-        let request = Request::get(uri).body(Nothing).unwrap();
+        let request = Request::get(uri).body(Nothing).expect("Request could not be built");
         self.ft = Some(self.fetch_service.fetch(request, callback));
     }
 }
@@ -156,6 +161,12 @@ impl Component for Model {
     type Properties = ();
 
     fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
+        let mut route_service: RouteService<()> = RouteService::new();
+        let route = route_service.get_route();
+        let route = Route::from(route);
+        let callback = link.callback(Msg::RouteChanged);
+        route_service.register_callback(callback);
+
         Self {
             fetch_service: FetchService::new(),
             storage_service: StorageService::new(Area::Local),
@@ -168,6 +179,8 @@ impl Component for Model {
             current_song: None,
             catalog: None,
             ft: None,
+            route_service,
+            route,
         }
     }
 
@@ -179,6 +192,7 @@ impl Component for Model {
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
+            Msg::RouteChanged(route) => self.route = route,
             Msg::OpenSongInMainView(song_id) => {
                 info!("Change song to {}", song_id);
                 self.current_song = match &self.catalog {
@@ -236,7 +250,7 @@ impl Component for Model {
                     { self.view_nav_footer() }
                 </nav>
                 <div class="content">
-                    { self.view_data() }
+                    { self.route() }
                 </div>
             </main>
         }

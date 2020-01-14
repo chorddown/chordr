@@ -1,5 +1,14 @@
 @import "variables";
 
+@mixin clearfix() {
+    &::before,
+    &::after {
+        clear: both;
+        content: '';
+        display: table-cell;
+    }
+}
+
 @mixin apply-styles($styles) {
     color: map-get($styles, font-color);
     font-weight: map-get($styles, font-weight);

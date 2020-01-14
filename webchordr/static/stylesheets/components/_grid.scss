@@ -1,0 +1,65 @@
+@import "prelude";
+
+@mixin build-row() {
+    @include clearfix;
+    width: 100%;
+    margin: -($grid-gutter-width/2);
+    display: flex;
+    flex-flow: row wrap;
+}
+
+@mixin build-columns($grid-columns) {
+    @include _build-columns-default($grid-columns);
+    @include _build-columns-width($grid-columns);
+    @include _build-grid($grid-columns);
+}
+
+@mixin _build-columns-default($grid-columns) {
+    $list: "";
+    @for $i from 1 through $grid-columns {
+        $list: "#{$list}.col-#{$i}";
+        @if $i < $grid-columns {
+            $list: "#{$list},"
+        }
+    }
+
+    #{$list} {
+        width: 100%;
+        padding-left: $grid-gutter-width/2;
+        padding-right: $grid-gutter-width/2;
+    }
+}
+
+@mixin _build-grid($grid-columns) {
+    $list: "";
+    @for $i from 1 through $grid-columns {
+        $list: "#{$list}.col-#{$i}";
+        @if $i < $grid-columns {
+            $list: "#{$list},"
+        }
+    }
+
+    .grid {
+        #{$list} {
+            padding-bottom: $grid-gutter-width;
+        }
+    }
+}
+
+@mixin _build-columns-width($grid-columns) {
+    @for $i from 1 through $grid-columns {
+        .col-#{$i} {
+            $width: 100%/$grid-columns * $i;
+            max-width: $width;
+            flex: 0 0 $width;
+        }
+    }
+}
+
+.row {
+    @include build-row;
+}
+
+@include build-columns($grid-columns);
+
+

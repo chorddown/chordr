@@ -5,7 +5,11 @@ self.addEventListener('install', function (e) {
             return cache.addAll([
                 '/',
                 '/index.html',
-                '/fonts/libre-baskerville-v7-latin_latin-ext-regular.woff2',
+                '/assets/fonts/libre-baskerville-v7-latin_latin-ext-regular.woff2',
+                '/assets/fonts/libre-baskerville-v7-latin_latin-ext-italic.woff2',
+                '/assets/fonts/merriweather-v21-latin-regular.woff2',
+                '/assets/fonts/merriweather-v21-latin-700.woff2',
+                '/assets/icons/fonts/iconmonstr-iconic-font.woff2',
                 '/stylesheets/chordr-default-styles.css',
                 '/stylesheets/chordr-app.css',
                 '/webchordr.js',

@@ -37,7 +37,7 @@ impl Component for SongView {
         true
     }
 
-    fn change(&mut self, props: Self::Properties) -> bool {
+    fn change(&mut self, props: Self::Properties) -> ShouldRender {
         if self.props.song.id() != props.song.id() {
             self.props = props;
             true
@@ -46,9 +46,9 @@ impl Component for SongView {
         }
     }
 
-    fn view(&self) -> VNode {
+    fn view(&self) -> Html {
         info!("View song {}", self.props.song.id());
-        let html = match convert_to_format(&self.props.song.src(), LibchordrFormat::HTML) {
+        let html = match convert_to_format(&self.props.song.src(), self.props.song.meta() ,LibchordrFormat::HTML) {
             Ok(s) => s,
             Err(e) => {
                 error!("{}", e);

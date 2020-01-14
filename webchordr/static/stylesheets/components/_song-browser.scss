@@ -1,0 +1,40 @@
+@import "prelude";
+
+.song-browser-home {
+    display: inline-block;
+    margin-right: $std-half;
+}
+
+.song-browser-back {
+    display: inline-block;
+    margin-top: $std-space;
+}
+.song-browser-header-suffix {
+    text-transform: uppercase;
+    margin-left: .3em;
+}
+
+.song-browser-song-list {
+    .song-item {
+    }
+}
+
+.song-browser-index-list {
+    //song-browser-index-item grid-button
+    //a[role=button].song-browser-index-item
+    .grid-button {
+        border: 1px solid $gray-dark;
+        text-transform: uppercase;
+        flex-flow: column;
+        //line-height: calc(4vw - #{2 * nth($button-padding, 1)});
+    }
+
+    .index-item-chars {
+        display: block;
+    }
+
+    .index-item-count {
+        display: block;
+        font-size: .6em;
+    }
+}
