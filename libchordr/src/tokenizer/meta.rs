@@ -36,7 +36,7 @@ impl Meta {
             "tempo" => Some(Self::tempo(content)),
             "duration" => Some(Self::duration(content)),
             "capo" => Some(Self::capo(content)),
-            "bnotation" | "b_notation" | "b notation" => Some(Self::b_notation(content)),
+            "bnotation" | "b_notation" | "b notation" | "b-notation" => Some(Self::b_notation(content)),
             _ => None,
         }
     }

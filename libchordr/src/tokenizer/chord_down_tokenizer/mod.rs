@@ -3,7 +3,6 @@ mod mode;
 use crate::tokenizer::chord_down_tokenizer::mode::ModePartner;
 use crate::tokenizer::modifier::Modifier;
 use crate::tokenizer::{Token, Tokenizer, Meta};
-use crate::models::meta::BNotation as BNotationEnum;
 use mode::Mode;
 use std::convert::TryFrom;
 
@@ -91,7 +90,6 @@ fn build_token_from_literal<S: AsRef<str>>(literal: S) -> Token {
     }
 }
 
-
 fn build_headline_token<S: AsRef<str>>(level: u8, value: S) -> Token {
     let (modifier, text) = Modifier::split(value.as_ref());
 
@@ -123,7 +121,7 @@ mod tests {
     use crate::test_helpers::get_test_tokens;
     use crate::helper::token_lines_to_tokens;
     use crate::tokenizer::Meta;
-    use crate::tokenizer::meta::Meta::BNotation;
+    use crate::models::meta::BNotation;
 
     #[test]
     fn test_tokenize_long() {
@@ -166,35 +164,47 @@ Key: Cm
     #[test]
     fn test_tokenize_meta_b_notation() {
         let tokenizer = ChordDownTokenizer::new();
+        // H
         {
             let token_lines = tokenizer.tokenize("B Notation: H");
 
-            assert_eq!(token_lines_to_tokens(token_lines).get(0), Some(&Token::Meta(Meta::BNotation(BNotationEnum::H))));
+            assert_eq!(token_lines_to_tokens(token_lines).get(0), Some(&Token::Meta(Meta::BNotation(BNotation::H))));
         }
         {
             let token_lines = tokenizer.tokenize("B_Notation: H");
 
-            assert_eq!(token_lines_to_tokens(token_lines).get(0), Some(&Token::Meta(Meta::BNotation(BNotationEnum::H))));
+            assert_eq!(token_lines_to_tokens(token_lines).get(0), Some(&Token::Meta(Meta::BNotation(BNotation::H))));
         }
         {
             let token_lines = tokenizer.tokenize("BNotation: H");
 
-            assert_eq!(token_lines_to_tokens(token_lines).get(0), Some(&Token::Meta(Meta::BNotation(BNotationEnum::H))));
+            assert_eq!(token_lines_to_tokens(token_lines).get(0), Some(&Token::Meta(Meta::BNotation(BNotation::H))));
         }
+        {
+            let token_lines = tokenizer.tokenize("B-Notation: H");
+
+            assert_eq!(token_lines_to_tokens(token_lines).get(0), Some(&Token::Meta(Meta::BNotation(BNotation::H))));
+        }
+        // B
         {
             let token_lines = tokenizer.tokenize("B Notation: B");
 
-            assert_eq!(token_lines_to_tokens(token_lines).get(0), Some(&Token::Meta(Meta::BNotation(BNotationEnum::B))));
+            assert_eq!(token_lines_to_tokens(token_lines).get(0), Some(&Token::Meta(Meta::BNotation(BNotation::B))));
         }
         {
             let token_lines = tokenizer.tokenize("B_Notation: B");
 
-            assert_eq!(token_lines_to_tokens(token_lines).get(0), Some(&Token::Meta(Meta::BNotation(BNotationEnum::B))));
+            assert_eq!(token_lines_to_tokens(token_lines).get(0), Some(&Token::Meta(Meta::BNotation(BNotation::B))));
         }
         {
             let token_lines = tokenizer.tokenize("BNotation: B");
 
-            assert_eq!(token_lines_to_tokens(token_lines).get(0), Some(&Token::Meta(Meta::BNotation(BNotationEnum::B))));
+            assert_eq!(token_lines_to_tokens(token_lines).get(0), Some(&Token::Meta(Meta::BNotation(BNotation::B))));
+        }
+        {
+            let token_lines = tokenizer.tokenize("B-Notation: B");
+
+            assert_eq!(token_lines_to_tokens(token_lines).get(0), Some(&Token::Meta(Meta::BNotation(BNotation::B))));
         }
     }
 }
