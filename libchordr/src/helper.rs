@@ -1,7 +1,7 @@
 use crate::converter::{Converter, ConverterTrait};
 use crate::error::Result;
 use crate::format::Format;
-use crate::parser::{Parser, ParserResult};
+use crate::parser::{Parser, ParserTrait, ParserResult};
 use crate::tokenizer::{build_tokenizer, Token, TokenLine, Tokenizer};
 use crate::models::song_meta_trait::SongMetaTrait;
 

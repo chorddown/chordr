@@ -3,7 +3,7 @@ use crate::models::meta::BNotation;
 use std::fmt::Display;
 use serde::export::Formatter;
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub enum Note {
     Cis,
     C,
@@ -38,6 +38,7 @@ impl Note {
             Self::B => if b_notation == BNotation::B { "B" } else { "H" },
         }
     }
+
     pub fn try_from(value: &str, b_notation: BNotation) -> Result<Self, Error> {
         if value.is_empty() {
             return Err(Error::chord_error("Given note is empty"));
@@ -79,7 +80,7 @@ impl Note {
             => Ok(Self::Gis),
 
             // G
-            "G" => Ok(Self::G),
+            "g" => Ok(Self::G),
 
             // F#
             "f#"

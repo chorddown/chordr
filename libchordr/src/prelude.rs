@@ -15,6 +15,7 @@ pub use crate::format::Format;
 /// Parsing
 pub use crate::parser::Node;
 pub use crate::parser::Parser;
+pub use crate::parser::ParserTrait;
 
 /// Data structures
 pub use crate::models::catalog::Catalog;

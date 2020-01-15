@@ -3,6 +3,8 @@ use crate::html::tag::{Content, Tag};
 use crate::html::tag_builder::TagBuilder;
 use crate::parser::{Node, SectionType};
 use crate::tokenizer::Token;
+use crate::models::chord::Chord;
+use crate::models::meta::BNotation;
 
 pub struct TagProvider {}
 
@@ -15,12 +17,12 @@ impl TagProvider {
         let mut gtb = TagBuilder::new();
 
         match node {
-            Node::ChordTextPair { chord, text } => self.build_column(
-                self.build_tag_for_token(chord),
+            Node::ChordTextPair { chords, text } => self.build_column(
+                self.build_tag_for_chords(chords),
                 self.build_tag_for_token(text),
             ),
             Node::ChordStandalone(chord) => {
-                self.build_column(self.build_tag_for_token(chord), Tag::blank())
+                self.build_column(self.build_tag_for_chords(chord), Tag::blank())
             }
             Node::Text(text) => self.build_column(Tag::blank(), self.build_tag_for_token(text)),
             Node::Document(children) => gtb
@@ -103,6 +105,22 @@ impl TagProvider {
                 .build(),
             Token::Meta(_) => unreachable!(),
         }
+    }
+
+    fn build_tag_for_chords(&self, chords: &Vec<Chord>) -> Tag {
+        let chords_formatted = chords
+            .iter()
+            .map(|c| c.to_string(BNotation::B))
+            .collect::<Vec<String>>()
+            .join("/");
+
+        let mut gtb = TagBuilder::new();
+        gtb
+            .set_tag_name("span")
+            .set_content_str(chords_formatted.clone())
+            .set_class_name("chordr-chord")
+            .set_attribute(Attribute::new("data-chord", &chords_formatted).unwrap())
+            .build()
     }
 
     fn build_tag_for_children<'a, 'b>(&'a self, children: &'a Vec<Node>) -> Tag {

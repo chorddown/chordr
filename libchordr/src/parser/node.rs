@@ -1,13 +1,15 @@
 use crate::parser::section_type::SectionType;
 use crate::tokenizer::{Modifier, Token, Meta};
+use crate::models::chord::Chord;
+use crate::models::meta::BNotation;
 
 #[derive(PartialOrd, PartialEq, Debug)]
 pub enum Node {
     ChordTextPair {
-        chord: Token,
+        chords: Vec<Chord>,
         text: Token,
     },
-    ChordStandalone(Token),
+    ChordStandalone(Vec<Chord>),
     Text(Token),
     Meta(Meta),
 
@@ -42,13 +44,20 @@ impl Node {
         Node::Headline(Token::headline(level, value.into(), modifier))
     }
 
-    pub fn chord_standalone<S: Into<String>>(value: S) -> Self {
-        Node::ChordStandalone(Token::chord(value.into()))
+    pub fn chord_standalone<S: AsRef<str>>(value: S) -> Self {
+        match Chord::try_from(value.as_ref(), BNotation::B) {
+            Ok(chord) => Node::ChordStandalone(vec![chord]),
+            Err(_) => Node::ChordStandalone(vec![]),
+        }
     }
-    pub fn chord_text_pair<S1: Into<String>, S2: Into<String>>(chord: S1, text: S2) -> Self {
-        let chord = Token::chord(chord);
+
+    pub fn chord_text_pair<S1: AsRef<str>, S2: Into<String>>(chord: S1, text: S2) -> Self {
+        let chord = match Chord::try_from(chord.as_ref(), BNotation::B) {
+            Ok(chord) => vec![chord],
+            Err(_) => vec![],
+        };
         let text = Token::literal(text);
-        Node::ChordTextPair { chord, text }
+        Node::ChordTextPair { chords: chord, text }
     }
 
     pub fn newline() -> Self {

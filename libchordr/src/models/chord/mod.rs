@@ -4,7 +4,7 @@ use crate::error::Error;
 use crate::models::meta::BNotation;
 pub use self::note::Note;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct Chord {
     root: Note,
     variant: Option<String>,
@@ -22,6 +22,13 @@ impl Chord {
         Self {
             root,
             variant: None,
+        }
+    }
+
+    pub fn to_string(&self, b_notation: BNotation) -> String {
+        match self.variant {
+            Some(ref v) => format!("{}{}", self.root.to_string(b_notation), v),
+            None => format!("{}", self.root.to_string(b_notation)),
         }
     }
 

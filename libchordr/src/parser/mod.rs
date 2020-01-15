@@ -1,6 +1,8 @@
 mod meta_information;
 mod node;
 mod parser_result;
+mod node_parser;
+mod meta_parser;
 mod section_type;
 
 pub use self::meta_information::MetaInformation;
@@ -9,111 +11,32 @@ pub use self::parser_result::ParserResult;
 pub use self::section_type::SectionType;
 use crate::models::meta::*;
 use crate::tokenizer::Token;
-use std::iter::Peekable;
-use std::vec::IntoIter;
+use crate::parser::node_parser::NodeParser;
+use crate::parser::meta_parser::MetaParser;
 
-pub struct Parser {
-    meta: MetaInformation,
+pub trait ParserTrait {
+    type Result;
+
+    /// Parse the given tokens into the Parser's result
+    fn parse(&mut self, tokens: Vec<Token>) -> Self::Result;
 }
+
+pub struct Parser {}
 
 impl Parser {
     pub fn new() -> Self {
-        Self {
-            meta: MetaInformation::default(),
-        }
-    }
-
-    pub fn parse(&mut self, tokens: Vec<Token>) -> ParserResult {
-        let mut tokens_iterator = tokens.into_iter().peekable();
-
-        let mut elements = vec![];
-
-        while let Some(token) = tokens_iterator.next() {
-            elements.push(self.visit(token, &mut tokens_iterator));
-        }
-
-        ParserResult::new(Node::Document(elements), self.meta.clone())
-    }
-
-    fn visit(&mut self, token: Token, tokens: &mut Peekable<IntoIter<Token>>) -> Node {
-        match token {
-            Token::Chord(_) => self.visit_chord(token, tokens),
-            Token::Headline {
-                level,
-                ref text,
-                modifier,
-            } => {
-                if level == 1 {
-                    self.meta.title = Some(text.clone())
-                }
-                let head = Some(Box::new(Node::Headline(token)));
-
-                if tokens.peek().is_some() {
-                    // Collect children
-                    let mut children = vec![];
-                    while let Some(token) = tokens.peek() {
-                        if token_is_start_of_section(token) {
-                            break;
-                        }
-                        children.push(self.visit(tokens.next().unwrap(), tokens));
-                    }
-
-                    Node::Section {
-                        head,
-                        children,
-                        section_type: modifier.into(),
-                    }
-                } else {
-                    Node::Section {
-                        head,
-                        children: vec![],
-                        section_type: modifier.into(),
-                    }
-                }
-            }
-            Token::Meta(meta) => {
-                self.meta.assign_from_token(&meta);
-                Node::Meta(meta)
-            }
-            Token::Literal(_) => Node::Text(token),
-            Token::Quote(_) => Node::Quote(token),
-            Token::Newline => Node::Newline,
-        }
-    }
-
-    fn visit_chord(&mut self, token: Token, tokens: &mut Peekable<IntoIter<Token>>) -> Node {
-        let chords = if let Token::Chord(c) = token { c } else { unreachable!("Invalid Token given") };
-
-        // TODO: The B-Notation must be detected before the actual parsing. Otherwise it is not possible to create a real Chord instance
-        if BNotation::is_european_chord(&chords) {
-            self.meta.b_notation = BNotation::H;
-        }
-
-        if let Some(next) = tokens.peek() {
-            if let Token::Literal(_) = next {
-                // Consume the next token
-                let text = tokens.next().unwrap();
-
-                return Node::ChordTextPair {
-                    chord: Token::Chord(chords),
-                    text,
-                };
-            }
-        }
-
-        return Node::ChordStandalone(Token::Chord(chords));
+        Self {}
     }
 }
 
-fn token_is_start_of_section(token: &Token) -> bool {
-    match token {
-        Token::Headline {
-            level: _,
-            text: _,
-            modifier: _,
-        } => true,
-        Token::Quote(_) => true,
-        _ => false,
+impl ParserTrait for Parser {
+    type Result = ParserResult;
+
+    fn parse(&mut self, tokens: Vec<Token>) -> ParserResult {
+        let meta = MetaParser::new().parse(tokens.clone());
+        let node = NodeParser::with_b_notation(meta.b_notation).parse(tokens);
+
+        ParserResult::new(node, meta)
     }
 }
 
@@ -195,7 +118,7 @@ mod tests {
                     Node::chord_standalone("E"),
                     Node::chord_standalone("A"),
                     Node::newline(),
-                    Node::chord_standalone("B"),
+                    Node::chord_standalone("A#"),
                     Node::chord_standalone("H"),
                 ],
             ),
