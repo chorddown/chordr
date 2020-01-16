@@ -61,7 +61,7 @@ fn convert(args: &ArgMatches) -> Result<()> {
     let input_file_path = args.value_of("INPUT").unwrap();
     let contents = fs::read_to_string(input_file_path)?;
     let tokens = build_tokenizer().tokenize(&contents);
-    let parser_result = Parser::new().parse(token_lines_to_tokens(tokens));
+    let parser_result = Parser::new().parse(token_lines_to_tokens(tokens))?;
     let converted = Converter::new().convert(
         parser_result.node_as_ref(),
         parser_result.meta_as_ref(),

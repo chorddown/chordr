@@ -13,12 +13,13 @@ use crate::models::meta::*;
 use crate::tokenizer::Token;
 use crate::parser::node_parser::NodeParser;
 use crate::parser::meta_parser::MetaParser;
+use crate::error::Error;
 
 pub trait ParserTrait {
-    type Result;
+    type OkType;
 
     /// Parse the given tokens into the Parser's result
-    fn parse(&mut self, tokens: Vec<Token>) -> Self::Result;
+    fn parse(&mut self, tokens: Vec<Token>) -> Result<Self::OkType, Error>;
 }
 
 pub struct Parser {}
@@ -30,13 +31,13 @@ impl Parser {
 }
 
 impl ParserTrait for Parser {
-    type Result = ParserResult;
+    type OkType = ParserResult;
 
-    fn parse(&mut self, tokens: Vec<Token>) -> ParserResult {
-        let meta = MetaParser::new().parse(tokens.clone());
-        let node = NodeParser::with_b_notation(meta.b_notation).parse(tokens);
+    fn parse(&mut self, tokens: Vec<Token>) -> Result<ParserResult, Error> {
+        let meta = MetaParser::new().parse(tokens.clone())?;
+        let node = NodeParser::with_b_notation(meta.b_notation).parse(tokens)?;
 
-        ParserResult::new(node, meta)
+        Ok(ParserResult::new(node, meta))
     }
 }
 
@@ -44,46 +45,21 @@ impl ParserTrait for Parser {
 mod tests {
     use super::*;
     use crate::tokenizer::Modifier;
+    use crate::test_helpers::get_test_parser_input;
 
     #[test]
     fn test_parse() {
         let mut parser = Parser::new();
-        let result = parser.parse(vec![
-            Token::headline(1, "Swing Low Sweet Chariot", Modifier::None),
-            Token::newline(),
-            Token::headline(2, "Chorus", Modifier::Chorus),
-            Token::literal("Swing "),
-            Token::chord("D"),
-            Token::literal("low, sweet "),
-            Token::chord("G"),
-            Token::literal("chari"),
-            Token::chord("D"),
-            Token::literal("ot,"),
-            Token::literal("Comin’ for to carry me "),
-            Token::chord("A7"),
-            Token::literal("home."),
-            Token::literal("Swing "),
-            Token::chord("D7"),
-            Token::headline(2, "Verse", Modifier::None),
-            Token::chord("E"),
-            Token::literal("low, sweet "),
-            Token::chord("G"),
-            Token::literal("chari"),
-            Token::chord("D"),
-            Token::literal("ot,"),
-            Token::chord("E"),
-            Token::chord("A"),
-            Token::newline(),
-            Token::chord("B"),
-            Token::chord("H"),
-        ]);
+        let result = parser.parse(get_test_parser_input());
 
+        assert!(result.is_ok());
+        let parser_result = result.unwrap();
         assert_eq!(
             Some("Swing Low Sweet Chariot".to_string()),
-            result.meta().title
+            parser_result.meta().title
         );
 
-        let ast = result.node();
+        let ast = parser_result.node();
 
         let expected_ast = Node::Document(vec![
             Node::section(
@@ -98,13 +74,13 @@ mod tests {
                 Modifier::Chorus,
                 vec![
                     Node::text("Swing "),
-                    Node::chord_text_pair("D", "low, sweet "),
-                    Node::chord_text_pair("G", "chari"),
-                    Node::chord_text_pair("D", "ot,"),
+                    Node::chord_text_pair("D", "low, sweet ").unwrap(),
+                    Node::chord_text_pair("G", "chari").unwrap(),
+                    Node::chord_text_pair("D", "ot,").unwrap(),
                     Node::text("Comin’ for to carry me "),
-                    Node::chord_text_pair("A7", "home."),
+                    Node::chord_text_pair("A7", "home.").unwrap(),
                     Node::text("Swing "),
-                    Node::chord_standalone("D7"),
+                    Node::chord_standalone("D7").unwrap(),
                 ],
             ),
             Node::section(
@@ -112,14 +88,14 @@ mod tests {
                 "Verse",
                 Modifier::None,
                 vec![
-                    Node::chord_text_pair("E", "low, sweet "),
-                    Node::chord_text_pair("G", "chari"),
-                    Node::chord_text_pair("D", "ot,"),
-                    Node::chord_standalone("E"),
-                    Node::chord_standalone("A"),
+                    Node::chord_text_pair("E", "low, sweet ").unwrap(),
+                    Node::chord_text_pair("G", "chari").unwrap(),
+                    Node::chord_text_pair("D", "ot,").unwrap(),
+                    Node::chord_standalone("E").unwrap(),
+                    Node::chord_standalone("A").unwrap(),
                     Node::newline(),
-                    Node::chord_standalone("A#"),
-                    Node::chord_standalone("H"),
+                    Node::chord_standalone("A#").unwrap(),
+                    Node::chord_standalone("H").unwrap(),
                 ],
             ),
         ]);
@@ -138,7 +114,8 @@ mod tests {
                 Token::literal("A text"),
             ]);
 
-            assert_eq!(result.meta_as_ref().b_notation, BNotation::B);
+            assert!(result.is_ok());
+            assert_eq!(result.unwrap().meta_as_ref().b_notation, BNotation::B);
         }
         {
             let result = parser.parse(vec![
@@ -147,7 +124,8 @@ mod tests {
                 Token::chord("E"),
             ]);
 
-            assert_eq!(result.meta_as_ref().b_notation, BNotation::B);
+            assert!(result.is_ok());
+            assert_eq!(result.unwrap().meta_as_ref().b_notation, BNotation::B);
         }
         {
             let result = parser.parse(vec![
@@ -157,7 +135,8 @@ mod tests {
                 Token::literal("A text"),
             ]);
 
-            assert_eq!(result.meta_as_ref().b_notation, BNotation::H);
+            assert!(result.is_ok());
+            assert_eq!(result.unwrap().meta_as_ref().b_notation, BNotation::H);
         }
         {
             let result = parser.parse(vec![
@@ -166,7 +145,8 @@ mod tests {
                 Token::chord("H"),
             ]);
 
-            assert_eq!(result.meta_as_ref().b_notation, BNotation::H);
+            assert!(result.is_ok());
+            assert_eq!(result.unwrap().meta_as_ref().b_notation, BNotation::H);
         }
     }
 }

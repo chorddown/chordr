@@ -13,18 +13,18 @@ pub struct NodeParser {
 }
 
 impl ParserTrait for NodeParser {
-    type Result = Node;
+    type OkType = Node;
 
-    fn parse(&mut self, tokens: Vec<Token>) -> Self::Result {
+    fn parse(&mut self, tokens: Vec<Token>) -> Result<Self::OkType, Error> {
         let mut tokens_iterator = tokens.into_iter().peekable();
 
         let mut elements = vec![];
 
         while let Some(token) = tokens_iterator.next() {
-            elements.push(self.visit(token, &mut tokens_iterator));
+            elements.push(self.visit(token, &mut tokens_iterator)?);
         }
 
-        Node::Document(elements)
+        Ok(Node::Document(elements))
     }
 }
 
@@ -33,7 +33,7 @@ impl NodeParser {
         Self { b_notation }
     }
 
-    fn visit(&mut self, token: Token, tokens: &mut Peekable<IntoIter<Token>>) -> Node {
+    fn visit(&mut self, token: Token, tokens: &mut Peekable<IntoIter<Token>>) -> Result<Node, Error> {
         match token {
             Token::Chord(_) => self.visit_chord(token, tokens),
             Token::Headline {
@@ -51,32 +51,31 @@ impl NodeParser {
                         if token_is_start_of_section(token) {
                             break;
                         }
-                        children.push(self.visit(tokens.next().unwrap(), tokens));
+                        let result = self.visit(tokens.next().unwrap(), tokens)?;
+                        children.push(result);
                     }
 
-                    Node::Section {
+                    Ok(Node::Section {
                         head,
                         children,
                         section_type: modifier.into(),
-                    }
+                    })
                 } else {
-                    Node::Section {
+                    Ok(Node::Section {
                         head,
                         children: vec![],
                         section_type: modifier.into(),
-                    }
+                    })
                 }
             }
-            Token::Meta(meta) => {
-                Node::Meta(meta)
-            }
-            Token::Literal(_) => Node::Text(token),
-            Token::Quote(_) => Node::Quote(token),
-            Token::Newline => Node::Newline,
+            Token::Meta(meta) => Ok(Node::Meta(meta)),
+            Token::Literal(_) => Ok(Node::Text(token)),
+            Token::Quote(_) => Ok(Node::Quote(token)),
+            Token::Newline => Ok(Node::Newline),
         }
     }
 
-    fn visit_chord(&mut self, token: Token, tokens: &mut Peekable<IntoIter<Token>>) -> Node {
+    fn visit_chord(&mut self, token: Token, tokens: &mut Peekable<IntoIter<Token>>) -> Result<Node, Error> {
         let chords_raw = if let Token::Chord(c) = token { c } else { unreachable!("Invalid Token given") };
 
         let chords: Vec<Chord> = chords_raw
@@ -89,14 +88,14 @@ impl NodeParser {
                 // Consume the next token
                 let text = tokens.next().unwrap();
 
-                return Node::ChordTextPair {
+                return Ok(Node::ChordTextPair {
                     chords,
                     text,
-                };
+                });
             }
         }
 
-        return Node::ChordStandalone(chords);
+        Ok(Node::ChordStandalone(chords))
     }
 }
 
@@ -120,35 +119,10 @@ mod tests {
     #[test]
     fn test_parse() {
         let mut parser = NodeParser::with_b_notation(BNotation::B);
-        let ast = parser.parse(vec![
-            Token::headline(1, "Swing Low Sweet Chariot", Modifier::None),
-            Token::newline(),
-            Token::headline(2, "Chorus", Modifier::Chorus),
-            Token::literal("Swing "),
-            Token::chord("D"),
-            Token::literal("low, sweet "),
-            Token::chord("G"),
-            Token::literal("chari"),
-            Token::chord("D"),
-            Token::literal("ot,"),
-            Token::literal("Comin’ for to carry me "),
-            Token::chord("A7"),
-            Token::literal("home."),
-            Token::literal("Swing "),
-            Token::chord("D7"),
-            Token::headline(2, "Verse", Modifier::None),
-            Token::chord("E"),
-            Token::literal("low, sweet "),
-            Token::chord("G"),
-            Token::literal("chari"),
-            Token::chord("D"),
-            Token::literal("ot,"),
-            Token::chord("E"),
-            Token::chord("A"),
-            Token::newline(),
-            Token::chord("B"),
-            Token::chord("H"),
-        ]);
+        let result = parser.parse(get_test_parser_input());
+
+        assert!(result.is_ok());
+        let ast = result.unwrap();
 
         let expected_ast = Node::Document(vec![
             Node::section(

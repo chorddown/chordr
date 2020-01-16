@@ -18,7 +18,7 @@ pub fn token_lines_to_tokens(token_lines: Vec<TokenLine>) -> Vec<Token> {
 
 pub fn parse_content(contents: &str) -> ParserResult {
     let tokens = build_tokenizer().tokenize(contents);
-    Parser::new().parse(token_lines_to_tokens(tokens))
+    Parser::new().parse(token_lines_to_tokens(tokens)).unwrap()
 }
 
 pub fn convert_to_format(contents: &str, meta: &dyn SongMetaTrait, format: Format) -> Result<String> {

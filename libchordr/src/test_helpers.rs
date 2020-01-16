@@ -86,3 +86,35 @@ pub fn get_test_tokens() -> Vec<TokenLine> {
         vec![Token::quote("Chorus"), Token::newline()],
     ]
 }
+
+pub fn get_test_parser_input() -> Vec<Token> {
+    vec![
+        Token::headline(1, "Swing Low Sweet Chariot", Modifier::None),
+        Token::newline(),
+        Token::headline(2, "Chorus", Modifier::Chorus),
+        Token::literal("Swing "),
+        Token::chord("D"),
+        Token::literal("low, sweet "),
+        Token::chord("G"),
+        Token::literal("chari"),
+        Token::chord("D"),
+        Token::literal("ot,"),
+        Token::literal("Comin’ for to carry me "),
+        Token::chord("A7"),
+        Token::literal("home."),
+        Token::literal("Swing "),
+        Token::chord("D7"),
+        Token::headline(2, "Verse", Modifier::None),
+        Token::chord("E"),
+        Token::literal("low, sweet "),
+        Token::chord("G"),
+        Token::literal("chari"),
+        Token::chord("D"),
+        Token::literal("ot,"),
+        Token::chord("E"),
+        Token::chord("A"),
+        Token::newline(),
+        Token::chord("B"),
+        Token::chord("H"),
+    ]
+}

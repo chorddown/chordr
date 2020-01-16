@@ -8,16 +8,16 @@ use crate::tokenizer::Token;
 pub struct MetaParser {}
 
 impl ParserTrait for MetaParser {
-    type Result = MetaInformation;
+    type OkType = MetaInformation;
 
 
-    fn parse(&mut self, tokens: Vec<Token>) -> MetaInformation {
+    fn parse(&mut self, tokens: Vec<Token>) -> Result<MetaInformation, Error> {
         let mut meta = MetaInformation::default();
         for token in tokens {
             meta = self.visit(token, meta);
         }
 
-        meta
+        Ok(meta)
     }
 }
 
@@ -69,43 +69,17 @@ impl MetaParser {
 mod tests {
     use super::*;
     use crate::tokenizer::Modifier;
+    use crate::test_helpers::get_test_parser_input;
 
     #[test]
     fn test_parse() {
         let mut parser = MetaParser::new();
-        let result = parser.parse(vec![
-            Token::headline(1, "Swing Low Sweet Chariot", Modifier::None),
-            Token::newline(),
-            Token::headline(2, "Chorus", Modifier::Chorus),
-            Token::literal("Swing "),
-            Token::chord("D"),
-            Token::literal("low, sweet "),
-            Token::chord("G"),
-            Token::literal("chari"),
-            Token::chord("D"),
-            Token::literal("ot,"),
-            Token::literal("Comin’ for to carry me "),
-            Token::chord("A7"),
-            Token::literal("home."),
-            Token::literal("Swing "),
-            Token::chord("D7"),
-            Token::headline(2, "Verse", Modifier::None),
-            Token::chord("E"),
-            Token::literal("low, sweet "),
-            Token::chord("G"),
-            Token::literal("chari"),
-            Token::chord("D"),
-            Token::literal("ot,"),
-            Token::chord("E"),
-            Token::chord("A"),
-            Token::newline(),
-            Token::chord("B"),
-            Token::chord("H"),
-        ]);
+        let result = parser.parse(get_test_parser_input());
 
+        assert!(result.is_ok());
         assert_eq!(
             Some("Swing Low Sweet Chariot".to_string()),
-            result.title
+            result.unwrap().title
         );
     }
 
@@ -120,7 +94,7 @@ mod tests {
                 Token::literal("A text"),
             ]);
 
-            assert_eq!(result.b_notation, BNotation::B);
+            assert_eq!(result.unwrap().b_notation, BNotation::B);
         }
         {
             let result = parser.parse(vec![
@@ -129,7 +103,7 @@ mod tests {
                 Token::chord("E"),
             ]);
 
-            assert_eq!(result.b_notation, BNotation::B);
+            assert_eq!(result.unwrap().b_notation, BNotation::B);
         }
         {
             let result = parser.parse(vec![
@@ -139,7 +113,7 @@ mod tests {
                 Token::literal("A text"),
             ]);
 
-            assert_eq!(result.b_notation, BNotation::H);
+            assert_eq!(result.unwrap().b_notation, BNotation::H);
         }
         {
             let result = parser.parse(vec![
@@ -148,7 +122,7 @@ mod tests {
                 Token::chord("H"),
             ]);
 
-            assert_eq!(result.b_notation, BNotation::H);
+            assert_eq!(result.unwrap().b_notation, BNotation::H);
         }
     }
 }
