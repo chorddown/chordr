@@ -1,15 +1,16 @@
 use crate::parser::section_type::SectionType;
 use crate::tokenizer::{Modifier, Token, Meta};
-use crate::models::chord::Chord;
 use crate::models::meta::BNotation;
+use crate::error::Error;
+use crate::models::chord::Chords;
 
 #[derive(PartialOrd, PartialEq, Debug)]
 pub enum Node {
     ChordTextPair {
-        chords: Vec<Chord>,
+        chords: Chords,
         text: Token,
     },
-    ChordStandalone(Vec<Chord>),
+    ChordStandalone(Chords),
     Text(Token),
     Meta(Meta),
 
@@ -44,20 +45,15 @@ impl Node {
         Node::Headline(Token::headline(level, value.into(), modifier))
     }
 
-    pub fn chord_standalone<S: AsRef<str>>(value: S) -> Self {
-        match Chord::try_from(value.as_ref(), BNotation::B) {
-            Ok(chord) => Node::ChordStandalone(vec![chord]),
-            Err(_) => Node::ChordStandalone(vec![]),
-        }
+    pub fn chord_standalone<S: AsRef<str>>(value: S) -> Result<Self, Error> {
+        Ok(Node::ChordStandalone(Chords::try_from(value.as_ref(), BNotation::B)?))
     }
 
-    pub fn chord_text_pair<S1: AsRef<str>, S2: Into<String>>(chord: S1, text: S2) -> Self {
-        let chord = match Chord::try_from(chord.as_ref(), BNotation::B) {
-            Ok(chord) => vec![chord],
-            Err(_) => vec![],
-        };
+    pub fn chord_text_pair<S1: AsRef<str>, S2: Into<String>>(chords: S1, text: S2) -> Result<Self, Error> {
+        let chords = Chords::try_from(chords.as_ref(), BNotation::B)?;
         let text = Token::literal(text);
-        Node::ChordTextPair { chords: chord, text }
+
+        Ok(Node::ChordTextPair { chords, text })
     }
 
     pub fn newline() -> Self {

@@ -6,7 +6,7 @@ pub use super::section_type::SectionType;
 use crate::tokenizer::Token;
 use std::iter::Peekable;
 use std::vec::IntoIter;
-use crate::models::chord::Chord;
+use crate::models::chord::Chords;
 
 pub struct NodeParser {
     b_notation: BNotation
@@ -78,10 +78,8 @@ impl NodeParser {
     fn visit_chord(&mut self, token: Token, tokens: &mut Peekable<IntoIter<Token>>) -> Result<Node, Error> {
         let chords_raw = if let Token::Chord(c) = token { c } else { unreachable!("Invalid Token given") };
 
-        let chords: Vec<Chord> = chords_raw
-            .split('/')
-            .filter_map(|r| Chord::try_from(&r, self.b_notation).ok())
-            .collect();
+        // TODO: Add relaxed parsing of chords like `[A ///]`
+        let chords = Chords::try_from(&chords_raw, self.b_notation)?;
 
         if let Some(next) = tokens.peek() {
             if let Token::Literal(_) = next {
@@ -115,6 +113,7 @@ fn token_is_start_of_section(token: &Token) -> bool {
 mod tests {
     use super::*;
     use crate::tokenizer::Modifier;
+    use crate::test_helpers::get_test_parser_input;
 
     #[test]
     fn test_parse() {
@@ -137,13 +136,13 @@ mod tests {
                 Modifier::Chorus,
                 vec![
                     Node::text("Swing "),
-                    Node::chord_text_pair("D", "low, sweet "),
-                    Node::chord_text_pair("G", "chari"),
-                    Node::chord_text_pair("D", "ot,"),
+                    Node::chord_text_pair("D", "low, sweet ").unwrap(),
+                    Node::chord_text_pair("G", "chari").unwrap(),
+                    Node::chord_text_pair("D", "ot,").unwrap(),
                     Node::text("Comin’ for to carry me "),
-                    Node::chord_text_pair("A7", "home."),
+                    Node::chord_text_pair("A7", "home.").unwrap(),
                     Node::text("Swing "),
-                    Node::chord_standalone("D7"),
+                    Node::chord_standalone("D7").unwrap(),
                 ],
             ),
             Node::section(
@@ -151,14 +150,14 @@ mod tests {
                 "Verse",
                 Modifier::None,
                 vec![
-                    Node::chord_text_pair("E", "low, sweet "),
-                    Node::chord_text_pair("G", "chari"),
-                    Node::chord_text_pair("D", "ot,"),
-                    Node::chord_standalone("E"),
-                    Node::chord_standalone("A"),
+                    Node::chord_text_pair("E", "low, sweet ").unwrap(),
+                    Node::chord_text_pair("G", "chari").unwrap(),
+                    Node::chord_text_pair("D", "ot,").unwrap(),
+                    Node::chord_standalone("E").unwrap(),
+                    Node::chord_standalone("A").unwrap(),
                     Node::newline(),
-                    Node::chord_standalone("B"),
-                    Node::chord_standalone("H"),
+                    Node::chord_standalone("B").unwrap(),
+                    Node::chord_standalone("H").unwrap(),
                 ],
             ),
         ]);

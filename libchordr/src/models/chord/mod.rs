@@ -1,8 +1,10 @@
 mod note;
+mod chords;
 
 use crate::error::Error;
 use crate::models::meta::BNotation;
 pub use self::note::Note;
+pub use self::chords::Chords;
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct Chord {
@@ -34,7 +36,7 @@ impl Chord {
 
     pub fn try_from(value: &str, b_notation: BNotation) -> Result<Self, Error> {
         if value.is_empty() {
-            return Err(Error::chord_error("Given root is empty"));
+            return Err(Error::chord_error("Given value is empty"));
         }
 
         if value.len() < 2 {
@@ -58,24 +60,6 @@ impl Chord {
             root: Note::try_from(&node_raw, b_notation)?,
             variant,
         });
-
-
-        //        match value {
-        //            "C" => Ok(Self::C),
-        //            "Cis" | "Des" => Ok(Self::Cis),
-        //            "D" => Ok(Self::D),
-        //            "Dis"|"Es" => Ok(Self::Dis),
-        //            "E" => Ok(Self::E),
-        //            "Eis" => Ok(Self::Eis),
-        //            "F" => Ok(Self::F),
-        //            "Fis"|"Ges" => Ok(Self::Fis),
-        //            "G" => Ok(Self::G),
-        //            "Gis"|"Aes" => Ok(Self::Gis),
-        //            "A" => Ok(Self::A),
-        //            "Ais"|"Bes" => Ok(Self::Ais),
-        //            "B" | "H" => Ok(Self::H),
-        //            _ => return Err(Error::chord_error(format!("Unknown note {}", value)))
-        //        }
     }
 
     fn split_note_characters(value: &str) -> Result<(String, String), Error> {
@@ -86,8 +70,6 @@ impl Chord {
         assert!(!value.is_empty(), "Value must not be empty");
         assert!(value.len() >= 2);
         let chars: Vec<char> = value.chars().collect();
-
-//        assert_eq!(chars.len(), value.len());
 
         match chars[0] {
             'A' | 'H' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' => (),

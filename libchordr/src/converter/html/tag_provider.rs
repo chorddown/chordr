@@ -3,8 +3,8 @@ use crate::html::tag::{Content, Tag};
 use crate::html::tag_builder::TagBuilder;
 use crate::parser::{Node, SectionType};
 use crate::tokenizer::Token;
-use crate::models::chord::Chord;
 use crate::models::meta::BNotation;
+use crate::models::chord::Chords;
 
 pub struct TagProvider {}
 
@@ -107,19 +107,13 @@ impl TagProvider {
         }
     }
 
-    fn build_tag_for_chords(&self, chords: &Vec<Chord>) -> Tag {
-        let chords_formatted = chords
-            .iter()
-            .map(|c| c.to_string(BNotation::B))
-            .collect::<Vec<String>>()
-            .join("/");
-
+    fn build_tag_for_chords(&self, chords: &Chords) -> Tag {
         let mut gtb = TagBuilder::new();
         gtb
             .set_tag_name("span")
-            .set_content_str(chords_formatted.clone())
+            .set_content_str(chords.to_string(BNotation::B))
             .set_class_name("chordr-chord")
-            .set_attribute(Attribute::new("data-chord", &chords_formatted).unwrap())
+            .set_attribute(Attribute::new("data-chord", &chords.to_string(BNotation::B)).unwrap())
             .build()
     }
 
