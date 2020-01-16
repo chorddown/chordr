@@ -1,7 +1,6 @@
-use libchordr::prelude::*;
 use yew::prelude::*;
 use yew::virtual_dom::VNode;
-use yew::{Callback, Component, ComponentLink};
+use yew::{Component, ComponentLink};
 use log::info;
 use crate::helpers::Class;
 use super::index::Index;

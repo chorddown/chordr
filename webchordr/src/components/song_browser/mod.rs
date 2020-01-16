@@ -10,7 +10,6 @@ use yew::prelude::*;
 use yew::{Component, ComponentLink, ShouldRender};
 use self::index_item::IndexItem;
 use crate::components::song_list::Item as SongItem;
-use std::string::ToString;
 use self::index::*;
 use self::link::SongBrowserLink;
 

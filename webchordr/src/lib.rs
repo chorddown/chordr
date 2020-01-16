@@ -18,7 +18,7 @@ use libchordr::prelude::*;
 use crate::components::song_list::Item;
 use crate::components::song_view::SongView;
 use crate::components::start_screen::StartScreen;
-use crate::components::song_browser::{SongBrowser, SongBrowserProps};
+use crate::components::song_browser::SongBrowser;
 use crate::route::AppRoute;
 
 pub enum Format {
