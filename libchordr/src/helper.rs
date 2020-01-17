@@ -16,11 +16,11 @@ pub fn token_lines_to_tokens(token_lines: Vec<TokenLine>) -> Vec<Token> {
     stream
 }
 
-pub fn parse_content(contents: &str) -> ParserResult {
+pub fn parse_content(contents: &str) -> Result<ParserResult> {
     let tokens = build_tokenizer().tokenize(contents);
-    Parser::new().parse(token_lines_to_tokens(tokens)).unwrap()
+    Parser::new().parse(token_lines_to_tokens(tokens))
 }
 
 pub fn convert_to_format(contents: &str, meta: &dyn SongMetaTrait, format: Format) -> Result<String> {
-    Converter::new().convert(parse_content(contents).node_as_ref(), meta, format)
+    Converter::new().convert(parse_content(contents)?.node_as_ref(), meta, format)
 }

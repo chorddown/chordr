@@ -30,7 +30,7 @@ impl TryFrom<&Path> for Song {
         };
 
         let song_id = path.file_name().unwrap().to_str().unwrap().to_owned();
-        let parser_result = parse_content(&src);
+        let parser_result = parse_content(&src)?;
         let title = parser_result.meta().title.unwrap_or(song_id.clone());
         let file_type = FileType::try_from(path)?;
 //        let meta = SongMeta::new(song_id, title, file_type);
