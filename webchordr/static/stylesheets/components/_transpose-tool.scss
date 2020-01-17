@@ -6,18 +6,19 @@
     right: $nav-width;
     background: $gray-light;
     color: $button-color;
+    padding: (1+$std-half) 0 (1+$std-half) $std-half;
+    line-height: $button-line-height;
+    font-size: $button-font-size;
 
     @media print {
         display: none;
     }
 
     label {
-        padding: (1+$std-half) 0 (1+$std-half) $std-half;
+        padding: 0;
         line-height: $button-line-height;
         font-size: $button-font-size;
-
     }
-
 
     input {
         background: transparent;
@@ -29,6 +30,12 @@
         color: $button-color;
     }
 
+    .value {
+        padding: 0 $std-half;
+        display: inline-block;
+        min-width: 26px;
+    }
+
     @include if-dark-mode {
         background: $gray-darker;
         color: $dark-mode-button-color;
@@ -38,6 +45,24 @@
         }
     }
 
+    button.discreet {
+        display: inline-block;
+        color: $button-color;
+
+        &:focus,
+        &:hover {
+            color: $button-hover-color;
+        }
+
+        @include if-dark-mode {
+            color: $dark-mode-button-color;
+
+            &:focus,
+            &:hover {
+                color: $dark-mode-button-hover-color;
+            }
+        }
+    }
 }
 
 main.-menu-hidden .transpose-tool {

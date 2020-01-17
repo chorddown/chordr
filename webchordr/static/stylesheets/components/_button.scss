@@ -4,32 +4,39 @@ a[role=button],
 button {
     display: block;
     appearance: none;
-    background: $button-bg;
-    color: $button-color;
-    width: 100%;
-    padding: $button-padding;
     line-height: $button-line-height;
     font-size: $button-font-size;
     border: $button-border;
     font-family: $ui-font;
     text-decoration: none;
-    text-align: center;
 
     &:focus,
     &:hover {
-        color: $button-hover-color;
-        background: $button-hover-bg;
         outline: none;
     }
 
-    @include if-dark-mode {
-        background: $dark-mode-button-bg;
-        color: $dark-mode-button-color;
+    &:not(.discreet) {
+        background: $button-bg;
+        color: $button-color;
+        width: 100%;
+        padding: $button-padding;
+        text-align: center;
 
         &:focus,
         &:hover {
-            color: $dark-mode-button-hover-color;
-            background: $dark-mode-button-hover-bg;
+            color: $button-hover-color;
+            background: $button-hover-bg;
+        }
+
+        @include if-dark-mode {
+            background: $dark-mode-button-bg;
+            color: $dark-mode-button-color;
+
+            &:focus,
+            &:hover {
+                color: $dark-mode-button-hover-color;
+                background: $dark-mode-button-hover-bg;
+            }
         }
     }
 
@@ -43,5 +50,10 @@ button {
         display: flex;
         align-items: center;
         justify-content: center;
+    }
+
+    &.discreet {
+        background: transparent;
+        border: none;
     }
 }

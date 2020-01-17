@@ -15,10 +15,13 @@ pub struct SongViewProps {
     pub song: Song,
 
     pub transpose_semitone: Option<isize>,
+    pub show_input_field: Option<()>,
 }
 
 pub enum Msg {
-    Click(ChangeData)
+    InputChange(ChangeData),
+    TransposeUp,
+    TransposeDown,
 }
 
 #[allow(dead_code)]
@@ -44,7 +47,7 @@ impl Component for SongView {
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
-            Msg::Click(ChangeData::Value(v)) => {
+            Msg::InputChange(ChangeData::Value(v)) => {
                 info!("{:?}", v);
 
                 self.transpose_semitone = match v.parse::<isize>() {
@@ -54,17 +57,24 @@ impl Component for SongView {
                         0
                     }
                 };
-                true // Indicate that the Component should re-render
             }
-            Msg::Click(change_data) => {
-                error!("Invalid change data {:?}", change_data);
-                true
+            Msg::InputChange(change_data) => error!("Invalid change data {:?}", change_data),
+            Msg::TransposeUp => {
+                self.transpose_semitone += 1;
+                info!("up to {:?}", self.transpose_semitone);
             }
-        }
+            Msg::TransposeDown => {
+                self.transpose_semitone -= 1;
+                info!("down to {:?}", self.transpose_semitone);
+            }
+        };
+
+        true
     }
     fn change(&mut self, props: Self::Properties) -> ShouldRender {
         if self.props.song.id() != props.song.id() {
             self.props = props;
+            self.transpose_semitone = 0;
             true
         } else {
             false
@@ -72,7 +82,7 @@ impl Component for SongView {
     }
 
     fn view(&self) -> Html {
-        info!("View song {}", self.props.song.id());
+        info!("View song {} (transpose {})", self.props.song.id(), self.transpose_semitone);
 
         let detail = self.convert_song_to_html_node();
         let transpose_tool = self.render_transpose_tool();
@@ -89,18 +99,46 @@ impl Component for SongView {
 
 impl SongView {
     fn render_transpose_tool(&self) -> Html {
-        let onchange = self.link.callback(|e: ChangeData| Msg::Click(e));
+        let transpose_up = self.link.callback(|_| Msg::TransposeUp);
+        let transpose_down = self.link.callback(|_| Msg::TransposeDown);
+        let show_input_field = self.props.show_input_field.is_some();
 
-        html! {
-            <div class="transpose-tool">
-                <label title="Transpose song">
-                    <span class="icon">{"♬"}</span>
-                    <input type="number" min="-11" max="11" onchange=onchange value=self.transpose_semitone/>
-                    <span class="sr-only">{"Transpose song"}</span>
-                </label>
-            </div>
-        }
+        let number_output = if show_input_field {
+            let onchange = self.link.callback(|e: ChangeData| Msg::InputChange(e));
+            html! {<input type="number" min="-11" max="11" onchange=onchange value=self.transpose_semitone/>}
+        } else {
+            html! {<span class="value">{self.transpose_semitone}</span>}
+        };
+
+        let inner = html! {
+            <>
+                <span class="icon">{"♬"}</span>
+                <button class="discreet" onclick=transpose_down><i class="im im-angle-left"></i></button>
+                {number_output}
+                <button class="discreet" onclick=transpose_up><i class="im im-angle-right"></i></button>
+                <span class="sr-only">{"Transpose song"}</span>
+            </>
+        };
+
+        (if show_input_field {
+            html! {
+                <div class="transpose-tool">
+                    <label title="Transpose song">
+                        {inner}
+                    </label>
+                </div>
+            }
+        } else {
+            html! {
+                <div class="transpose-tool">
+                    <div title="Transpose song">
+                        {inner}
+                    </div>
+                </div>
+            }
+        }) as Html
     }
+
     fn convert_song_to_html_string(&self) -> String {
         let props = &self.props;
 

@@ -1076,41 +1076,46 @@ a[role=button],
 button {
   display: block;
   appearance: none;
-  background: #b7b7b0;
-  color: #62625e;
-  width: 100%;
-  padding: 7px 14px;
   line-height: 26px;
   font-size: 1em;
   border: 1px solid #8d8d88;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
-  text-decoration: none;
-  text-align: center; }
+  text-decoration: none; }
   a[role=button]:focus, a[role=button]:hover,
   button:focus,
   button:hover {
-    color: #62625e;
-    background: #8d8d88;
     outline: none; }
-  @media screen and (prefers-color-scheme: dark) {
-    a[role=button],
-    button {
+  a[role=button]:not(.discreet),
+  button:not(.discreet) {
+    background: #b7b7b0;
+    color: #62625e;
+    width: 100%;
+    padding: 7px 14px;
+    text-align: center; }
+    a[role=button]:not(.discreet):focus, a[role=button]:not(.discreet):hover,
+    button:not(.discreet):focus,
+    button:not(.discreet):hover {
+      color: #62625e;
+      background: #8d8d88; }
+    @media screen and (prefers-color-scheme: dark) {
+      a[role=button]:not(.discreet),
+      button:not(.discreet) {
+        background: #221d1c;
+        color: white; }
+        a[role=button]:not(.discreet):focus, a[role=button]:not(.discreet):hover,
+        button:not(.discreet):focus,
+        button:not(.discreet):hover {
+          color: white;
+          background: #62625e; } }
+    html.dark-mode a[role=button]:not(.discreet), html.dark-mode
+    button:not(.discreet) {
       background: #221d1c;
       color: white; }
-      a[role=button]:focus, a[role=button]:hover,
-      button:focus,
-      button:hover {
+      html.dark-mode a[role=button]:not(.discreet):focus, html.dark-mode a[role=button]:not(.discreet):hover, html.dark-mode
+      button:not(.discreet):focus, html.dark-mode
+      button:not(.discreet):hover {
         color: white;
-        background: #62625e; } }
-  html.dark-mode a[role=button], html.dark-mode
-  button {
-    background: #221d1c;
-    color: white; }
-    html.dark-mode a[role=button]:focus, html.dark-mode a[role=button]:hover, html.dark-mode
-    button:focus, html.dark-mode
-    button:hover {
-      color: white;
-      background: #62625e; }
+        background: #62625e; }
   a[role=button].-inline,
   button.-inline {
     display: inline-block;
@@ -1121,6 +1126,10 @@ button {
     display: flex;
     align-items: center;
     justify-content: center; }
+  a[role=button].discreet,
+  button.discreet {
+    background: transparent;
+    border: none; }
 
 .start-screen {
   display: flex;
@@ -1162,12 +1171,15 @@ button {
   top: 0;
   right: 300px;
   background: #d8d8d0;
-  color: #62625e; }
+  color: #62625e;
+  padding: 8px 0 8px 7px;
+  line-height: 26px;
+  font-size: 1em; }
   @media print {
     .transpose-tool {
       display: none; } }
   .transpose-tool label {
-    padding: 8px 0 8px 7px;
+    padding: 0;
     line-height: 26px;
     font-size: 1em; }
   .transpose-tool input {
@@ -1178,6 +1190,10 @@ button {
     width: 56px;
     padding: 0 0 0 7px;
     color: #62625e; }
+  .transpose-tool .value {
+    padding: 0 7px;
+    display: inline-block;
+    min-width: 26px; }
   @media screen and (prefers-color-scheme: dark) {
     .transpose-tool {
       background: #62625e;
@@ -1189,6 +1205,20 @@ button {
     color: white; }
     html.dark-mode .transpose-tool input {
       color: white; }
+  .transpose-tool button.discreet {
+    display: inline-block;
+    color: #62625e; }
+    .transpose-tool button.discreet:focus, .transpose-tool button.discreet:hover {
+      color: #62625e; }
+    @media screen and (prefers-color-scheme: dark) {
+      .transpose-tool button.discreet {
+        color: white; }
+        .transpose-tool button.discreet:focus, .transpose-tool button.discreet:hover {
+          color: white; } }
+    html.dark-mode .transpose-tool button.discreet {
+      color: white; }
+      html.dark-mode .transpose-tool button.discreet:focus, html.dark-mode .transpose-tool button.discreet:hover {
+        color: white; }
 
 main.-menu-hidden .transpose-tool {
   display: none;
