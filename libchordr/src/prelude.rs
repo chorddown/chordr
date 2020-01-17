@@ -30,6 +30,4 @@ pub use crate::models::song_meta::SongMeta;
 pub use crate::catalog_builder::CatalogBuilder;
 
 /// Helper methods
-pub use crate::helper::convert_to_format;
-pub use crate::helper::parse_content;
-pub use crate::helper::token_lines_to_tokens;
+pub use crate::helper::*;

@@ -1,10 +1,12 @@
 mod note;
 mod chords;
+mod transposition;
 
 use crate::error::Error;
 use crate::models::meta::BNotation;
 pub use self::note::Note;
 pub use self::chords::Chords;
+pub use self::transposition::TransposableTrait;
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct Chord {
@@ -100,6 +102,15 @@ impl From<Note> for Chord {
     }
 }
 
+impl TransposableTrait for Chord {
+    fn transpose(&self, semitones: isize) -> Self {
+        Self {
+            root: self.root.transpose(semitones),
+            variant: self.variant.clone(),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -186,5 +197,86 @@ mod tests {
         let chord = Chord::try_from("D#9Daniel", BNotation::B).unwrap();
         assert_eq!(chord.root, Note::Dis);
         assert_eq!(chord.variant, Some("9Daniel".to_owned()));
+    }
+
+    #[test]
+    fn transpose_test() {
+        let map = vec![
+            // +0
+            (0, "C", Note::C),
+            (0, "C#", Note::Cis),
+            (0, "D", Note::D),
+            (0, "D#", Note::Dis),
+            (0, "E", Note::E),
+            (0, "F", Note::F),
+            (0, "B", Note::B),
+
+            // +1
+            (1, "C", Note::Cis),
+            (1, "C#", Note::D),
+            (1, "D", Note::Dis),
+            (1, "D#", Note::E),
+            (1, "E", Note::F),
+            (1, "F", Note::Fis),
+            (1, "A#", Note::B),
+            (1, "B", Note::C),
+
+            // +12 = +0
+            (12, "C", Note::C),
+            (12, "C#", Note::Cis),
+            (12, "D", Note::D),
+            (12, "G#", Note::Gis),
+            (12, "A", Note::A),
+            (12, "A#", Note::Ais),
+            (12, "B", Note::B),
+
+            // +13 = +1
+            (13, "C", Note::Cis),
+            (13, "C#", Note::D),
+            (13, "G#", Note::A),
+            (13, "A", Note::Ais),
+            (13, "A#", Note::B),
+            (13, "B", Note::C),
+
+            // +4
+            (4, "C", Note::E),
+            (4, "C#", Note::F),
+            (4, "E", Note::Gis),
+            (4, "F", Note::A),
+            (4, "F#", Note::Ais),
+            (4, "G", Note::B),
+            (4, "B", Note::Dis),
+
+            // -1
+            (-1, "C", Note::B),
+            (-1, "C#", Note::C),
+            (-1, "E", Note::Dis),
+            (-1, "F", Note::E),
+            (-1, "F#", Note::F),
+            (-1, "B", Note::Ais),
+
+            // +11 = -1
+            (11, "C", Note::B),
+            (11, "C#", Note::C),
+            (11, "D", Note::Cis),
+            (11, "E", Note::Dis),
+            (11, "F", Note::E),
+            (11, "F#", Note::F),
+            (11, "G", Note::Fis),
+            (11, "B", Note::Ais),
+        ];
+
+        for (semitones, input, expected_root) in &map {
+            let chord = Chord::try_from(input, BNotation::B).expect(&format!("Bad test data {}", input));
+            let transposed = chord.transpose(*semitones);
+            assert_eq!(transposed.root, *expected_root, "Transpose failed for {:?} {}", input, semitones);
+            assert_eq!(transposed.variant, None, "Transpose changed the variant for {:?} {}", input, semitones);
+        }
+        for (semitones, input, expected_root) in &map {
+            let chord = Chord::try_from(&format!("{}dim", input), BNotation::B).expect(&format!("Bad test data {}", input));
+            let transposed = chord.transpose(*semitones);
+            assert_eq!(transposed.root, *expected_root, "Transpose failed for {:?} {}", input, semitones);
+            assert_eq!(transposed.variant, Some("dim".to_owned()), "Transpose changed the variant for {:?} {}", input, semitones);
+        }
     }
 }

@@ -6,7 +6,7 @@ pub struct ParserResult {
 }
 
 impl ParserResult {
-    pub(super) fn new(node: Node, meta: MetaInformation) -> Self {
+    pub fn new(node: Node, meta: MetaInformation) -> Self {
         Self { meta, node }
     }
 

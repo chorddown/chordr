@@ -2,9 +2,9 @@ use crate::parser::section_type::SectionType;
 use crate::tokenizer::{Modifier, Token, Meta};
 use crate::models::meta::BNotation;
 use crate::error::Error;
-use crate::models::chord::Chords;
+use crate::models::chord::{Chords, TransposableTrait};
 
-#[derive(PartialOrd, PartialEq, Debug)]
+#[derive(PartialOrd, PartialEq, Debug, Clone)]
 pub enum Node {
     ChordTextPair {
         chords: Chords,
@@ -66,5 +66,120 @@ impl Node {
 
     pub fn quote<S: Into<String>>(value: S) -> Self {
         Node::Quote(Token::quote(value))
+    }
+}
+
+impl TransposableTrait for Node {
+    fn transpose(&self, semitones: isize) -> Self {
+        match self {
+            Node::ChordTextPair { chords, text } => Node::ChordTextPair {
+                chords: chords.transpose(semitones),
+                text: text.clone(),
+            },
+            Node::ChordStandalone(chords) => Node::ChordStandalone(chords.transpose(semitones)),
+
+            Node::Document(nodes) => {
+                Node::Document(nodes.iter().map(|n| n.transpose(semitones)).collect())
+            }
+            Node::Section {
+                head,
+                section_type,
+                children,
+            } => {
+                Node::Section {
+                    head: head.clone(),
+                    section_type: section_type.clone(),
+                    children: (children.iter().map(|n| n.transpose(semitones)).collect()),
+                }
+            }
+            _ => self.clone(),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn transpose_test() {
+        let input = Node::Document(vec![
+            Node::section(
+                1,
+                "Swing Low Sweet Chariot",
+                Modifier::None,
+                vec![Node::newline()],
+            ),
+            Node::section(
+                2,
+                "Chorus",
+                Modifier::Chorus,
+                vec![
+                    Node::text("Swing "),
+                    Node::chord_text_pair("D", "low, sweet ").unwrap(),
+                    Node::chord_text_pair("G", "chari").unwrap(),
+                    Node::chord_text_pair("D", "ot,").unwrap(),
+                    Node::text("Comin’ for to carry me "),
+                    Node::chord_text_pair("A7", "home.").unwrap(),
+                    Node::text("Swing "),
+                    Node::chord_standalone("D7").unwrap(),
+                ],
+            ),
+            Node::section(
+                2,
+                "Verse",
+                Modifier::None,
+                vec![
+                    Node::chord_text_pair("E", "low, sweet ").unwrap(),
+                    Node::chord_text_pair("G", "chari").unwrap(),
+                    Node::chord_text_pair("D", "ot,").unwrap(),
+                    Node::chord_standalone("E").unwrap(),
+                    Node::chord_standalone("A").unwrap(),
+                    Node::newline(),
+                    Node::chord_standalone("A#").unwrap(),
+                    Node::chord_standalone("H").unwrap(),
+                ],
+            ),
+        ]);
+        let expected = Node::Document(vec![
+            Node::section(
+                1,
+                "Swing Low Sweet Chariot",
+                Modifier::None,
+                vec![Node::newline()],
+            ),
+            Node::section(
+                2,
+                "Chorus",
+                Modifier::Chorus,
+                vec![
+                    Node::text("Swing "),
+                    Node::chord_text_pair("E", "low, sweet ").unwrap(),
+                    Node::chord_text_pair("A", "chari").unwrap(),
+                    Node::chord_text_pair("E", "ot,").unwrap(),
+                    Node::text("Comin’ for to carry me "),
+                    Node::chord_text_pair("B7", "home.").unwrap(),
+                    Node::text("Swing "),
+                    Node::chord_standalone("E7").unwrap(),
+                ],
+            ),
+            Node::section(
+                2,
+                "Verse",
+                Modifier::None,
+                vec![
+                    Node::chord_text_pair("F#", "low, sweet ").unwrap(),
+                    Node::chord_text_pair("A", "chari").unwrap(),
+                    Node::chord_text_pair("E", "ot,").unwrap(),
+                    Node::chord_standalone("F#").unwrap(),
+                    Node::chord_standalone("B").unwrap(),
+                    Node::newline(),
+                    Node::chord_standalone("C").unwrap(),
+                    Node::chord_standalone("C#").unwrap(),
+                ],
+            ),
+        ]);
+
+        assert_eq!(input.transpose(2), expected);
     }
 }
