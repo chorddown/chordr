@@ -68,7 +68,7 @@ impl Model {
         match &self.catalog {
             Some(catalog) => {
                 match catalog.get(song_id) {
-                    Some(song) => html! {<SongView song=song/>},
+                    Some(song) => html! {<SongView song=song />},
                     None => html! {},
                 }
             }

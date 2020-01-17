@@ -1,0 +1,46 @@
+@import "prelude";
+
+.transpose-tool {
+    position: fixed;
+    top: 0;
+    right: $nav-width;
+    background: $gray-light;
+    color: $button-color;
+
+    @media print {
+        display: none;
+    }
+
+    label {
+        padding: (1+$std-half) 0 (1+$std-half) $std-half;
+        line-height: $button-line-height;
+        font-size: $button-font-size;
+
+    }
+
+
+    input {
+        background: transparent;
+        border: none;
+        -webkit-appearance: none;
+        appearance: none;
+        width: 4 * $std-space;
+        padding: 0 0 0 $std-half;
+        color: $button-color;
+    }
+
+    @include if-dark-mode {
+        background: $gray-darker;
+        color: $dark-mode-button-color;
+
+        input {
+            color: $dark-mode-button-color;
+        }
+    }
+
+}
+
+main.-menu-hidden .transpose-tool {
+    display: none;
+    right: $nav-collapsed-width;
+}

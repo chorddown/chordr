@@ -964,12 +964,31 @@ body {
     background: #221d1c;
     color: white; }
 
+label {
+  display: block;
+  margin: 0; }
+
+input {
+  font-size: 16px;
+  font: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  display: inline-block;
+  margin: 0; }
+  input:focus {
+    outline: none; }
+
 main {
   display: flex;
   flex-flow: row wrap; }
 
 .im {
   font-size: .8em; }
+
+.sr-only {
+  text-indent: -10000px;
+  font-size: 0;
+  height: 0;
+  width: 0;
+  position: absolute; }
 
 .row {
   width: 100%;
@@ -1137,6 +1156,43 @@ button {
 .song-browser-index-list .index-item-count {
   display: block;
   font-size: .6em; }
+
+.transpose-tool {
+  position: fixed;
+  top: 0;
+  right: 300px;
+  background: #d8d8d0;
+  color: #62625e; }
+  @media print {
+    .transpose-tool {
+      display: none; } }
+  .transpose-tool label {
+    padding: 8px 0 8px 7px;
+    line-height: 26px;
+    font-size: 1em; }
+  .transpose-tool input {
+    background: transparent;
+    border: none;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 56px;
+    padding: 0 0 0 7px;
+    color: #62625e; }
+  @media screen and (prefers-color-scheme: dark) {
+    .transpose-tool {
+      background: #62625e;
+      color: white; }
+      .transpose-tool input {
+        color: white; } }
+  html.dark-mode .transpose-tool {
+    background: #62625e;
+    color: white; }
+    html.dark-mode .transpose-tool input {
+      color: white; }
+
+main.-menu-hidden .transpose-tool {
+  display: none;
+  right: 40px; }
 
 nav {
   background: #d8d8d0;

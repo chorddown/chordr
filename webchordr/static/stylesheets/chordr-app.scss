@@ -25,6 +25,22 @@ body {
     }
 }
 
+label {
+    display: block;
+    margin: 0;
+}
+
+input {
+    font-size: $font-size-web;
+    font: $ui-font;
+    display: inline-block;
+    margin: 0;
+
+    &:focus {
+        outline: none;
+    }
+}
+
 main {
     display: flex;
     flex-flow: row wrap;
@@ -34,90 +50,14 @@ main {
     font-size: .8em;
 }
 
+@import "components/misc";
 @import "components/grid";
 @import "components/link";
 @import "components/button";
 @import "components/start-screen";
 @import "components/song-browser";
-
-nav {
-    background: $nav-bg;
-    order: 2;
-    display: flex;
-    flex-flow: column;
-    position: fixed;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    overflow: scroll;
-    padding-left: 2px;
-    @include print-hidden;
-    @include if-dark-mode {
-        background: $dark-mode-nav-bg;
-    }
-
-    &.-visible {
-        width: $nav-width;
-    }
-
-    .song-list {
-        display: flex;
-        flex-flow: column;
-        overflow: scroll;
-        height: calc(100vh - #{$nav-button-height + $nav-footer-border-width});
-    }
-
-    a[role=button],
-    button {
-        margin-bottom: 2px;
-    }
-
-    footer {
-        margin-top: auto;
-        justify-self: flex-end;
-        display: flex;
-        order: 200;
-        border-top: $nav-footer-border-width solid $nav-footer-border-color;
-        @include if-dark-mode {
-            border-top: $nav-footer-border-width solid $gray-darker;
-        }
-
-        .im {
-            vertical-align: middle;
-        }
-
-        .im + span {
-            margin-left: .3em;
-        }
-
-        a[role=button],
-        button {
-            float: left;
-            width: 50%;
-            margin-bottom: 0;
-            height: $nav-button-height;
-
-            &:only-child {
-                width: 100%;
-            }
-        }
-
-        a[role=button].reload-songs,
-        button.reload-songs {
-            margin-bottom: 0;
-
-            .im {
-                font-size: 1em;
-                float: left;
-                line-height: 30px;
-            }
-        }
-    }
-
-    &.-hidden footer button {
-        width: 100%;
-    }
-}
+@import "components/transpose-tool";
+@import "components/nav-bar";
 
 .content {
     background: $background;
