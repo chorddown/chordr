@@ -57,7 +57,7 @@ impl Component for Setlist {
         html! {
             <div class="setlist-tool">
                 <div title=title>
-                    <div class="discreet" onclick=on_click><i class=icon></i></div>
+                    <button class="discreet" onclick=on_click><i class=icon></i></button>
                     <span class="sr-only">{title}</span>
                 </div>
             </div>
