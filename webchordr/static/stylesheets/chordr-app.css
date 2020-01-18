@@ -1166,142 +1166,84 @@ button {
   display: block;
   font-size: .6em; }
 
-.transpose-tool, .setlist-tool {
-  position: fixed;
-  right: 300px;
-  background: #d8d8d0;
-  color: #62625e;
-  padding: 8px 0 8px 7px;
-  line-height: 26px;
-  font-size: 1em; }
-  @media print {
-    .transpose-tool, .setlist-tool {
-      display: none; } }
-  .transpose-tool label, .setlist-tool label {
-    padding: 0;
-    line-height: 26px;
-    font-size: 1em; }
-  .transpose-tool input, .setlist-tool input {
-    background: transparent;
-    border: none;
-    -webkit-appearance: none;
-    appearance: none;
-    width: 56px;
-    padding: 0 0 0 7px;
-    color: #62625e; }
-  @media screen and (prefers-color-scheme: dark) {
-    .transpose-tool, .setlist-tool {
-      background: #62625e;
-      color: white; }
-      .transpose-tool input, .setlist-tool input {
-        color: white; } }
-  html.dark-mode .transpose-tool, html.dark-mode .setlist-tool {
-    background: #62625e;
-    color: white; }
-    html.dark-mode .transpose-tool input, html.dark-mode .setlist-tool input {
-      color: white; }
-  .transpose-tool button.discreet, .setlist-tool button.discreet {
-    display: inline-block;
-    color: #62625e; }
-    .transpose-tool button.discreet:focus, .setlist-tool button.discreet:focus, .transpose-tool button.discreet:hover, .setlist-tool button.discreet:hover {
-      color: #62625e; }
-    .transpose-tool button.discreet[disabled], .setlist-tool button.discreet[disabled] {
-      color: #b7b7b0;
-      cursor: not-allowed; }
-    @media screen and (prefers-color-scheme: dark) {
-      .transpose-tool button.discreet, .setlist-tool button.discreet {
-        color: white; }
-        .transpose-tool button.discreet:focus, .setlist-tool button.discreet:focus, .transpose-tool button.discreet:hover, .setlist-tool button.discreet:hover {
-          color: white; } }
-    html.dark-mode .transpose-tool button.discreet, html.dark-mode .setlist-tool button.discreet {
-      color: white; }
-      html.dark-mode .transpose-tool button.discreet:focus, html.dark-mode .setlist-tool button.discreet:focus, html.dark-mode .transpose-tool button.discreet:hover, html.dark-mode .setlist-tool button.discreet:hover {
-        color: white; }
-
-main.-menu-hidden .song-tool {
-  display: none;
-  right: 40px; }
-
-.transpose-tool, .setlist-tool {
-  position: fixed;
-  right: 300px;
-  background: #d8d8d0;
-  color: #62625e;
-  padding: 8px 0 8px 7px;
-  line-height: 26px;
-  font-size: 1em; }
-  @media print {
-    .transpose-tool, .setlist-tool {
-      display: none; } }
-  .transpose-tool label, .setlist-tool label {
-    padding: 0;
-    line-height: 26px;
-    font-size: 1em; }
-  .transpose-tool input, .setlist-tool input {
-    background: transparent;
-    border: none;
-    -webkit-appearance: none;
-    appearance: none;
-    width: 56px;
-    padding: 0 0 0 7px;
-    color: #62625e; }
-  @media screen and (prefers-color-scheme: dark) {
-    .transpose-tool, .setlist-tool {
-      background: #62625e;
-      color: white; }
-      .transpose-tool input, .setlist-tool input {
-        color: white; } }
-  html.dark-mode .transpose-tool, html.dark-mode .setlist-tool {
-    background: #62625e;
-    color: white; }
-    html.dark-mode .transpose-tool input, html.dark-mode .setlist-tool input {
-      color: white; }
-  .transpose-tool button.discreet, .setlist-tool button.discreet {
-    display: inline-block;
-    color: #62625e; }
-    .transpose-tool button.discreet:focus, .setlist-tool button.discreet:focus, .transpose-tool button.discreet:hover, .setlist-tool button.discreet:hover {
-      color: #62625e; }
-    .transpose-tool button.discreet[disabled], .setlist-tool button.discreet[disabled] {
-      color: #b7b7b0;
-      cursor: not-allowed; }
-    @media screen and (prefers-color-scheme: dark) {
-      .transpose-tool button.discreet, .setlist-tool button.discreet {
-        color: white; }
-        .transpose-tool button.discreet:focus, .setlist-tool button.discreet:focus, .transpose-tool button.discreet:hover, .setlist-tool button.discreet:hover {
-          color: white; } }
-    html.dark-mode .transpose-tool button.discreet, html.dark-mode .setlist-tool button.discreet {
-      color: white; }
-      html.dark-mode .transpose-tool button.discreet:focus, html.dark-mode .setlist-tool button.discreet:focus, html.dark-mode .transpose-tool button.discreet:hover, html.dark-mode .setlist-tool button.discreet:hover {
-        color: white; }
-
-main.-menu-hidden .song-tool {
-  display: none;
-  right: 40px; }
-
 .transpose-tool {
+  position: fixed;
+  right: 300px;
+  background: #d8d8d0;
+  color: #62625e;
+  padding: 8px 0 8px 7px;
+  line-height: 26px;
+  font-size: 1em;
   top: 0; }
+  @media print {
+    .transpose-tool {
+      display: none; } }
+  .transpose-tool label {
+    padding: 0;
+    line-height: 26px;
+    font-size: 1em; }
+  .transpose-tool input {
+    background: transparent;
+    border: none;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 56px;
+    padding: 0 0 0 7px;
+    color: #62625e; }
+  @media screen and (prefers-color-scheme: dark) {
+    .transpose-tool {
+      background: #62625e;
+      color: white; }
+      .transpose-tool input {
+        color: white; } }
+  html.dark-mode .transpose-tool {
+    background: #62625e;
+    color: white; }
+    html.dark-mode .transpose-tool input {
+      color: white; }
+  .transpose-tool button.discreet {
+    display: inline-block;
+    color: #62625e; }
+    .transpose-tool button.discreet:focus, .transpose-tool button.discreet:hover {
+      color: #62625e; }
+    .transpose-tool button.discreet[disabled] {
+      color: #b7b7b0;
+      cursor: not-allowed; }
+    @media screen and (prefers-color-scheme: dark) {
+      .transpose-tool button.discreet {
+        color: white; }
+        .transpose-tool button.discreet:focus, .transpose-tool button.discreet:hover {
+          color: white; } }
+    html.dark-mode .transpose-tool button.discreet {
+      color: white; }
+      html.dark-mode .transpose-tool button.discreet:focus, html.dark-mode .transpose-tool button.discreet:hover {
+        color: white; }
+  main.-menu-hidden .transpose-tool {
+    display: none;
+    right: 40px; }
   .transpose-tool .value {
     padding: 0 7px;
     display: inline-block;
     min-width: 42px;
     text-align: center; }
 
-.transpose-tool, .setlist-tool {
+.setlist-tool {
   position: fixed;
   right: 300px;
   background: #d8d8d0;
   color: #62625e;
   padding: 8px 0 8px 7px;
   line-height: 26px;
-  font-size: 1em; }
+  font-size: 1em;
+  top: 45px; }
   @media print {
-    .transpose-tool, .setlist-tool {
+    .setlist-tool {
       display: none; } }
-  .transpose-tool label, .setlist-tool label {
+  .setlist-tool label {
     padding: 0;
     line-height: 26px;
     font-size: 1em; }
-  .transpose-tool input, .setlist-tool input {
+  .setlist-tool input {
     background: transparent;
     border: none;
     -webkit-appearance: none;
@@ -1310,40 +1252,36 @@ main.-menu-hidden .song-tool {
     padding: 0 0 0 7px;
     color: #62625e; }
   @media screen and (prefers-color-scheme: dark) {
-    .transpose-tool, .setlist-tool {
+    .setlist-tool {
       background: #62625e;
       color: white; }
-      .transpose-tool input, .setlist-tool input {
+      .setlist-tool input {
         color: white; } }
-  html.dark-mode .transpose-tool, html.dark-mode .setlist-tool {
+  html.dark-mode .setlist-tool {
     background: #62625e;
     color: white; }
-    html.dark-mode .transpose-tool input, html.dark-mode .setlist-tool input {
+    html.dark-mode .setlist-tool input {
       color: white; }
-  .transpose-tool button.discreet, .setlist-tool button.discreet {
+  .setlist-tool button.discreet {
     display: inline-block;
     color: #62625e; }
-    .transpose-tool button.discreet:focus, .setlist-tool button.discreet:focus, .transpose-tool button.discreet:hover, .setlist-tool button.discreet:hover {
+    .setlist-tool button.discreet:focus, .setlist-tool button.discreet:hover {
       color: #62625e; }
-    .transpose-tool button.discreet[disabled], .setlist-tool button.discreet[disabled] {
+    .setlist-tool button.discreet[disabled] {
       color: #b7b7b0;
       cursor: not-allowed; }
     @media screen and (prefers-color-scheme: dark) {
-      .transpose-tool button.discreet, .setlist-tool button.discreet {
+      .setlist-tool button.discreet {
         color: white; }
-        .transpose-tool button.discreet:focus, .setlist-tool button.discreet:focus, .transpose-tool button.discreet:hover, .setlist-tool button.discreet:hover {
+        .setlist-tool button.discreet:focus, .setlist-tool button.discreet:hover {
           color: white; } }
-    html.dark-mode .transpose-tool button.discreet, html.dark-mode .setlist-tool button.discreet {
+    html.dark-mode .setlist-tool button.discreet {
       color: white; }
-      html.dark-mode .transpose-tool button.discreet:focus, html.dark-mode .setlist-tool button.discreet:focus, html.dark-mode .transpose-tool button.discreet:hover, html.dark-mode .setlist-tool button.discreet:hover {
+      html.dark-mode .setlist-tool button.discreet:focus, html.dark-mode .setlist-tool button.discreet:hover {
         color: white; }
-
-main.-menu-hidden .song-tool {
-  display: none;
-  right: 40px; }
-
-.setlist-tool {
-  top: 45px; }
+  main.-menu-hidden .setlist-tool {
+    display: none;
+    right: 40px; }
 
 nav {
   background: #d8d8d0;

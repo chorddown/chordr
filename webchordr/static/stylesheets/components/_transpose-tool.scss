@@ -1,8 +1,7 @@
 @import "prelude";
-@import "song-tool";
 
 .transpose-tool {
-    @extend %song-tool;
+    @include song-tool;
     top: 0;
 
     .value {
