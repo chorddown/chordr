@@ -33,7 +33,8 @@
     .value {
         padding: 0 $std-half;
         display: inline-block;
-        min-width: 26px;
+        min-width: 42px;
+        text-align: center;
     }
 
     @include if-dark-mode {
@@ -52,6 +53,11 @@
         &:focus,
         &:hover {
             color: $button-hover-color;
+        }
+
+        &[disabled] {
+            color: $gray;
+            cursor: not-allowed;
         }
 
         @include if-dark-mode {

@@ -1193,7 +1193,8 @@ button {
   .transpose-tool .value {
     padding: 0 7px;
     display: inline-block;
-    min-width: 26px; }
+    min-width: 42px;
+    text-align: center; }
   @media screen and (prefers-color-scheme: dark) {
     .transpose-tool {
       background: #62625e;
@@ -1210,6 +1211,9 @@ button {
     color: #62625e; }
     .transpose-tool button.discreet:focus, .transpose-tool button.discreet:hover {
       color: #62625e; }
+    .transpose-tool button.discreet[disabled] {
+      color: #b7b7b0;
+      cursor: not-allowed; }
     @media screen and (prefers-color-scheme: dark) {
       .transpose-tool button.discreet {
         color: white; }
