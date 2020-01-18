@@ -126,20 +126,9 @@ mod tests {
     #[test]
     fn test_tokenize_long() {
         let content =
-            include_str!("../../../../webchordr/static/songs/swing_low_sweet_chariot.chorddown");
+            include_str!("../../../tests/resources/swing_low_sweet_chariot.chorddown");
         let token_lines = ChordDownTokenizer::new().tokenize(content);
-        assert_eq!(token_lines.len(), 12);
-
-        let mut token_lines_iter = token_lines.iter();
-
-        for expected_line in get_test_tokens() {
-            let line = token_lines_iter.next().unwrap();
-            let mut line_iter = line.iter();
-            for expected_token in expected_line {
-                let actual_token = line_iter.next().unwrap();
-                assert_eq!(&expected_token, actual_token);
-            }
-        }
+        assert_eq!(token_lines, get_test_tokens());
     }
 
     #[test]

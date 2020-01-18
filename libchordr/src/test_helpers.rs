@@ -1,4 +1,5 @@
 use crate::tokenizer::{Modifier, Token, TokenLine};
+use crate::parser::Node;
 
 #[cfg(test)]
 pub fn get_test_tokens() -> Vec<TokenLine> {
@@ -117,4 +118,67 @@ pub fn get_test_parser_input() -> Vec<Token> {
         Token::chord("B"),
         Token::chord("H"),
     ]
+}
+
+pub fn get_test_ast() -> Node {
+    Node::Document(vec![
+        Node::section(
+            1,
+            "Swing Low Sweet Chariot",
+            Modifier::None,
+            vec![Node::newline()],
+        ),
+        Node::section(
+            2,
+            "Chorus",
+            Modifier::Chorus,
+            vec![
+                Node::newline(),
+                Node::text("Swing "),
+                Node::chord_text_pair("D", "low, sweet ").unwrap(),
+                Node::chord_text_pair("G", "chari").unwrap(),
+                Node::chord_text_pair("D", "ot,").unwrap(),
+                Node::newline(),
+                Node::text("Comin’ for to carry me "),
+                Node::chord_text_pair("A7", "home.").unwrap(),
+                Node::newline(),
+                Node::text("Swing "),
+                Node::chord_text_pair("D7", "low, sweet ").unwrap(),
+                Node::chord_text_pair("G", "chari").unwrap(),
+                Node::chord_text_pair("D", "ot,").unwrap(),
+                Node::newline(),
+                Node::text("Comin’ for to "),
+                Node::chord_text_pair("A7", "carry me ").unwrap(),
+                Node::chord_text_pair("D", "home.").unwrap(),
+                Node::newline(),
+            ],
+        ),
+        Node::section(
+            2,
+            "Verse 1",
+            Modifier::None,
+            vec![
+                Node::newline(),
+                Node::text("I "),
+                Node::chord_text_pair("D", "looked over Jordan, and ").unwrap(),
+                Node::chord_text_pair("G", "what did I ").unwrap(),
+                Node::chord_text_pair("D", "see,").unwrap(),
+                Node::newline(),
+                Node::text("Comin’ for to carry me "),
+                Node::chord_text_pair("A7", "home.").unwrap(),
+                Node::newline(),
+                Node::text("A "),
+                Node::chord_text_pair("D", "band of angels ").unwrap(),
+                Node::chord_text_pair("G", "comin’ after ").unwrap(),
+                Node::chord_text_pair("D", "me,").unwrap(),
+                Node::newline(),
+                Node::text("Comin’ for to "),
+                Node::chord_text_pair("A7", "carry me ").unwrap(),
+                Node::chord_text_pair("D", "home.").unwrap(),
+                Node::newline(),
+            ],
+        ),
+        Node::quote("Chorus"),
+        Node::newline(),
+    ])
 }

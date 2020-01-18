@@ -112,56 +112,18 @@ fn token_is_start_of_section(token: &Token) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tokenizer::Modifier;
-    use crate::test_helpers::get_test_parser_input;
+    use crate::test_helpers::get_test_ast;
+    use crate::test_helpers::get_test_tokens;
+    use crate::helper::token_lines_to_tokens;
 
     #[test]
     fn test_parse() {
         let mut parser = NodeParser::with_b_notation(BNotation::B);
-        let result = parser.parse(get_test_parser_input());
+        let result = parser.parse(token_lines_to_tokens(get_test_tokens()));
 
         assert!(result.is_ok());
         let ast = result.unwrap();
 
-        let expected_ast = Node::Document(vec![
-            Node::section(
-                1,
-                "Swing Low Sweet Chariot",
-                Modifier::None,
-                vec![Node::newline()],
-            ),
-            Node::section(
-                2,
-                "Chorus",
-                Modifier::Chorus,
-                vec![
-                    Node::text("Swing "),
-                    Node::chord_text_pair("D", "low, sweet ").unwrap(),
-                    Node::chord_text_pair("G", "chari").unwrap(),
-                    Node::chord_text_pair("D", "ot,").unwrap(),
-                    Node::text("Comin’ for to carry me "),
-                    Node::chord_text_pair("A7", "home.").unwrap(),
-                    Node::text("Swing "),
-                    Node::chord_standalone("D7").unwrap(),
-                ],
-            ),
-            Node::section(
-                2,
-                "Verse",
-                Modifier::None,
-                vec![
-                    Node::chord_text_pair("E", "low, sweet ").unwrap(),
-                    Node::chord_text_pair("G", "chari").unwrap(),
-                    Node::chord_text_pair("D", "ot,").unwrap(),
-                    Node::chord_standalone("E").unwrap(),
-                    Node::chord_standalone("A").unwrap(),
-                    Node::newline(),
-                    Node::chord_standalone("B").unwrap(),
-                    Node::chord_standalone("H").unwrap(),
-                ],
-            ),
-        ]);
-
-        assert_eq!(expected_ast, ast);
+        assert_eq!(ast, get_test_ast());
     }
 }

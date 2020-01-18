@@ -3,6 +3,7 @@ use crate::tokenizer::{Modifier, Token, Meta};
 use crate::models::meta::BNotation;
 use crate::error::Error;
 use crate::models::chord::{Chords, TransposableTrait};
+use std::convert::TryFrom;
 
 #[derive(PartialOrd, PartialEq, Debug, Clone)]
 pub enum Node {
@@ -25,8 +26,10 @@ pub enum Node {
     Newline,
 }
 
+
+#[allow(dead_code)]
 impl Node {
-    pub fn section<S: Into<String>, T: Into<SectionType> + Into<Modifier>>(
+    pub(crate) fn section<S: Into<String>, T: Into<SectionType> + Into<Modifier>>(
         level: u8,
         value: S,
         section_type: T,
@@ -41,30 +44,37 @@ impl Node {
         }
     }
 
-    pub fn headline<S: Into<String>>(level: u8, value: S, modifier: Modifier) -> Self {
+    pub(crate) fn headline<S: Into<String>>(level: u8, value: S, modifier: Modifier) -> Self {
         Node::Headline(Token::headline(level, value.into(), modifier))
     }
 
-    pub fn chord_standalone<S: AsRef<str>>(value: S) -> Result<Self, Error> {
+    pub(crate) fn chord_standalone<S: AsRef<str>>(value: S) -> Result<Self, Error> {
         Ok(Node::ChordStandalone(Chords::try_from(value.as_ref(), BNotation::B)?))
     }
 
-    pub fn chord_text_pair<S1: AsRef<str>, S2: Into<String>>(chords: S1, text: S2) -> Result<Self, Error> {
+    pub(crate) fn chord_text_pair<S1: AsRef<str>, S2: Into<String>>(chords: S1, text: S2) -> Result<Self, Error> {
         let chords = Chords::try_from(chords.as_ref(), BNotation::B)?;
         let text = Token::literal(text);
 
         Ok(Node::ChordTextPair { chords, text })
     }
 
-    pub fn newline() -> Self {
+    pub(crate) fn meta<S: AsRef<str>>(meta: S) -> Result<Self, Error> {
+        match Meta::try_from(meta.as_ref()) {
+            Ok(m) => Ok(Node::Meta(m)),
+            Err(_) => Err(Error::parser_error(format!("Invalid meta data given: '{}'", meta.as_ref())))
+        }
+    }
+
+    pub(crate) fn newline() -> Self {
         Node::Newline
     }
 
-    pub fn text<S: Into<String>>(value: S) -> Self {
+    pub(crate) fn text<S: Into<String>>(value: S) -> Self {
         Node::Text(Token::literal(value.into()))
     }
 
-    pub fn quote<S: Into<String>>(value: S) -> Self {
+    pub(crate) fn quote<S: Into<String>>(value: S) -> Self {
         Node::Quote(Token::quote(value))
     }
 }
