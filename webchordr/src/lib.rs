@@ -27,10 +27,10 @@ pub enum Format {
 }
 
 #[allow(dead_code)]
-pub struct Model {
+pub struct App {
     fetch_service: FetchService,
     storage_service: StorageService,
-    link: ComponentLink<Model>,
+    link: ComponentLink<App>,
     fetching: bool,
     song_list: Option<SongList>,
     song_meta: Option<SongMeta>,
@@ -54,7 +54,7 @@ pub enum Msg {
     RouteChanged(Route<()>),
 }
 
-impl Model {
+impl App {
     fn route(&self) -> Html {
         match AppRoute::switch(self.route.clone()) {
             Some(AppRoute::Song(id)) => self.view_song(id),
@@ -68,7 +68,7 @@ impl Model {
         match &self.catalog {
             Some(catalog) => {
                 match catalog.get(song_id) {
-                    Some(song) => html! {<SongView song=song />},
+                    Some(song) => html! {<SongView song=song is_on_set_list=true />},
                     None => html! {},
                 }
             }
@@ -98,7 +98,7 @@ impl Model {
                 html! {
                     <div class="song-list">
                         { for c.iter().map(render) }
-                     </div>
+                    </div>
                 }
             }
             None => html! {},
@@ -156,7 +156,7 @@ impl Model {
     }
 }
 
-impl Component for Model {
+impl Component for App {
     type Message = Msg;
     type Properties = ();
 

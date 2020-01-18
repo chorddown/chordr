@@ -1,4 +1,4 @@
 fn main() {
     web_logger::init();
-    yew::start_app::<webchordr::Model>();
+    yew::start_app::<webchordr::App>();
 }
