@@ -1,4 +1,5 @@
 use crate::parser::SectionType;
+use std::fmt::{Display, Error, Formatter};
 
 #[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
 pub enum Modifier {
@@ -52,7 +53,7 @@ impl From<char> for Modifier {
         match s {
             '!' => Self::Chorus,
             '-' => Self::Bridge,
-            _ => Self::None
+            _ => Self::None,
         }
     }
 }
@@ -64,6 +65,20 @@ impl From<SectionType> for Modifier {
             SectionType::Unknown => Modifier::None,
             SectionType::Bridge => Modifier::Bridge,
         }
+    }
+}
+
+impl Display for Modifier {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
+        write!(
+            f,
+            "{}",
+            match self {
+                Self::Chorus => "!",
+                Self::Bridge => "-",
+                Self::None => "",
+            }
+        )
     }
 }
 
@@ -88,11 +103,20 @@ mod tests {
 
     #[test]
     fn test_split_umlauts() {
-        assert_eq!(Modifier::split(" Überschrift"), (Modifier::None, " Überschrift"));
-        assert_eq!(Modifier::split("Überschrift"), (Modifier::None, "Überschrift"));
+        assert_eq!(
+            Modifier::split(" Überschrift"),
+            (Modifier::None, " Überschrift")
+        );
+        assert_eq!(
+            Modifier::split("Überschrift"),
+            (Modifier::None, "Überschrift")
+        );
         assert_eq!(Modifier::split(""), (Modifier::None, ""));
 
-        assert_eq!(Modifier::split("! Überschrift"), (Modifier::Chorus, " Überschrift"));
+        assert_eq!(
+            Modifier::split("! Überschrift"),
+            (Modifier::Chorus, " Überschrift")
+        );
         assert_eq!(Modifier::split("!"), (Modifier::Chorus, ""));
         assert_eq!(Modifier::split("! "), (Modifier::Chorus, " "));
 
