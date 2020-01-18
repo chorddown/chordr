@@ -4,6 +4,7 @@ use std::convert::TryFrom;
 pub enum Format {
     HTML,
     Chorddown,
+    SongBeamer,
     #[cfg(feature = "pdf")]
     PDF,
 }
@@ -15,6 +16,7 @@ impl TryFrom<&str> for Format {
         match value.to_lowercase().as_str() {
             "html" => Ok(Self::HTML),
             "chorddown" => Ok(Self::Chorddown),
+            "songbeamer" => Ok(Self::SongBeamer),
             #[cfg(feature = "pdf")]
             "pdf" => Ok(Self::PDF),
             _ => Err(())

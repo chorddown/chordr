@@ -5,8 +5,10 @@ use self::pdf::PdfConverter;
 use crate::error::Result;
 use crate::models::song_meta_trait::SongMetaTrait;
 use crate::prelude::*;
+use crate::converter::songbeamer::SongBeamerConverter;
 
 mod chorddown;
+mod songbeamer;
 mod html;
 #[cfg(feature = "pdf")]
 mod pdf;
@@ -26,6 +28,7 @@ impl Converter {
         match format {
             Format::HTML => Box::new(HtmlConverter {}),
             Format::Chorddown => Box::new(ChorddownConverter {}),
+            Format::SongBeamer => Box::new(SongBeamerConverter {}),
             #[cfg(feature = "pdf")]
             Format::PDF => Box::new(PdfConverter {}),
         }

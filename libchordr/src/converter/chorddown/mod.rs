@@ -172,6 +172,7 @@ mod tests {
     use super::*;
     use crate::parser::MetaInformation;
     use crate::test_helpers::get_test_ast;
+    use crate::test_helpers::get_test_metadata;
     use crate::tokenizer::Modifier;
 
     #[test]
@@ -213,7 +214,7 @@ Comin’ for to [A7]carry me [D]home.
         let converter = ChorddownConverter {};
         let result = converter.convert(
             &get_test_ast(),
-            &get_test_meta(),
+            &get_test_metadata(),
             Format::Chorddown,
         );
 
@@ -277,7 +278,7 @@ Comin’ for to [A7]carry me [D]home.
         ]);
         let result = converter.convert(
             &ast,
-            &get_test_meta(),
+            &get_test_metadata(),
             Format::Chorddown,
         );
 
@@ -346,24 +347,5 @@ Swing [D]low, sweet [G]chari[D]ot.
 Swing [D]low, sweet [G]chari[D]ot.
 "#
         );
-    }
-
-    fn get_test_meta() -> MetaInformation {
-        MetaInformation {
-            title: Some("Great new song".to_owned()),
-            subtitle: Some("Originally known as 'Swing low sweet chariot'".to_owned()),
-            artist: Some("Me".to_owned()),
-            composer: Some("Wallace Willis".to_owned()),
-            lyricist: Some("Wallace Willis".to_owned()),
-            copyright: None,
-            album: None,
-            year: Some("1865".to_owned()),
-            key: None,
-            time: None,
-            tempo: None,
-            duration: None,
-            capo: Some("1".to_owned()),
-            b_notation: BNotation::B,
-        }
     }
 }

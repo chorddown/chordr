@@ -1,5 +1,6 @@
 use crate::tokenizer::{Modifier, Token, TokenLine};
-use crate::parser::Node;
+use crate::parser::{Node, MetaInformation};
+use crate::models::meta::BNotation;
 
 #[cfg(test)]
 pub fn get_test_tokens() -> Vec<TokenLine> {
@@ -181,4 +182,23 @@ pub fn get_test_ast() -> Node {
         Node::quote("Chorus"),
         Node::newline(),
     ])
+}
+
+pub fn get_test_metadata() -> MetaInformation {
+    MetaInformation {
+        title: Some("Great new song".to_owned()),
+        subtitle: Some("Originally known as 'Swing low sweet chariot'".to_owned()),
+        artist: Some("Me".to_owned()),
+        composer: Some("Wallace Willis".to_owned()),
+        lyricist: Some("Wallace Willis".to_owned()),
+        copyright: None,
+        album: None,
+        year: Some("1865".to_owned()),
+        key: None,
+        time: None,
+        tempo: None,
+        duration: None,
+        capo: Some("1".to_owned()),
+        b_notation: BNotation::B,
+    }
 }
