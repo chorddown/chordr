@@ -1,10 +1,12 @@
+use self::chorddown::ChorddownConverter;
+use self::html::HtmlConverter;
 #[cfg(feature = "pdf")]
 use self::pdf::PdfConverter;
-use crate::converter::html::HtmlConverter;
 use crate::error::Result;
-use crate::prelude::*;
 use crate::models::song_meta_trait::SongMetaTrait;
+use crate::prelude::*;
 
+mod chorddown;
 mod html;
 #[cfg(feature = "pdf")]
 mod pdf;
@@ -19,9 +21,11 @@ impl Converter {
     pub fn new() -> Self {
         Self {}
     }
+
     pub fn get_converter(format: Format) -> Box<dyn ConverterTrait> {
         match format {
             Format::HTML => Box::new(HtmlConverter {}),
+            Format::Chorddown => Box::new(ChorddownConverter {}),
             #[cfg(feature = "pdf")]
             Format::PDF => Box::new(PdfConverter {}),
         }
@@ -48,7 +52,8 @@ mod tests {
         let result = Converter::new().convert(
             parser_result.node_as_ref(),
             parser_result.meta_as_ref(),
-            Format::HTML);
+            Format::HTML,
+        );
 
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), content.trim())

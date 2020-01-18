@@ -7,6 +7,7 @@ use std::fs;
 use libchordr::prelude::Error;
 use libchordr::prelude::Result;
 use libchordr::prelude::*;
+use std::convert::TryFrom;
 
 fn main() {
     let output_arg = Arg::with_name("OUTPUT")
@@ -24,7 +25,11 @@ fn main() {
                         .required(true)
                         .help("Chorddown file to parse"),
                 )
-                .arg(output_arg.clone()),
+                .arg(output_arg.clone())
+                .arg(
+                    Arg::with_name("FORMAT")
+                        .help("Output format"),
+                ),
         )
         .subcommand(
             SubCommand::with_name("build-catalog")
@@ -49,6 +54,7 @@ fn main() {
     } else if let Some(matches) = args.subcommand_matches("build-catalog") {
         build_catalog(matches)
     } else {
+        eprintln!("Missing argument subcommand");
         Ok(())
     };
 
@@ -59,15 +65,18 @@ fn main() {
 
 fn convert(args: &ArgMatches) -> Result<()> {
     let input_file_path = args.value_of("INPUT").unwrap();
+    let format = get_output_format(args);
     let contents = fs::read_to_string(input_file_path)?;
     let tokens = build_tokenizer().tokenize(&contents);
     let parser_result = Parser::new().parse(token_lines_to_tokens(tokens))?;
     let converted = Converter::new().convert(
         parser_result.node_as_ref(),
         parser_result.meta_as_ref(),
-        Format::HTML)?;
-    let output = format!(
-        r#"
+        format)?;
+
+    let output = if format == Format::HTML {
+        format!(
+            r#"
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -82,12 +91,25 @@ fn convert(args: &ArgMatches) -> Result<()> {
 </body>
 </html>
     "#,
-        title = parser_result.meta().title.unwrap_or("".to_owned()),
-        styles = include_str!("../../webchordr/static/stylesheets/chordr-default-styles.css"),
-        content = converted
-    );
+            title = parser_result.meta().title.unwrap_or("".to_owned()),
+            styles = include_str!("../../webchordr/static/stylesheets/chordr-default-styles.css"),
+            content = converted
+        )
+    } else {
+        converted
+    };
 
     handle_output(args, output)
+}
+
+fn get_output_format(args: &ArgMatches) -> Format {
+    if let Some(raw_format) = args.value_of("FORMAT") {
+        if let Ok(f) = Format::try_from(raw_format) {
+            return f;
+        }
+    }
+
+    Format::HTML
 }
 
 fn build_catalog(args: &ArgMatches) -> Result<()> {
