@@ -1,6 +1,6 @@
 use libchordr::models::prelude::*;
-use std::collections::BTreeMap;
 use log::debug;
+use std::collections::BTreeMap;
 
 /// A struct holding the character group to navigate to and the number of matching [Song]s
 #[derive(Clone, PartialEq, Debug)]
@@ -11,23 +11,27 @@ pub struct Index {
 
 impl Index {
     fn new(chars: String, count: usize) -> Self {
-        Self {
-            chars,
-            count,
-        }
+        Self { chars, count }
     }
 }
 
 /// Return the indexes for the given [Song]s
 pub fn build_indexes(songs: Vec<&Song>, root_chars: &str) -> Vec<Index> {
-    let indexes: Vec<String> = songs.iter().map(|s| get_index(s.title(), root_chars)).collect();
-//    indexes.sort();
+    let indexes: Vec<String> = songs
+        .iter()
+        .map(|s| get_index(s.title(), root_chars))
+        .collect();
+    //    indexes.sort();
 
     let mut map: BTreeMap<String, Index> = BTreeMap::new();
     for chars in indexes {
         match map.get_mut(&chars) {
-            Some(mut index) => { index.count += 1; }
-            None => { map.insert(chars.clone(), Index::new(chars.clone(), 1)); }
+            Some(mut index) => {
+                index.count += 1;
+            }
+            None => {
+                map.insert(chars.clone(), Index::new(chars.clone(), 1));
+            }
         }
     }
 
@@ -51,4 +55,3 @@ fn get_index(s: String, root_chars: &str) -> String {
 fn sub_string(input: &str, length: usize) -> String {
     input.chars().take(length).collect()
 }
-

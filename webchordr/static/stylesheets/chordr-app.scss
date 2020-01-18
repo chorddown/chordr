@@ -50,14 +50,7 @@ main {
     font-size: .8em;
 }
 
-@import "components/misc";
-@import "components/grid";
-@import "components/link";
-@import "components/button";
-@import "components/start-screen";
-@import "components/song-browser";
-@import "components/transpose-tool";
-@import "components/nav-bar";
+@import "components";
 
 .content {
     background: $background;

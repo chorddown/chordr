@@ -1,8 +1,8 @@
+use crate::helpers::Class;
 use libchordr::prelude::*;
 use yew::prelude::*;
 use yew::virtual_dom::VNode;
 use yew::{Component, ComponentLink};
-use crate::helpers::Class;
 
 #[derive(Properties, PartialEq)]
 pub struct SongListItemProps {

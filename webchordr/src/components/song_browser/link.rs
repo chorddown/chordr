@@ -1,8 +1,7 @@
-use yew::prelude::*;
 use super::SONG_BROWSER_PLACEHOLDER;
+use yew::prelude::*;
 
 pub struct SongBrowserLink {}
-
 
 impl Component for SongBrowserLink {
     type Message = ();

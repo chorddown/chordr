@@ -31,6 +31,9 @@ nav {
     button {
         margin-bottom: 2px;
     }
+    .song-item.-separator {
+        height: $std-half;
+    }
 
     footer {
         margin-top: auto;

@@ -1,0 +1,7 @@
+@import "prelude";
+@import "song-tool";
+
+.setlist-tool {
+    @extend %song-tool;
+    top: 45px;
+}

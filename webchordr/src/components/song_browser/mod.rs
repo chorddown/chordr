@@ -1,17 +1,17 @@
-mod link;
-mod index_item;
 mod index;
+mod index_item;
+mod link;
 
+use self::index::*;
+use self::index_item::IndexItem;
+use self::link::SongBrowserLink;
+use crate::components::song_list::Item as SongItem;
 use libchordr::models::catalog::Catalog;
 use libchordr::models::song_data::SongData;
 use libchordr::prelude::Song;
 use log::info;
 use yew::prelude::*;
 use yew::{Component, ComponentLink, ShouldRender};
-use self::index_item::IndexItem;
-use crate::components::song_list::Item as SongItem;
-use self::index::*;
-use self::link::SongBrowserLink;
 
 pub struct SongBrowser {
     props: SongBrowserProps,
@@ -73,7 +73,7 @@ impl SongBrowser {
 
             html! { <a class="song-browser-back -inline" href=href><i class="im im-angle-left"></i>{ "Back" }</a> }
         } else {
-            html! { }
+            html! {}
         }) as Html
     }
 
@@ -155,8 +155,6 @@ impl Component for SongBrowser {
     }
 }
 
-
 fn sub_string(input: &str, length: usize) -> String {
     input.chars().take(length).collect()
 }
-

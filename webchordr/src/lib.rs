@@ -2,24 +2,26 @@
 extern crate stdweb;
 
 mod components;
-mod route;
 mod helpers;
+mod route;
 
+use crate::components::song_browser::SongBrowser;
+use crate::components::song_list::SongList;
+use crate::components::song_view::SongView;
+use crate::components::start_screen::StartScreen;
+use crate::route::AppRoute;
+use failure::Error;
+use libchordr::prelude::*;
 use log::error;
 use log::info;
 use stdweb::js;
-use failure::Error;
 use yew::format::{Json, Nothing};
 use yew::services::fetch::{FetchService, FetchTask, Request, Response};
 use yew::services::storage::{Area, StorageService};
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
 use yew_router::prelude::*;
-use libchordr::prelude::*;
-use crate::components::song_list::Item;
-use crate::components::song_view::SongView;
-use crate::components::start_screen::StartScreen;
-use crate::components::song_browser::SongBrowser;
-use crate::route::AppRoute;
+
+const STORAGE_KEY_SET_LIST: &'static str = "net.cundd.chordr.set-list";
 
 pub enum Format {
     Json,
@@ -30,24 +32,24 @@ pub enum Format {
 pub struct App {
     fetch_service: FetchService,
     storage_service: StorageService,
-    link: ComponentLink<App>,
-    fetching: bool,
-    song_list: Option<SongList>,
-    song_meta: Option<SongMeta>,
-    song_data: Option<String>,
-    catalog: Option<Catalog>,
-    current_song: Option<Song>,
-    show_menu: bool,
-    ft: Option<FetchTask>,
-
     route_service: RouteService<()>,
     route: Route<()>,
+    link: ComponentLink<App>,
+    ft: Option<FetchTask>,
+
+    show_menu: bool,
+    fetching: bool,
+    catalog: Option<Catalog>,
+    current_song: Option<Song>,
+    setlist: Vec<Song>,
 }
 
 pub enum Msg {
     OpenSongInMainView(SongId),
     FetchCatalogReady(Result<Catalog, Error>),
     FetchCatalog(bool),
+    SetlistAdd(Song),
+    SetlistRemove(Song),
     ToggleMenu,
     Reload,
     Ignore,
@@ -56,29 +58,44 @@ pub enum Msg {
 
 impl App {
     fn route(&self) -> Html {
-        match AppRoute::switch(self.route.clone()) {
+        (match AppRoute::switch(self.route.clone()) {
             Some(AppRoute::Song(id)) => self.view_song(id),
             Some(AppRoute::SongBrowser(chars)) => self.view_song_browser(chars),
-            Some(AppRoute::Index) => html! {<><StartScreen/>{self.view_song_browser("".to_owned())}</>},
+            Some(AppRoute::Index) => {
+                html! {<><StartScreen/>{self.view_song_browser("".to_owned())}</>}
+            }
             None => html! {<><StartScreen/>{self.view_song_browser("".to_owned())}</>},
-        }
+        }) as Html
     }
 
     fn view_song(&self, song_id: SongId) -> Html {
-        match &self.catalog {
-            Some(catalog) => {
-                match catalog.get(song_id) {
-                    Some(song) => html! {<SongView song=song is_on_set_list=true />},
-                    None => html! {},
+        if self.catalog.is_none() {
+            return html! {};
+        }
+
+        let catalog = self.catalog.as_ref().unwrap();
+        (match catalog.get(song_id) {
+            Some(song) => {
+                let add = self.link.callback(|s| Msg::SetlistAdd(s));
+                let remove = self.link.callback(|s| Msg::SetlistRemove(s));
+                let is_on_setlist = self.setlist.contains(song);
+
+                html! {
+                    <SongView
+                        song=song
+                        enable_setlists=false
+                        on_setlist_add=add
+                        on_setlist_remove=remove
+                        is_on_setlist=is_on_setlist
+                    />
                 }
             }
-            None => html! {}
-        }
+            None => html! {},
+        }) as Html
     }
 
     fn view_song_browser(&self, chars: String) -> Html {
         (match &self.catalog {
-//            Some(catalog) => SongBrowser::create(SongBrowserProps{}).view()
             Some(catalog) => {
                 info!("New chars from router: {}", chars);
                 html! {<SongBrowser chars=chars catalog=catalog/>}
@@ -88,21 +105,26 @@ impl App {
     }
 
     fn view_song_list(&self) -> Html {
-        let render = |song: &Song| {
-            let song = song.clone();
-            html! { <Item song=song/> }
+        let setlist_empty = self.setlist.is_empty();
+
+        let separator = if setlist_empty {
+            html! {}
+        } else {
+            html! { <div class="song-item -separator">{"\u{00a0}"}</div> }
         };
 
-        return (match &self.catalog {
-            Some(c) => {
-                html! {
-                    <div class="song-list">
-                        { for c.iter().map(render) }
-                    </div>
-                }
-            }
-            None => html! {},
-        }) as Html;
+        let catalog_list = match &self.catalog {
+            Some(c) => c.iter().map(|s| s.clone()).collect(),
+            None => Vec::new(),
+        };
+
+        html! {
+            <div class="song-list">
+                <SongList songs=self.setlist.clone()/>
+                { separator }
+                <SongList songs=catalog_list/>
+            </div>
+        }
     }
 
     fn view_nav_footer(&self) -> Html {
@@ -151,8 +173,30 @@ impl App {
         } else {
             uri_base
         };
-        let request = Request::get(uri).body(Nothing).expect("Request could not be built");
+        let request = Request::get(uri)
+            .body(Nothing)
+            .expect("Request could not be built");
         self.ft = Some(self.fetch_service.fetch(request, callback));
+    }
+
+    fn setlist_add(&mut self, song: Song) {
+        self.setlist.push(song);
+        self.storage_service
+            .store(STORAGE_KEY_SET_LIST, Json(&self.setlist));
+    }
+
+    fn setlist_remove(&mut self, song: Song) {
+        match self.setlist.iter().position(|x| *x == song) {
+            Some(pos) => {
+                info!("Remove song {} from set-list", song.id());
+                self.setlist.remove(pos);
+            }
+            None => {
+                info!("Could not find song {} in set-list", song.id());
+            }
+        }
+        self.storage_service
+            .store(STORAGE_KEY_SET_LIST, Json(&self.setlist));
     }
 }
 
@@ -167,18 +211,24 @@ impl Component for App {
         let callback = link.callback(Msg::RouteChanged);
         route_service.register_callback(callback);
 
+        let storage_service = StorageService::new(Area::Local);
+        let setlist =
+            if let Json(Ok(restored_model)) = storage_service.restore(STORAGE_KEY_SET_LIST) {
+                restored_model
+            } else {
+                Vec::new()
+            };
+
         Self {
             fetch_service: FetchService::new(),
-            storage_service: StorageService::new(Area::Local),
+            storage_service,
             link,
             fetching: false,
             show_menu: true,
-            song_list: None,
-            song_meta: None,
-            song_data: None,
             current_song: None,
             catalog: None,
             ft: None,
+            setlist,
             route_service,
             route,
         }
@@ -208,6 +258,8 @@ impl Component for App {
                 self.catalog = response.ok();
             }
             Msg::FetchCatalog(no_cache) => self.fetch_catalog(no_cache),
+            Msg::SetlistAdd(song) => self.setlist_add(song),
+            Msg::SetlistRemove(song) => self.setlist_remove(song),
             Msg::Ignore => {
                 return false;
             }

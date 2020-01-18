@@ -1,7 +1,6 @@
-use yew::prelude::*;
 use log::error;
 use log::info;
-
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct TransposeToolProps {
@@ -21,7 +20,6 @@ pub enum Msg {
     InputChange(ChangeData),
 }
 
-
 #[allow(dead_code)]
 pub struct TransposeTool {
     /// State from the parent
@@ -38,15 +36,18 @@ impl Component for TransposeTool {
         Self { link, props }
     }
 
-
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
             Msg::InputChange(ChangeData::Value(v)) => {
                 info!("{:?}", v);
 
                 match v.parse::<isize>() {
-                    Ok(v) => { self.props.on_set.emit(v); }
-                    Err(_) => { error!("Invalid change data {:?}", v); }
+                    Ok(v) => {
+                        self.props.on_set.emit(v);
+                    }
+                    Err(_) => {
+                        error!("Invalid change data {:?}", v);
+                    }
                 };
             }
             Msg::InputChange(change_data) => error!("Invalid change data {:?}", change_data),
@@ -109,5 +110,3 @@ impl Component for TransposeTool {
         }) as Html
     }
 }
-
-impl TransposeTool {}

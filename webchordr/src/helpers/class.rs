@@ -1,5 +1,5 @@
+use failure::_core::fmt::{Error, Formatter};
 use std::fmt::Display;
-use failure::_core::fmt::{Formatter, Error};
 use yew::Classes;
 
 #[derive(Clone, Debug, PartialEq)]
@@ -50,7 +50,6 @@ impl From<&String> for Class {
         Self(string.clone())
     }
 }
-
 
 // --------------------------------------------------
 // Transform an instance of Class into something else

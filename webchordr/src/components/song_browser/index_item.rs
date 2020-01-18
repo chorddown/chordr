@@ -1,9 +1,9 @@
+use super::index::Index;
+use crate::helpers::Class;
+use log::info;
 use yew::prelude::*;
 use yew::virtual_dom::VNode;
 use yew::{Component, ComponentLink};
-use log::info;
-use crate::helpers::Class;
-use super::index::Index;
 
 #[derive(Properties, PartialEq, Debug)]
 pub struct SongBrowserIndexItemProps {
