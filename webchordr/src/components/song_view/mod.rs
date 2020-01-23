@@ -8,6 +8,7 @@ use stdweb::web::Node;
 use yew::prelude::*;
 use yew::virtual_dom::VNode;
 use yew::{Component, ComponentLink};
+use libchordr::models::chord::fmt::Formatting;
 
 mod setlist_tool;
 mod transpose_tool;
@@ -151,10 +152,10 @@ impl SongView {
                 &props.song.src(),
                 self.transpose_semitone,
                 props.song.meta(),
-                LibchordrFormat::HTML,
+                Formatting::with_format(LibchordrFormat::HTML),
             )
         } else {
-            convert_to_format(&props.song.src(), props.song.meta(), LibchordrFormat::HTML)
+            convert_to_format(&props.song.src(), props.song.meta(), Formatting::with_format(LibchordrFormat::HTML))
         };
 
         match converter_result {

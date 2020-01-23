@@ -1,12 +1,15 @@
 mod note;
 mod chords;
 mod transposition;
+pub mod fmt;
 
 use crate::error::Error;
 use crate::models::meta::BNotation;
 pub use self::note::Note;
 pub use self::chords::Chords;
+pub use self::fmt::NoteDisplay;
 pub use self::transposition::TransposableTrait;
+use crate::models::chord::fmt::Formatting;
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct Chord {
@@ -26,13 +29,6 @@ impl Chord {
         Self {
             root,
             variant: None,
-        }
-    }
-
-    pub fn to_string(&self, b_notation: BNotation) -> String {
-        match self.variant {
-            Some(ref v) => format!("{}{}", self.root.to_string(b_notation), v),
-            None => format!("{}", self.root.to_string(b_notation)),
         }
     }
 
@@ -94,6 +90,13 @@ impl Chord {
             variant_raw.iter().collect::<String>(),
         ))
     }
+
+//    fn to_string(&self, b_notation: BNotation, sn: SemitoneNotation) -> &str {
+//        match self.variant {
+//            Some(ref v) => format!("{}{}", NoteDisplay::to_string(&self.root, b_notation, sn), v).as_str(),
+//            None => format!("{}", NoteDisplay::to_string(&self.root, b_notation, sn)).as_str(),
+//        }
+//    }
 }
 
 impl From<Note> for Chord {
@@ -110,6 +113,16 @@ impl TransposableTrait for Chord {
         }
     }
 }
+
+impl NoteDisplay for Chord {
+    fn to_string(&self, formatting: Formatting) -> String {
+        match self.variant {
+            Some(ref v) => format!("{}{}", NoteDisplay::to_string(&self.root, formatting), v),
+            None => format!("{}", NoteDisplay::to_string(&self.root, formatting)),
+        }
+    }
+}
+
 
 #[cfg(test)]
 mod tests {

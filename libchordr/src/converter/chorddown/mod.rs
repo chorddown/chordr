@@ -1,20 +1,20 @@
 use super::ConverterTrait;
 use crate::error::Result;
-use crate::format::Format;
 use crate::models::chord::Chords;
-use crate::models::meta::{BNotation, MetaTrait};
+use crate::models::meta::MetaTrait;
 use crate::parser::Node;
 use crate::tokenizer::Token;
+use crate::models::chord::fmt::*;
 
 pub struct ChorddownConverter {}
 
 impl ConverterTrait for ChorddownConverter {
-    fn convert(&self, node: &Node, meta: &dyn MetaTrait, _format: Format) -> Result<String> {
+    fn convert(&self, node: &Node, meta: &dyn MetaTrait, formatting: Formatting) -> Result<String> {
         let output = format!(
             "{}{}{}",
             self.build_title(meta),
             self.build_meta(meta),
-            self.build_node(node)?
+            self.build_node(node, formatting)?
         );
         Ok(cleanup_output(&output))
     }
@@ -22,18 +22,18 @@ impl ConverterTrait for ChorddownConverter {
 
 
 impl ChorddownConverter {
-    fn build_node<'a>(&'a self, node: &'a Node) -> Result<String> {
+    fn build_node<'a>(&'a self, node: &'a Node, formatting: Formatting) -> Result<String> {
         match node {
             Node::ChordTextPair { chords, text } => Ok(format!(
                 "{}{}",
-                self.build_tag_for_chords(chords),
+                self.build_tag_for_chords(chords, formatting),
                 self.build_token(text),
             )),
             Node::ChordStandalone(chord) => {
-                Ok(self.build_column(self.build_tag_for_chords(chord), ""))
+                Ok(self.build_column(self.build_tag_for_chords(chord, formatting), ""))
             }
             Node::Text(text) => Ok(self.build_token(text)),
-            Node::Document(children) => Ok(self.build_tag_for_children(children)),
+            Node::Document(children) => Ok(self.build_tag_for_children(children, formatting)),
             Node::Headline(token) => Ok(self.build_token(token)),
             Node::Quote(token) => Ok(self.build_token(token)),
             Node::Meta(_) => {
@@ -49,10 +49,10 @@ impl ChorddownConverter {
                 let inner = match head {
                     Some(head) => format!(
                         "{}{}",
-                        self.build_node(head)?,
-                        self.build_tag_for_children(children)
+                        self.build_node(head, formatting)?,
+                        self.build_tag_for_children(children, formatting)
                     ),
-                    None => self.build_tag_for_children(children),
+                    None => self.build_tag_for_children(children, formatting),
                 };
 
                 Ok(format!("{}\n", inner))
@@ -130,14 +130,14 @@ impl ChorddownConverter {
         buffer.join("\n")
     }
 
-    fn build_tag_for_chords(&self, chords: &Chords) -> String {
-        format!("[{}]", chords.to_string(BNotation::B))
+    fn build_tag_for_chords(&self, chords: &Chords, formatting: Formatting) -> String {
+        format!("[{}]", chords.to_string(formatting))
     }
 
-    fn build_tag_for_children<'a, 'b>(&'a self, children: &'a Vec<Node>) -> String {
+    fn build_tag_for_children<'a, 'b>(&'a self, children: &'a Vec<Node>, formatting: Formatting) -> String {
         children
             .iter()
-            .filter_map(|n| self.build_node(n).ok())
+            .filter_map(|n| self.build_node(n, formatting).ok())
             .collect::<Vec<String>>()
             .join("")
     }
@@ -174,6 +174,7 @@ mod tests {
     use crate::test_helpers::get_test_ast;
     use crate::test_helpers::get_test_metadata;
     use crate::tokenizer::Modifier;
+    use crate::format::Format;
 
     #[test]
     fn test_convert() {
@@ -181,7 +182,7 @@ mod tests {
         let result = converter.convert(
             &get_test_ast(),
             &MetaInformation::default(),
-            Format::Chorddown,
+            Formatting::with_format(Format::Chorddown),
         );
 
         assert!(result.is_ok());
@@ -215,7 +216,7 @@ Comin’ for to [A7]carry me [D]home.
         let result = converter.convert(
             &get_test_ast(),
             &get_test_metadata(),
-            Format::Chorddown,
+            Formatting::with_format(Format::Chorddown),
         );
 
         assert!(result.is_ok());
@@ -279,7 +280,7 @@ Comin’ for to [A7]carry me [D]home.
         let result = converter.convert(
             &ast,
             &get_test_metadata(),
-            Format::Chorddown,
+            Formatting::with_format(Format::Chorddown),
         );
 
         assert!(result.is_ok());
@@ -330,7 +331,7 @@ Swing [D]low, sweet [G]chari[D]ot.
         let result = converter.convert(
             &ast,
             &MetaInformation::default(),
-            Format::Chorddown,
+            Formatting::with_format(Format::Chorddown),
         );
 
         assert!(result.is_ok());

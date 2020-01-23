@@ -83,7 +83,7 @@ impl App {
                 html! {
                     <SongView
                         song=song
-                        enable_setlists=false
+                        enable_setlists=true
                         on_setlist_add=add
                         on_setlist_remove=remove
                         is_on_setlist=is_on_setlist
@@ -117,6 +117,7 @@ impl App {
             Some(c) => c.iter().map(|s| s.clone()).collect(),
             None => Vec::new(),
         };
+        let catalog_list = vec![];
 
         html! {
             <div class="song-list">

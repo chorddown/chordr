@@ -1,6 +1,6 @@
 use std::convert::TryFrom;
 
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Debug)]
 pub enum Format {
     HTML,
     Chorddown,

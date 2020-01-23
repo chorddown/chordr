@@ -3,6 +3,8 @@ use crate::models::meta::BNotation;
 use std::fmt::Debug;
 use serde::export::Formatter;
 use crate::models::chord::transposition::TransposableTrait;
+use crate::models::chord::NoteDisplay;
+use crate::models::chord::fmt::Formatting;
 
 #[derive(Clone, Copy, PartialEq, PartialOrd)]
 pub enum Note {
@@ -21,23 +23,6 @@ pub enum Note {
 }
 
 impl Note {
-    pub fn to_string(&self, b_notation: BNotation) -> &str {
-        match self {
-            Self::C => "C",
-            Self::Cis => "C#",
-            Self::D => "D",
-            Self::Dis => "D#",
-            Self::E => "E",
-            Self::F => "F",
-            Self::Fis => "F#",
-            Self::G => "G",
-            Self::Gis => "G#",
-            Self::A => "A",
-            Self::Ais => "A#",
-            Self::B => if b_notation == BNotation::B { "B" } else { "H" },
-        }
-    }
-
     pub fn try_from(value: &str, b_notation: BNotation) -> Result<Self, Error> {
         if value.is_empty() {
             return Err(Error::chord_error("Given note is empty"));
@@ -141,6 +126,25 @@ impl Debug for Note {
             Self::Ais => "A#",
             Self::B => "B",
         })
+    }
+}
+
+impl NoteDisplay for Note {
+    fn to_string(&self, formatting: Formatting) -> String {
+        match self {
+            Self::C => "C",
+            Self::Cis => "C#",
+            Self::D => "D",
+            Self::Dis => "D#",
+            Self::E => "E",
+            Self::F => "F",
+            Self::Fis => "F#",
+            Self::G => "G",
+            Self::Gis => "G#",
+            Self::A => "A",
+            Self::Ais => "A#",
+            Self::B => if formatting.b_notation == BNotation::B { "B" } else { "H" },
+        }.to_string()
     }
 }
 

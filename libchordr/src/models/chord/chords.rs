@@ -1,6 +1,7 @@
-use crate::models::chord::{Chord, TransposableTrait};
+use crate::models::chord::{Chord, TransposableTrait, NoteDisplay};
 use crate::models::meta::BNotation;
 use crate::error::Error;
+use crate::models::chord::fmt::Formatting;
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 pub struct Chords(Chord, Option<Chord>);
@@ -28,13 +29,6 @@ impl Chords {
 
         Ok(Chords(chord1, chord2))
     }
-
-    pub fn to_string(&self, b_notation: BNotation) -> String {
-        match &self.1 {
-            None => self.0.to_string(b_notation),
-            Some(c) => format!("{}/{}", self.0.to_string(b_notation), c.to_string(b_notation)),
-        }
-    }
 }
 
 impl TransposableTrait for Chords {
@@ -46,6 +40,14 @@ impl TransposableTrait for Chords {
     }
 }
 
+impl NoteDisplay for Chords {
+    fn to_string(&self, formatting: Formatting) -> String {
+        match &self.1 {
+            None => self.0.to_string(formatting),
+            Some(c) => format!("{}/{}", self.0.to_string(formatting), c.to_string(formatting)),
+        }
+    }
+}
 
 #[cfg(test)]
 mod tests {

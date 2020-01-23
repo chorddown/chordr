@@ -8,6 +8,7 @@ use libchordr::prelude::Error;
 use libchordr::prelude::Result;
 use libchordr::prelude::*;
 use std::convert::TryFrom;
+use libchordr::models::chord::fmt::Formatting;
 
 fn main() {
     let output_arg = Arg::with_name("OUTPUT")
@@ -72,7 +73,8 @@ fn convert(args: &ArgMatches) -> Result<()> {
     let converted = Converter::new().convert(
         parser_result.node_as_ref(),
         parser_result.meta_as_ref(),
-        format)?;
+        Formatting::with_format(format),
+    )?;
 
     let output = if format == Format::HTML {
         format!(

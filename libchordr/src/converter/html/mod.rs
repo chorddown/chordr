@@ -4,6 +4,7 @@ use crate::converter::ConverterTrait;
 use crate::models::song_meta_trait::SongMetaTrait;
 use crate::prelude::*;
 use tag_provider::TagProvider;
+use crate::models::chord::fmt::Formatting;
 
 pub struct HtmlConverter {}
 
@@ -13,13 +14,14 @@ impl HtmlConverter {
         node: &Node,
         meta: &dyn SongMetaTrait,
         tag_builder: &TagProvider,
+        formatting: Formatting,
     ) -> Result<String> {
         Ok(format!(
             r#"<div id="chordr">
 {}
 {}
 </div>"#,
-            tag_builder.build_tag_for_node(node),
+            tag_builder.build_tag_for_node(node, formatting),
             self.format_meta(meta)
         ))
     }
@@ -63,9 +65,9 @@ Capo:       {}
 }
 
 impl ConverterTrait for HtmlConverter {
-    fn convert(&self, node: &Node, meta: &dyn SongMetaTrait, _format: Format) -> Result<String> {
+    fn convert(&self, node: &Node, meta: &dyn SongMetaTrait, formatting: Formatting) -> Result<String> {
         let tag_builder = TagProvider::new();
 
-        self.html_for_node(node, meta, &tag_builder)
+        self.html_for_node(node, meta, &tag_builder, formatting)
     }
 }

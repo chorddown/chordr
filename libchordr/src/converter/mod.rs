@@ -6,6 +6,7 @@ use crate::error::Result;
 use crate::models::song_meta_trait::SongMetaTrait;
 use crate::prelude::*;
 use crate::converter::songbeamer::SongBeamerConverter;
+use crate::models::chord::fmt::Formatting;
 
 mod chorddown;
 mod songbeamer;
@@ -14,7 +15,7 @@ mod html;
 mod pdf;
 
 pub trait ConverterTrait {
-    fn convert(&self, node: &Node, meta: &dyn SongMetaTrait, format: Format) -> Result<String>;
+    fn convert(&self, node: &Node, meta: &dyn SongMetaTrait, formatting: Formatting) -> Result<String>;
 }
 
 pub struct Converter {}
@@ -36,8 +37,8 @@ impl Converter {
 }
 
 impl ConverterTrait for Converter {
-    fn convert(&self, node: &Node, meta: &dyn SongMetaTrait, format: Format) -> Result<String> {
-        Converter::get_converter(format).convert(node, meta, format)
+    fn convert(&self, node: &Node, meta: &dyn SongMetaTrait, formatting: Formatting) -> Result<String> {
+        Converter::get_converter(formatting.format).convert(node, meta, formatting)
     }
 }
 
@@ -55,7 +56,7 @@ mod tests {
         let result = Converter::new().convert(
             parser_result.node_as_ref(),
             parser_result.meta_as_ref(),
-            Format::HTML,
+            Formatting::with_format(Format::HTML),
         );
 
         assert!(result.is_ok());

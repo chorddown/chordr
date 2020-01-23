@@ -1,10 +1,10 @@
 use crate::converter::{Converter, ConverterTrait};
 use crate::error::Result;
-use crate::format::Format;
 use crate::parser::{Parser, ParserTrait, ParserResult};
 use crate::tokenizer::{build_tokenizer, Token, TokenLine, Tokenizer};
 use crate::models::song_meta_trait::SongMetaTrait;
 use crate::models::chord::TransposableTrait;
+use crate::models::chord::fmt::Formatting;
 
 pub fn token_lines_to_tokens(token_lines: Vec<TokenLine>) -> Vec<Token> {
     let mut stream = vec![];
@@ -29,10 +29,10 @@ pub fn transpose_content(contents: &str, semitones: isize) -> Result<ParserResul
     Ok(ParserResult::new(transposed_node, parser_result.meta()))
 }
 
-pub fn convert_to_format(contents: &str, meta: &dyn SongMetaTrait, format: Format) -> Result<String> {
-    Converter::new().convert(parse_content(contents)?.node_as_ref(), meta, format)
+pub fn convert_to_format(contents: &str, meta: &dyn SongMetaTrait, formatting: Formatting) -> Result<String> {
+    Converter::new().convert(parse_content(contents)?.node_as_ref(), meta, formatting)
 }
 
-pub fn transpose_and_convert_to_format(contents: &str, semitones: isize, meta: &dyn SongMetaTrait, format: Format) -> Result<String> {
-    Converter::new().convert(transpose_content(contents, semitones)?.node_as_ref(), meta, format)
+pub fn transpose_and_convert_to_format(contents: &str, semitones: isize, meta: &dyn SongMetaTrait, formatting: Formatting) -> Result<String> {
+    Converter::new().convert(transpose_content(contents, semitones)?.node_as_ref(), meta, formatting)
 }
