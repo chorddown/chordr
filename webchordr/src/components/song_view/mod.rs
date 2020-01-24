@@ -45,7 +45,6 @@ pub struct SongView {
     /// Utility object
     link: ComponentLink<Self>,
 
-    is_on_setlist: bool,
     transpose_semitone: isize,
 }
 
@@ -55,13 +54,11 @@ impl Component for SongView {
 
     fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
         let transpose_semitone = props.transpose_semitone.unwrap_or(0);
-        let is_on_setlist = props.is_on_setlist;
 
         Self {
             link,
             props,
             transpose_semitone,
-            is_on_setlist,
         }
     }
 
@@ -82,7 +79,6 @@ impl Component for SongView {
             Msg::SetlistChange(flag) => {
                 let song = &self.props.song;
                 info!("Set Song {} on set-list: {:?}", song.id(), flag);
-                self.is_on_setlist = flag;
                 if flag {
                     self.props.on_setlist_add.emit(song.clone())
                 } else {
@@ -95,9 +91,12 @@ impl Component for SongView {
     }
 
     fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        if self.props.song.id() != props.song.id() {
+        let song_changed = self.props.song.id() != props.song.id();
+        if song_changed || self.props != props {
+            if song_changed {
+                self.transpose_semitone = 0;
+            }
             self.props = props;
-            self.transpose_semitone = 0;
             true
         } else {
             false
@@ -106,9 +105,10 @@ impl Component for SongView {
 
     fn view(&self) -> Html {
         info!(
-            "View song {} (transpose {})",
+            "View song {} (transpose {}, in setlist: {})",
             self.props.song.id(),
-            self.transpose_semitone
+            self.transpose_semitone,
+            self.props.is_on_setlist
         );
 
         let detail = self.convert_song_to_html_node();
@@ -121,7 +121,7 @@ impl Component for SongView {
             html! {
                 <Setlist
                     on_click=setlist_set
-                    is_on_setlist=self.is_on_setlist
+                    is_on_setlist=self.props.is_on_setlist
                 />
             }
         } else {
@@ -166,9 +166,7 @@ impl SongView {
             }
         }
     }
-}
 
-impl SongView {
     fn convert_song_to_html_node(&self) -> VNode {
         let html = self.convert_song_to_html_string();
         if let Ok(node) = Node::from_html(&html) {

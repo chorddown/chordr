@@ -32,6 +32,15 @@ impl Component for Item {
         true
     }
 
+    fn change(&mut self, props: Self::Properties) -> bool {
+        if self.props != props {
+            self.props = props;
+            true
+        } else {
+            false
+        }
+    }
+
     fn view(&self) -> VNode {
         let title = &self.props.song.title();
         let href = format!("#/song/{}", self.props.song.id());
