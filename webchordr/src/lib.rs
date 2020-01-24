@@ -80,6 +80,8 @@ impl App {
                 let remove = self.link.callback(|s| Msg::SetlistRemove(s));
                 let is_on_setlist = self.setlist.contains(song);
 
+                info!("Song {} is on list? {}", song.id(), is_on_setlist);
+
                 html! {
                     <SongView
                         song=song
@@ -105,6 +107,8 @@ impl App {
     }
 
     fn view_song_list(&self) -> Html {
+        // Not properly working
+        let view_catalog_in_nav = true;
         let setlist_empty = self.setlist.is_empty();
 
         let separator = if setlist_empty {
@@ -113,19 +117,26 @@ impl App {
             html! { <div class="song-item -separator">{"\u{00a0}"}</div> }
         };
 
-        let catalog_list = match &self.catalog {
-            Some(c) => c.iter().map(|s| s.clone()).collect(),
-            None => Vec::new(),
-        };
-        let catalog_list = vec![];
+        (if view_catalog_in_nav {
+            let catalog_list = match &self.catalog {
+                Some(c) => c.iter().map(|s| s.clone()).collect(),
+                None => Vec::new(),
+            };
 
-        html! {
-            <div class="song-list">
-                <SongList songs=self.setlist.clone()/>
-                { separator }
-                <SongList songs=catalog_list/>
-            </div>
-        }
+            html! {
+                <div class="song-list">
+                    <SongList songs=self.setlist.clone()/>
+                    { separator }
+                    <SongList songs=catalog_list/>
+                </div>
+            }
+        } else {
+            html! {
+                <div class="song-list">
+                    <SongList songs=self.setlist.clone()/>
+                </div>
+            }
+        }) as Html
     }
 
     fn view_nav_footer(&self) -> Html {
