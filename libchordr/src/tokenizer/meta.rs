@@ -54,7 +54,7 @@ impl Meta {
             Self::Tempo(_) => "Tempo",
             Self::Duration(_) => "Duration",
             Self::Capo(_) => "Capo",
-            Self::BNotation(_) => "BNotation",
+            Self::BNotation(_) => "B-Notation",
         }
     }
 
@@ -71,7 +71,7 @@ impl Meta {
             Self::Tempo(c) => c,
             Self::Duration(c) => c,
             Self::Capo(c) => c,
-            Self::BNotation(_) => ""
+            Self::BNotation(c) => c.as_str()
         }
     }
 

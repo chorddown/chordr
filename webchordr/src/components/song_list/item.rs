@@ -45,7 +45,6 @@ impl Component for Item {
         let title = &self.props.song.title();
         let href = format!("#/song/{}", self.props.song.id());
         let class = self.props.class.or("song-item");
-        //("song-item".into());
 
         html! { <a role="button" class=class href=href>{ title }</a> }
     }

@@ -36,7 +36,7 @@ impl Nav {
             html! {
                 <footer>
                     <button class="toggle-menu" onclick=toggle_menu>{ "→" }</button>
-                    <a role="button" class="home" href="/" title="Reload the song catalog and go to home screen">
+                    <a role="button" class="home" href="/#" title="Go to home screen">
                         <i class="im im-home"></i>
                         <span>{ "Home" }</span>
                     </a>

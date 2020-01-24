@@ -1,5 +1,8 @@
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
+use std::fmt::Display;
+use serde::export::Formatter;
+use serde::export::fmt::Error;
 
 /// Enum defining how the `B` is defined
 ///
@@ -17,11 +20,24 @@ impl BNotation {
             _ => false
         }
     }
+
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::B => "B",
+            Self::H => "H",
+        }
+    }
 }
 
 impl Default for BNotation {
     fn default() -> Self {
         Self::B
+    }
+}
+
+impl Display for BNotation {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
+        write!(f, "{}", self.as_str())
     }
 }
 

@@ -21,6 +21,7 @@ use yew::{html, Component, ComponentLink, Html, ShouldRender};
 use yew_router::prelude::*;
 use crate::components::nav::Nav;
 use std::rc::Rc;
+use crate::components::reload_section::ReloadSection;
 
 const STORAGE_KEY_SET_LIST: &'static str = "net.cundd.chordr.set-list";
 
@@ -63,9 +64,9 @@ impl App {
             Some(AppRoute::Song(id)) => self.view_song(id),
             Some(AppRoute::SongBrowser(chars)) => self.view_song_browser(chars),
             Some(AppRoute::Index) => {
-                html! {<><StartScreen/>{self.view_song_browser("".to_owned())}</>}
+                html! {<><StartScreen/>{self.view_song_browser("")}<ReloadSection /></>}
             }
-            None => html! {<><StartScreen/>{self.view_song_browser("".to_owned())}</>},
+            None => html! {<><StartScreen/>{self.view_song_browser("")}<ReloadSection /></>},
         }) as Html
     }
 
@@ -97,7 +98,8 @@ impl App {
         }) as Html
     }
 
-    fn view_song_browser(&self, chars: String) -> Html {
+    fn view_song_browser<S: Into<String>>(&self, chars: S) -> Html {
+        let chars = chars.into();
         (match &self.catalog {
             Some(catalog) => {
                 info!("New chars from router: {}", chars);
@@ -234,13 +236,6 @@ impl Component for App {
     }
 
     fn view(&self) -> Html {
-        let mut menu_classes = vec!["menu"];
-        let _ = if self.show_menu {
-            menu_classes.push("-visible");
-        } else {
-            menu_classes.push("-hidden");
-        };
-
         let main_classes = if self.show_menu {
             "-menu-visible"
         } else {
