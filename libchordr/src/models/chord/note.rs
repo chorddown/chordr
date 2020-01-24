@@ -1,7 +1,6 @@
 use crate::error::Error;
-use crate::models::meta::BNotation;
-use std::fmt::Debug;
-use serde::export::Formatter;
+use crate::models::meta::{BNotation, SemitoneNotation};
+use std::fmt::{Debug, Formatter};
 use crate::models::chord::transposition::TransposableTrait;
 use crate::models::chord::NoteDisplay;
 use crate::models::chord::fmt::Formatting;
@@ -130,19 +129,25 @@ impl Debug for Note {
 }
 
 impl NoteDisplay for Note {
-    fn to_string(&self, formatting: Formatting) -> String {
+    fn note_format(&self, formatting: Formatting) -> String {
+        let sharp = formatting.semitone_notation == SemitoneNotation::Sharp;
         match self {
             Self::C => "C",
-            Self::Cis => "C#",
+            Self::Cis if sharp => "C#",
+            Self::Cis => "Db",
             Self::D => "D",
-            Self::Dis => "D#",
+            Self::Dis if sharp => "D#",
+            Self::Dis => "Eb",
             Self::E => "E",
             Self::F => "F",
-            Self::Fis => "F#",
+            Self::Fis if sharp => "F#",
+            Self::Fis => "Gb",
             Self::G => "G",
-            Self::Gis => "G#",
+            Self::Gis if sharp => "G#",
+            Self::Gis => "Ab",
             Self::A => "A",
-            Self::Ais => "A#",
+            Self::Ais if sharp => "A#",
+            Self::Ais => if formatting.b_notation == BNotation::B { "Bb" } else { "B" },
             Self::B => if formatting.b_notation == BNotation::B { "B" } else { "H" },
         }.to_string()
     }
@@ -195,6 +200,7 @@ impl TransposableTrait for Note {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::format::Format;
 
     #[test]
     fn try_from_test() {
@@ -347,5 +353,59 @@ mod tests {
         for (semitones, input, expected) in map {
             assert_eq!(input.transpose(semitones), expected, "Transpose failed for {:?} {}", input, semitones);
         }
+    }
+
+
+    #[test]
+    fn note_format_test() {
+        let sharp_b = Formatting {
+            b_notation: BNotation::B,
+            semitone_notation: SemitoneNotation::Sharp,
+            format: Format::HTML,
+        };
+        let flat_b = Formatting {
+            b_notation: BNotation::B,
+            semitone_notation: SemitoneNotation::Flat,
+            format: Format::HTML,
+        };
+        let sharp_europe = Formatting {
+            b_notation: BNotation::H,
+            semitone_notation: SemitoneNotation::Sharp,
+            format: Format::HTML,
+        };
+        let flat_europe = Formatting {
+            b_notation: BNotation::H,
+            semitone_notation: SemitoneNotation::Flat,
+            format: Format::HTML,
+        };
+        assert_eq!(Note::C.note_format(sharp_b), "C".to_owned());
+        assert_eq!(Note::C.note_format(flat_b), "C".to_owned());
+        assert_eq!(Note::C.note_format(sharp_europe), "C".to_owned());
+        assert_eq!(Note::C.note_format(flat_europe), "C".to_owned());
+
+        assert_eq!(Note::Cis.note_format(sharp_b), "C#".to_owned());
+        assert_eq!(Note::Cis.note_format(flat_b), "Db".to_owned());
+        assert_eq!(Note::Cis.note_format(sharp_europe), "C#".to_owned());
+        assert_eq!(Note::Cis.note_format(flat_europe), "Db".to_owned());
+
+        assert_eq!(Note::B.note_format(sharp_b), "B".to_owned());
+        assert_eq!(Note::B.note_format(flat_b), "B".to_owned());
+        assert_eq!(Note::B.note_format(sharp_europe), "H".to_owned());
+        assert_eq!(Note::B.note_format(flat_europe), "H".to_owned());
+
+        assert_eq!(Note::Ais.note_format(sharp_b), "A#".to_owned());
+        assert_eq!(Note::Ais.note_format(flat_b), "Bb".to_owned());
+        assert_eq!(Note::Ais.note_format(sharp_europe), "A#".to_owned());
+        assert_eq!(Note::Ais.note_format(flat_europe), "B".to_owned());
+
+        assert_eq!(Note::F.note_format(sharp_b), "F".to_owned());
+        assert_eq!(Note::F.note_format(flat_b), "F".to_owned());
+        assert_eq!(Note::F.note_format(sharp_europe), "F".to_owned());
+        assert_eq!(Note::F.note_format(flat_europe), "F".to_owned());
+
+        assert_eq!(Note::Fis.note_format(sharp_b), "F#".to_owned());
+        assert_eq!(Note::Fis.note_format(flat_b), "Gb".to_owned());
+        assert_eq!(Note::Fis.note_format(sharp_europe), "F#".to_owned());
+        assert_eq!(Note::Fis.note_format(flat_europe), "Gb".to_owned());
     }
 }

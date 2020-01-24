@@ -82,19 +82,7 @@ impl TagProvider {
         let mut gtb = TagBuilder::new();
 
         match token {
-            Token::Chord(_c) => unreachable!(),
-//                gtb
-//                .set_tag_name("span")
-//                .set_content_str(c)
-//                .set_class_name("chordr-chord")
-//                .set_attribute(Attribute::new("data-chord", c.to_string(formatting)).unwrap())
-//                .build(),
             Token::Literal(c) => gtb.set_tag_name("span").set_content_str(c).build(),
-            Token::Newline => {
-                let inner = format!("{}\n", Tag::with_name("br"));
-
-                Tag::raw(Content::Raw(inner))
-            }
             Token::Quote(c) => gtb.set_tag_name("blockquote").set_content_str(c).build(),
             Token::Headline {
                 level,
@@ -104,16 +92,18 @@ impl TagProvider {
                 .set_tag_name(&format!("h{}", level))
                 .set_content_str(c)
                 .build(),
+            Token::Chord(_) => unreachable!(),
             Token::Meta(_) => unreachable!(),
+            Token::Newline => unreachable!(),
         }
     }
 
     fn build_tag_for_chords(&self, chords: &Chords, formatting: Formatting) -> Tag {
         let mut gtb = TagBuilder::new();
         gtb.set_tag_name("span")
-            .set_content_str(chords.to_string(formatting))
+            .set_content_str(chords.note_format(formatting))
             .set_class_name("chordr-chord")
-            .set_attribute(Attribute::new("data-chord", &chords.to_string(formatting)).unwrap())
+            .set_attribute(Attribute::new("data-chord", &chords.note_format(formatting)).unwrap())
             .build()
     }
 

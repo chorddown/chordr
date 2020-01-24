@@ -41,10 +41,10 @@ impl TransposableTrait for Chords {
 }
 
 impl NoteDisplay for Chords {
-    fn to_string(&self, formatting: Formatting) -> String {
+    fn note_format(&self, formatting: Formatting) -> String {
         match &self.1 {
-            None => self.0.to_string(formatting),
-            Some(c) => format!("{}/{}", self.0.to_string(formatting), c.to_string(formatting)),
+            None => NoteDisplay::note_format(&self.0, formatting),
+            Some(c) => format!("{}/{}", NoteDisplay::note_format(&self.0, formatting), NoteDisplay::note_format(c, formatting)),
         }
     }
 }

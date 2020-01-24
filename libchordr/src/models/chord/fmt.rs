@@ -29,5 +29,5 @@ impl Default for Formatting {
 }
 
 pub trait NoteDisplay {
-    fn to_string(&self, format: Formatting) -> String;
+    fn note_format(&self, format: Formatting) -> String;
 }

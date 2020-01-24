@@ -115,10 +115,10 @@ impl TransposableTrait for Chord {
 }
 
 impl NoteDisplay for Chord {
-    fn to_string(&self, formatting: Formatting) -> String {
+    fn note_format(&self, formatting: Formatting) -> String {
         match self.variant {
-            Some(ref v) => format!("{}{}", NoteDisplay::to_string(&self.root, formatting), v),
-            None => format!("{}", NoteDisplay::to_string(&self.root, formatting)),
+            Some(ref v) => format!("{}{}", NoteDisplay::note_format(&self.root, formatting), v),
+            None => format!("{}", NoteDisplay::note_format(&self.root, formatting)),
         }
     }
 }

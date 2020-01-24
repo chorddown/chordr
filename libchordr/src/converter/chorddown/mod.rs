@@ -131,7 +131,7 @@ impl ChorddownConverter {
     }
 
     fn build_tag_for_chords(&self, chords: &Chords, formatting: Formatting) -> String {
-        format!("[{}]", chords.to_string(formatting))
+        format!("[{}]", chords.note_format(formatting))
     }
 
     fn build_tag_for_children<'a, 'b>(&'a self, children: &'a Vec<Node>, formatting: Formatting) -> String {
