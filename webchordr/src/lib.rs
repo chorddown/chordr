@@ -6,7 +6,6 @@ mod helpers;
 mod route;
 
 use crate::components::song_browser::SongBrowser;
-use crate::components::song_list::SongList;
 use crate::components::song_view::SongView;
 use crate::components::start_screen::StartScreen;
 use crate::route::AppRoute;
@@ -20,6 +19,8 @@ use yew::services::fetch::{FetchService, FetchTask, Request, Response};
 use yew::services::storage::{Area, StorageService};
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
 use yew_router::prelude::*;
+use crate::components::nav::Nav;
+use std::rc::Rc;
 
 const STORAGE_KEY_SET_LIST: &'static str = "net.cundd.chordr.set-list";
 
@@ -103,61 +104,6 @@ impl App {
                 html! {<SongBrowser chars=chars catalog=catalog/>}
             }
             None => html! {},
-        }) as Html
-    }
-
-    fn view_song_list(&self) -> Html {
-        // Not properly working
-        let view_catalog_in_nav = true;
-        let setlist_empty = self.setlist.is_empty();
-
-        let separator = if setlist_empty {
-            html! {}
-        } else {
-            html! { <div class="song-item -separator">{"\u{00a0}"}</div> }
-        };
-
-        (if view_catalog_in_nav {
-            let catalog_list = match &self.catalog {
-                Some(c) => c.iter().map(|s| s.clone()).collect(),
-                None => Vec::new(),
-            };
-
-            html! {
-                <div class="song-list">
-                    <SongList songs=self.setlist.clone()/>
-                    { separator }
-                    <SongList songs=catalog_list/>
-                </div>
-            }
-        } else {
-            html! {
-                <div class="song-list">
-                    <SongList songs=self.setlist.clone()/>
-                </div>
-            }
-        }) as Html
-    }
-
-    fn view_nav_footer(&self) -> Html {
-        let toggle_menu = self.link.callback(|_| Msg::ToggleMenu);
-
-        (if self.show_menu {
-            html! {
-                <footer>
-                    <button class="toggle-menu" onclick=toggle_menu>{ "→" }</button>
-                    <a role="button" class="home" href="/" title="Reload the song catalog and go to home screen">
-                        <i class="im im-home"></i>
-                        <span>{ "Home" }</span>
-                    </a>
-                </footer>
-            }
-        } else {
-            html! {
-                <footer>
-                    <button class="toggle-menu" onclick=toggle_menu>{ "︎←" }</button>
-                </footer>
-            }
         }) as Html
     }
 
@@ -301,18 +247,16 @@ impl Component for App {
             "-menu-hidden"
         };
 
-        let song_list = if self.show_menu {
-            self.view_song_list()
-        } else {
-            html! {}
-        };
+        let toggle_menu = self.link.callback(|_| Msg::ToggleMenu);
+        let songs = Rc::new(self.setlist.clone());
 
         html! {
             <main class=main_classes>
-                <nav class=menu_classes>
-                    { song_list }
-                    { self.view_nav_footer() }
-                </nav>
+                <Nav
+                    show_menu=self.show_menu
+                    songs=songs
+                    on_toggle=toggle_menu
+                />
                 <div class="content">
                     { self.route() }
                 </div>

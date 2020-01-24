@@ -4,11 +4,12 @@ pub use self::item::Item;
 use libchordr::prelude::*;
 use log::info;
 use yew::prelude::*;
+use std::rc::Rc;
 
 #[derive(Properties, PartialEq)]
 pub struct SongListProps {
     #[props(required)]
-    pub songs: Vec<Song>,
+    pub songs: Rc<Vec<Song>>,
 }
 
 pub struct SongList {
@@ -38,9 +39,7 @@ impl Component for SongList {
 
     fn view(&self) -> Html {
         let songs = &self.props.songs;
-        let empty = songs.is_empty();
         let render = |song: &Song| {
-            let song = song.clone();
             html! { <Item song=song/> }
         };
 
@@ -48,10 +47,7 @@ impl Component for SongList {
             "Redraw song list {:?}",
             songs.iter().map(|s| s.id()).collect::<Vec<String>>()
         );
-        (if empty {
-            html! {}
-        } else {
-            html! { for songs.iter().map(render) }
-        }) as Html
+
+        (html! { for songs.iter().map(render) }) as Html
     }
 }
