@@ -20,7 +20,6 @@ pub enum Msg {
     InputChange(ChangeData),
 }
 
-#[allow(dead_code)]
 pub struct TransposeTool {
     /// State from the parent
     props: TransposeToolProps,

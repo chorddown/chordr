@@ -1,4 +1,5 @@
 use yew::prelude::*;
+use crate::components::nbsp::Nbsp;
 
 pub struct ReloadSection {}
 
@@ -19,7 +20,7 @@ impl Component for ReloadSection {
             <div class="reload-button-container">
                 <a class="reload-button" href="/" title="Reload the song catalog">
                     <i class="im im-sync"></i>
-                    {"\u{00a0}"}
+                    <Nbsp/>
                     <span>{"Reload the catalog"}</span>
                 </a>
             </div>

@@ -1,0 +1,80 @@
+@import "prelude";
+
+.song-tools {
+    position: fixed;
+    top: 0;
+    right: $nav-width;
+    background: $gray-light;
+    color: $button-color;
+    padding: (1+$std-half) $std-half;
+    line-height: $button-line-height;
+    font-size: $button-font-size;
+
+    @media print {
+        display: none;
+    }
+
+    label {
+        padding: 0;
+        line-height: $button-line-height;
+        font-size: $button-font-size;
+    }
+
+    input {
+        background: transparent;
+        border: none;
+        -webkit-appearance: none;
+        appearance: none;
+        width: 4 * $std-space;
+        padding: 0 0 0 $std-half;
+        color: $button-color;
+    }
+
+    @include if-dark-mode {
+        background: $gray-darker;
+        color: $dark-mode-button-color;
+
+        input {
+            color: $dark-mode-button-color;
+        }
+    }
+
+    button {
+
+    }
+
+    button.discreet {
+        $button-size: 30px;
+        display: inline-block;
+        color: $button-color;
+        height: $button-size;
+        min-width: $button-size;
+
+        &:hover {
+            color: $gray-dark;
+        }
+
+        &[disabled] {
+            color: $gray;
+            cursor: not-allowed;
+        }
+
+        &.-active {
+            background: $gray;
+        }
+
+        @include if-dark-mode {
+            color: $dark-mode-button-color;
+
+            &:focus,
+            &:hover {
+                color: $dark-mode-button-hover-color;
+            }
+        }
+    }
+
+    @at-root main.-menu-hidden #{&} {
+        display: none;
+        right: $nav-collapsed-width;
+    }
+}

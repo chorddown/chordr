@@ -1166,23 +1166,23 @@ button {
   display: block;
   font-size: .6em; }
 
-.transpose-tool {
+.song-tools {
   position: fixed;
+  top: 0;
   right: 300px;
   background: #d8d8d0;
   color: #62625e;
-  padding: 8px 0 8px 7px;
+  padding: 8px 7px;
   line-height: 26px;
-  font-size: 1em;
-  top: 0; }
+  font-size: 1em; }
   @media print {
-    .transpose-tool {
+    .song-tools {
       display: none; } }
-  .transpose-tool label {
+  .song-tools label {
     padding: 0;
     line-height: 26px;
     font-size: 1em; }
-  .transpose-tool input {
+  .song-tools input {
     background: transparent;
     border: none;
     -webkit-appearance: none;
@@ -1191,36 +1191,46 @@ button {
     padding: 0 0 0 7px;
     color: #62625e; }
   @media screen and (prefers-color-scheme: dark) {
-    .transpose-tool {
+    .song-tools {
       background: #62625e;
       color: white; }
-      .transpose-tool input {
+      .song-tools input {
         color: white; } }
-  html.dark-mode .transpose-tool {
+  html.dark-mode .song-tools {
     background: #62625e;
     color: white; }
-    html.dark-mode .transpose-tool input {
+    html.dark-mode .song-tools input {
       color: white; }
-  .transpose-tool button.discreet {
+  .song-tools button.discreet {
     display: inline-block;
-    color: #62625e; }
-    .transpose-tool button.discreet:focus, .transpose-tool button.discreet:hover {
-      color: #62625e; }
-    .transpose-tool button.discreet[disabled] {
+    color: #62625e;
+    height: 30px;
+    min-width: 30px; }
+    .song-tools button.discreet:hover {
+      color: #8d8d88; }
+    .song-tools button.discreet[disabled] {
       color: #b7b7b0;
       cursor: not-allowed; }
+    .song-tools button.discreet.-active {
+      background: #b7b7b0; }
     @media screen and (prefers-color-scheme: dark) {
-      .transpose-tool button.discreet {
+      .song-tools button.discreet {
         color: white; }
-        .transpose-tool button.discreet:focus, .transpose-tool button.discreet:hover {
+        .song-tools button.discreet:focus, .song-tools button.discreet:hover {
           color: white; } }
-    html.dark-mode .transpose-tool button.discreet {
+    html.dark-mode .song-tools button.discreet {
       color: white; }
-      html.dark-mode .transpose-tool button.discreet:focus, html.dark-mode .transpose-tool button.discreet:hover {
+      html.dark-mode .song-tools button.discreet:focus, html.dark-mode .song-tools button.discreet:hover {
         color: white; }
-  main.-menu-hidden .transpose-tool {
+  main.-menu-hidden .song-tools {
     display: none;
     right: 40px; }
+
+.transpose-tool {
+  margin-bottom: 7px;
+  margin-right: -7px; }
+  .transpose-tool:last-child {
+    margin-bottom: 0; }
   .transpose-tool .value {
     padding: 0 7px;
     display: inline-block;
@@ -1228,60 +1238,21 @@ button {
     text-align: center; }
 
 .setlist-tool {
-  position: fixed;
-  right: 300px;
-  background: #d8d8d0;
-  color: #62625e;
-  padding: 8px 0 8px 7px;
-  line-height: 26px;
-  font-size: 1em;
-  top: 45px; }
-  @media print {
-    .setlist-tool {
-      display: none; } }
-  .setlist-tool label {
-    padding: 0;
-    line-height: 26px;
-    font-size: 1em; }
-  .setlist-tool input {
-    background: transparent;
-    border: none;
-    -webkit-appearance: none;
-    appearance: none;
-    width: 56px;
-    padding: 0 0 0 7px;
-    color: #62625e; }
-  @media screen and (prefers-color-scheme: dark) {
-    .setlist-tool {
-      background: #62625e;
-      color: white; }
-      .setlist-tool input {
-        color: white; } }
-  html.dark-mode .setlist-tool {
-    background: #62625e;
-    color: white; }
-    html.dark-mode .setlist-tool input {
-      color: white; }
-  .setlist-tool button.discreet {
-    display: inline-block;
-    color: #62625e; }
-    .setlist-tool button.discreet:focus, .setlist-tool button.discreet:hover {
-      color: #62625e; }
-    .setlist-tool button.discreet[disabled] {
-      color: #b7b7b0;
-      cursor: not-allowed; }
-    @media screen and (prefers-color-scheme: dark) {
-      .setlist-tool button.discreet {
-        color: white; }
-        .setlist-tool button.discreet:focus, .setlist-tool button.discreet:hover {
-          color: white; } }
-    html.dark-mode .setlist-tool button.discreet {
-      color: white; }
-      html.dark-mode .setlist-tool button.discreet:focus, html.dark-mode .setlist-tool button.discreet:hover {
-        color: white; }
-  main.-menu-hidden .setlist-tool {
-    display: none;
-    right: 40px; }
+  margin-bottom: 7px; }
+  .setlist-tool:last-child {
+    margin-bottom: 0; }
+  .setlist-tool button {
+    width: 100%; }
+  .setlist-tool i.im {
+    vertical-align: middle; }
+
+.semitone-notation-tool {
+  margin-bottom: 7px; }
+  .semitone-notation-tool:last-child {
+    margin-bottom: 0; }
+  .semitone-notation-tool button {
+    width: 50%;
+    border: 1px solid #b7b7b0; }
 
 nav {
   background: #d8d8d0;

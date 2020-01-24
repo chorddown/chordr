@@ -9,9 +9,12 @@ use yew::prelude::*;
 use yew::virtual_dom::VNode;
 use yew::{Component, ComponentLink};
 use libchordr::models::chord::fmt::Formatting;
+use libchordr::models::meta::SemitoneNotation;
+use crate::components::song_view::semitone_notation_tool::SemitoneNotationTool;
 
 mod setlist_tool;
 mod transpose_tool;
+mod semitone_notation_tool;
 
 #[derive(Properties, PartialEq)]
 pub struct SongViewProps {
@@ -36,6 +39,7 @@ pub enum Msg {
     TransposeDown,
     TransposeSet(isize),
     SetlistChange(bool),
+    SemitoneNotationChange(SemitoneNotation),
 }
 
 #[allow(dead_code)]
@@ -46,6 +50,7 @@ pub struct SongView {
     link: ComponentLink<Self>,
 
     transpose_semitone: isize,
+    formatting: Formatting,
 }
 
 impl Component for SongView {
@@ -54,11 +59,13 @@ impl Component for SongView {
 
     fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
         let transpose_semitone = props.transpose_semitone.unwrap_or(0);
+        let formatting = Formatting::with_format(LibchordrFormat::HTML);
 
         Self {
             link,
             props,
             transpose_semitone,
+            formatting,
         }
     }
 
@@ -84,6 +91,9 @@ impl Component for SongView {
                 } else {
                     self.props.on_setlist_remove.emit(song.clone())
                 }
+            }
+            Msg::SemitoneNotationChange(s) => {
+                self.formatting = Formatting { semitone_notation: s, ..self.formatting };
             }
         };
 
@@ -116,6 +126,7 @@ impl Component for SongView {
         let transpose_down = self.link.callback(|_| Msg::TransposeDown);
         let transpose_set = self.link.callback(|v| Msg::TransposeSet(v));
         let setlist_set = self.link.callback(|b| Msg::SetlistChange(b));
+        let semitone_notation_set = self.link.callback(|s| Msg::SemitoneNotationChange(s));
 
         let setlist_tool = if self.props.enable_setlists {
             html! {
@@ -130,14 +141,20 @@ impl Component for SongView {
         html! {
             <div>
                 {detail}
-                <TransposeTool
-                    show_input_field=false
-                    transpose_semitone=self.transpose_semitone
-                    on_click_up=transpose_up
-                    on_click_down=transpose_down
-                    on_set=transpose_set
-                />
-                {setlist_tool}
+                <div class="song-tools">
+                    <TransposeTool
+                        show_input_field=false
+                        transpose_semitone=self.transpose_semitone
+                        on_click_up=transpose_up
+                        on_click_down=transpose_down
+                        on_set=transpose_set
+                    />
+                    {setlist_tool}
+                    <SemitoneNotationTool
+                        semitone_notation=self.formatting.semitone_notation
+                        on_change=semitone_notation_set
+                    />
+                </div>
             </div>
         }
     }
@@ -152,10 +169,10 @@ impl SongView {
                 &props.song.src(),
                 self.transpose_semitone,
                 props.song.meta(),
-                Formatting::with_format(LibchordrFormat::HTML),
+                self.formatting,
             )
         } else {
-            convert_to_format(&props.song.src(), props.song.meta(), Formatting::with_format(LibchordrFormat::HTML))
+            convert_to_format(&props.song.src(), props.song.meta(), self.formatting)
         };
 
         match converter_result {

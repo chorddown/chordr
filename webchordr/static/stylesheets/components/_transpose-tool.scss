@@ -2,7 +2,7 @@
 
 .transpose-tool {
     @include song-tool;
-    top: 0;
+    margin-right: -$std-half;
 
     .value {
         padding: 0 $std-half;

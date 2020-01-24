@@ -4,3 +4,4 @@ pub mod song_list;
 pub mod song_view;
 pub mod start_screen;
 pub mod reload_section;
+pub mod nbsp;

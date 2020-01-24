@@ -55,6 +55,8 @@ $nav-footer-border-color: $gray-dark !default;
 $nav-width: 300px !default;
 $nav-collapsed-width: $nav-button-height !default;
 
+$tool-top-space: $nav-button-height + 5px;
+
 $_block-style: (
     font-color: $text-color,
     font-weight: normal,

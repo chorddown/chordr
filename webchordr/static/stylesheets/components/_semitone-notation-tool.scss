@@ -1,0 +1,10 @@
+@import "prelude";
+
+.semitone-notation-tool {
+    @include song-tool;
+
+    button {
+        width: 50%;
+        border: 1px solid $gray;
+    }
+}
