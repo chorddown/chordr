@@ -11,6 +11,9 @@ path = "src/bin.rs"
 [dependencies]
 libchordr = { path = "../libchordr" }
 clap = "2.33.0"
+log = "0.4.8"
+simplelog = "^0.6.0"
+chrono = "^0.4.10"
 
 [dependencies.dropbox-sdk]
 version = "*"

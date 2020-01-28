@@ -1,10 +1,15 @@
 extern crate clap;
+extern crate log;
 
 use crate::error::{Error, Result};
 use crate::service::*;
 use clap::{App, Arg, ArgMatches, SubCommand};
+use simplelog;
+use simplelog::TerminalMode;
 use std::env;
-use std::path::{PathBuf, Path};
+use log::{info, debug};
+use std::path::{Path, PathBuf};
+use chrono::{DateTime, Utc};
 
 mod error;
 mod service;
@@ -36,6 +41,9 @@ fn main() {
         )
         .get_matches();
 
+    if let Err(error) = configure_logging(&args) {
+        eprintln!("{}", error);
+    }
     let error = if let Some(matches) = args.subcommand_matches("download") {
         download(matches)
     } else {
@@ -56,12 +64,43 @@ fn download(args: &ArgMatches) -> Result<()> {
         println!("No files found");
     }
     for file in &files {
-        match service.download(file.clone(), &destination_for_file(&file, args)?) {
-            Ok(_) => println!("Downloaded file {}", file),
-            Err(e) => eprintln!("Could not download file {}: {}", file, e)
+        let destination = destination_for_file(&file.path(), args)?;
+        if let Err(e) = check_if_should_download(file, &destination) {
+            eprintln!("Skip download file {}: {}", file.path(), e)
+        } else {
+            match service.download(file.clone(), &destination) {
+                Ok(_) => println!("Downloaded file {}", file.path()),
+                Err(e) => eprintln!("Could not download file {}: {}", file.path(), e),
+            }
         }
     }
     Ok(())
+}
+
+fn check_if_should_download(source: &FileEntry, destination: &Path) -> Result<()> {
+    if !(destination.exists()) {
+        return Ok(());
+    }
+
+    match destination.metadata() {
+        Err(_) => Err(Error::download_error("Could not fetch metadata")),
+        Ok(metadata) => match metadata.modified() {
+            Err(_) => Err(Error::download_error("Could not fetch modification time")),
+            Ok(modified) => {
+                let remote_time = source.modified_date();
+                let local_time: DateTime<Utc> = DateTime::from(modified);
+                let local_time_utc = local_time.with_timezone(&remote_time.timezone());
+
+                debug!("Compare remote vs local file time: {} vs {}", remote_time, local_time_utc);
+                if local_time_utc < remote_time {
+                    info!("Remote file is newer than local file, will overwrite");
+                    Ok(())
+                } else {
+                    Err(Error::download_error("Local file is newer than remote"))
+                }
+            }
+        }
+    }
 }
 
 fn get_api_key(args: &ArgMatches) -> Result<String> {
@@ -78,8 +117,13 @@ fn get_api_key(args: &ArgMatches) -> Result<String> {
 fn get_service(args: &ArgMatches) -> Result<Services> {
     let service_identifier = args.value_of("SERVICE").unwrap();
     match service_identifier.to_lowercase().as_str() {
-        "dropbox" => Ok(Services::DropboxService(DropboxService::new(get_api_key(args)?))),
-        _ => Err(Error::unknown_service_error(format!("Service {} is not implemented", service_identifier))),
+        "dropbox" => Ok(Services::DropboxService(DropboxService::new(get_api_key(
+            args,
+        )?))),
+        _ => Err(Error::unknown_service_error(format!(
+            "Service {} is not implemented",
+            service_identifier
+        ))),
     }
 }
 
@@ -93,13 +137,51 @@ fn destination_for_file<P: AsRef<Path>>(file: &P, args: &ArgMatches) -> Result<P
     if output_path.is_dir() {
         match file.as_ref().file_name() {
             Some(file_name) => Ok(output_path.join(file_name)),
-            None => Err(Error::io_error(format!("Could not get remove name of file {}", file.as_ref().to_string_lossy())))
+            None => Err(Error::io_error(format!(
+                "Could not get remove name of file {}",
+                file.as_ref().to_string_lossy()
+            ))),
         }
     } else if output_path.is_file() {
-        Err(Error::io_error(format!("Output path {} is not a directory", output_path_string)))
+        Err(Error::io_error(format!(
+            "Output path {} is not a directory",
+            output_path_string
+        )))
     } else if !output_path.exists() {
-        Err(Error::io_error(format!("Output path {} does not exist", output_path_string)))
+        Err(Error::io_error(format!(
+            "Output path {} does not exist",
+            output_path_string
+        )))
     } else {
-        Err(Error::io_error(format!("Output path {} is not a path", output_path_string)))
+        Err(Error::io_error(format!(
+            "Output path {} is not a path",
+            output_path_string
+        )))
+    }
+}
+
+fn configure_logging(matches: &ArgMatches<'_>) -> Result<()> {
+    let log_level_filter = match matches.occurrences_of("v") {
+        1 => simplelog::LevelFilter::Info,
+        2 => simplelog::LevelFilter::Debug,
+        3 => simplelog::LevelFilter::Trace,
+        _ => simplelog::LevelFilter::Warn,
+    };
+
+    let mut loggers: Vec<Box<dyn simplelog::SharedLogger>> = vec![];
+    let mut config = simplelog::Config::default();
+    config.time_format = Some("%H:%M:%S%.3f");
+
+    if let Some(core_logger) =
+    simplelog::TermLogger::new(log_level_filter, config, TerminalMode::Mixed)
+    {
+        loggers.push(core_logger);
+    } else {
+        loggers.push(simplelog::SimpleLogger::new(log_level_filter, config));
+    }
+
+    match simplelog::CombinedLogger::init(loggers) {
+        Ok(_) => Ok(()),
+        Err(e) => Err(Error::io_error(format!("{}", e))),
     }
 }

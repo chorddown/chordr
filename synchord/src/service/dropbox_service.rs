@@ -1,57 +1,89 @@
+use crate::error::{Error, Result};
+use crate::service::file_entry::FileEntry;
 use crate::service::ServiceTrait;
-use crate::error::{Result, Error};
-use std::path::Path;
-use std::io::prelude::*;
-use dropbox_sdk::files::{DownloadArg, ListFolderArg, Metadata};
+use chrono::DateTime;
+use dropbox_sdk::files::{DownloadArg, FileMetadata, ListFolderArg, Metadata};
+use std::convert::TryFrom;
 use std::fs::File;
+use std::io;
+use std::io::prelude::*;
+use std::path::Path;
 
 pub struct DropboxService {
-    http_client: Box<dyn dropbox_sdk::client_trait::HttpClient>
+    http_client: Box<dyn dropbox_sdk::client_trait::HttpClient>,
 }
 
 impl DropboxService {
     pub fn new<S: Into<String>>(api_key: S) -> Self {
         Self {
-            http_client: Box::new(dropbox_sdk::HyperClient::new(api_key.into()))
+            http_client: Box::new(dropbox_sdk::HyperClient::new(api_key.into())),
+        }
+    }
+
+    fn fetch_file_stream(&self, file: String) -> Result<Box<dyn Read>> {
+        let request_argument = DownloadArg::new(file);
+        let result = dropbox_sdk::files::download(
+            self.http_client.as_ref(),
+            &request_argument,
+            None,
+            None,
+        )??;
+
+        match result.body {
+            Some(body) => Ok(body),
+            None => Err(Error::download_error("Response body is empty")),
         }
     }
 }
 
 impl ServiceTrait for DropboxService {
     /// List files inside "Apps/synchord"
-    fn list_files(&self) -> Result<Vec<String>, Error> {
-        let request_argument: ListFolderArg = ListFolderArg::new("".to_owned());
-        let result = dropbox_sdk::files::list_folder(self.http_client.as_ref(), &request_argument)??;
+    ///
+    /// Once a new App has been created inside the Dropbox developer UI the token can be retrieved
+    /// and the "App folder name" for the newly created app can be defined. With the app token the
+    /// service will only have access to the contents of the App folder.
+    ///
+    /// https://www.dropbox.com/developers/apps
+    fn list_files(&self) -> Result<Vec<FileEntry>, Error> {
+        let path_relative_to_app_folder = "".to_owned();
+        let request_argument: ListFolderArg = ListFolderArg::new(path_relative_to_app_folder);
+        let result =
+            dropbox_sdk::files::list_folder(self.http_client.as_ref(), &request_argument)??;
 
-        Ok(
-            result.entries
-                .iter()
-                .filter_map(|m| {
-                    match m {
-                        Metadata::File(data) => data.path_lower.clone(),
-                        Metadata::Folder(_) => return None,
-                        Metadata::Deleted(_) => return None,
-                    }
-                })
-                .collect()
-        )
+        Ok(result
+            .entries
+            .iter()
+            .filter_map(|m| {
+                match m {
+                    Metadata::File(data) => FileEntry::try_from(data).ok(),
+                    Metadata::Folder(_) => return None, // Not implemented
+                    Metadata::Deleted(_) => return None, // Not implemented
+                }
+            })
+            .collect())
     }
 
-    fn download(&self, file: String, destination: &Path) -> Result<(), Error> {
-        let body = self.fetch_file(file)?;
+    fn download(&self, file: FileEntry, destination: &Path) -> Result<()> {
+        let mut body = self.fetch_file_stream(file.path().to_owned())?;
+        let mut file_handle = File::create(destination)?;
+        io::copy(&mut body, &mut file_handle)?;
 
-        let mut file = File::create(destination)?;
-        Ok(file.write_all(body.as_bytes())?)
+        Ok(())
     }
 }
 
-impl DropboxService {
-    fn fetch_file(&self, file: String) -> Result<String> {
-        let request_argument = DownloadArg::new(file);
-        let result = dropbox_sdk::files::download(self.http_client.as_ref(), &request_argument, None, None)??;
-        let mut body = String::new();
-        result.body.unwrap().read_to_string(&mut body)?;
+impl TryFrom<&FileMetadata> for FileEntry {
+    type Error = ();
 
-        Ok(body)
+    fn try_from(value: &FileMetadata) -> Result<Self, Self::Error> {
+        let path = match value.path_lower {
+            Some(ref p) => p,
+            None => return Err(()),
+        };
+
+        match DateTime::parse_from_rfc3339(&value.server_modified) {
+            Ok(date) => Ok(FileEntry::new(path, value.size as usize, date)),
+            Err(_) => Err(()),
+        }
     }
 }

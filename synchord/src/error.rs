@@ -1,6 +1,6 @@
+use dropbox_sdk::files::{DownloadError, ListFolderError};
 use std::error::Error as StdError;
 use std::fmt::{Display, Error as FmtError, Formatter};
-use dropbox_sdk::files::{ListFolderError, DownloadError};
 
 /// Shorthand for synchord results
 pub type Result<T, E = Error> = ::std::result::Result<T, E>;
