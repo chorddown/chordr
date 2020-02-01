@@ -1134,13 +1134,17 @@ button {
 .start-screen {
   display: flex;
   width: 100%;
-  height: calc(50vh - 28px);
+  height: 30vh;
   align-items: center;
   justify-content: center; }
   .start-screen img {
     max-width: 100%;
-    width: 256px;
+    width: 200px;
     margin: 0 auto; }
+
+.reload-button {
+  display: inline-block;
+  line-height: 40px; }
 
 .song-browser-home {
   display: inline-block;

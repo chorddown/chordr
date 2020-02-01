@@ -3,13 +3,18 @@
 .start-screen {
     display: flex;
     width: 100%;
-    height: calc(50vh - #{2 * $std-space});
+    height: 30vh;
     align-items: center;
     justify-content: center;
 
     img {
         max-width: 100%;
-        width: 256px;
+        width: 200px;
         margin: 0 auto;
     }
+}
+
+.reload-button {
+    display: inline-block;
+    line-height: 40px;
 }
