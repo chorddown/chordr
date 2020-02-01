@@ -15,3 +15,4 @@ libchordr = { path = "../libchordr" }
 failure = "0.1"
 yew = {git = "https://github.com/yewstack/yew", branch = "master"}
 yew-router = { git = "https://github.com/yewstack/yew_router", branch="master" }
+percent-encoding = "2.1.0"

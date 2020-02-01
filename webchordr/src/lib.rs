@@ -22,6 +22,7 @@ use yew_router::prelude::*;
 use crate::components::nav::Nav;
 use std::rc::Rc;
 use crate::components::reload_section::ReloadSection;
+use percent_encoding::percent_decode_str;
 
 const STORAGE_KEY_SET_LIST: &'static str = "net.cundd.chordr.set-list";
 
@@ -76,30 +77,48 @@ impl App {
         }
 
         let catalog = self.catalog.as_ref().unwrap();
-        (match catalog.get(song_id) {
-            Some(song) => {
-                let add = self.link.callback(|s| Msg::SetlistAdd(s));
-                let remove = self.link.callback(|s| Msg::SetlistRemove(s));
-                let is_on_setlist = self.setlist.contains(song);
+        if let Some(song) = catalog.get(song_id.clone()) {
+            let add = self.link.callback(|s| Msg::SetlistAdd(s));
+            let remove = self.link.callback(|s| Msg::SetlistRemove(s));
+            let is_on_setlist = self.setlist.contains(song);
 
-                info!("Song {} is on list? {}", song.id(), is_on_setlist);
+            info!("Song {} is on list? {}", song.id(), is_on_setlist);
 
-                html! {
-                    <SongView
-                        song=song
-                        enable_setlists=true
-                        on_setlist_add=add
-                        on_setlist_remove=remove
-                        is_on_setlist=is_on_setlist
-                    />
+            return html! {
+                <SongView
+                    song=song
+                    enable_setlists=true
+                    on_setlist_add=add
+                    on_setlist_remove=remove
+                    is_on_setlist=is_on_setlist
+                />
+            };
+        }
+
+        match percent_decode_str(&song_id).decode_utf8() {
+            Ok(decoded) => {
+                let decoded = decoded.to_string();
+                info!("Decoded song ID '{}' to '{}'", song_id, decoded);
+                if decoded != song_id {
+                    self.view_song(decoded)
+                } else {
+                    html! {}
                 }
             }
-            None => html! {},
-        }) as Html
+            Err(e) => {
+                error!("Could not decode the song ID {}", e);
+                html! {}
+            }
+        }
     }
 
     fn view_song_browser<S: Into<String>>(&self, chars: S) -> Html {
-        let chars = chars.into();
+        let chars_as_string = chars.into();
+        let chars = match percent_decode_str(&chars_as_string).decode_utf8() {
+            Ok(decoded) => decoded.to_string(),
+            Err(_) => chars_as_string,
+        };
+
         (match &self.catalog {
             Some(catalog) => {
                 info!("New chars from router: {}", chars);
