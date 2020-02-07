@@ -3,13 +3,13 @@ extern crate log;
 
 use crate::error::{Error, Result};
 use crate::service::*;
+use chrono::{DateTime, Utc};
 use clap::{App, Arg, ArgMatches, SubCommand};
+use log::{debug, info};
 use simplelog;
 use simplelog::TerminalMode;
 use std::env;
-use log::{info, debug};
 use std::path::{Path, PathBuf};
-use chrono::{DateTime, Utc};
 
 mod error;
 mod service;
@@ -37,6 +37,32 @@ fn main() {
                         .long("api-key")
                         .takes_value(true)
                         .help("API key to authenticate with the service"),
+                )
+                .arg(
+                    Arg::with_name("USERNAME")
+                        .long("username")
+                        .short("u")
+                        .takes_value(true)
+                        .help("Username to authenticate with the service"),
+                )
+                .arg(
+                    Arg::with_name("PASSWORD")
+                        .long("password")
+                        .short("p")
+                        .takes_value(true)
+                        .help("Password to authenticate with the service"),
+                )
+                .arg(
+                    Arg::with_name("URL")
+                        .long("url")
+                        .takes_value(true)
+                        .help("WebDAV entry point URL"),
+                )
+                .arg(
+                    Arg::with_name("REMOTE_DIRECTORY")
+                        .long("remote-directory")
+                        .takes_value(true)
+                        .help("Remote directory to list"),
                 ),
         )
         .get_matches();
@@ -91,7 +117,10 @@ fn check_if_should_download(source: &FileEntry, destination: &Path) -> Result<()
                 let local_time: DateTime<Utc> = DateTime::from(modified);
                 let local_time_utc = local_time.with_timezone(&remote_time.timezone());
 
-                debug!("Compare remote vs local file time: {} vs {}", remote_time, local_time_utc);
+                debug!(
+                    "Compare remote vs local file time: {} vs {}",
+                    remote_time, local_time_utc
+                );
                 if local_time_utc < remote_time {
                     info!("Remote file is newer than local file, will overwrite");
                     Ok(())
@@ -99,7 +128,7 @@ fn check_if_should_download(source: &FileEntry, destination: &Path) -> Result<()
                     Err(Error::download_error("Local file is newer than remote"))
                 }
             }
-        }
+        },
     }
 }
 
@@ -114,12 +143,52 @@ fn get_api_key(args: &ArgMatches) -> Result<String> {
     }
 }
 
+fn get_url(args: &ArgMatches) -> Result<String> {
+    match args.value_of("URL") {
+        Some(val) => Ok(val.to_owned()),
+        None => Err(Error::missing_argument_error("No URL provided")),
+    }
+}
+
+fn get_username(args: &ArgMatches) -> Result<String> {
+    match args.value_of("USERNAME") {
+        Some(val) => Ok(val.to_owned()),
+        None => Err(Error::missing_argument_error("No username provided")),
+    }
+}
+
+fn get_remote_directory(args: &ArgMatches) -> Result<String> {
+    match args.value_of("REMOTE_DIRECTORY") {
+        Some(val) => Ok(val.to_owned()),
+        None => Err(Error::missing_argument_error(
+            "No remote-directory provided",
+        )),
+    }
+}
+
+fn get_password(args: &ArgMatches) -> Result<String> {
+    if let Some(t) = args.value_of("PASSWORD") {
+        return Ok(t.to_owned());
+    }
+
+    match env::var("PASSWORD") {
+        Ok(val) => Ok(val),
+        Err(_) => Err(Error::missing_argument_error("No password provided")),
+    }
+}
+
 fn get_service(args: &ArgMatches) -> Result<Services> {
     let service_identifier = args.value_of("SERVICE").unwrap();
     match service_identifier.to_lowercase().as_str() {
         "dropbox" => Ok(Services::DropboxService(DropboxService::new(get_api_key(
             args,
         )?))),
+        "webdav" => Ok(Services::WebDAVService(WebDAVService::new(
+            get_url(args)?,
+            get_remote_directory(args)?,
+            get_username(args)?,
+            get_password(args)?,
+        )?)),
         _ => Err(Error::unknown_service_error(format!(
             "Service {} is not implemented",
             service_identifier
@@ -173,7 +242,7 @@ fn configure_logging(matches: &ArgMatches<'_>) -> Result<()> {
     config.time_format = Some("%H:%M:%S%.3f");
 
     if let Some(core_logger) =
-    simplelog::TermLogger::new(log_level_filter, config, TerminalMode::Mixed)
+        simplelog::TermLogger::new(log_level_filter, config, TerminalMode::Mixed)
     {
         loggers.push(core_logger);
     } else {

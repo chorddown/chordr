@@ -1,4 +1,6 @@
 use dropbox_sdk::files::{DownloadError, ListFolderError};
+use reqwest::Error as RequestError;
+use xml::reader::Error as XmlError;
 use std::error::Error as StdError;
 use std::fmt::{Display, Error as FmtError, Formatter};
 
@@ -21,12 +23,20 @@ impl Error {
         Error::new(Kind::MissingArgumentError(description.into()))
     }
 
+    pub fn invalid_argument_error<S: Into<String>>(description: S) -> Self {
+        Error::new(Kind::InvalidArgumentError(description.into()))
+    }
+
     pub fn unknown_service_error<S: Into<String>>(description: S) -> Self {
         Error::new(Kind::UnknownServiceError(description.into()))
     }
 
     pub fn io_error<S: Into<String>>(description: S) -> Self {
         Error::new(Kind::IoError(description.into()))
+    }
+
+    pub fn xml_parser_error<S: Into<String>>(description: S) -> Self {
+        Error::new(Kind::XMLParserError(description.into()))
     }
 
     pub fn from_error<E: StdError + 'static>(error: E) -> Self {
@@ -78,13 +88,33 @@ impl From<DownloadError> for Error {
     }
 }
 
+impl From<RequestError> for Error {
+    fn from(error: RequestError) -> Self {
+        Error::download_error(format!("{}", error))
+    }
+}
+
+impl From<XmlError> for Error {
+    fn from(error: XmlError) -> Self {
+        Error::xml_parser_error(format!("{}", error))
+    }
+}
+
+impl From<::chrono::format::ParseError> for Error {
+    fn from(error: ::chrono::format::ParseError) -> Self {
+        Error::xml_parser_error(format!("{}", error))
+    }
+}
+
 #[derive(Debug)]
 #[allow(dead_code)]
 enum Kind {
     DownloadError(String),
     UnknownServiceError(String),
     MissingArgumentError(String),
+    InvalidArgumentError(String),
     IoError(String),
+    XMLParserError(String),
     UnknownError(String),
 }
 
@@ -96,7 +126,9 @@ impl Display for Kind {
             Kind::DownloadError(s) => write!(f, "Download error: {}", s),
             Kind::UnknownServiceError(s) => write!(f, "Unknown service error: {}", s),
             Kind::MissingArgumentError(s) => write!(f, "Missing argument error: {}", s),
+            Kind::InvalidArgumentError(s) => write!(f, "Invalid argument error: {}", s),
             Kind::IoError(s) => write!(f, "IO error: {}", s),
+            Kind::XMLParserError(s) => write!(f, "XML parser error: {}", s),
             Kind::UnknownError(s) => write!(f, "Unknown error: {}", s),
         }
     }

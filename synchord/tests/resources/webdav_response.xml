@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<d:multistatus xmlns:d="DAV:" xmlns:s="http://sabredav.org/ns" xmlns:oc="http://owncloud.org/ns"
+               xmlns:nc="http://nextcloud.org/ns">
+    <d:response>
+        <d:href>/remote.php/webdav/Lyrics/</d:href>
+        <d:propstat>
+            <d:prop>
+                <d:getlastmodified>Sun, 02 Feb 2020 19:04:49 GMT</d:getlastmodified>
+                <d:getetag>&quot;5e173d511a4c8&quot;</d:getetag>
+                <d:resourcetype>
+                    <d:collection/>
+                </d:resourcetype>
+                <oc:fileid>534</oc:fileid>
+                <oc:permissions>RGDNVCK</oc:permissions>
+                <oc:size>30</oc:size>
+                <nc:has-preview>false</nc:has-preview>
+                <oc:favorite>0</oc:favorite>
+                <oc:comments-unread>0</oc:comments-unread>
+                <oc:owner-display-name>Me</oc:owner-display-name>
+                <oc:share-types/>
+            </d:prop>
+            <d:status>HTTP/1.1 200 OK</d:status>
+        </d:propstat>
+        <d:propstat>
+            <d:prop>
+                <d:getcontenttype/>
+                <d:getcontentlength/>
+            </d:prop>
+            <d:status>HTTP/1.1 404 Not Found</d:status>
+        </d:propstat>
+    </d:response>
+    <d:response>
+        <d:href>/remote.php/webdav/Lyrics/amazing-grace.chorddown</d:href>
+        <d:propstat>
+            <d:prop>
+                <d:getlastmodified>Sun, 02 Feb 2020 19:04:34 GMT</d:getlastmodified>
+                <d:getetag>&quot;50ffaee31095dc7b9e959aaff97b358a&quot;</d:getetag>
+                <d:getcontenttype>application/octet-stream</d:getcontenttype>
+                <d:resourcetype/>
+                <oc:fileid>536</oc:fileid>
+                <oc:permissions>RGDNVW</oc:permissions>
+                <oc:size>12</oc:size>
+                <d:getcontentlength>12</d:getcontentlength>
+                <nc:has-preview>false</nc:has-preview>
+                <oc:favorite>0</oc:favorite>
+                <oc:comments-unread>0</oc:comments-unread>
+                <oc:owner-display-name>Me</oc:owner-display-name>
+                <oc:share-types/>
+            </d:prop>
+            <d:status>HTTP/1.1 200 OK</d:status>
+        </d:propstat>
+    </d:response>
+    <d:response>
+        <d:href>/remote.php/webdav/Lyrics/swing-low.chorddown</d:href>
+        <d:propstat>
+            <d:prop>
+                <d:getlastmodified>Sun, 02 Feb 2020 19:04:49 GMT</d:getlastmodified>
+                <d:getcontentlength>18</d:getcontentlength>
+                <d:resourcetype/>
+                <d:getetag>&quot;c66d963f10fe1af45bf74598780d504&quot;</d:getetag>
+                <d:getcontenttype>application/octet-stream</d:getcontenttype>
+            </d:prop>
+            <d:status>HTTP/1.1 200 OK</d:status>
+        </d:propstat>
+        <d:propstat>
+            <d:prop>
+                <d:quota-used-bytes/>
+                <d:quota-available-bytes/>
+            </d:prop>
+            <d:status>HTTP/1.1 404 Not Found</d:status>
+        </d:propstat>    </d:response>
+</d:multistatus>
