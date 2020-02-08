@@ -52,9 +52,7 @@ impl MetaParser {
 
     fn visit_chord(&mut self, token: Token, meta: MetaInformation) -> MetaInformation {
         let chords = if let Token::Chord(c) = token { c } else { unreachable!("Invalid Token given") };
-
-        if BNotation::is_european_chord(&chords) {
-//            self.meta.b_notation = BNotation::H;
+        if BNotation::contains_european_chord(&chords) {
             MetaInformation {
                 b_notation: BNotation::H,
                 ..meta

@@ -21,6 +21,10 @@ impl BNotation {
         }
     }
 
+    pub fn contains_european_chord(chord: &str) -> bool {
+        chord.contains('H') || chord.contains('h')
+    }
+
     pub fn as_str(&self) -> &str {
         match self {
             Self::B => "B",
