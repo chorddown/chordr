@@ -19,6 +19,10 @@ impl Error {
         Error::new(Kind::DownloadError(description.into()))
     }
 
+    pub fn skip_download<S: Into<String>>(description: S) -> Self {
+        Error::new(Kind::SkipDownload(description.into()))
+    }
+
     pub fn missing_argument_error<S: Into<String>>(description: S) -> Self {
         Error::new(Kind::MissingArgumentError(description.into()))
     }
@@ -109,12 +113,28 @@ impl From<::chrono::format::ParseError> for Error {
 #[derive(Debug)]
 #[allow(dead_code)]
 enum Kind {
+    /// Error trying to download files or file information
     DownloadError(String),
+
+    /// "Error" kind signaling why a download was skipped
+    SkipDownload(String),
+
+    /// Error if an unknown service was requested
     UnknownServiceError(String),
+
+    /// Error if a required argument is missing
     MissingArgumentError(String),
+
+    /// Error if an argument is invalid
     InvalidArgumentError(String),
+
+    /// Error during file IO
     IoError(String),
+
+    /// Error during XML parsing
     XMLParserError(String),
+
+    /// Unknown/uncategorized error
     UnknownError(String),
 }
 
@@ -124,6 +144,7 @@ impl Display for Kind {
     fn fmt(&self, f: &mut Formatter) -> Result<(), FmtError> {
         match self {
             Kind::DownloadError(s) => write!(f, "Download error: {}", s),
+            Kind::SkipDownload(s) => write!(f, "{}", s),
             Kind::UnknownServiceError(s) => write!(f, "Unknown service error: {}", s),
             Kind::MissingArgumentError(s) => write!(f, "Missing argument error: {}", s),
             Kind::InvalidArgumentError(s) => write!(f, "Invalid argument error: {}", s),

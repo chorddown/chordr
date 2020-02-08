@@ -125,7 +125,7 @@ fn check_if_should_download(source: &FileEntry, destination: &Path) -> Result<()
                     info!("Remote file is newer than local file, will overwrite");
                     Ok(())
                 } else {
-                    Err(Error::download_error("Local file is newer than remote"))
+                    Err(Error::skip_download("Local file is newer than remote"))
                 }
             }
         },
