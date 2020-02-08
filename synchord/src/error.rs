@@ -7,10 +7,10 @@ use std::fmt::{Display, Error as FmtError, Formatter};
 /// Shorthand for synchord results
 pub type Result<T, E = Error> = ::std::result::Result<T, E>;
 
-/// Error type for errors raised in the chord library
-#[derive(Debug)]
+/// Error type for errors raised in synchord
+#[derive(Debug, Clone)]
 pub struct Error {
-    inner: Box<dyn StdError>,
+    inner: Kind
 }
 
 #[doc(hidden)]
@@ -43,15 +43,9 @@ impl Error {
         Error::new(Kind::XMLParserError(description.into()))
     }
 
-    pub fn from_error<E: StdError + 'static>(error: E) -> Self {
-        Error {
-            inner: Box::new(error),
-        }
-    }
-
     fn new(kind: Kind) -> Self {
         Error {
-            inner: Box::new(kind),
+            inner: kind,
         }
     }
 }
@@ -62,21 +56,17 @@ impl Display for Error {
     }
 }
 
-impl StdError for Error {
-    fn source(&self) -> Option<&(dyn StdError + 'static)> {
-        Some(self.inner.as_ref())
-    }
-}
+impl StdError for Error {}
 
 impl From<::std::io::Error> for Error {
     fn from(error: ::std::io::Error) -> Self {
-        Error::from_error(error)
+        Error::io_error(format!("{}", error))
     }
 }
 
 impl From<dropbox_sdk::Error> for Error {
     fn from(error: dropbox_sdk::Error) -> Self {
-        Error::from_error(error)
+        Error::download_error(format!("{}", error))
     }
 }
 
@@ -110,7 +100,13 @@ impl From<::chrono::format::ParseError> for Error {
     }
 }
 
-#[derive(Debug)]
+//impl From<&Error> for Error {
+//    fn from(error: &Error) -> Self {
+//        Error::from_error(Kind::UnknownError(format!("{}", error)))
+//    }
+//}
+
+#[derive(Debug, Clone)]
 #[allow(dead_code)]
 enum Kind {
     /// Error trying to download files or file information

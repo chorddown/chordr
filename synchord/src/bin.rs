@@ -1,23 +1,48 @@
 extern crate clap;
 extern crate log;
 
+mod error;
+mod service;
+mod helper;
+mod prelude;
+
 use crate::error::{Error, Result};
-use crate::service::*;
-use chrono::{DateTime, Utc};
+use crate::prelude::*;
 use clap::{App, Arg, ArgMatches, SubCommand};
-use log::{debug, info};
 use simplelog;
 use simplelog::TerminalMode;
 use std::env;
-use std::path::{Path, PathBuf};
-
-mod error;
-mod service;
+use std::path::PathBuf;
 
 fn main() {
     let output_arg = Arg::with_name("OUTPUT")
         .required(true)
         .help("Output directory path");
+    let service_arg = Arg::with_name("SERVICE")
+        .required(true)
+        .help("Online service to use (dropbox)");
+    let api_token_arg = Arg::with_name("API_TOKEN")
+        .long("api-key")
+        .takes_value(true)
+        .help("API key to authenticate with the service");
+    let username_arg = Arg::with_name("USERNAME")
+        .long("username")
+        .short("u")
+        .takes_value(true)
+        .help("Username to authenticate with the service");
+    let password_arg = Arg::with_name("PASSWORD")
+        .long("password")
+        .short("p")
+        .takes_value(true)
+        .help("Password to authenticate with the service");
+    let url_arg = Arg::with_name("URL")
+        .long("url")
+        .takes_value(true)
+        .help("WebDAV entry point URL");
+    let remote_directory_arg = Arg::with_name("REMOTE_DIRECTORY")
+        .long("remote-directory")
+        .takes_value(true)
+        .help("Remote directory to list");
     let args = App::new(env!("CARGO_PKG_NAME"))
         .version(env!("CARGO_PKG_VERSION"))
         .author("Daniel Corn <info@cundd.net>")
@@ -26,44 +51,13 @@ fn main() {
             SubCommand::with_name("download")
                 .version(env!("CARGO_PKG_VERSION"))
                 .about("Download files from the service")
-                .arg(
-                    Arg::with_name("SERVICE")
-                        .required(true)
-                        .help("Online service to use (dropbox)"),
-                )
+                .arg(service_arg.clone())
                 .arg(output_arg.clone())
-                .arg(
-                    Arg::with_name("API_TOKEN")
-                        .long("api-key")
-                        .takes_value(true)
-                        .help("API key to authenticate with the service"),
-                )
-                .arg(
-                    Arg::with_name("USERNAME")
-                        .long("username")
-                        .short("u")
-                        .takes_value(true)
-                        .help("Username to authenticate with the service"),
-                )
-                .arg(
-                    Arg::with_name("PASSWORD")
-                        .long("password")
-                        .short("p")
-                        .takes_value(true)
-                        .help("Password to authenticate with the service"),
-                )
-                .arg(
-                    Arg::with_name("URL")
-                        .long("url")
-                        .takes_value(true)
-                        .help("WebDAV entry point URL"),
-                )
-                .arg(
-                    Arg::with_name("REMOTE_DIRECTORY")
-                        .long("remote-directory")
-                        .takes_value(true)
-                        .help("Remote directory to list"),
-                ),
+                .arg(api_token_arg.clone())
+                .arg(username_arg.clone())
+                .arg(password_arg.clone())
+                .arg(url_arg.clone())
+                .arg(remote_directory_arg.clone()),
         )
         .get_matches();
 
@@ -73,7 +67,7 @@ fn main() {
     let error = if let Some(matches) = args.subcommand_matches("download") {
         download(matches)
     } else {
-        eprintln!("Missing argument subcommand");
+        eprintln!("Missing argument 'subcommand'");
         Ok(())
     };
 
@@ -83,54 +77,13 @@ fn main() {
 }
 
 fn download(args: &ArgMatches) -> Result<()> {
-    let service = get_service(args)?;
+    let service_config = build_service_config(args);
+    let service = get_service(args, &service_config)?;
 
-    let files = service.list_files()?;
-    if files.len() == 0 {
-        println!("No files found");
-    }
-    for file in &files {
-        let destination = destination_for_file(&file.path(), args)?;
-        if let Err(e) = check_if_should_download(file, &destination) {
-            eprintln!("Skip download file {}: {}", file.path(), e)
-        } else {
-            match service.download(file.clone(), &destination) {
-                Ok(_) => println!("Downloaded file {}", file.path()),
-                Err(e) => eprintln!("Could not download file {}: {}", file.path(), e),
-            }
-        }
-    }
+    helper::download(service, service_config)?;
     Ok(())
 }
 
-fn check_if_should_download(source: &FileEntry, destination: &Path) -> Result<()> {
-    if !(destination.exists()) {
-        return Ok(());
-    }
-
-    match destination.metadata() {
-        Err(_) => Err(Error::download_error("Could not fetch metadata")),
-        Ok(metadata) => match metadata.modified() {
-            Err(_) => Err(Error::download_error("Could not fetch modification time")),
-            Ok(modified) => {
-                let remote_time = source.modified_date();
-                let local_time: DateTime<Utc> = DateTime::from(modified);
-                let local_time_utc = local_time.with_timezone(&remote_time.timezone());
-
-                debug!(
-                    "Compare remote vs local file time: {} vs {}",
-                    remote_time, local_time_utc
-                );
-                if local_time_utc < remote_time {
-                    info!("Remote file is newer than local file, will overwrite");
-                    Ok(())
-                } else {
-                    Err(Error::skip_download("Local file is newer than remote"))
-                }
-            }
-        },
-    }
-}
 
 fn get_api_key(args: &ArgMatches) -> Result<String> {
     if let Some(t) = args.value_of("API_TOKEN") {
@@ -177,26 +130,13 @@ fn get_password(args: &ArgMatches) -> Result<String> {
     }
 }
 
-fn get_service(args: &ArgMatches) -> Result<Services> {
+fn get_service(args: &ArgMatches, service_config: &ServiceConfig) -> Result<Services> {
     let service_identifier = args.value_of("SERVICE").unwrap();
-    match service_identifier.to_lowercase().as_str() {
-        "dropbox" => Ok(Services::DropboxService(DropboxService::new(get_api_key(
-            args,
-        )?))),
-        "webdav" => Ok(Services::WebDAVService(WebDAVService::new(
-            get_url(args)?,
-            get_remote_directory(args)?,
-            get_username(args)?,
-            get_password(args)?,
-        )?)),
-        _ => Err(Error::unknown_service_error(format!(
-            "Service {} is not implemented",
-            service_identifier
-        ))),
-    }
+
+    Services::build_service_by_identifier(service_identifier, service_config)
 }
 
-fn destination_for_file<P: AsRef<Path>>(file: &P, args: &ArgMatches) -> Result<PathBuf> {
+fn get_local_directory(args: &ArgMatches) -> Result<PathBuf> {
     let output_path = PathBuf::from(args.value_of("OUTPUT").unwrap());
     let output_path_string = output_path.to_str().map_or_else(
         || format!("{}", output_path.to_string_lossy()),
@@ -204,13 +144,7 @@ fn destination_for_file<P: AsRef<Path>>(file: &P, args: &ArgMatches) -> Result<P
     );
 
     if output_path.is_dir() {
-        match file.as_ref().file_name() {
-            Some(file_name) => Ok(output_path.join(file_name)),
-            None => Err(Error::io_error(format!(
-                "Could not get remove name of file {}",
-                file.as_ref().to_string_lossy()
-            ))),
-        }
+        Ok(output_path)
     } else if output_path.is_file() {
         Err(Error::io_error(format!(
             "Output path {} is not a directory",
@@ -229,6 +163,17 @@ fn destination_for_file<P: AsRef<Path>>(file: &P, args: &ArgMatches) -> Result<P
     }
 }
 
+fn build_service_config(args: &ArgMatches) -> ServiceConfig {
+    ServiceConfig::new(
+        get_api_key(args),
+        get_url(args),
+        get_remote_directory(args),
+        get_username(args),
+        get_password(args),
+        get_local_directory(args),
+    )
+}
+
 fn configure_logging(matches: &ArgMatches<'_>) -> Result<()> {
     let log_level_filter = match matches.occurrences_of("v") {
         1 => simplelog::LevelFilter::Info,
@@ -242,7 +187,7 @@ fn configure_logging(matches: &ArgMatches<'_>) -> Result<()> {
     config.time_format = Some("%H:%M:%S%.3f");
 
     if let Some(core_logger) =
-        simplelog::TermLogger::new(log_level_filter, config, TerminalMode::Mixed)
+    simplelog::TermLogger::new(log_level_filter, config, TerminalMode::Mixed)
     {
         loggers.push(core_logger);
     } else {
