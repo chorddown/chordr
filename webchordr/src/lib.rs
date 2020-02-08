@@ -4,6 +4,7 @@ extern crate stdweb;
 mod components;
 mod helpers;
 mod route;
+mod setlist;
 
 use crate::components::song_browser::SongBrowser;
 use crate::components::song_view::SongView;
@@ -11,8 +12,7 @@ use crate::components::start_screen::StartScreen;
 use crate::route::AppRoute;
 use failure::Error;
 use libchordr::prelude::*;
-use log::error;
-use log::info;
+use log::{info, warn, error};
 use stdweb::js;
 use yew::format::{Json, Nothing};
 use yew::services::fetch::{FetchService, FetchTask, Request, Response};
@@ -23,6 +23,7 @@ use crate::components::nav::Nav;
 use std::rc::Rc;
 use crate::components::reload_section::ReloadSection;
 use percent_encoding::percent_decode_str;
+use crate::setlist::Setlist;
 
 const STORAGE_KEY_SET_LIST: &'static str = "net.cundd.chordr.set-list";
 
@@ -44,7 +45,7 @@ pub struct App {
     fetching: bool,
     catalog: Option<Catalog>,
     current_song: Option<Song>,
-    setlist: Vec<Song>,
+    setlist: Setlist,
 }
 
 pub enum Msg {
@@ -159,23 +160,17 @@ impl App {
     }
 
     fn setlist_add(&mut self, song: Song) {
-        self.setlist.push(song);
+        self.setlist.add(song);
         self.storage_service
             .store(STORAGE_KEY_SET_LIST, Json(&self.setlist));
     }
 
     fn setlist_remove(&mut self, song: Song) {
-        match self.setlist.iter().position(|x| *x == song) {
-            Some(pos) => {
-                info!("Remove song {} from set-list", song.id());
-                self.setlist.remove(pos);
-            }
-            None => {
-                info!("Could not find song {} in set-list", song.id());
-            }
+        match self.setlist.remove(&song) {
+            Ok(_) => info!("Removed song {} from set-list", song.id()),
+            Err(_) => warn!("Could not remove song {} from set-list", song.id()),
         }
-        self.storage_service
-            .store(STORAGE_KEY_SET_LIST, Json(&self.setlist));
+        self.storage_service.store(STORAGE_KEY_SET_LIST, Json(&self.setlist));
     }
 }
 
@@ -195,7 +190,7 @@ impl Component for App {
             if let Json(Ok(restored_model)) = storage_service.restore(STORAGE_KEY_SET_LIST) {
                 restored_model
             } else {
-                Vec::new()
+                Setlist::new()
             };
 
         Self {

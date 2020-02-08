@@ -5,11 +5,12 @@ use libchordr::prelude::*;
 use log::info;
 use yew::prelude::*;
 use std::rc::Rc;
+use crate::setlist::Setlist;
 
 #[derive(Properties, PartialEq)]
 pub struct SongListProps {
     #[props(required)]
-    pub songs: Rc<Vec<Song>>,
+    pub songs: Rc<Setlist>,
 }
 
 pub struct SongList {
