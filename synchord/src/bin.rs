@@ -20,7 +20,7 @@ fn main() {
         .help("Output directory path");
     let service_arg = Arg::with_name("SERVICE")
         .required(true)
-        .help("Online service to use (dropbox)");
+        .help("Online service to use (dropbox, WebDAV)");
     let api_token_arg = Arg::with_name("API_TOKEN")
         .long("api-key")
         .takes_value(true)
@@ -114,7 +114,7 @@ fn get_remote_directory(args: &ArgMatches) -> Result<String> {
     match args.value_of("REMOTE_DIRECTORY") {
         Some(val) => Ok(val.to_owned()),
         None => Err(Error::missing_argument_error(
-            "No remote-directory provided",
+            "No remote directory provided",
         )),
     }
 }
