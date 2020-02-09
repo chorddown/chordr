@@ -10,7 +10,7 @@ use crate::setlist::Setlist;
 #[derive(Properties, PartialEq)]
 pub struct SongListProps {
     #[props(required)]
-    pub songs: Rc<Setlist>,
+    pub songs: Rc<Setlist<Song>>,
 }
 
 pub struct SongList {

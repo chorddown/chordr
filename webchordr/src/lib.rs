@@ -45,7 +45,7 @@ pub struct App {
     fetching: bool,
     catalog: Option<Catalog>,
     current_song: Option<Song>,
-    setlist: Setlist,
+    setlist: Setlist<Song>,
 }
 
 pub enum Msg {
