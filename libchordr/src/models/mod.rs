@@ -6,6 +6,8 @@ pub mod chord;
 pub mod song_data;
 pub mod song_id;
 pub mod song_list;
+pub mod song_settings;
+pub mod setlist;
 pub mod meta;
 
 #[deprecated(note = "Please use meta::meta_trait instead")]

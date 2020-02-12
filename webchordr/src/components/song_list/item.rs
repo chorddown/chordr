@@ -5,24 +5,24 @@ use yew::virtual_dom::VNode;
 use yew::{Component, ComponentLink};
 
 #[derive(Properties, PartialEq)]
-pub struct SongListItemProps {
+pub struct SongListItemProps<S: SongData> {
     #[props(required)]
-    pub song: Song,
+    pub song: S,
 
     pub class: Class,
 }
 
 #[allow(dead_code)]
-pub struct Item {
+pub struct Item<S: SongData + PartialEq + 'static> {
     /// State from the parent
-    props: SongListItemProps,
+    props: SongListItemProps<S>,
     /// Utility object
     link: ComponentLink<Self>,
 }
 
-impl Component for Item {
+impl<S: SongData + PartialEq + 'static> Component for Item<S> {
     type Message = ();
-    type Properties = SongListItemProps;
+    type Properties = SongListItemProps<S>;
 
     fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
         Self { link, props }

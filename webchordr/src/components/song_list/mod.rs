@@ -5,12 +5,13 @@ use libchordr::prelude::*;
 use log::info;
 use yew::prelude::*;
 use std::rc::Rc;
-use crate::setlist::Setlist;
+use crate::setlist_entry::SetlistEntry;
+use libchordr::models::setlist::Setlist;
 
 #[derive(Properties, PartialEq)]
 pub struct SongListProps {
     #[props(required)]
-    pub songs: Rc<Setlist<Song>>,
+    pub songs: Rc<Setlist<SetlistEntry>>,
 }
 
 pub struct SongList {
@@ -40,8 +41,8 @@ impl Component for SongList {
 
     fn view(&self) -> Html {
         let songs = &self.props.songs;
-        let render = |song: &Song| {
-            html! { <Item song=song/> }
+        let render = |song: &SetlistEntry| {
+            html! { <Item<SetlistEntry> song=song.clone()/> }
         };
 
         info!(

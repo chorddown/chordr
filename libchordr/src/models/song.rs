@@ -3,6 +3,7 @@ use crate::models::song_data::SongData;
 use crate::models::song_meta::SongMeta;
 use serde::Deserialize;
 use serde::Serialize;
+use crate::models::song_id::SongIdTrait;
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
 pub struct Song {
@@ -27,11 +28,13 @@ impl Song {
     }
 }
 
-impl SongData for Song {
+impl SongIdTrait for Song {
     fn id(&self) -> String {
         self.meta.id()
     }
+}
 
+impl SongData for Song {
     fn title(&self) -> String {
         self.meta.title()
     }

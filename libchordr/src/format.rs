@@ -1,6 +1,7 @@
 use std::convert::TryFrom;
+use serde::{Deserialize, Serialize};
 
-#[derive(Copy, Clone, PartialEq, Debug)]
+#[derive(Copy, Clone, PartialEq, Debug, Deserialize, Serialize)]
 pub enum Format {
     HTML,
     Chorddown,

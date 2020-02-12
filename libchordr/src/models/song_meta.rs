@@ -4,6 +4,7 @@ use super::song_id::SongId;
 use serde;
 use serde::{Deserialize, Serialize};
 use crate::models::meta::*;
+use crate::models::song_id::SongIdTrait;
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
 pub struct SongMeta {
@@ -45,7 +46,7 @@ impl SongMeta {
             tempo: None,
             duration: None,
             capo: None,
-            b_notation: Default::default()
+            b_notation: Default::default(),
         }
     }
 
@@ -129,11 +130,13 @@ impl MetaTrait for SongMeta {
     }
 }
 
-impl SongData for SongMeta {
+impl SongIdTrait for SongMeta {
     fn id(&self) -> SongId {
         self.id.clone()
     }
+}
 
+impl SongData for SongMeta {
     fn title(&self) -> String {
         self.title.clone()
     }

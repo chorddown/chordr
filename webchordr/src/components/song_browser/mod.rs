@@ -123,7 +123,7 @@ impl Component for SongBrowser {
         let render_song_item = |song| {
             html! {
                 <div class="col-3">
-                    <SongItem class="song-item grid-button"
+                    <SongItem<Song> class="song-item grid-button"
                         song=song/>
                 </div>
             }

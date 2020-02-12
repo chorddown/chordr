@@ -1,6 +1,5 @@
 use crate::models::song::Song;
-use crate::models::song_data::SongData;
-use crate::models::song_id::SongId;
+use crate::models::song_id::{SongId, SongIdTrait};
 use serde::{Deserialize, Serialize};
 use std::slice::Iter;
 

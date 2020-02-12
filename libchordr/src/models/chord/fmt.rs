@@ -1,7 +1,8 @@
 use crate::models::meta::{BNotation, SemitoneNotation};
 use crate::format::Format;
+use serde::{Deserialize, Serialize};
 
-#[derive(Copy, Clone, PartialEq, Debug)]
+#[derive(Copy, Clone, PartialEq, Debug, Deserialize, Serialize)]
 pub struct Formatting {
     pub b_notation: BNotation,
     pub semitone_notation: SemitoneNotation,

@@ -4,7 +4,7 @@ extern crate stdweb;
 mod components;
 mod helpers;
 mod route;
-mod setlist;
+mod setlist_entry;
 
 use crate::components::song_browser::SongBrowser;
 use crate::components::song_view::SongView;
@@ -23,7 +23,9 @@ use crate::components::nav::Nav;
 use std::rc::Rc;
 use crate::components::reload_section::ReloadSection;
 use percent_encoding::percent_decode_str;
-use crate::setlist::Setlist;
+use crate::setlist_entry::SetlistEntry;
+use libchordr::models::setlist::Setlist;
+use libchordr::models::song_id::SongIdTrait;
 
 const STORAGE_KEY_SET_LIST: &'static str = "net.cundd.chordr.set-list";
 
@@ -45,7 +47,7 @@ pub struct App {
     fetching: bool,
     catalog: Option<Catalog>,
     current_song: Option<Song>,
-    setlist: Setlist<Song>,
+    setlist: Setlist<SetlistEntry>,
 }
 
 pub enum Msg {
@@ -160,13 +162,25 @@ impl App {
     }
 
     fn setlist_add(&mut self, song: Song) {
-        self.setlist.add(song);
+        // TODO: Add the SetlistEntry with the correct formatting and transpose settings
+        if let Err(e) = self.setlist.add(song.into()) {
+            error!("Could not add song to setlist: {:?}", e);
+        }
+        self.storage_service
+            .store(STORAGE_KEY_SET_LIST, Json(&self.setlist));
+    }
+
+    fn setlist_replace(&mut self, song: Song) {
+        // TODO: Replace the SetlistEntry with the correct formatting and transpose settings
+        if let Err(e) = self.setlist.add(song.into()) {
+            error!("Could not add song to setlist: {:?}", e);
+        }
         self.storage_service
             .store(STORAGE_KEY_SET_LIST, Json(&self.setlist));
     }
 
     fn setlist_remove(&mut self, song: Song) {
-        match self.setlist.remove(&song) {
+        match self.setlist.remove_by_id(song.id()) {
             Ok(_) => info!("Removed song {} from set-list", song.id()),
             Err(_) => warn!("Could not remove song {} from set-list", song.id()),
         }

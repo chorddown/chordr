@@ -1,13 +1,13 @@
 use crate::components::song_list::SongList;
 use yew::prelude::*;
 use std::rc::Rc;
-use crate::setlist::Setlist;
-use libchordr::prelude::Song;
+use crate::setlist_entry::SetlistEntry;
+use libchordr::models::setlist::Setlist;
 
 #[derive(Properties, PartialEq)]
 pub struct NavProps {
     #[props(required)]
-    pub songs: Rc<Setlist<Song>>,
+    pub songs: Rc<Setlist<SetlistEntry>>,
     #[props(required)]
     pub show_menu: bool,
     #[props(required)]

@@ -4,7 +4,7 @@ use crate::error::{Error, Result};
 use crate::models::catalog::Catalog;
 use crate::models::file_type::FileType;
 use crate::models::song::Song;
-use crate::models::song_data::SongData;
+use crate::models::song_id::SongIdTrait;
 use std::convert::TryFrom;
 use std::fs::{self, DirEntry};
 use std::path::Path;
