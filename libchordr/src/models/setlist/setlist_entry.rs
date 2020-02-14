@@ -17,7 +17,7 @@ pub struct SetlistEntry {
 }
 
 impl SetlistEntry {
-    pub fn form_song_with_settings<S: SongData>(song: &S, settings: SongSettings) -> Self {
+    pub fn from_song_with_settings<S: SongData>(song: &S, settings: SongSettings) -> Self {
         Self {
             song_id: song.id(),
             file_type: song.file_type(),
@@ -26,18 +26,18 @@ impl SetlistEntry {
         }
     }
 
-    pub fn form_song<S: SongData>(song: &S, formatting: Formatting) -> Self {
-        Self::form_song_with_settings(song, SongSettings::new(0, formatting))
+    pub fn from_song<S: SongData>(song: &S, formatting: Formatting) -> Self {
+        Self::from_song_with_settings(song, SongSettings::new(0, formatting))
     }
 
-    pub fn form_song_with_formatting_and_transpose<S: SongData>(song: &S, formatting: Formatting, transpose: isize) -> Self {
-        Self::form_song_with_settings(song, SongSettings::new(transpose, formatting))
+    pub fn from_song_with_formatting_and_transpose<S: SongData>(song: &S, formatting: Formatting, transpose: isize) -> Self {
+        Self::from_song_with_settings(song, SongSettings::new(transpose, formatting))
     }
 }
 
 impl From<Song> for SetlistEntry {
     fn from(s: Song) -> Self {
-        SetlistEntry::form_song(&s, Formatting::default())
+        SetlistEntry::from_song(&s, Formatting::default())
     }
 }
 
