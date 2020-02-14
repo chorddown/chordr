@@ -24,7 +24,9 @@ pub use crate::models::song::Song;
 pub use crate::models::song_data::SongData;
 pub use crate::models::song_id::{SongId, SongIdTrait};
 pub use crate::models::song_meta::SongMeta;
-pub use crate::models::setlist::*;
+pub use crate::models::meta::{SemitoneNotation, BNotation, MetaTrait};
+pub use crate::models::setlist::{Setlist, SetlistEntry};
+pub use crate::models::chord::fmt::Formatting;
 
 /// Catalog management
 pub use crate::catalog_builder::CatalogBuilder;

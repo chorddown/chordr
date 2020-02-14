@@ -8,10 +8,7 @@ use stdweb::web::Node;
 use yew::prelude::*;
 use yew::virtual_dom::VNode;
 use yew::{Component, ComponentLink};
-use libchordr::models::chord::fmt::Formatting;
-use libchordr::models::meta::SemitoneNotation;
 use crate::components::song_view::semitone_notation_tool::SemitoneNotationTool;
-use libchordr::models::setlist::SetlistEntry;
 
 mod setlist_tool;
 mod transpose_tool;
