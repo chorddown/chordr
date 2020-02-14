@@ -4,7 +4,6 @@ extern crate stdweb;
 mod components;
 mod helpers;
 mod route;
-mod setlist_entry;
 
 use crate::components::song_browser::SongBrowser;
 use crate::components::song_view::SongView;
@@ -23,8 +22,7 @@ use crate::components::nav::Nav;
 use std::rc::Rc;
 use crate::components::reload_section::ReloadSection;
 use percent_encoding::percent_decode_str;
-use crate::setlist_entry::SetlistEntry;
-use libchordr::models::setlist::Setlist;
+use libchordr::models::setlist::{Setlist,SetlistEntry};
 use libchordr::models::song_id::SongIdTrait;
 
 const STORAGE_KEY_SET_LIST: &'static str = "net.cundd.chordr.set-list";

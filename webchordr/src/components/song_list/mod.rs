@@ -5,7 +5,6 @@ use libchordr::prelude::*;
 use log::info;
 use yew::prelude::*;
 use std::rc::Rc;
-use crate::setlist_entry::SetlistEntry;
 use libchordr::models::setlist::Setlist;
 
 #[derive(Properties, PartialEq)]

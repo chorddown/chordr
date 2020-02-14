@@ -1,9 +1,12 @@
+mod setlist_entry;
+
 use serde::Deserialize;
 use serde::Serialize;
 use std::slice::Iter;
 use crate::models::song_data::SongData;
 use crate::models::song_id::{SongId, SongIdTrait};
 use crate::error::{Error, Result};
+pub use self::setlist_entry::SetlistEntry;
 
 /// A generic set of Songs identified by their [SongId]
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -43,8 +46,9 @@ impl<S: SongIdTrait> Setlist<S> {
     }
 
     /// Remove the entry with the given [SongId] from the [Setlist]
-    pub fn remove_by_id(&mut self, song_id: SongId) -> Result<()> {
-        match self.0.iter().position(|s| s.id() == song_id) {
+    pub fn remove_by_id<I: AsRef<str>>(&mut self, song_id: I) -> Result<()> {
+        let song_id = song_id.as_ref();
+        match self.0.iter().position(|s| s.id().as_str() == song_id) {
             Some(pos) => {
                 self.0.remove(pos);
                 Ok(())

@@ -1,8 +1,7 @@
 use crate::components::song_list::SongList;
 use yew::prelude::*;
 use std::rc::Rc;
-use crate::setlist_entry::SetlistEntry;
-use libchordr::models::setlist::Setlist;
+use libchordr::models::setlist::*;
 
 #[derive(Properties, PartialEq)]
 pub struct NavProps {
