@@ -23,7 +23,6 @@ pub use crate::models::file_type::FileType;
 pub use crate::models::song::Song;
 pub use crate::models::song_data::SongData;
 pub use crate::models::song_id::{SongId, SongIdTrait};
-pub use crate::models::song_list::SongList;
 pub use crate::models::song_meta::SongMeta;
 
 /// Catalog management
