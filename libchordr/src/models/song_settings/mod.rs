@@ -1,8 +1,10 @@
-use serde::Deserialize;
-use serde::Serialize;
+mod song_settings_map;
+
+use serde::{Deserialize, Serialize};
 use crate::models::chord::fmt::Formatting;
 use crate::models::meta::{BNotation, SemitoneNotation};
 use crate::format::Format;
+pub use song_settings_map::SongSettingsMap;
 
 /// A structure of formatting and transpose settings for a song
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
@@ -29,5 +31,8 @@ impl SongSettings {
     }
     pub fn transpose_semitone(&self) -> isize {
         self.transpose_semitone
+    }
+    pub fn formatting(&self) -> Formatting {
+        self.formatting
     }
 }

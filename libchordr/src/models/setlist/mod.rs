@@ -7,6 +7,7 @@ use crate::models::song_data::SongData;
 use crate::models::song_id::{SongId, SongIdTrait};
 use crate::error::{Error, Result};
 pub use self::setlist_entry::SetlistEntry;
+use std::mem;
 
 /// A generic set of Songs identified by their [SongId]
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -31,32 +32,47 @@ impl<S: SongIdTrait> Setlist<S> {
     }
 
     /// Add the given [SongData] instance to the [Setlist] if it's [SongId] is not already registered
-    pub fn add(&mut self, song: S) -> Result<(), ()> {
+    pub fn add(&mut self, song: S) -> Result<()> {
         if !self.contains(&song) {
             self.0.push(song);
             Ok(())
         } else {
-            Err(())
+            Err(Error::setlist_error(format!("Song {} is already in set-list", song.id())))
         }
     }
 
     /// Replace the given [SongData] instance in the [Setlist]
-    pub fn replace(&mut self, song: S) -> Result<(), ()> {
-        unimplemented!()
+    pub fn replace(&mut self, song: S) -> Result<()> {
+        let song_id = song.id();
+        match self.position(&song_id) {
+            Some(pos) => {
+                mem::replace(&mut self.0[pos], song);
+                Ok(())
+            }
+            None => {
+                Err(Error::setlist_error(format!("Could not find song {} in set-list", song_id)))
+            }
+        }
     }
 
     /// Remove the entry with the given [SongId] from the [Setlist]
     pub fn remove_by_id<I: AsRef<str>>(&mut self, song_id: I) -> Result<()> {
         let song_id = song_id.as_ref();
-        match self.0.iter().position(|s| s.id().as_str() == song_id) {
+        match self.position(song_id) {
             Some(pos) => {
                 self.0.remove(pos);
                 Ok(())
             }
             None => {
-                Err(Error::unknown_error(format!("Could not find song {} in set-list", song_id)))
+                Err(Error::setlist_error(format!("Could not find song {} in set-list", song_id)))
             }
         }
+    }
+
+    /// Get the position of the entry with the given [SongId]
+    fn position<I: AsRef<str>>(&mut self, song_id: I) -> Option<usize> {
+        let song_id = song_id.as_ref();
+        self.0.iter().position(|s| s.id().as_str() == song_id)
     }
 
     /// Remove the entry with the matching [SongId] from the [Setlist]

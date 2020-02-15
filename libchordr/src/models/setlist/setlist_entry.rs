@@ -33,6 +33,14 @@ impl SetlistEntry {
     pub fn from_song_with_formatting_and_transpose<S: SongData>(song: &S, formatting: Formatting, transpose: isize) -> Self {
         Self::from_song_with_settings(song, SongSettings::new(transpose, formatting))
     }
+
+    pub fn settings_ref(&self) -> &SongSettings {
+        &self.settings
+    }
+
+    pub fn settings(self) -> SongSettings {
+        self.settings
+    }
 }
 
 impl From<Song> for SetlistEntry {

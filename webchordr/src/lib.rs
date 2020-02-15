@@ -11,7 +11,7 @@ use crate::components::start_screen::StartScreen;
 use crate::route::AppRoute;
 use failure::Error;
 use libchordr::prelude::*;
-use log::{info, warn, error};
+use log::{info, warn, error, debug};
 use stdweb::js;
 use yew::format::{Json, Nothing};
 use yew::services::fetch::{FetchService, FetchTask, Request, Response};
@@ -22,10 +22,12 @@ use crate::components::nav::Nav;
 use std::rc::Rc;
 use crate::components::reload_section::ReloadSection;
 use percent_encoding::percent_decode_str;
-use libchordr::models::setlist::{Setlist,SetlistEntry};
+use libchordr::models::setlist::{Setlist, SetlistEntry};
 use libchordr::models::song_id::SongIdTrait;
+use libchordr::models::song_settings::SongSettings;
 
-const STORAGE_KEY_SET_LIST: &'static str = "net.cundd.chordr.set-list";
+const STORAGE_KEY_SETLIST: &'static str = "net.cundd.chordr.setlist";
+const STORAGE_KEY_SETTINGS: &'static str = "net.cundd.chordr.settings";
 
 pub enum Format {
     Json,
@@ -46,14 +48,16 @@ pub struct App {
     catalog: Option<Catalog>,
     current_song: Option<Song>,
     setlist: Setlist<SetlistEntry>,
+    settings: SongSettingsMap,
 }
 
 pub enum Msg {
     OpenSongInMainView(SongId),
     FetchCatalogReady(Result<Catalog, Error>),
     FetchCatalog(bool),
-    SetlistAdd(Song),
-    SetlistRemove(Song),
+    SetlistAdd(SetlistEntry),
+    SetlistRemove(SongId),
+    SongSettingsChange(SongId, SongSettings),
     ToggleMenu,
     Reload,
     Ignore,
@@ -81,16 +85,31 @@ impl App {
         if let Some(song) = catalog.get(song_id.clone()) {
             let add = self.link.callback(|s| Msg::SetlistAdd(s));
             let remove = self.link.callback(|s| Msg::SetlistRemove(s));
+            let change = self.link.callback(|s: (SongId, SongSettings)| Msg::SongSettingsChange(s.0, s.1));
             let is_on_setlist = self.setlist.contains(song);
+
+            let song_settings = match self.settings.get(&song_id) {
+                Some(s) => {
+                    info!("Found settings for song {}: {:?}", song_id, s);
+                    s.clone()
+                }
+                None => {
+                    info!("No settings for song {} found in setlist", song_id);
+                    SongSettings::new(0, Formatting::default())
+                }
+            };
+
 
             info!("Song {} is on list? {}", song.id(), is_on_setlist);
 
             return html! {
                 <SongView
                     song=song
+                    song_settings=song_settings
                     enable_setlists=true
                     on_setlist_add=add
                     on_setlist_remove=remove
+                    on_settings_change=change
                     is_on_setlist=is_on_setlist
                 />
             };
@@ -108,7 +127,7 @@ impl App {
             }
             Err(e) => {
                 error!("Could not decode the song ID {}", e);
-                html! {}
+                (html! {}) as Html
             }
         }
     }
@@ -159,30 +178,26 @@ impl App {
         self.ft = Some(self.fetch_service.fetch(request, callback));
     }
 
-    fn setlist_add(&mut self, song: Song) {
-        // TODO: Add the SetlistEntry with the correct formatting and transpose settings
-        if let Err(e) = self.setlist.add(song.into()) {
-            error!("Could not add song to setlist: {:?}", e);
+    fn setlist_add(&mut self, song: SetlistEntry) {
+        let song_id = song.id();
+        match self.setlist.add(song) {
+            Ok(_) => debug!("Did add song to setlist {}", song_id),
+            Err(e) => error!("Could not add song to setlist: {:?}", e),
         }
-        self.storage_service
-            .store(STORAGE_KEY_SET_LIST, Json(&self.setlist));
+        self.storage_service.store(STORAGE_KEY_SETLIST, Json(&self.setlist));
     }
 
-    fn setlist_replace(&mut self, song: Song) {
-        // TODO: Replace the SetlistEntry with the correct formatting and transpose settings
-        if let Err(e) = self.setlist.add(song.into()) {
-            error!("Could not add song to setlist: {:?}", e);
+    fn setlist_remove(&mut self, song_id: SongId) {
+        match self.setlist.remove_by_id(&song_id) {
+            Ok(_) => info!("Removed song {} from setlist", song_id),
+            Err(_) => warn!("Could not remove song {} from setlist", song_id),
         }
-        self.storage_service
-            .store(STORAGE_KEY_SET_LIST, Json(&self.setlist));
+        self.storage_service.store(STORAGE_KEY_SETLIST, Json(&self.setlist));
     }
 
-    fn setlist_remove(&mut self, song: Song) {
-        match self.setlist.remove_by_id(song.id()) {
-            Ok(_) => info!("Removed song {} from set-list", song.id()),
-            Err(_) => warn!("Could not remove song {} from set-list", song.id()),
-        }
-        self.storage_service.store(STORAGE_KEY_SET_LIST, Json(&self.setlist));
+    fn song_settings_change(&mut self, song_id: SongId, settings: SongSettings) {
+        self.settings.store(song_id, settings);
+        self.storage_service.store(STORAGE_KEY_SETTINGS, Json(&self.settings));
     }
 }
 
@@ -199,10 +214,16 @@ impl Component for App {
 
         let storage_service = StorageService::new(Area::Local);
         let setlist =
-            if let Json(Ok(restored_model)) = storage_service.restore(STORAGE_KEY_SET_LIST) {
+            if let Json(Ok(restored_model)) = storage_service.restore(STORAGE_KEY_SETLIST) {
                 restored_model
             } else {
                 Setlist::new()
+            };
+        let settings =
+            if let Json(Ok(restored_model)) = storage_service.restore(STORAGE_KEY_SETTINGS) {
+                restored_model
+            } else {
+                SongSettingsMap::new()
             };
 
         Self {
@@ -214,6 +235,7 @@ impl Component for App {
             current_song: None,
             catalog: None,
             ft: None,
+            settings,
             setlist,
             route_service,
             route,
@@ -246,9 +268,8 @@ impl Component for App {
             Msg::FetchCatalog(no_cache) => self.fetch_catalog(no_cache),
             Msg::SetlistAdd(song) => self.setlist_add(song),
             Msg::SetlistRemove(song) => self.setlist_remove(song),
-            Msg::Ignore => {
-                return false;
-            }
+            Msg::SongSettingsChange(song_id, settings) => self.song_settings_change(song_id, settings),
+            Msg::Ignore => return false,
             Msg::ToggleMenu => {
                 self.show_menu = !self.show_menu;
             }

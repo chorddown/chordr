@@ -33,6 +33,10 @@ impl Error {
         Error::new(Kind::ChordError(description.into()))
     }
 
+    pub fn setlist_error<S: Into<String>>(description: S) -> Self {
+        Error::new(Kind::SetlistError(description.into()))
+    }
+
     pub fn unknown_error<S: Into<String>>(description: S) -> Self {
         Error::new(Kind::UnknownError(description.into()))
     }
@@ -75,6 +79,7 @@ enum Kind {
     CatalogBuilderError(String, PathBuf),
     FileTypeError(String),
     ChordError(String),
+    SetlistError(String),
     UnknownError(String),
 }
 
@@ -90,6 +95,7 @@ impl Display for Kind {
             }
             Kind::FileTypeError(s) => write!(f, "FileTypeError error: {}", s),
             Kind::ChordError(s) => write!(f, "Chord error: {}", s),
+            Kind::SetlistError(s) => write!(f, "Setlist error: {}", s),
             Kind::UnknownError(s) => write!(f, "Unknown error: {}", s),
         }
     }

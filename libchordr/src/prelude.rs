@@ -26,6 +26,7 @@ pub use crate::models::song_id::{SongId, SongIdTrait};
 pub use crate::models::song_meta::SongMeta;
 pub use crate::models::meta::{SemitoneNotation, BNotation, MetaTrait};
 pub use crate::models::setlist::{Setlist, SetlistEntry};
+pub use crate::models::song_settings::{SongSettings, SongSettingsMap};
 pub use crate::models::chord::fmt::Formatting;
 
 /// Catalog management
