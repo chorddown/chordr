@@ -51,6 +51,7 @@ impl TryFrom<DirEntry> for Song {
 mod tests {
     use super::*;
     use crate::models::song_data::SongData;
+    use crate::models::song_id::SongIdTrait;
 
     #[test]
     fn test_try_from() {
