@@ -20,6 +20,14 @@ impl Error {
         Error::new(Kind::IoError(description.into()))
     }
 
+    pub fn configuration_error<S: Into<String>>(description: S) -> Self {
+        Error::new(Kind::ConfigurationError(description.into()))
+    }
+
+    pub fn configuration_reader_error<S: Into<String>>(description: S) -> Self {
+        Error::new(Kind::ConfigurationReaderError(description.into()))
+    }
+
     fn from_error<E: StdError + 'static>(error: E) -> Self {
         Error {
             inner: Box::new(error),
@@ -38,6 +46,8 @@ impl Display for Error {
         write!(f, "{}", self.inner)
     }
 }
+
+impl StdError for Error {}
 
 impl From<::std::io::Error> for Error {
     fn from(error: ::std::io::Error) -> Self {
@@ -66,6 +76,12 @@ enum Kind {
     /// Error during file IO
     IoError(String),
 
+    /// Error with the configuration
+    ConfigurationError(String),
+
+    /// Error while reading the configuration
+    ConfigurationReaderError(String),
+
     /// Unknown/uncategorized error
     UnknownError(String),
 }
@@ -77,6 +93,8 @@ impl Display for Kind {
         match self {
             Kind::SerializationError(s) => write!(f, "Serialization error: {}", s),
             Kind::IoError(s) => write!(f, "IO error: {}", s),
+            Kind::ConfigurationError(s) => write!(f, "Configuration error: {}", s),
+            Kind::ConfigurationReaderError(s) => write!(f, "Configuration reader error: {}", s),
             Kind::UnknownError(s) => write!(f, "Unknown error: {}", s),
         }
     }

@@ -1,0 +1,9 @@
+catalog_file: /tmp/path/to/catalog-file.json
+output_directory: /tmp/path/to/download/chorddown-files
+service:
+  identifier: WebDAV
+  api_token: MY_API_TOKEN
+  username: this-is-me
+  password: 123-easy
+  url: https://mycloud.example.com
+  remote_directory: remote-dir
