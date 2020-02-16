@@ -137,30 +137,7 @@ fn get_service(args: &ArgMatches, service_config: &ServiceConfig) -> Result<Serv
 }
 
 fn get_local_directory(args: &ArgMatches) -> Result<PathBuf> {
-    let output_path = PathBuf::from(args.value_of("OUTPUT").unwrap());
-    let output_path_string = output_path.to_str().map_or_else(
-        || format!("{}", output_path.to_string_lossy()),
-        |s| s.to_owned(),
-    );
-
-    if output_path.is_dir() {
-        Ok(output_path)
-    } else if output_path.is_file() {
-        Err(Error::io_error(format!(
-            "Output path {} is not a directory",
-            output_path_string
-        )))
-    } else if !output_path.exists() {
-        Err(Error::io_error(format!(
-            "Output path {} does not exist",
-            output_path_string
-        )))
-    } else {
-        Err(Error::io_error(format!(
-            "Output path {} is not a path",
-            output_path_string
-        )))
-    }
+    Ok(PathBuf::from(args.value_of("OUTPUT").unwrap()))
 }
 
 fn build_service_config(args: &ArgMatches) -> ServiceConfig {

@@ -54,7 +54,7 @@ pub fn check_if_should_download(source: &FileEntry, destination: &Path) -> Resul
 }
 
 fn destination_for_file<P: AsRef<Path>, S: ServiceConfigTrait>(file: &P, service_config: &S) -> Result<PathBuf> {
-    let output_path = service_config.local_directory()?;
+    let output_path = get_output_path(service_config)?;
 
     match file.as_ref().file_name() {
         Some(file_name) => Ok(output_path.join(file_name)),
@@ -62,5 +62,34 @@ fn destination_for_file<P: AsRef<Path>, S: ServiceConfigTrait>(file: &P, service
             "Could not get remove name of file {}",
             file.as_ref().to_string_lossy()
         ))),
+    }
+}
+
+fn get_output_path<S: ServiceConfigTrait>(service_config: &S) -> Result<PathBuf> {
+    let output_path = service_config.local_directory()?;
+    if output_path.is_dir() {
+        return Ok(output_path);
+    }
+
+    let output_path_string = output_path.to_str().map_or_else(
+        || format!("{}", output_path.to_string_lossy()),
+        |s| s.to_owned(),
+    );
+
+    if output_path.is_file() {
+        Err(Error::io_error(format!(
+            "Output path {} is not a directory",
+            output_path_string
+        )))
+    } else if !output_path.exists() {
+        Err(Error::io_error(format!(
+            "Output path {} does not exist",
+            output_path_string
+        )))
+    } else {
+        Err(Error::io_error(format!(
+            "Output path {} is not a path",
+            output_path_string
+        )))
     }
 }
