@@ -3,6 +3,7 @@ use crate::error::Result;
 use libsynchord::prelude::{ServiceConfig, Services};
 use libsynchord::error::Error as SynchordError;
 use std::env;
+use log::info;
 use super::{TaskTrait, RecurringTaskTrait};
 
 pub struct DownloadTask {
@@ -24,6 +25,7 @@ impl TaskTrait for DownloadTask {
 
 impl RecurringTaskTrait for DownloadTask {
     fn run(&self) -> Result<()> {
+        info!("Run Download Task");
         libsynchord::helper::download(&self.service, &self.service_config)?;
 
         Ok(())
