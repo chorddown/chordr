@@ -86,6 +86,7 @@ mod test {
         assert_eq!(configuration.service.password, "123-easy");
         assert_eq!(configuration.service.url, "https://mycloud.example.com");
         assert_eq!(configuration.service.remote_directory, "remote-dir");
+        assert_eq!(configuration.service.sync_interval, 34);
     }
 
     #[test]

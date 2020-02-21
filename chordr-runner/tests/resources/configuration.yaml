@@ -7,3 +7,4 @@ service:
   password: 123-easy
   url: https://mycloud.example.com
   remote_directory: remote-dir
+  sync_interval: 34

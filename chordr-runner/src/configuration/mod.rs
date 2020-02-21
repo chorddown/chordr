@@ -7,7 +7,7 @@ use serde::export::Formatter;
 use serde::export::fmt::Error;
 
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct Configuration {
     /// Path to the catalog file
     pub catalog_file: PathBuf,
@@ -19,7 +19,7 @@ pub struct Configuration {
     pub service: ServiceConfiguration,
 }
 
-#[derive(Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq, Clone)]
 pub enum ServiceIdentifier {
     WebDAV,
     Dropbox,
@@ -34,7 +34,7 @@ impl Display for ServiceIdentifier {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct ServiceConfiguration {
     /// Online service to use (dropbox, WebDAV)
     pub identifier: ServiceIdentifier,
@@ -53,5 +53,8 @@ pub struct ServiceConfiguration {
 
     /// Remote directory to list
     pub remote_directory: String,
+
+    /// Number of seconds to wait between service updates
+    pub sync_interval: u64,
 }
 
