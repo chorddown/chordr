@@ -1,12 +1,12 @@
+mod chord_down_tokenizer;
+mod meta;
 mod modifier;
 mod token;
-mod meta;
-mod chord_down_tokenizer;
 
 use self::chord_down_tokenizer::ChordDownTokenizer;
+pub use self::meta::Meta;
 pub use self::modifier::Modifier;
 pub use self::token::Token;
-pub use self::meta::Meta;
 //pub use self::directive::Directive;
 //use crate::tokenizer::chord_pro_tokenizer::ChordProTokenizer;
 

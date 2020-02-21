@@ -1,8 +1,8 @@
+use serde::export::fmt::Error;
+use serde::export::Formatter;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 use std::fmt::Display;
-use serde::export::Formatter;
-use serde::export::fmt::Error;
 
 /// Enum defining how the `B` is defined
 ///
@@ -17,7 +17,7 @@ impl BNotation {
     pub fn is_european_chord(chord: &str) -> bool {
         match Self::try_from(chord) {
             Ok(Self::H) => true,
-            _ => false
+            _ => false,
         }
     }
 
@@ -55,7 +55,7 @@ impl TryFrom<char> for BNotation {
         match value {
             'B' | 'b' => Ok(Self::B),
             'H' | 'h' => Ok(Self::H),
-            _ => Err(NotationError {})
+            _ => Err(NotationError {}),
         }
     }
 }
@@ -68,7 +68,7 @@ impl TryFrom<&str> for BNotation {
         match value {
             "B" | "b" => Ok(Self::B),
             "H" | "h" => Ok(Self::H),
-            _ => Err(NotationError {})
+            _ => Err(NotationError {}),
         }
     }
 }

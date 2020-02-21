@@ -1,9 +1,8 @@
-use chrono::{DateTime, Utc};
 use crate::error::{Error, Result};
 use crate::service::*;
+use chrono::{DateTime, Utc};
+use log::{debug, error, info, warn};
 use std::path::{Path, PathBuf};
-use log::{debug, info, warn, error};
-
 
 pub fn download(service: &Services, service_config: &ServiceConfig) -> Result<Vec<FileEntry>> {
     let files = service.list_files()?;
@@ -53,7 +52,10 @@ pub fn check_if_should_download(source: &FileEntry, destination: &Path) -> Resul
     }
 }
 
-fn destination_for_file<P: AsRef<Path>, S: ServiceConfigTrait>(file: &P, service_config: &S) -> Result<PathBuf> {
+fn destination_for_file<P: AsRef<Path>, S: ServiceConfigTrait>(
+    file: &P,
+    service_config: &S,
+) -> Result<PathBuf> {
     let output_path = get_output_path(service_config)?;
 
     match file.as_ref().file_name() {

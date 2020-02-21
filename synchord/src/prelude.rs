@@ -1,2 +1,2 @@
-pub use crate::service::*;
 pub use crate::error::*;
+pub use crate::service::*;

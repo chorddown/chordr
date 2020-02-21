@@ -1,9 +1,9 @@
-use crate::task::{TaskTrait, RecurringTaskTrait};
-use crate::error::Error;
 use crate::configuration::Configuration;
+use crate::error::Error;
+use crate::task::{RecurringTaskTrait, TaskTrait};
 use libchordr::prelude::{CatalogBuilder, FileType};
-use std::fs;
 use log::info;
+use std::fs;
 
 pub struct BuildCatalogTask {
     catalog_builder: CatalogBuilder,
@@ -11,7 +11,10 @@ pub struct BuildCatalogTask {
 }
 
 impl TaskTrait for BuildCatalogTask {
-    fn with_configuration(configuration: &Configuration) -> Result<Self, Error> where Self: std::marker::Sized {
+    fn with_configuration(configuration: &Configuration) -> Result<Self, Error>
+    where
+        Self: std::marker::Sized,
+    {
         let catalog_builder = CatalogBuilder::new();
         Ok(Self {
             catalog_builder,
@@ -41,7 +44,13 @@ impl RecurringTaskTrait for BuildCatalogTask {
             Err(e) => return Err(Error::serialization_error(format!("{}", e))),
         };
 
-        info!("Write catalog to {}", self.configuration.catalog_file.as_path().to_string_lossy());
-        Ok(fs::write(self.configuration.catalog_file.as_path(), output)?)
+        info!(
+            "Write catalog to {}",
+            self.configuration.catalog_file.as_path().to_string_lossy()
+        );
+        Ok(fs::write(
+            self.configuration.catalog_file.as_path(),
+            output,
+        )?)
     }
 }

@@ -1,10 +1,10 @@
+use super::{RecurringTaskTrait, TaskTrait};
 use crate::configuration::Configuration;
 use crate::error::Result;
-use libsynchord::prelude::{ServiceConfig, Services};
 use libsynchord::error::Error as SynchordError;
-use std::env;
+use libsynchord::prelude::{ServiceConfig, Services};
 use log::info;
-use super::{TaskTrait, RecurringTaskTrait};
+use std::env;
 
 pub struct DownloadTask {
     service_config: ServiceConfig,

@@ -2,20 +2,25 @@ use self::chorddown::ChorddownConverter;
 use self::html::HtmlConverter;
 #[cfg(feature = "pdf")]
 use self::pdf::PdfConverter;
+use crate::converter::songbeamer::SongBeamerConverter;
 use crate::error::Result;
+use crate::models::chord::fmt::Formatting;
 use crate::models::song_meta_trait::SongMetaTrait;
 use crate::prelude::*;
-use crate::converter::songbeamer::SongBeamerConverter;
-use crate::models::chord::fmt::Formatting;
 
 mod chorddown;
-mod songbeamer;
 mod html;
 #[cfg(feature = "pdf")]
 mod pdf;
+mod songbeamer;
 
 pub trait ConverterTrait {
-    fn convert(&self, node: &Node, meta: &dyn SongMetaTrait, formatting: Formatting) -> Result<String>;
+    fn convert(
+        &self,
+        node: &Node,
+        meta: &dyn SongMetaTrait,
+        formatting: Formatting,
+    ) -> Result<String>;
 }
 
 pub struct Converter {}
@@ -37,7 +42,12 @@ impl Converter {
 }
 
 impl ConverterTrait for Converter {
-    fn convert(&self, node: &Node, meta: &dyn SongMetaTrait, formatting: Formatting) -> Result<String> {
+    fn convert(
+        &self,
+        node: &Node,
+        meta: &dyn SongMetaTrait,
+        formatting: Formatting,
+    ) -> Result<String> {
         Converter::get_converter(formatting.format).convert(node, meta, formatting)
     }
 }

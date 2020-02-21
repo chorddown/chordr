@@ -5,26 +5,26 @@ mod components;
 mod helpers;
 mod route;
 
+use crate::components::nav::Nav;
+use crate::components::reload_section::ReloadSection;
 use crate::components::song_browser::SongBrowser;
 use crate::components::song_view::SongView;
 use crate::components::start_screen::StartScreen;
 use crate::route::AppRoute;
 use failure::Error;
+use libchordr::models::setlist::{Setlist, SetlistEntry};
+use libchordr::models::song_id::SongIdTrait;
+use libchordr::models::song_settings::SongSettings;
 use libchordr::prelude::*;
-use log::{info, warn, error, debug};
+use log::{debug, error, info, warn};
+use percent_encoding::percent_decode_str;
+use std::rc::Rc;
 use stdweb::js;
 use yew::format::{Json, Nothing};
 use yew::services::fetch::{FetchService, FetchTask, Request, Response};
 use yew::services::storage::{Area, StorageService};
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
 use yew_router::prelude::*;
-use crate::components::nav::Nav;
-use std::rc::Rc;
-use crate::components::reload_section::ReloadSection;
-use percent_encoding::percent_decode_str;
-use libchordr::models::setlist::{Setlist, SetlistEntry};
-use libchordr::models::song_id::SongIdTrait;
-use libchordr::models::song_settings::SongSettings;
 
 const STORAGE_KEY_SETLIST: &'static str = "net.cundd.chordr.setlist";
 const STORAGE_KEY_SETTINGS: &'static str = "net.cundd.chordr.settings";
@@ -85,7 +85,9 @@ impl App {
         if let Some(song) = catalog.get(song_id.clone()) {
             let add = self.link.callback(|s| Msg::SetlistAdd(s));
             let remove = self.link.callback(|s| Msg::SetlistRemove(s));
-            let change = self.link.callback(|s: (SongId, SongSettings)| Msg::SongSettingsChange(s.0, s.1));
+            let change = self
+                .link
+                .callback(|s: (SongId, SongSettings)| Msg::SongSettingsChange(s.0, s.1));
             let is_on_setlist = self.setlist.contains(song);
 
             let song_settings = match self.settings.get(&song_id) {
@@ -98,7 +100,6 @@ impl App {
                     SongSettings::new(0, Formatting::default())
                 }
             };
-
 
             info!("Song {} is on list? {}", song.id(), is_on_setlist);
 
@@ -184,7 +185,8 @@ impl App {
             Ok(_) => debug!("Did add song to setlist {}", song_id),
             Err(e) => error!("Could not add song to setlist: {:?}", e),
         }
-        self.storage_service.store(STORAGE_KEY_SETLIST, Json(&self.setlist));
+        self.storage_service
+            .store(STORAGE_KEY_SETLIST, Json(&self.setlist));
     }
 
     fn setlist_remove(&mut self, song_id: SongId) {
@@ -192,12 +194,29 @@ impl App {
             Ok(_) => info!("Removed song {} from setlist", song_id),
             Err(_) => warn!("Could not remove song {} from setlist", song_id),
         }
-        self.storage_service.store(STORAGE_KEY_SETLIST, Json(&self.setlist));
+        self.storage_service
+            .store(STORAGE_KEY_SETLIST, Json(&self.setlist));
     }
 
     fn song_settings_change(&mut self, song_id: SongId, settings: SongSettings) {
         self.settings.store(song_id, settings);
-        self.storage_service.store(STORAGE_KEY_SETTINGS, Json(&self.settings));
+        self.storage_service
+            .store(STORAGE_KEY_SETTINGS, Json(&self.settings));
+    }
+
+    fn get_setlist(storage_service: &StorageService) -> Setlist<SetlistEntry> {
+        if let Json(Ok(restored_model)) = storage_service.restore(STORAGE_KEY_SETLIST) {
+            restored_model
+        } else {
+            Setlist::new()
+        }
+    }
+    fn get_settings(storage_service: &StorageService) -> SongSettingsMap {
+        if let Json(Ok(restored_model)) = storage_service.restore(STORAGE_KEY_SETTINGS) {
+            restored_model
+        } else {
+            SongSettingsMap::new()
+        }
     }
 }
 
@@ -213,18 +232,8 @@ impl Component for App {
         route_service.register_callback(callback);
 
         let storage_service = StorageService::new(Area::Local);
-        let setlist =
-            if let Json(Ok(restored_model)) = storage_service.restore(STORAGE_KEY_SETLIST) {
-                restored_model
-            } else {
-                Setlist::new()
-            };
-        let settings =
-            if let Json(Ok(restored_model)) = storage_service.restore(STORAGE_KEY_SETTINGS) {
-                restored_model
-            } else {
-                SongSettingsMap::new()
-            };
+        let setlist = App::get_setlist(&storage_service);
+        let settings = App::get_settings(&storage_service);
 
         Self {
             fetch_service: FetchService::new(),
@@ -268,7 +277,9 @@ impl Component for App {
             Msg::FetchCatalog(no_cache) => self.fetch_catalog(no_cache),
             Msg::SetlistAdd(song) => self.setlist_add(song),
             Msg::SetlistRemove(song) => self.setlist_remove(song),
-            Msg::SongSettingsChange(song_id, settings) => self.song_settings_change(song_id, settings),
+            Msg::SongSettingsChange(song_id, settings) => {
+                self.song_settings_change(song_id, settings)
+            }
             Msg::Ignore => return false,
             Msg::ToggleMenu => {
                 self.show_menu = !self.show_menu;

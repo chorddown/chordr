@@ -1,6 +1,6 @@
-use crate::tokenizer::{Modifier, Token, TokenLine};
-use crate::parser::{Node, MetaInformation};
 use crate::models::meta::BNotation;
+use crate::parser::{MetaInformation, Node};
+use crate::tokenizer::{Modifier, Token, TokenLine};
 
 #[cfg(test)]
 pub fn get_test_tokens() -> Vec<TokenLine> {

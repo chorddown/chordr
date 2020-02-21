@@ -2,9 +2,9 @@ extern crate clap;
 extern crate log;
 
 mod error;
-mod service;
 mod helper;
 mod prelude;
+mod service;
 
 use crate::error::{Error, Result};
 use crate::prelude::*;
@@ -83,7 +83,6 @@ fn download(args: &ArgMatches) -> Result<()> {
     helper::download(&service, &service_config)?;
     Ok(())
 }
-
 
 fn get_api_key(args: &ArgMatches) -> Result<String> {
     if let Some(t) = args.value_of("API_TOKEN") {
@@ -164,7 +163,7 @@ fn configure_logging(matches: &ArgMatches<'_>) -> Result<()> {
     config.time_format = Some("%H:%M:%S%.3f");
 
     if let Some(core_logger) =
-    simplelog::TermLogger::new(log_level_filter, config, TerminalMode::Mixed)
+        simplelog::TermLogger::new(log_level_filter, config, TerminalMode::Mixed)
     {
         loggers.push(core_logger);
     } else {

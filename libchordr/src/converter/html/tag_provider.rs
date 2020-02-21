@@ -1,10 +1,10 @@
 use crate::html::attribute::Attribute;
 use crate::html::tag::{Content, Tag};
 use crate::html::tag_builder::TagBuilder;
+use crate::models::chord::fmt::Formatting;
 use crate::models::chord::{Chords, NoteDisplay};
 use crate::parser::{Node, SectionType};
 use crate::tokenizer::Token;
-use crate::models::chord::fmt::Formatting;
 
 pub struct TagProvider {}
 
@@ -24,7 +24,9 @@ impl TagProvider {
             Node::ChordStandalone(chord) => {
                 self.build_column(self.build_tag_for_chords(chord, formatting), Tag::blank())
             }
-            Node::Text(text) => self.build_column(Tag::blank(), self.build_tag_for_token(text, formatting)),
+            Node::Text(text) => {
+                self.build_column(Tag::blank(), self.build_tag_for_token(text, formatting))
+            }
             Node::Document(children) => gtb
                 .set_tag_name("div")
                 .set_id("chordr-song")
@@ -107,7 +109,11 @@ impl TagProvider {
             .build()
     }
 
-    fn build_tag_for_children<'a, 'b>(&'a self, children: &'a Vec<Node>, formatting: Formatting) -> Tag {
+    fn build_tag_for_children<'a, 'b>(
+        &'a self,
+        children: &'a Vec<Node>,
+        formatting: Formatting,
+    ) -> Tag {
         let mut gtb = TagBuilder::new();
         let inner = children
             .iter()

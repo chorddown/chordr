@@ -1,4 +1,4 @@
-use crate::error::{Result, Error};
+use crate::error::{Error, Result};
 use std::path::PathBuf;
 
 pub trait ServiceConfigTrait {

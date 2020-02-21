@@ -26,7 +26,7 @@ impl TryFrom<char> for SemitoneNotation {
         match value {
             '#' | '♯' => Ok(Self::Sharp),
             'b' | '♭' => Ok(Self::Flat),
-            _ => Err(SemitoneNotationError {})
+            _ => Err(SemitoneNotationError {}),
         }
     }
 }
@@ -39,17 +39,20 @@ impl TryFrom<&str> for SemitoneNotation {
         match value {
             "#" | "♯" => Ok(Self::Sharp),
             "b" | "♭" => Ok(Self::Flat),
-            _ => Err(SemitoneNotationError {})
+            _ => Err(SemitoneNotationError {}),
         }
     }
 }
 
 impl Display for SemitoneNotation {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
-        write!(f, "{}", match self {
-            Self::Sharp => "♯",
-            Self::Flat => "♭",
-        })
+        write!(
+            f,
+            "{}",
+            match self {
+                Self::Sharp => "♯",
+                Self::Flat => "♭",
+            }
+        )
     }
 }
-

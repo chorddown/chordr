@@ -1,19 +1,19 @@
 mod meta_information;
-mod node;
-mod parser_result;
-mod node_parser;
 mod meta_parser;
+mod node;
+mod node_parser;
+mod parser_result;
 mod section_type;
 
 pub use self::meta_information::MetaInformation;
 pub use self::node::Node;
 pub use self::parser_result::ParserResult;
 pub use self::section_type::SectionType;
-use crate::models::meta::*;
-use crate::tokenizer::Token;
-use crate::parser::node_parser::NodeParser;
-use crate::parser::meta_parser::MetaParser;
 use crate::error::Error;
+use crate::models::meta::*;
+use crate::parser::meta_parser::MetaParser;
+use crate::parser::node_parser::NodeParser;
+use crate::tokenizer::Token;
 
 pub trait ParserTrait {
     type OkType;
@@ -44,8 +44,8 @@ impl ParserTrait for Parser {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tokenizer::Modifier;
     use crate::test_helpers::get_test_parser_input;
+    use crate::tokenizer::Modifier;
 
     #[test]
     fn test_parse() {

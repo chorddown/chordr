@@ -1,8 +1,8 @@
+use crate::models::file_type::FileType;
 use crate::models::song::Song;
 use crate::models::song_data::SongData;
-use crate::models::file_type::FileType;
 use crate::models::song_id::{SongId, SongIdTrait};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 /// An implementation of [SongData] for use inside [Setlist]s
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]

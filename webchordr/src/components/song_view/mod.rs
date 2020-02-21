@@ -1,5 +1,7 @@
 use self::setlist_tool::Setlist;
 use self::transpose_tool::TransposeTool;
+use crate::components::song_view::semitone_notation_tool::SemitoneNotationTool;
+use libchordr::models::song_settings::SongSettings;
 use libchordr::prelude::*;
 use log::error;
 use log::info;
@@ -7,12 +9,10 @@ use stdweb::web::Node;
 use yew::prelude::*;
 use yew::virtual_dom::VNode;
 use yew::{Component, ComponentLink};
-use crate::components::song_view::semitone_notation_tool::SemitoneNotationTool;
-use libchordr::models::song_settings::SongSettings;
 
+mod semitone_notation_tool;
 mod setlist_tool;
 mod transpose_tool;
-mod semitone_notation_tool;
 
 #[derive(Properties, PartialEq)]
 pub struct SongViewProps {
@@ -60,13 +60,19 @@ impl Component for SongView {
     fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
         let song_settings = props.song_settings.clone();
 
-        Self { link, props, song_settings }
+        Self {
+            link,
+            props,
+            song_settings,
+        }
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
             Msg::TransposeUp => self.change_transpose(self.song_settings.transpose_semitone() + 1),
-            Msg::TransposeDown => self.change_transpose(self.song_settings.transpose_semitone() - 1),
+            Msg::TransposeDown => {
+                self.change_transpose(self.song_settings.transpose_semitone() - 1)
+            }
             Msg::TransposeSet(v) => self.change_transpose(v),
             Msg::SemitoneNotationChange(s) => self.change_semitone_notation(s),
             Msg::SetlistChange(flag) => {
@@ -146,13 +152,11 @@ impl Component for SongView {
     }
 }
 
-
 impl SongView {
     fn send_change(&self) {
-        self.props.on_settings_change.emit((
-            self.props.song.id(),
-            self.song_settings.clone()
-        ))
+        self.props
+            .on_settings_change
+            .emit((self.props.song.id(), self.song_settings.clone()))
     }
 
     fn convert_song_to_html_string(&self) -> String {
@@ -197,14 +201,14 @@ impl SongView {
     }
 
     fn change_semitone_notation(&mut self, s: SemitoneNotation) -> () {
-        let formatting = Formatting { semitone_notation: s, ..self.song_settings.formatting() };
+        let formatting = Formatting {
+            semitone_notation: s,
+            ..self.song_settings.formatting()
+        };
         let transpose_semitone = self.song_settings.transpose_semitone();
 
         info!("Change formatting to {:?}", formatting);
-        self.song_settings = SongSettings::new(
-            transpose_semitone,
-            formatting,
-        );
+        self.song_settings = SongSettings::new(transpose_semitone, formatting);
         self.send_change();
     }
 }

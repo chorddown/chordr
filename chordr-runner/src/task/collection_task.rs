@@ -1,21 +1,22 @@
-use crate::task::{TaskTrait, RecurringTaskTrait};
 use crate::configuration::Configuration;
 use crate::error::Error;
+use crate::task::{RecurringTaskTrait, TaskTrait};
 
 pub struct CollectionTask<'a> {
-    tasks: Vec<&'a dyn RecurringTaskTrait>
+    tasks: Vec<&'a dyn RecurringTaskTrait>,
 }
 
 impl<'a> CollectionTask<'a> {
     pub fn new(tasks: Vec<&'a dyn RecurringTaskTrait>) -> Self {
-        Self {
-            tasks
-        }
+        Self { tasks }
     }
 }
 
 impl<'a> TaskTrait for CollectionTask<'a> {
-    fn with_configuration(_configuration: &Configuration) -> Result<Self, Error> where Self: std::marker::Sized {
+    fn with_configuration(_configuration: &Configuration) -> Result<Self, Error>
+    where
+        Self: std::marker::Sized,
+    {
         unimplemented!()
     }
 }

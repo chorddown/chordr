@@ -1,15 +1,15 @@
 pub use super::meta_information::MetaInformation;
-pub use super::*;
 pub use super::node::Node;
 pub use super::parser_result::ParserResult;
 pub use super::section_type::SectionType;
+pub use super::*;
+use crate::models::chord::Chords;
 use crate::tokenizer::Token;
 use std::iter::Peekable;
 use std::vec::IntoIter;
-use crate::models::chord::Chords;
 
 pub struct NodeParser {
-    b_notation: BNotation
+    b_notation: BNotation,
 }
 
 impl ParserTrait for NodeParser {
@@ -33,7 +33,11 @@ impl NodeParser {
         Self { b_notation }
     }
 
-    fn visit(&mut self, token: Token, tokens: &mut Peekable<IntoIter<Token>>) -> Result<Node, Error> {
+    fn visit(
+        &mut self,
+        token: Token,
+        tokens: &mut Peekable<IntoIter<Token>>,
+    ) -> Result<Node, Error> {
         match token {
             Token::Chord(_) => self.visit_chord(token, tokens),
             Token::Headline {
@@ -75,8 +79,16 @@ impl NodeParser {
         }
     }
 
-    fn visit_chord(&mut self, token: Token, tokens: &mut Peekable<IntoIter<Token>>) -> Result<Node, Error> {
-        let chords_raw = if let Token::Chord(c) = token { c } else { unreachable!("Invalid Token given") };
+    fn visit_chord(
+        &mut self,
+        token: Token,
+        tokens: &mut Peekable<IntoIter<Token>>,
+    ) -> Result<Node, Error> {
+        let chords_raw = if let Token::Chord(c) = token {
+            c
+        } else {
+            unreachable!("Invalid Token given")
+        };
 
         // TODO: Add relaxed parsing of chords like `[A ///]`
         let chords = Chords::try_from(&chords_raw, self.b_notation)?;
@@ -86,10 +98,7 @@ impl NodeParser {
                 // Consume the next token
                 let text = tokens.next().unwrap();
 
-                return Ok(Node::ChordTextPair {
-                    chords,
-                    text,
-                });
+                return Ok(Node::ChordTextPair { chords, text });
             }
         }
 
@@ -112,9 +121,9 @@ fn token_is_start_of_section(token: &Token) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::helper::token_lines_to_tokens;
     use crate::test_helpers::get_test_ast;
     use crate::test_helpers::get_test_tokens;
-    use crate::helper::token_lines_to_tokens;
 
     #[test]
     fn test_parse() {

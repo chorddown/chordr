@@ -1,5 +1,5 @@
-use std::convert::TryFrom;
 use serde::{Deserialize, Serialize};
+use std::convert::TryFrom;
 
 #[derive(Copy, Clone, PartialEq, Debug, Deserialize, Serialize)]
 pub enum Format {
@@ -20,7 +20,7 @@ impl TryFrom<&str> for Format {
             "songbeamer" => Ok(Self::SongBeamer),
             #[cfg(feature = "pdf")]
             "pdf" => Ok(Self::PDF),
-            _ => Err(())
+            _ => Err(()),
         }
     }
 }

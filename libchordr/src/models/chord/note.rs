@@ -1,9 +1,9 @@
 use crate::error::Error;
-use crate::models::meta::{BNotation, SemitoneNotation};
-use std::fmt::{Debug, Formatter};
+use crate::models::chord::fmt::Formatting;
 use crate::models::chord::transposition::TransposableTrait;
 use crate::models::chord::NoteDisplay;
-use crate::models::chord::fmt::Formatting;
+use crate::models::meta::{BNotation, SemitoneNotation};
+use std::fmt::{Debug, Formatter};
 
 #[derive(Clone, Copy, PartialEq, PartialOrd)]
 pub enum Note {
@@ -111,20 +111,24 @@ impl Note {
 
 impl Debug for Note {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), ::std::fmt::Error> {
-        write!(f, "{}", match self {
-            Self::C => "C",
-            Self::Cis => "C#",
-            Self::D => "D",
-            Self::Dis => "D#",
-            Self::E => "E",
-            Self::F => "F",
-            Self::Fis => "F#",
-            Self::G => "G",
-            Self::Gis => "G#",
-            Self::A => "A",
-            Self::Ais => "A#",
-            Self::B => "B",
-        })
+        write!(
+            f,
+            "{}",
+            match self {
+                Self::C => "C",
+                Self::Cis => "C#",
+                Self::D => "D",
+                Self::Dis => "D#",
+                Self::E => "E",
+                Self::F => "F",
+                Self::Fis => "F#",
+                Self::G => "G",
+                Self::Gis => "G#",
+                Self::A => "A",
+                Self::Ais => "A#",
+                Self::B => "B",
+            }
+        )
     }
 }
 
@@ -147,9 +151,22 @@ impl NoteDisplay for Note {
             Self::Gis => "Ab",
             Self::A => "A",
             Self::Ais if sharp => "A#",
-            Self::Ais => if formatting.b_notation == BNotation::B { "Bb" } else { "B" },
-            Self::B => if formatting.b_notation == BNotation::B { "B" } else { "H" },
-        }.to_string()
+            Self::Ais => {
+                if formatting.b_notation == BNotation::B {
+                    "Bb"
+                } else {
+                    "B"
+                }
+            }
+            Self::B => {
+                if formatting.b_notation == BNotation::B {
+                    "B"
+                } else {
+                    "H"
+                }
+            }
+        }
+        .to_string()
     }
 }
 
@@ -183,10 +200,8 @@ impl From<isize> for Note {
             10 => Note::A,
             11 => Note::Ais,
 
-            _ if scaled < 1 => {
-                Note::from(12 + scaled)
-            }
-            _ => unreachable!()
+            _ if scaled < 1 => Note::from(12 + scaled),
+            _ => unreachable!(),
         }
     }
 }
@@ -264,7 +279,6 @@ mod tests {
             (0, Note::A, Note::A),
             (0, Note::Ais, Note::Ais),
             (0, Note::B, Note::B),
-
             // +1
             (1, Note::C, Note::Cis),
             (1, Note::Cis, Note::D),
@@ -278,7 +292,6 @@ mod tests {
             (1, Note::A, Note::Ais),
             (1, Note::Ais, Note::B),
             (1, Note::B, Note::C),
-
             // +12 = +0
             (12, Note::C, Note::C),
             (12, Note::Cis, Note::Cis),
@@ -292,7 +305,6 @@ mod tests {
             (12, Note::A, Note::A),
             (12, Note::Ais, Note::Ais),
             (12, Note::B, Note::B),
-
             // +13 = +1
             (13, Note::C, Note::Cis),
             (13, Note::Cis, Note::D),
@@ -306,7 +318,6 @@ mod tests {
             (13, Note::A, Note::Ais),
             (13, Note::Ais, Note::B),
             (13, Note::B, Note::C),
-
             // +4
             (4, Note::C, Note::E),
             (4, Note::Cis, Note::F),
@@ -320,7 +331,6 @@ mod tests {
             (4, Note::A, Note::Cis),
             (4, Note::Ais, Note::D),
             (4, Note::B, Note::Dis),
-
             // -1
             (-1, Note::C, Note::B),
             (-1, Note::Cis, Note::C),
@@ -334,7 +344,6 @@ mod tests {
             (-1, Note::A, Note::Gis),
             (-1, Note::Ais, Note::A),
             (-1, Note::B, Note::Ais),
-
             // +11 = -1
             (11, Note::C, Note::B),
             (11, Note::Cis, Note::C),
@@ -351,10 +360,15 @@ mod tests {
         ];
 
         for (semitones, input, expected) in map {
-            assert_eq!(input.transpose(semitones), expected, "Transpose failed for {:?} {}", input, semitones);
+            assert_eq!(
+                input.transpose(semitones),
+                expected,
+                "Transpose failed for {:?} {}",
+                input,
+                semitones
+            );
         }
     }
-
 
     #[test]
     fn note_format_test() {

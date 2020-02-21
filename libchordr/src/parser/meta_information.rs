@@ -1,6 +1,6 @@
-use crate::tokenizer::Meta;
-use crate::models::song_meta_trait::SongMetaTrait;
 use crate::models::meta::b_notation::BNotation;
+use crate::models::song_meta_trait::SongMetaTrait;
+use crate::tokenizer::Meta;
 
 /// Meta Information for a parsed song
 #[derive(Clone, Debug)]
@@ -25,30 +25,18 @@ impl MetaInformation {
     /// Copy the Meta content into the appropriate field
     pub(crate) fn assign_from_token(&mut self, t: &Meta) {
         match t {
-            Meta::Artist(content) =>
-                self.artist = Some(content.clone()),
-            Meta::Composer(content) =>
-                self.composer = Some(content.clone()),
-            Meta::Lyricist(content) =>
-                self.lyricist = Some(content.clone()),
-            Meta::Copyright(content) =>
-                self.copyright = Some(content.clone()),
-            Meta::Album(content) =>
-                self.album = Some(content.clone()),
-            Meta::Year(content) =>
-                self.year = Some(content.clone()),
-            Meta::Key(content) =>
-                self.key = Some(content.clone()),
-            Meta::Time(content) =>
-                self.time = Some(content.clone()),
-            Meta::Tempo(content) =>
-                self.tempo = Some(content.clone()),
-            Meta::Duration(content) =>
-                self.duration = Some(content.clone()),
-            Meta::Capo(content) =>
-                self.capo = Some(content.clone()),
-            Meta::BNotation(notation) =>
-                self.b_notation = notation.clone(),
+            Meta::Artist(content) => self.artist = Some(content.clone()),
+            Meta::Composer(content) => self.composer = Some(content.clone()),
+            Meta::Lyricist(content) => self.lyricist = Some(content.clone()),
+            Meta::Copyright(content) => self.copyright = Some(content.clone()),
+            Meta::Album(content) => self.album = Some(content.clone()),
+            Meta::Year(content) => self.year = Some(content.clone()),
+            Meta::Key(content) => self.key = Some(content.clone()),
+            Meta::Time(content) => self.time = Some(content.clone()),
+            Meta::Tempo(content) => self.tempo = Some(content.clone()),
+            Meta::Duration(content) => self.duration = Some(content.clone()),
+            Meta::Capo(content) => self.capo = Some(content.clone()),
+            Meta::BNotation(notation) => self.b_notation = notation.clone(),
         }
     }
 }
@@ -127,7 +115,7 @@ impl Default for MetaInformation {
             tempo: None,
             duration: None,
             capo: None,
-            b_notation: Default::default()
+            b_notation: Default::default(),
         }
     }
 }

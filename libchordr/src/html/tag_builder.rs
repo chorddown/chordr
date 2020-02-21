@@ -19,7 +19,7 @@ impl<'a> TagBuilder<'a> {
         }
     }
 
-    pub fn set_content_str<S:Into<String>>(&mut self, content: S) -> &mut Self {
+    pub fn set_content_str<S: Into<String>>(&mut self, content: S) -> &mut Self {
         self.set_content(Content::Some(content.into()))
     }
 

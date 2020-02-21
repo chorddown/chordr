@@ -2,7 +2,7 @@ mod mode;
 
 use crate::tokenizer::chord_down_tokenizer::mode::ModePartner;
 use crate::tokenizer::modifier::Modifier;
-use crate::tokenizer::{Token, Tokenizer, Meta};
+use crate::tokenizer::{Meta, Token, Tokenizer};
 use mode::Mode;
 use std::convert::TryFrom;
 
@@ -86,7 +86,7 @@ fn from_mode_and_literal(mode: Mode, literal: &str, header_level: u8) -> Token {
 fn build_token_from_literal<S: AsRef<str>>(literal: S) -> Token {
     match Meta::try_from(literal.as_ref()) {
         Ok(meta) => Token::Meta(meta),
-        Err(_) => Token::Literal(literal.as_ref().to_owned())
+        Err(_) => Token::Literal(literal.as_ref().to_owned()),
     }
 }
 
@@ -118,15 +118,14 @@ fn add_token(tokens: &mut Vec<Token>, token: Token) -> () {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::test_helpers::get_test_tokens;
     use crate::helper::token_lines_to_tokens;
-    use crate::tokenizer::Meta;
     use crate::models::meta::BNotation;
+    use crate::test_helpers::get_test_tokens;
+    use crate::tokenizer::Meta;
 
     #[test]
     fn test_tokenize_long() {
-        let content =
-            include_str!("../../../tests/resources/swing_low_sweet_chariot.chorddown");
+        let content = include_str!("../../../tests/resources/swing_low_sweet_chariot.chorddown");
         let token_lines = ChordDownTokenizer::new().tokenize(content);
         assert_eq!(token_lines, get_test_tokens());
     }
@@ -142,9 +141,15 @@ Key: Cm
         assert_eq!(token_lines.len(), 3);
         let tokens = token_lines_to_tokens(token_lines);
 
-        assert_eq!(tokens.get(0), Some(&Token::Meta(Meta::composer("Daniel Corn"))));
+        assert_eq!(
+            tokens.get(0),
+            Some(&Token::Meta(Meta::composer("Daniel Corn")))
+        );
         assert_eq!(tokens.get(1), Some(&Token::Newline));
-        assert_eq!(tokens.get(2), Some(&Token::Meta(Meta::artist("The Fantastic Corns"))));
+        assert_eq!(
+            tokens.get(2),
+            Some(&Token::Meta(Meta::artist("The Fantastic Corns")))
+        );
         assert_eq!(tokens.get(3), Some(&Token::Newline));
         assert_eq!(tokens.get(4), Some(&Token::Meta(Meta::key("Cm"))));
         assert_eq!(tokens.get(5), Some(&Token::Newline));
@@ -157,43 +162,67 @@ Key: Cm
         {
             let token_lines = tokenizer.tokenize("B Notation: H");
 
-            assert_eq!(token_lines_to_tokens(token_lines).get(0), Some(&Token::Meta(Meta::BNotation(BNotation::H))));
+            assert_eq!(
+                token_lines_to_tokens(token_lines).get(0),
+                Some(&Token::Meta(Meta::BNotation(BNotation::H)))
+            );
         }
         {
             let token_lines = tokenizer.tokenize("B_Notation: H");
 
-            assert_eq!(token_lines_to_tokens(token_lines).get(0), Some(&Token::Meta(Meta::BNotation(BNotation::H))));
+            assert_eq!(
+                token_lines_to_tokens(token_lines).get(0),
+                Some(&Token::Meta(Meta::BNotation(BNotation::H)))
+            );
         }
         {
             let token_lines = tokenizer.tokenize("BNotation: H");
 
-            assert_eq!(token_lines_to_tokens(token_lines).get(0), Some(&Token::Meta(Meta::BNotation(BNotation::H))));
+            assert_eq!(
+                token_lines_to_tokens(token_lines).get(0),
+                Some(&Token::Meta(Meta::BNotation(BNotation::H)))
+            );
         }
         {
             let token_lines = tokenizer.tokenize("B-Notation: H");
 
-            assert_eq!(token_lines_to_tokens(token_lines).get(0), Some(&Token::Meta(Meta::BNotation(BNotation::H))));
+            assert_eq!(
+                token_lines_to_tokens(token_lines).get(0),
+                Some(&Token::Meta(Meta::BNotation(BNotation::H)))
+            );
         }
         // B
         {
             let token_lines = tokenizer.tokenize("B Notation: B");
 
-            assert_eq!(token_lines_to_tokens(token_lines).get(0), Some(&Token::Meta(Meta::BNotation(BNotation::B))));
+            assert_eq!(
+                token_lines_to_tokens(token_lines).get(0),
+                Some(&Token::Meta(Meta::BNotation(BNotation::B)))
+            );
         }
         {
             let token_lines = tokenizer.tokenize("B_Notation: B");
 
-            assert_eq!(token_lines_to_tokens(token_lines).get(0), Some(&Token::Meta(Meta::BNotation(BNotation::B))));
+            assert_eq!(
+                token_lines_to_tokens(token_lines).get(0),
+                Some(&Token::Meta(Meta::BNotation(BNotation::B)))
+            );
         }
         {
             let token_lines = tokenizer.tokenize("BNotation: B");
 
-            assert_eq!(token_lines_to_tokens(token_lines).get(0), Some(&Token::Meta(Meta::BNotation(BNotation::B))));
+            assert_eq!(
+                token_lines_to_tokens(token_lines).get(0),
+                Some(&Token::Meta(Meta::BNotation(BNotation::B)))
+            );
         }
         {
             let token_lines = tokenizer.tokenize("B-Notation: B");
 
-            assert_eq!(token_lines_to_tokens(token_lines).get(0), Some(&Token::Meta(Meta::BNotation(BNotation::B))));
+            assert_eq!(
+                token_lines_to_tokens(token_lines).get(0),
+                Some(&Token::Meta(Meta::BNotation(BNotation::B)))
+            );
         }
     }
 }

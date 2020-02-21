@@ -1,11 +1,10 @@
 pub(crate) mod reader;
 
+use serde::export::fmt::Error;
+use serde::export::Formatter;
+use serde::Deserialize;
 use std::fmt::Display;
 use std::path::PathBuf;
-use serde::Deserialize;
-use serde::export::Formatter;
-use serde::export::fmt::Error;
-
 
 #[derive(Deserialize, Debug, Clone)]
 pub struct Configuration {
@@ -27,10 +26,14 @@ pub enum ServiceIdentifier {
 
 impl Display for ServiceIdentifier {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
-        write!(f, "{}", match self {
-            ServiceIdentifier::WebDAV => "WebDAV",
-            ServiceIdentifier::Dropbox => "Dropbox",
-        })
+        write!(
+            f,
+            "{}",
+            match self {
+                ServiceIdentifier::WebDAV => "WebDAV",
+                ServiceIdentifier::Dropbox => "Dropbox",
+            }
+        )
     }
 }
 
@@ -57,4 +60,3 @@ pub struct ServiceConfiguration {
     /// Number of seconds to wait between service updates
     pub sync_interval: u64,
 }
-

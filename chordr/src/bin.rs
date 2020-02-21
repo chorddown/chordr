@@ -4,11 +4,11 @@ extern crate libchordr;
 use clap::{App, Arg, ArgMatches, SubCommand};
 use std::fs;
 
+use libchordr::models::chord::fmt::Formatting;
 use libchordr::prelude::Error;
 use libchordr::prelude::Result;
 use libchordr::prelude::*;
 use std::convert::TryFrom;
-use libchordr::models::chord::fmt::Formatting;
 
 fn main() {
     let output_arg = Arg::with_name("OUTPUT")
@@ -27,10 +27,7 @@ fn main() {
                         .help("Chorddown file to parse"),
                 )
                 .arg(output_arg.clone())
-                .arg(
-                    Arg::with_name("FORMAT")
-                        .help("Output format"),
-                ),
+                .arg(Arg::with_name("FORMAT").help("Output format")),
         )
         .subcommand(
             SubCommand::with_name("build-catalog")

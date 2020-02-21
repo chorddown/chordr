@@ -3,22 +3,22 @@ extern crate libchordr;
 extern crate libsynchord;
 extern crate log;
 
-mod error;
 mod configuration;
+mod error;
 mod task;
 
+use crate::configuration::Configuration;
 use crate::error::{Error, Result};
+use crate::task::{BuildCatalogTask, CollectionTask, DownloadTask, RecurringTaskTrait, TaskTrait};
 use clap::{App, Arg, ArgMatches};
+use configuration::reader::Reader;
 use log::{error, info};
 use simplelog;
 use simplelog::TerminalMode;
 use std::env;
 use std::path::Path;
-use configuration::reader::Reader;
-use crate::configuration::Configuration;
-use std::{thread, time};
-use crate::task::{DownloadTask, TaskTrait, RecurringTaskTrait, CollectionTask, BuildCatalogTask};
 use std::process::exit;
+use std::{thread, time};
 
 fn main() {
     if let Err(e) = run() {
@@ -32,20 +32,26 @@ fn run() -> Result<()> {
         .version(env!("CARGO_PKG_VERSION"))
         .author("Daniel Corn <info@cundd.net>")
         .about("Synchronize chorddown files with online file services")
-        .arg(Arg::with_name("configuration")
-            .help("File containing the configuration")
-            .short("c")
-            .long("configuration")
-            .required(true)
-            .takes_value(true))
-        .arg(Arg::with_name("pretty")
-            .help("Output indented JSON")
-            .short("p")
-            .long("pretty"))
-        .arg(Arg::with_name("verbosity")
-            .help("Change the verbosity of the output")
-            .short("v")
-            .multiple(true));
+        .arg(
+            Arg::with_name("configuration")
+                .help("File containing the configuration")
+                .short("c")
+                .long("configuration")
+                .required(true)
+                .takes_value(true),
+        )
+        .arg(
+            Arg::with_name("pretty")
+                .help("Output indented JSON")
+                .short("p")
+                .long("pretty"),
+        )
+        .arg(
+            Arg::with_name("verbosity")
+                .help("Change the verbosity of the output")
+                .short("v")
+                .multiple(true),
+        );
     let matches = app.get_matches();
     configure_logging(&matches)?;
     let configuration = read_configuration(&matches)?;
@@ -58,11 +64,11 @@ fn start_loop(configuration: &Configuration) -> Result<()> {
     let download_task = DownloadTask::with_configuration(&configuration)?;
     let build_catalog_task = BuildCatalogTask::with_configuration(&configuration)?;
 
-    let collection_task = CollectionTask::new(vec![
-        &download_task,
-        &build_catalog_task,
-    ]);
-    info!("Start task loop with an interval of {} seconds", configuration.service.sync_interval);
+    let collection_task = CollectionTask::new(vec![&download_task, &build_catalog_task]);
+    info!(
+        "Start task loop with an interval of {} seconds",
+        configuration.service.sync_interval
+    );
     loop {
         info!("Run tasks");
         if let Err(e) = collection_task.run() {
@@ -89,7 +95,7 @@ fn configure_logging(matches: &ArgMatches<'_>) -> Result<()> {
     config.time_format = Some("%H:%M:%S%.3f");
 
     if let Some(core_logger) =
-    simplelog::TermLogger::new(log_level_filter, config, TerminalMode::Mixed)
+        simplelog::TermLogger::new(log_level_filter, config, TerminalMode::Mixed)
     {
         loggers.push(core_logger);
     } else {

@@ -1,7 +1,7 @@
-use std::collections::HashMap;
 use crate::models::song_id::SongId;
 use crate::models::song_settings::SongSettings;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 /// A map of [SongSettings] to [SongId]s
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]

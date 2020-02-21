@@ -1,8 +1,8 @@
 use dropbox_sdk::files::{DownloadError, ListFolderError};
 use reqwest::Error as RequestError;
-use xml::reader::Error as XmlError;
 use std::error::Error as StdError;
 use std::fmt::{Display, Error as FmtError, Formatter};
+use xml::reader::Error as XmlError;
 
 /// Shorthand for synchord results
 pub type Result<T, E = Error> = ::std::result::Result<T, E>;
@@ -10,7 +10,7 @@ pub type Result<T, E = Error> = ::std::result::Result<T, E>;
 /// Error type for errors raised in synchord
 #[derive(Debug, Clone)]
 pub struct Error {
-    inner: Kind
+    inner: Kind,
 }
 
 #[doc(hidden)]
@@ -44,9 +44,7 @@ impl Error {
     }
 
     fn new(kind: Kind) -> Self {
-        Error {
-            inner: kind,
-        }
+        Error { inner: kind }
     }
 }
 

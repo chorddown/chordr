@@ -1,7 +1,7 @@
 use crate::components::song_list::SongList;
-use yew::prelude::*;
-use std::rc::Rc;
 use libchordr::models::setlist::*;
+use std::rc::Rc;
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct NavProps {
@@ -15,7 +15,7 @@ pub struct NavProps {
 
 #[allow(dead_code)]
 pub struct Nav {
-    props: NavProps
+    props: NavProps,
 }
 
 impl Nav {
@@ -57,9 +57,7 @@ impl Component for Nav {
     type Properties = NavProps;
 
     fn create(props: Self::Properties, _link: ComponentLink<Self>) -> Self {
-        Self {
-            props
-        }
+        Self { props }
     }
 
     fn update(&mut self, _msg: Self::Message) -> ShouldRender {

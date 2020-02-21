@@ -1,10 +1,10 @@
 use super::ConverterTrait;
 use crate::error::Result;
+use crate::models::chord::fmt::*;
 use crate::models::chord::Chords;
 use crate::models::meta::MetaTrait;
 use crate::parser::Node;
 use crate::tokenizer::Token;
-use crate::models::chord::fmt::*;
 
 pub struct ChorddownConverter {}
 
@@ -19,7 +19,6 @@ impl ConverterTrait for ChorddownConverter {
         Ok(cleanup_output(&output))
     }
 }
-
 
 impl ChorddownConverter {
     fn build_node<'a>(&'a self, node: &'a Node, formatting: Formatting) -> Result<String> {
@@ -134,7 +133,11 @@ impl ChorddownConverter {
         format!("[{}]", chords.note_format(formatting))
     }
 
-    fn build_tag_for_children<'a, 'b>(&'a self, children: &'a Vec<Node>, formatting: Formatting) -> String {
+    fn build_tag_for_children<'a, 'b>(
+        &'a self,
+        children: &'a Vec<Node>,
+        formatting: Formatting,
+    ) -> String {
         children
             .iter()
             .filter_map(|n| self.build_node(n, formatting).ok())
@@ -151,15 +154,10 @@ impl ChorddownConverter {
 }
 
 fn cleanup_output(output: &str) -> String {
-    format!(
-        "{}\n",
-        remove_double_blank_lines(output).trim_end()
-    )
+    format!("{}\n", remove_double_blank_lines(output).trim_end())
 }
 
-
-fn remove_double_blank_lines(
-    input: &str) -> String {
+fn remove_double_blank_lines(input: &str) -> String {
     if input.contains("\n\n\n") {
         remove_double_blank_lines(&input.replace("\n\n\n", "\n\n"))
     } else {
@@ -170,11 +168,11 @@ fn remove_double_blank_lines(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::format::Format;
     use crate::parser::MetaInformation;
     use crate::test_helpers::get_test_ast;
     use crate::test_helpers::get_test_metadata;
     use crate::tokenizer::Modifier;
-    use crate::format::Format;
 
     #[test]
     fn test_convert() {

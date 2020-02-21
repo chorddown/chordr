@@ -1,11 +1,11 @@
 mod item;
 
 pub use self::item::Item;
+use libchordr::models::setlist::Setlist;
 use libchordr::prelude::*;
 use log::info;
-use yew::prelude::*;
 use std::rc::Rc;
-use libchordr::models::setlist::Setlist;
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct SongListProps {

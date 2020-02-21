@@ -1,5 +1,5 @@
-use yew::prelude::*;
 use crate::components::nbsp::Nbsp;
+use yew::prelude::*;
 
 pub type OnSetlist = bool;
 
@@ -46,14 +46,14 @@ impl Component for Setlist {
                 "Remove song from setlist",
                 remove_from_list,
                 "im im-check-square-o",
-                "discreet -active"
+                "discreet -active",
             )
         } else {
             (
                 "Add song to setlist",
                 add_to_list,
                 "im im-square-o",
-                "discreet"
+                "discreet",
             )
         };
 

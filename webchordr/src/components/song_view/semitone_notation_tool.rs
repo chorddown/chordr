@@ -1,5 +1,5 @@
-use yew::prelude::*;
 use libchordr::models::meta::SemitoneNotation;
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct SemitoneNotationToolProps {

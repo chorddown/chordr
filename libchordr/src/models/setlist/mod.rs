@@ -1,13 +1,13 @@
 mod setlist_entry;
 
-use serde::Deserialize;
-use serde::Serialize;
-use std::slice::Iter;
+pub use self::setlist_entry::SetlistEntry;
+use crate::error::{Error, Result};
 use crate::models::song_data::SongData;
 use crate::models::song_id::{SongId, SongIdTrait};
-use crate::error::{Error, Result};
-pub use self::setlist_entry::SetlistEntry;
+use serde::Deserialize;
+use serde::Serialize;
 use std::mem;
+use std::slice::Iter;
 
 /// A generic set of Songs identified by their [SongId]
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -37,7 +37,10 @@ impl<S: SongIdTrait> Setlist<S> {
             self.0.push(song);
             Ok(())
         } else {
-            Err(Error::setlist_error(format!("Song {} is already in set-list", song.id())))
+            Err(Error::setlist_error(format!(
+                "Song {} is already in set-list",
+                song.id()
+            )))
         }
     }
 
@@ -49,9 +52,10 @@ impl<S: SongIdTrait> Setlist<S> {
                 mem::replace(&mut self.0[pos], song);
                 Ok(())
             }
-            None => {
-                Err(Error::setlist_error(format!("Could not find song {} in set-list", song_id)))
-            }
+            None => Err(Error::setlist_error(format!(
+                "Could not find song {} in set-list",
+                song_id
+            ))),
         }
     }
 
@@ -63,9 +67,10 @@ impl<S: SongIdTrait> Setlist<S> {
                 self.0.remove(pos);
                 Ok(())
             }
-            None => {
-                Err(Error::setlist_error(format!("Could not find song {} in set-list", song_id)))
-            }
+            None => Err(Error::setlist_error(format!(
+                "Could not find song {} in set-list",
+                song_id
+            ))),
         }
     }
 

@@ -1,5 +1,5 @@
-use crate::tokenizer::modifier::Modifier;
 use super::meta::Meta;
+use crate::tokenizer::modifier::Modifier;
 
 #[derive(Debug, PartialOrd, PartialEq, Clone)]
 pub enum Token {

@@ -1,7 +1,7 @@
-use std::fmt::Debug;
 use super::b_notation::BNotation;
+use std::fmt::Debug;
 
-pub trait MetaTrait : Debug{
+pub trait MetaTrait: Debug {
     fn title(&self) -> Option<String>;
     fn subtitle(&self) -> Option<String>;
     fn artist(&self) -> Option<String>;

@@ -1,9 +1,9 @@
 use crate::models::file_type::FileType;
 use crate::models::song_data::SongData;
+use crate::models::song_id::SongIdTrait;
 use crate::models::song_meta::SongMeta;
 use serde::Deserialize;
 use serde::Serialize;
-use crate::models::song_id::SongIdTrait;
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
 pub struct Song {

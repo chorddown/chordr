@@ -1,15 +1,14 @@
 pub use super::meta_information::MetaInformation;
-pub use super::*;
 pub use super::node::Node;
 pub use super::parser_result::ParserResult;
 pub use super::section_type::SectionType;
+pub use super::*;
 use crate::tokenizer::Token;
 
 pub struct MetaParser {}
 
 impl ParserTrait for MetaParser {
     type OkType = MetaInformation;
-
 
     fn parse(&mut self, tokens: Vec<Token>) -> Result<MetaInformation, Error> {
         let mut meta = MetaInformation::default();
@@ -20,7 +19,6 @@ impl ParserTrait for MetaParser {
         Ok(meta)
     }
 }
-
 
 impl MetaParser {
     pub fn new() -> Self {
@@ -36,7 +34,10 @@ impl MetaParser {
                 modifier: _,
             } => {
                 if level == 1 {
-                    MetaInformation { title: Some(text.clone()), ..meta }
+                    MetaInformation {
+                        title: Some(text.clone()),
+                        ..meta
+                    }
                 } else {
                     meta
                 }
@@ -46,12 +47,16 @@ impl MetaParser {
                 new_meta.assign_from_token(&token_meta);
                 new_meta
             }
-            _ => meta
+            _ => meta,
         }
     }
 
     fn visit_chord(&mut self, token: Token, meta: MetaInformation) -> MetaInformation {
-        let chords = if let Token::Chord(c) = token { c } else { unreachable!("Invalid Token given") };
+        let chords = if let Token::Chord(c) = token {
+            c
+        } else {
+            unreachable!("Invalid Token given")
+        };
         if BNotation::contains_european_chord(&chords) {
             MetaInformation {
                 b_notation: BNotation::H,
@@ -66,8 +71,8 @@ impl MetaParser {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tokenizer::Modifier;
     use crate::test_helpers::get_test_parser_input;
+    use crate::tokenizer::Modifier;
 
     #[test]
     fn test_parse() {

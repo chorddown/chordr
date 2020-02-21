@@ -1,14 +1,19 @@
 use super::ConverterTrait;
 use crate::error::Result;
+use crate::models::chord::fmt::Formatting;
 use crate::models::meta::MetaTrait;
 use crate::parser::Node;
 use crate::tokenizer::Token;
-use crate::models::chord::fmt::Formatting;
 
 pub struct SongBeamerConverter {}
 
 impl ConverterTrait for SongBeamerConverter {
-    fn convert(&self, node: &Node, meta: &dyn MetaTrait, _formatting: Formatting) -> Result<String> {
+    fn convert(
+        &self,
+        node: &Node,
+        meta: &dyn MetaTrait,
+        _formatting: Formatting,
+    ) -> Result<String> {
         let output = format!(
             "{}\n{}\n{}",
             self.build_std_meta(meta),
@@ -25,7 +30,6 @@ impl ConverterTrait for SongBeamerConverter {
     }
 }
 
-
 impl SongBeamerConverter {
     fn build_node<'a>(&'a self, node: &'a Node) -> Result<String> {
         match node {
@@ -37,9 +41,7 @@ impl SongBeamerConverter {
                 head: _,
                 children,
                 section_type: _,
-            } => {
-                Ok(format!("---\n{}\n", self.build_tag_for_children(children)))
-            }
+            } => Ok(format!("---\n{}\n", self.build_tag_for_children(children))),
 
             Node::Headline(_) => Ok(String::new()),
             Node::ChordStandalone(_) => Ok(String::new()),
@@ -62,7 +64,8 @@ impl SongBeamerConverter {
     fn build_std_meta(&self, _meta: &dyn MetaTrait) -> String {
         r"#LangCount=1
 #Editor=Chordr
-#Version=3".to_owned()
+#Version=3"
+            .to_owned()
     }
 
     fn build_meta(&self, meta: &dyn MetaTrait) -> String {
@@ -111,7 +114,6 @@ impl SongBeamerConverter {
         buffer.join("\n")
     }
 
-
     fn build_tag_for_children<'a, 'b>(&'a self, children: &'a Vec<Node>) -> String {
         children
             .iter()
@@ -122,9 +124,11 @@ impl SongBeamerConverter {
 }
 
 fn cleanup_output(output: &str) -> String {
-    format!("{}\n", remove_blank_slides(&remove_blank_lines(output)).trim_end())
+    format!(
+        "{}\n",
+        remove_blank_slides(&remove_blank_lines(output)).trim_end()
+    )
 }
-
 
 fn remove_blank_lines(input: &str) -> String {
     if input.contains("\n\n") {
@@ -145,11 +149,11 @@ fn remove_blank_slides(input: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::format::Format;
     use crate::parser::MetaInformation;
     use crate::test_helpers::get_test_ast;
     use crate::test_helpers::get_test_metadata;
     use crate::tokenizer::Modifier;
-    use crate::format::Format;
 
     #[test]
     fn test_convert() {

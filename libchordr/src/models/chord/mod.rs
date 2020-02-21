@@ -1,15 +1,15 @@
-mod note;
 mod chords;
-mod transposition;
 pub mod fmt;
+mod note;
+mod transposition;
 
-use crate::error::Error;
-use crate::models::meta::BNotation;
-pub use self::note::Note;
 pub use self::chords::Chords;
 pub use self::fmt::NoteDisplay;
+pub use self::note::Note;
 pub use self::transposition::TransposableTrait;
+use crate::error::Error;
 use crate::models::chord::fmt::Formatting;
+use crate::models::meta::BNotation;
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct Chord {
@@ -45,8 +45,8 @@ impl Chord {
 
         let (node_raw, variant_raw) = Self::split_note_characters(value)?;
 
-//        println!("ch {:?}", first_non_node_part);
-//
+        //        println!("ch {:?}", first_non_node_part);
+        //
         let variant_raw_trimmed = variant_raw.trim();
         let variant = if variant_raw_trimmed.is_empty() {
             None
@@ -72,11 +72,16 @@ impl Chord {
         match chars[0] {
             'A' | 'H' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' => (),
             'a' | 'h' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' => (),
-            _ => return Err(Error::chord_error(format!("First character '{}' is not a note", chars[0])))
+            _ => {
+                return Err(Error::chord_error(format!(
+                    "First character '{}' is not a note",
+                    chars[0]
+                )))
+            }
         }
         let note_has_two_chars = match chars[1] {
             '♭' | 'b' | '♯' | '#' => true,
-            _ => false
+            _ => false,
         };
 
         let (node_raw, variant_raw) = if note_has_two_chars {
@@ -91,12 +96,12 @@ impl Chord {
         ))
     }
 
-//    fn to_string(&self, b_notation: BNotation, sn: SemitoneNotation) -> &str {
-//        match self.variant {
-//            Some(ref v) => format!("{}{}", NoteDisplay::to_string(&self.root, b_notation, sn), v).as_str(),
-//            None => format!("{}", NoteDisplay::to_string(&self.root, b_notation, sn)).as_str(),
-//        }
-//    }
+    //    fn to_string(&self, b_notation: BNotation, sn: SemitoneNotation) -> &str {
+    //        match self.variant {
+    //            Some(ref v) => format!("{}{}", NoteDisplay::to_string(&self.root, b_notation, sn), v).as_str(),
+    //            None => format!("{}", NoteDisplay::to_string(&self.root, b_notation, sn)).as_str(),
+    //        }
+    //    }
 }
 
 impl From<Note> for Chord {
@@ -122,7 +127,6 @@ impl NoteDisplay for Chord {
         }
     }
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -223,7 +227,6 @@ mod tests {
             (0, "E", Note::E),
             (0, "F", Note::F),
             (0, "B", Note::B),
-
             // +1
             (1, "C", Note::Cis),
             (1, "C#", Note::D),
@@ -233,7 +236,6 @@ mod tests {
             (1, "F", Note::Fis),
             (1, "A#", Note::B),
             (1, "B", Note::C),
-
             // +12 = +0
             (12, "C", Note::C),
             (12, "C#", Note::Cis),
@@ -242,7 +244,6 @@ mod tests {
             (12, "A", Note::A),
             (12, "A#", Note::Ais),
             (12, "B", Note::B),
-
             // +13 = +1
             (13, "C", Note::Cis),
             (13, "C#", Note::D),
@@ -250,7 +251,6 @@ mod tests {
             (13, "A", Note::Ais),
             (13, "A#", Note::B),
             (13, "B", Note::C),
-
             // +4
             (4, "C", Note::E),
             (4, "C#", Note::F),
@@ -259,7 +259,6 @@ mod tests {
             (4, "F#", Note::Ais),
             (4, "G", Note::B),
             (4, "B", Note::Dis),
-
             // -1
             (-1, "C", Note::B),
             (-1, "C#", Note::C),
@@ -267,7 +266,6 @@ mod tests {
             (-1, "F", Note::E),
             (-1, "F#", Note::F),
             (-1, "B", Note::Ais),
-
             // +11 = -1
             (11, "C", Note::B),
             (11, "C#", Note::C),
@@ -280,16 +278,36 @@ mod tests {
         ];
 
         for (semitones, input, expected_root) in &map {
-            let chord = Chord::try_from(input, BNotation::B).expect(&format!("Bad test data {}", input));
+            let chord =
+                Chord::try_from(input, BNotation::B).expect(&format!("Bad test data {}", input));
             let transposed = chord.transpose(*semitones);
-            assert_eq!(transposed.root, *expected_root, "Transpose failed for {:?} {}", input, semitones);
-            assert_eq!(transposed.variant, None, "Transpose changed the variant for {:?} {}", input, semitones);
+            assert_eq!(
+                transposed.root, *expected_root,
+                "Transpose failed for {:?} {}",
+                input, semitones
+            );
+            assert_eq!(
+                transposed.variant, None,
+                "Transpose changed the variant for {:?} {}",
+                input, semitones
+            );
         }
         for (semitones, input, expected_root) in &map {
-            let chord = Chord::try_from(&format!("{}dim", input), BNotation::B).expect(&format!("Bad test data {}", input));
+            let chord = Chord::try_from(&format!("{}dim", input), BNotation::B)
+                .expect(&format!("Bad test data {}", input));
             let transposed = chord.transpose(*semitones);
-            assert_eq!(transposed.root, *expected_root, "Transpose failed for {:?} {}", input, semitones);
-            assert_eq!(transposed.variant, Some("dim".to_owned()), "Transpose changed the variant for {:?} {}", input, semitones);
+            assert_eq!(
+                transposed.root, *expected_root,
+                "Transpose failed for {:?} {}",
+                input, semitones
+            );
+            assert_eq!(
+                transposed.variant,
+                Some("dim".to_owned()),
+                "Transpose changed the variant for {:?} {}",
+                input,
+                semitones
+            );
         }
     }
 }

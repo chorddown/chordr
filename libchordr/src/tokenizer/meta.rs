@@ -1,5 +1,5 @@
-use std::convert::TryFrom;
 use crate::models::meta::BNotation;
+use std::convert::TryFrom;
 
 /// Meta information gathered during tokenization
 ///
@@ -36,7 +36,9 @@ impl Meta {
             "tempo" => Some(Self::tempo(content)),
             "duration" => Some(Self::duration(content)),
             "capo" => Some(Self::capo(content)),
-            "bnotation" | "b_notation" | "b notation" | "b-notation" => Some(Self::b_notation(content)),
+            "bnotation" | "b_notation" | "b notation" | "b-notation" => {
+                Some(Self::b_notation(content))
+            }
             _ => None,
         }
     }
@@ -71,7 +73,7 @@ impl Meta {
             Self::Tempo(c) => c,
             Self::Duration(c) => c,
             Self::Capo(c) => c,
-            Self::BNotation(c) => c.as_str()
+            Self::BNotation(c) => c.as_str(),
         }
     }
 
@@ -120,12 +122,10 @@ impl Meta {
     }
 
     pub fn b_notation<S: AsRef<str>>(content: S) -> Self {
-        Self::BNotation(
-            match BNotation::try_from(content.as_ref()) {
-                Ok(n) => n,
-                Err(_) => Default::default()
-            }
-        )
+        Self::BNotation(match BNotation::try_from(content.as_ref()) {
+            Ok(n) => n,
+            Err(_) => Default::default(),
+        })
     }
 }
 
@@ -138,11 +138,9 @@ impl TryFrom<&str> for Meta {
             return Err(());
         }
 
-        match Self::from_keyword_and_content(
-            parts.get(0).unwrap(),
-            parts.get(1).unwrap()) {
+        match Self::from_keyword_and_content(parts.get(0).unwrap(), parts.get(1).unwrap()) {
             Some(p) => Ok(p),
-            None => Err(())
+            None => Err(()),
         }
     }
 }

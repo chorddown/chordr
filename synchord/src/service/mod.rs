@@ -1,15 +1,15 @@
 mod dropbox_service;
 mod file_entry;
-mod web_dav_service;
 mod service_config;
+mod web_dav_service;
 
-pub use self::service_config::ServiceConfig;
 pub use self::dropbox_service::DropboxService;
 pub use self::file_entry::FileEntry;
+pub use self::service_config::ServiceConfig;
 pub use self::web_dav_service::WebDAVService;
 use crate::error::{Error, Result};
-use std::path::Path;
 pub use crate::service::service_config::ServiceConfigTrait;
+use std::path::Path;
 
 pub trait ServiceTrait {
     fn list_files(&self) -> Result<Vec<FileEntry>>;
@@ -22,9 +22,14 @@ pub enum Services {
 }
 
 impl Services {
-    pub fn build_service_by_identifier<S: ServiceConfigTrait>(service_identifier: &str, service_config: &S) -> Result<Self> {
+    pub fn build_service_by_identifier<S: ServiceConfigTrait>(
+        service_identifier: &str,
+        service_config: &S,
+    ) -> Result<Self> {
         match service_identifier.to_lowercase().as_str() {
-            "dropbox" => Ok(Services::DropboxService(DropboxService::new(service_config.api_key()?))),
+            "dropbox" => Ok(Services::DropboxService(DropboxService::new(
+                service_config.api_key()?,
+            ))),
             "webdav" => Ok(Services::WebDAVService(WebDAVService::new(
                 service_config.url()?,
                 service_config.remote_directory()?,

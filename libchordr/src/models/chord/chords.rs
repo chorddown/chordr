@@ -1,7 +1,7 @@
-use crate::models::chord::{Chord, TransposableTrait, NoteDisplay};
-use crate::models::meta::BNotation;
 use crate::error::Error;
 use crate::models::chord::fmt::Formatting;
+use crate::models::chord::{Chord, NoteDisplay, TransposableTrait};
+use crate::models::meta::BNotation;
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 pub struct Chords(Chord, Option<Chord>);
@@ -44,7 +44,11 @@ impl NoteDisplay for Chords {
     fn note_format(&self, formatting: Formatting) -> String {
         match &self.1 {
             None => NoteDisplay::note_format(&self.0, formatting),
-            Some(c) => format!("{}/{}", NoteDisplay::note_format(&self.0, formatting), NoteDisplay::note_format(c, formatting)),
+            Some(c) => format!(
+                "{}/{}",
+                NoteDisplay::note_format(&self.0, formatting),
+                NoteDisplay::note_format(c, formatting)
+            ),
         }
     }
 }
@@ -157,7 +161,9 @@ mod tests {
         assert_eq!(chord.0.variant, None);
         assert!(chord.1.is_none());
 
-        let chord = Chords::try_from("C#madd2add4/B", BNotation::H).unwrap().transpose(3);
+        let chord = Chords::try_from("C#madd2add4/B", BNotation::H)
+            .unwrap()
+            .transpose(3);
         assert_eq!(chord.0.root, Note::E);
         assert_eq!(chord.0.variant, Some("madd2add4".to_owned()));
         assert!(chord.1.is_some());
@@ -165,7 +171,9 @@ mod tests {
         assert_eq!(chord1.root, Note::Cis);
         assert_eq!(chord1.variant, None);
 
-        let chord = Chords::try_from("Bbmaj7/C#m", BNotation::B).unwrap().transpose(-2);
+        let chord = Chords::try_from("Bbmaj7/C#m", BNotation::B)
+            .unwrap()
+            .transpose(-2);
         assert_eq!(chord.0.root, Note::Gis);
         assert_eq!(chord.0.variant, Some("maj7".to_owned()));
         assert!(chord.1.is_some());

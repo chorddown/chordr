@@ -1,9 +1,9 @@
 mod song_settings_map;
 
-use serde::{Deserialize, Serialize};
+use crate::format::Format;
 use crate::models::chord::fmt::Formatting;
 use crate::models::meta::{BNotation, SemitoneNotation};
-use crate::format::Format;
+use serde::{Deserialize, Serialize};
 pub use song_settings_map::SongSettingsMap;
 
 /// A structure of formatting and transpose settings for a song

@@ -1,8 +1,8 @@
-use crate::parser::section_type::SectionType;
-use crate::tokenizer::{Modifier, Token, Meta};
-use crate::models::meta::BNotation;
 use crate::error::Error;
 use crate::models::chord::{Chords, TransposableTrait};
+use crate::models::meta::BNotation;
+use crate::parser::section_type::SectionType;
+use crate::tokenizer::{Meta, Modifier, Token};
 use std::convert::TryFrom;
 
 #[derive(PartialOrd, PartialEq, Debug, Clone)]
@@ -26,7 +26,6 @@ pub enum Node {
     Newline,
 }
 
-
 #[allow(dead_code)]
 impl Node {
     pub(crate) fn section<S: Into<String>, T: Into<SectionType> + Into<Modifier>>(
@@ -49,10 +48,16 @@ impl Node {
     }
 
     pub(crate) fn chord_standalone<S: AsRef<str>>(value: S) -> Result<Self, Error> {
-        Ok(Node::ChordStandalone(Chords::try_from(value.as_ref(), BNotation::B)?))
+        Ok(Node::ChordStandalone(Chords::try_from(
+            value.as_ref(),
+            BNotation::B,
+        )?))
     }
 
-    pub(crate) fn chord_text_pair<S1: AsRef<str>, S2: Into<String>>(chords: S1, text: S2) -> Result<Self, Error> {
+    pub(crate) fn chord_text_pair<S1: AsRef<str>, S2: Into<String>>(
+        chords: S1,
+        text: S2,
+    ) -> Result<Self, Error> {
         let chords = Chords::try_from(chords.as_ref(), BNotation::B)?;
         let text = Token::literal(text);
 
@@ -62,7 +67,10 @@ impl Node {
     pub(crate) fn meta<S: AsRef<str>>(meta: S) -> Result<Self, Error> {
         match Meta::try_from(meta.as_ref()) {
             Ok(m) => Ok(Node::Meta(m)),
-            Err(_) => Err(Error::parser_error(format!("Invalid meta data given: '{}'", meta.as_ref())))
+            Err(_) => Err(Error::parser_error(format!(
+                "Invalid meta data given: '{}'",
+                meta.as_ref()
+            ))),
         }
     }
 
@@ -95,13 +103,11 @@ impl TransposableTrait for Node {
                 head,
                 section_type,
                 children,
-            } => {
-                Node::Section {
-                    head: head.clone(),
-                    section_type: section_type.clone(),
-                    children: (children.iter().map(|n| n.transpose(semitones)).collect()),
-                }
-            }
+            } => Node::Section {
+                head: head.clone(),
+                section_type: section_type.clone(),
+                children: (children.iter().map(|n| n.transpose(semitones)).collect()),
+            },
             _ => self.clone(),
         }
     }
