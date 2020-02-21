@@ -80,7 +80,7 @@ fn download(args: &ArgMatches) -> Result<()> {
     let service_config = build_service_config(args);
     let service = get_service(args, &service_config)?;
 
-    helper::download(service, service_config)?;
+    helper::download(&service, &service_config)?;
     Ok(())
 }
 

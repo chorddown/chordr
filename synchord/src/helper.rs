@@ -5,13 +5,13 @@ use std::path::{Path, PathBuf};
 use log::{debug, info, warn, error};
 
 
-pub fn download(service: Services, service_config: ServiceConfig) -> Result<Vec<FileEntry>> {
+pub fn download(service: &Services, service_config: &ServiceConfig) -> Result<Vec<FileEntry>> {
     let files = service.list_files()?;
     if files.len() == 0 {
         info!("No files found");
     }
     for file in &files {
-        let destination = destination_for_file(&file.path(), &service_config)?;
+        let destination = destination_for_file(&file.path(), service_config)?;
         if let Err(e) = check_if_should_download(file, &destination) {
             warn!("Skip download file {}: {}", file.path(), e)
         } else {
