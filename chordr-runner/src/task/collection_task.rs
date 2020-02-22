@@ -13,7 +13,7 @@ impl<'a> CollectionTask<'a> {
 }
 
 impl<'a> TaskTrait for CollectionTask<'a> {
-    fn with_configuration(_configuration: &Configuration) -> Result<Self, Error>
+    fn with_configuration(_configuration: Configuration) -> Result<Self, Error>
     where
         Self: std::marker::Sized,
     {

@@ -1,17 +1,30 @@
+mod abstract_service_config;
 mod dropbox_service;
 mod file_entry;
-mod service_config;
+mod service_configuration;
 mod web_dav_service;
 
+pub use self::abstract_service_config::AbstractServiceConfig;
+// pub use self::abstract_service_config::ServiceConfigTrait;
 pub use self::dropbox_service::DropboxService;
 pub use self::file_entry::FileEntry;
-pub use self::service_config::ServiceConfig;
+pub use self::service_configuration::ServiceConfigurationTrait;
+pub use self::service_identifier::ServiceIdentifier;
 pub use self::web_dav_service::WebDAVService;
 use crate::error::{Error, Result};
-pub use crate::service::service_config::ServiceConfigTrait;
 use std::path::Path;
 
+mod service_identifier;
+
 pub trait ServiceTrait {
+    type Configuration: ServiceConfigurationTrait;
+
+    /// Build a new Service instance from the [`Service`]'s [`Configuration`]
+    fn new(configuration: Self::Configuration) -> Result<Self>
+    where
+        Self: Sized;
+
+    fn identifier(&self) -> ServiceIdentifier;
     fn list_files(&self) -> Result<Vec<FileEntry>>;
     fn download(&self, file: FileEntry, destination: &Path) -> Result<()>;
 }
@@ -21,30 +34,34 @@ pub enum Services {
     WebDAVService(WebDAVService),
 }
 
-impl Services {
-    pub fn build_service_by_identifier<S: ServiceConfigTrait>(
-        service_identifier: &str,
-        service_config: &S,
-    ) -> Result<Self> {
-        match service_identifier.to_lowercase().as_str() {
-            "dropbox" => Ok(Services::DropboxService(DropboxService::new(
-                service_config.api_key()?,
-            ))),
-            "webdav" => Ok(Services::WebDAVService(WebDAVService::new(
-                service_config.url()?,
-                service_config.remote_directory()?,
-                service_config.username()?,
-                service_config.password()?,
+impl ServiceTrait for Services {
+    type Configuration = AbstractServiceConfig;
+
+    /// # Panics
+    ///
+    /// If `configuration` could not be converted into the requested [`Service`]'s Configuration
+    fn new(configuration: Self::Configuration) -> Result<Self> {
+        match configuration.identifier() {
+            ServiceIdentifier::Dropbox => Ok(Services::DropboxService(DropboxService::new(
+                <DropboxService as ServiceTrait>::Configuration::from_service_config(
+                    configuration,
+                )?,
             )?)),
-            _ => Err(Error::unknown_service_error(format!(
-                "Service {} is not implemented",
-                service_identifier
-            ))),
+            ServiceIdentifier::WebDAV => Ok(Services::WebDAVService(WebDAVService::new(
+                <WebDAVService as ServiceTrait>::Configuration::from_service_config(
+                    configuration,
+                )?,
+            )?)),
         }
     }
-}
 
-impl ServiceTrait for Services {
+    fn identifier(&self) -> ServiceIdentifier {
+        match self {
+            Services::DropboxService(service) => service.identifier(),
+            Services::WebDAVService(service) => service.identifier(),
+        }
+    }
+
     fn list_files(&self) -> Result<Vec<FileEntry>, Error> {
         match self {
             Services::DropboxService(service) => service.list_files(),

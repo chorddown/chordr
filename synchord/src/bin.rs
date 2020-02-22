@@ -11,6 +11,7 @@ use crate::prelude::*;
 use clap::{App, Arg, ArgMatches, SubCommand};
 use simplelog;
 use simplelog::TerminalMode;
+use std::convert::TryFrom;
 use std::env;
 use std::path::PathBuf;
 
@@ -77,8 +78,8 @@ fn main() {
 }
 
 fn download(args: &ArgMatches) -> Result<()> {
-    let service_config = build_service_config(args);
-    let service = get_service(args, &service_config)?;
+    let service_config = build_service_config(args)?;
+    let service = Services::new(service_config.clone())?;
 
     helper::download(&service, &service_config)?;
     Ok(())
@@ -129,25 +130,18 @@ fn get_password(args: &ArgMatches) -> Result<String> {
     }
 }
 
-fn get_service(args: &ArgMatches, service_config: &ServiceConfig) -> Result<Services> {
+fn build_service_config(args: &ArgMatches) -> Result<AbstractServiceConfig> {
     let service_identifier = args.value_of("SERVICE").unwrap();
 
-    Services::build_service_by_identifier(service_identifier, service_config)
-}
-
-fn get_local_directory(args: &ArgMatches) -> Result<PathBuf> {
-    Ok(PathBuf::from(args.value_of("OUTPUT").unwrap()))
-}
-
-fn build_service_config(args: &ArgMatches) -> ServiceConfig {
-    ServiceConfig::new(
+    Ok(AbstractServiceConfig::build(
         get_api_key(args),
         get_url(args),
         get_remote_directory(args),
         get_username(args),
         get_password(args),
-        get_local_directory(args),
-    )
+        PathBuf::from(args.value_of("OUTPUT").unwrap()),
+        ServiceIdentifier::try_from(service_identifier)?,
+    ))
 }
 
 fn configure_logging(matches: &ArgMatches<'_>) -> Result<()> {

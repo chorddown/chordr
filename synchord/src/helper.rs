@@ -4,7 +4,10 @@ use chrono::{DateTime, Utc};
 use log::{debug, error, info, warn};
 use std::path::{Path, PathBuf};
 
-pub fn download(service: &Services, service_config: &ServiceConfig) -> Result<Vec<FileEntry>> {
+pub fn download(
+    service: &Services,
+    service_config: &AbstractServiceConfig,
+) -> Result<Vec<FileEntry>> {
     let files = service.list_files()?;
     if files.len() == 0 {
         info!("No files found");
@@ -52,7 +55,7 @@ pub fn check_if_should_download(source: &FileEntry, destination: &Path) -> Resul
     }
 }
 
-fn destination_for_file<P: AsRef<Path>, S: ServiceConfigTrait>(
+fn destination_for_file<P: AsRef<Path>, S: ServiceConfigurationTrait>(
     file: &P,
     service_config: &S,
 ) -> Result<PathBuf> {
@@ -67,10 +70,10 @@ fn destination_for_file<P: AsRef<Path>, S: ServiceConfigTrait>(
     }
 }
 
-fn get_output_path<S: ServiceConfigTrait>(service_config: &S) -> Result<PathBuf> {
-    let output_path = service_config.local_directory()?;
+fn get_output_path<S: ServiceConfigurationTrait>(service_config: &S) -> Result<PathBuf> {
+    let output_path = service_config.local_directory();
     if output_path.is_dir() {
-        return Ok(output_path);
+        return Ok(output_path.to_path_buf());
     }
 
     let output_path_string = output_path.to_str().map_or_else(

@@ -43,6 +43,10 @@ impl Error {
         Error::new(Kind::XMLParserError(description.into()))
     }
 
+    pub fn url_error<S: Into<String>>(description: S) -> Self {
+        Error::new(Kind::UrlError(description.into()))
+    }
+
     fn new(kind: Kind) -> Self {
         Error { inner: kind }
     }
@@ -97,6 +101,11 @@ impl From<::chrono::format::ParseError> for Error {
         Error::xml_parser_error(format!("{}", error))
     }
 }
+impl From<::url::ParseError> for Error {
+    fn from(error: ::url::ParseError) -> Self {
+        Error::url_error(format!("{}", error))
+    }
+}
 
 //impl From<&Error> for Error {
 //    fn from(error: &Error) -> Self {
@@ -128,6 +137,9 @@ enum Kind {
     /// Error during XML parsing
     XMLParserError(String),
 
+    /// Error during URL parsing
+    UrlError(String),
+
     /// Unknown/uncategorized error
     UnknownError(String),
 }
@@ -144,6 +156,7 @@ impl Display for Kind {
             Kind::InvalidArgumentError(s) => write!(f, "Invalid argument error: {}", s),
             Kind::IoError(s) => write!(f, "IO error: {}", s),
             Kind::XMLParserError(s) => write!(f, "XML parser error: {}", s),
+            Kind::UrlError(s) => write!(f, "URL error: {}", s),
             Kind::UnknownError(s) => write!(f, "Unknown error: {}", s),
         }
     }

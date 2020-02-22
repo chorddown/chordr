@@ -20,8 +20,11 @@ log = "0.4.8"
 simplelog = "^0.6.0"
 chrono = "^0.4.10"
 hyperdav = "0.2.0"
+url = "~1.7"
 reqwest = "0.8"
 xml-rs = "0.3"
+serde = {version ="^1.0", features = ["derive"]}
+serde_derive = "^1.0"
 
 [dependencies.dropbox-sdk]
 version = "*"

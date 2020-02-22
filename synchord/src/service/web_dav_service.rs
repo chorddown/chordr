@@ -3,44 +3,24 @@ mod propfind_parser;
 use self::propfind_parser::parse_propfind_response;
 use crate::error::{Error, Result};
 use crate::service::file_entry::FileEntry;
-use crate::service::ServiceTrait;
+use crate::service::{
+    AbstractServiceConfig, ServiceConfigurationTrait, ServiceIdentifier, ServiceTrait,
+};
 use hyperdav::Client;
-use reqwest::{Method, Response, StatusCode};
+use reqwest::{Method, Response, StatusCode, Url};
 use std::borrow::Cow;
 use std::fs::File;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 pub struct WebDAVService {
     client: Client,
-    url: CowStr,
+    url: Url,
     remote_directory: CowStr,
 }
 
 type CowStr = Cow<'static, str>;
 
 impl WebDAVService {
-    pub fn new<S: Into<CowStr>, U: Into<CowStr>>(
-        url: U,
-        remote_directory: S,
-        username: S,
-        password: S,
-    ) -> Result<Self> {
-        let url = url.into();
-        let client = match Client::new()
-            .credentials(username.into(), password.into())
-            .build(url.as_ref())
-        {
-            Ok(c) => c,
-            Err(e) => return Err(Error::invalid_argument_error(format!("{}", e))),
-        };
-
-        Ok(Self {
-            url,
-            client,
-            remote_directory: remote_directory.into(),
-        })
-    }
-
     /// List files in a directory on the WebDAV server.
     ///
     /// This method fails if the passed path doesn't exist on the WebDAV server.
@@ -85,8 +65,8 @@ impl WebDAVService {
             .split_terminator('/')
             .filter(|s| !s.is_empty())
             .collect();
-        let url_parts: Vec<&str> = self
-            .url
+        let url_as_string = self.url.to_string();
+        let url_parts: Vec<&str> = url_as_string
             .split_terminator('/')
             .filter(|s| !s.is_empty())
             .collect();
@@ -122,7 +102,64 @@ impl WebDAVService {
     }
 }
 
+pub struct WebDAVServiceConfiguration {
+    url: CowStr,
+    remote_directory: CowStr,
+    username: CowStr,
+    password: CowStr,
+    local_directory: PathBuf,
+}
+
+impl ServiceConfigurationTrait for WebDAVServiceConfiguration {
+    fn from_service_config(service_config: AbstractServiceConfig) -> Result<Self, Error>
+    where
+        Self: Sized,
+    {
+        Ok(Self {
+            url: service_config.url()?.into(),
+            remote_directory: service_config.remote_directory()?.into(),
+            username: service_config.username()?.into(),
+            password: service_config.password()?.into(),
+            local_directory: service_config.local_directory().to_path_buf(),
+        })
+    }
+
+    fn identifier(&self) -> ServiceIdentifier {
+        ServiceIdentifier::WebDAV
+    }
+
+    fn local_directory(&self) -> &Path {
+        self.local_directory.as_path()
+    }
+}
+
 impl ServiceTrait for WebDAVService {
+    type Configuration = WebDAVServiceConfiguration;
+
+    fn new(configuration: Self::Configuration) -> Result<Self, Error> {
+        let url: Url = Url::parse(configuration.url.as_ref())?;
+        let client_result = Client::new()
+            .credentials(
+                configuration.username,
+                configuration.password,
+            )
+            .build(url.as_ref());
+        let client = match client_result {
+            Ok(c) => c,
+            Err(e) => return Err(Error::invalid_argument_error(format!("{}", e))),
+        };
+
+        Ok(Self {
+            url,
+            client,
+            remote_directory: configuration.remote_directory,
+        })
+    }
+
+    fn identifier(&self) -> ServiceIdentifier {
+        ServiceIdentifier::WebDAV
+    }
+
     fn list_files(&self) -> Result<Vec<FileEntry>, Error> {
         self.list(self.remote_directory.split('/').collect::<Vec<&str>>())
     }

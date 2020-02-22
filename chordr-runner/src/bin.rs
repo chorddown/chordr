@@ -61,8 +61,8 @@ fn run() -> Result<()> {
 
 fn start_loop(configuration: &Configuration) -> Result<()> {
     let sleep_interval = time::Duration::from_secs(configuration.service.sync_interval);
-    let download_task = DownloadTask::with_configuration(&configuration)?;
-    let build_catalog_task = BuildCatalogTask::with_configuration(&configuration)?;
+    let download_task = DownloadTask::with_configuration(configuration.clone())?;
+    let build_catalog_task = BuildCatalogTask::with_configuration(configuration.clone())?;
 
     let collection_task = CollectionTask::new(vec![&download_task, &build_catalog_task]);
     info!(

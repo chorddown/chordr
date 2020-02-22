@@ -1,0 +1,9 @@
+{
+  "catalog_file": "/tmp/path/to/catalog-file.json",
+  "output_directory": "/tmp/path/to/download/chorddown-files",
+  "service": {
+    "identifier": "Dropbox",
+    "api_token": "MY_API_TOKEN",
+    "sync_interval": 34
+  }
+}

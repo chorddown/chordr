@@ -11,14 +11,14 @@ pub struct BuildCatalogTask {
 }
 
 impl TaskTrait for BuildCatalogTask {
-    fn with_configuration(configuration: &Configuration) -> Result<Self, Error>
+    fn with_configuration(configuration: Configuration) -> Result<Self, Error>
     where
         Self: std::marker::Sized,
     {
         let catalog_builder = CatalogBuilder::new();
         Ok(Self {
             catalog_builder,
-            configuration: configuration.clone(),
+            configuration
         })
     }
 }

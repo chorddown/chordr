@@ -2,19 +2,19 @@ use super::{RecurringTaskTrait, TaskTrait};
 use crate::configuration::Configuration;
 use crate::error::Result;
 use libsynchord::error::Error as SynchordError;
-use libsynchord::prelude::{ServiceConfig, Services};
+use libsynchord::prelude::{AbstractServiceConfig, Services, ServiceTrait, ServiceConfigurationTrait};
 use log::info;
 use std::env;
 
 pub struct DownloadTask {
-    service_config: ServiceConfig,
+    service_config: AbstractServiceConfig,
     service: Services,
 }
 
 impl TaskTrait for DownloadTask {
-    fn with_configuration(configuration: &Configuration) -> Result<Self> {
+    fn with_configuration(configuration: Configuration) -> Result<Self> {
         let service_config = build_service_config(configuration);
-        let service = get_service(configuration, &service_config)?;
+        let service = get_service(service_config.clone())?;
 
         Ok(Self {
             service_config,
@@ -25,39 +25,42 @@ impl TaskTrait for DownloadTask {
 
 impl RecurringTaskTrait for DownloadTask {
     fn run(&self) -> Result<()> {
-        info!("Run Download Task");
+        info!(
+            "Run Download Task: Download files using service {} to {}",
+            self.service.identifier(),
+            self.service_config.local_directory().display()
+        );
         libsynchord::helper::download(&self.service, &self.service_config)?;
 
         Ok(())
     }
 }
 
-fn get_service(configuration: &Configuration, service_config: &ServiceConfig) -> Result<Services> {
-    Ok(Services::build_service_by_identifier(
-        &configuration.service.identifier.to_string(),
-        service_config,
-    )?)
+fn get_service(service_config: AbstractServiceConfig) -> Result<Services> {
+    Ok(Services::new(service_config)?)
 }
 
-fn build_service_config(configuration: &Configuration) -> ServiceConfig {
-    let api_token = if !(configuration.service.api_token.trim().is_empty()) {
-        Ok(configuration.service.api_token.trim().to_owned())
-    } else {
-        get_api_key()
+fn build_service_config(configuration: Configuration) -> AbstractServiceConfig {
+    let api_token = match &configuration.service.api_token {
+        Some(v) if !v.trim().is_empty() => Ok(v.to_owned()),
+        Some(_) => get_api_key(),
+        None => get_api_key(),
     };
 
-    let password = if !(configuration.service.password.trim().is_empty()) {
-        Ok(configuration.service.password.trim().to_owned())
-    } else {
-        get_password()
+    let password = match &configuration.service.password {
+        Some(v) if !v.trim().is_empty() => Ok(v.to_owned()),
+        Some(_) => get_password(),
+        None => get_password(),
     };
-    ServiceConfig::new(
+
+    AbstractServiceConfig::build(
         api_token,
-        Ok(configuration.service.url.clone()),
-        Ok(configuration.service.remote_directory.clone()),
-        Ok(configuration.service.username.clone()),
+        configuration.service.url.ok_or(SynchordError::missing_argument_error("URL")),
+        configuration.service.remote_directory.ok_or(SynchordError::missing_argument_error("Remote-directory")),
+        configuration.service.username.ok_or(SynchordError::missing_argument_error("Username")),
         password,
-        Ok(configuration.output_directory.clone()),
+        configuration.output_directory.clone(),
+        configuration.service.identifier,
     )
 }
 

@@ -1,25 +1,21 @@
 use crate::error::{Error, Result};
 use crate::service::file_entry::FileEntry;
-use crate::service::ServiceTrait;
+use crate::service::{
+    AbstractServiceConfig, ServiceConfigurationTrait, ServiceIdentifier, ServiceTrait,
+};
 use chrono::DateTime;
 use dropbox_sdk::files::{DownloadArg, FileMetadata, ListFolderArg, Metadata};
 use std::convert::TryFrom;
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 pub struct DropboxService {
     http_client: Box<dyn dropbox_sdk::client_trait::HttpClient>,
 }
 
 impl DropboxService {
-    pub fn new<S: Into<String>>(api_key: S) -> Self {
-        Self {
-            http_client: Box::new(dropbox_sdk::HyperClient::new(api_key.into())),
-        }
-    }
-
     fn fetch_file_stream(&self, file: String) -> Result<Box<dyn Read>> {
         let request_argument = DownloadArg::new(file);
         let result = dropbox_sdk::files::download(
@@ -36,7 +32,44 @@ impl DropboxService {
     }
 }
 
+pub struct DropboxServiceConfiguration {
+    api_key: String,
+    local_directory: PathBuf,
+}
+
+impl ServiceConfigurationTrait for DropboxServiceConfiguration {
+    fn from_service_config(service_config: AbstractServiceConfig) -> Result<Self> {
+        Ok(Self {
+            api_key: service_config.api_key()?,
+            local_directory: service_config.local_directory().to_path_buf(),
+        })
+    }
+
+    fn identifier(&self) -> ServiceIdentifier {
+        ServiceIdentifier::Dropbox
+    }
+
+    fn local_directory(&self) -> &Path {
+        self.local_directory.as_path()
+    }
+}
+
 impl ServiceTrait for DropboxService {
+    type Configuration = DropboxServiceConfiguration;
+
+    fn new(configuration: Self::Configuration) -> Result<Self>
+    where
+        Self: Sized,
+    {
+        Ok(Self {
+            http_client: Box::new(dropbox_sdk::HyperClient::new(configuration.api_key)),
+        })
+    }
+
+    fn identifier(&self) -> ServiceIdentifier {
+        ServiceIdentifier::Dropbox
+    }
+
     /// List files inside "Apps/synchord"
     ///
     /// Once a new App has been created inside the Dropbox developer UI the token can be retrieved

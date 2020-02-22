@@ -77,11 +77,9 @@ fn get_file_reader(path: &Path) -> Result<BufReader<File>, Error> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::configuration::ServiceIdentifier;
+    use libsynchord::prelude::ServiceIdentifier;
 
-    fn assert_valid_configuration(result: Result<Configuration, Error>) {
-        assert!(result.is_ok(), result.unwrap_err().to_string());
-
+    fn assert_valid_mandatory_configuration(result: Result<Configuration, Error>) -> Configuration {
         let configuration = result.unwrap();
         assert_eq!(
             configuration.catalog_file.to_string_lossy(),
@@ -91,12 +89,39 @@ mod test {
             configuration.output_directory.to_string_lossy(),
             "/tmp/path/to/download/chorddown-files"
         );
+        configuration
+    }
+
+    fn assert_valid_configuration(result: Result<Configuration, Error>) {
+        assert!(result.is_ok(), result.unwrap_err().to_string());
+
+        let configuration = assert_valid_mandatory_configuration(result);
+        assert_valid_webdav_configuration_values(configuration.clone());
         assert_eq!(configuration.service.identifier, ServiceIdentifier::WebDAV);
-        assert_eq!(configuration.service.api_token, "MY_API_TOKEN");
-        assert_eq!(configuration.service.username, "this-is-me");
-        assert_eq!(configuration.service.password, "123-easy");
-        assert_eq!(configuration.service.url, "https://mycloud.example.com");
-        assert_eq!(configuration.service.remote_directory, "remote-dir");
+        assert_eq!(configuration.service.api_token.unwrap(), "MY_API_TOKEN");
+    }
+
+    fn assert_valid_dropbox_configuration(result: Result<Configuration, Error>) {
+        assert!(result.is_ok(), result.unwrap_err().to_string());
+
+        let configuration = assert_valid_mandatory_configuration(result);
+        assert_eq!(configuration.service.identifier, ServiceIdentifier::Dropbox);
+        assert_eq!(configuration.service.api_token.unwrap(), "MY_API_TOKEN");
+    }
+
+    fn assert_valid_webdav_configuration(result: Result<Configuration, Error>) {
+        assert!(result.is_ok(), result.unwrap_err().to_string());
+
+        let configuration = assert_valid_mandatory_configuration(result);
+        assert_valid_webdav_configuration_values(configuration);
+    }
+
+    fn assert_valid_webdav_configuration_values(configuration: Configuration) {
+        assert_eq!(configuration.service.identifier, ServiceIdentifier::WebDAV);
+        assert_eq!(configuration.service.username.unwrap(), "this-is-me");
+        assert_eq!(configuration.service.password.unwrap(), "123-easy");
+        assert_eq!(configuration.service.url.unwrap(), "https://mycloud.example.com");
+        assert_eq!(configuration.service.remote_directory.unwrap(), "remote-dir");
         assert_eq!(configuration.service.sync_interval, 34);
     }
 
@@ -138,6 +163,24 @@ mod test {
             env!("CARGO_MANIFEST_DIR")
         )));
         assert_valid_configuration(result);
+    }
+
+    #[test]
+    fn read_dropbox_configuration_from_file() {
+        let result = Reader::read_configuration_from_file(&Path::new(&format!(
+            "{}/tests/resources/configuration-dropbox.json",
+            env!("CARGO_MANIFEST_DIR")
+        )));
+        assert_valid_dropbox_configuration(result);
+    }
+
+    #[test]
+    fn read_webdav_configuration_from_file() {
+        let result = Reader::read_configuration_from_file(&Path::new(&format!(
+            "{}/tests/resources/configuration-webdav.json",
+            env!("CARGO_MANIFEST_DIR")
+        )));
+        assert_valid_webdav_configuration(result);
     }
 
     #[test]
