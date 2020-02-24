@@ -1,9 +1,9 @@
-mod chord_down_tokenizer;
+mod chorddown_tokenizer;
 mod meta;
 mod modifier;
 mod token;
 
-use self::chord_down_tokenizer::ChordDownTokenizer;
+use self::chorddown_tokenizer::ChorddownTokenizer;
 pub use self::meta::Meta;
 pub use self::modifier::Modifier;
 pub use self::token::Token;
@@ -34,5 +34,5 @@ pub trait Tokenizer {
 
 /// Build a new Tokenizer instance
 pub fn build_tokenizer() -> impl Tokenizer {
-    ChordDownTokenizer::new()
+    ChorddownTokenizer::new()
 }

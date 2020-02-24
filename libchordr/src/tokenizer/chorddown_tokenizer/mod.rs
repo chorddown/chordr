@@ -1,20 +1,20 @@
 mod mode;
 
-use crate::tokenizer::chord_down_tokenizer::mode::ModePartner;
+use crate::tokenizer::chorddown_tokenizer::mode::ModePartner;
 use crate::tokenizer::modifier::Modifier;
 use crate::tokenizer::{Meta, Token, Tokenizer};
 use mode::Mode;
 use std::convert::TryFrom;
 
-pub(crate) struct ChordDownTokenizer {}
+pub(crate) struct ChorddownTokenizer {}
 
-impl ChordDownTokenizer {
+impl ChorddownTokenizer {
     pub fn new() -> Self {
         Self {}
     }
 }
 
-impl Tokenizer for ChordDownTokenizer {
+impl Tokenizer for ChorddownTokenizer {
     fn tokenize_line(&self, line: &str) -> Option<Vec<Token>> {
         if line.trim().is_empty() {
             return None;
@@ -126,7 +126,7 @@ mod tests {
     #[test]
     fn test_tokenize_long() {
         let content = include_str!("../../../tests/resources/swing_low_sweet_chariot.chorddown");
-        let token_lines = ChordDownTokenizer::new().tokenize(content);
+        let token_lines = ChorddownTokenizer::new().tokenize(content);
         assert_eq!(token_lines, get_test_tokens());
     }
 
@@ -137,7 +137,7 @@ Composer: Daniel Corn
 Artist: The Fantastic Corns
 Key: Cm
 ";
-        let token_lines = ChordDownTokenizer::new().tokenize(content);
+        let token_lines = ChorddownTokenizer::new().tokenize(content);
         assert_eq!(token_lines.len(), 3);
         let tokens = token_lines_to_tokens(token_lines);
 
@@ -157,7 +157,7 @@ Key: Cm
 
     #[test]
     fn test_tokenize_meta_b_notation() {
-        let tokenizer = ChordDownTokenizer::new();
+        let tokenizer = ChorddownTokenizer::new();
         // H
         {
             let token_lines = tokenizer.tokenize("B Notation: H");
