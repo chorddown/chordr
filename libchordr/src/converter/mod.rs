@@ -60,7 +60,7 @@ mod tests {
     #[test]
     fn test_convert() {
         let content = include_str!("../../tests/resources/swing_low_sweet_chariot.html");
-        let result = Parser::new().parse(token_lines_to_tokens(get_test_tokens()));
+        let result = Parser::new().parse(get_test_tokens());
         assert!(result.is_ok());
         let parser_result = result.unwrap();
         let result = Converter::new().convert(

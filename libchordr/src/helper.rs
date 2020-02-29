@@ -6,6 +6,7 @@ use crate::models::song_meta_trait::SongMetaTrait;
 use crate::parser::{Parser, ParserResult, ParserTrait};
 use crate::tokenizer::{build_tokenizer, Token, TokenLine, Tokenizer};
 
+#[deprecated(note = "Please use the `Token`s directly")]
 pub fn token_lines_to_tokens(token_lines: Vec<TokenLine>) -> Vec<Token> {
     let mut stream = vec![];
     for line in token_lines {
@@ -19,7 +20,7 @@ pub fn token_lines_to_tokens(token_lines: Vec<TokenLine>) -> Vec<Token> {
 
 pub fn parse_content(contents: &str) -> Result<ParserResult> {
     let tokens = build_tokenizer().tokenize(contents);
-    Parser::new().parse(token_lines_to_tokens(tokens))
+    Parser::new().parse(tokens)
 }
 
 pub fn transpose_content(contents: &str, semitones: isize) -> Result<ParserResult> {

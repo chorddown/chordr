@@ -144,3 +144,11 @@ impl TryFrom<&str> for Meta {
         }
     }
 }
+
+impl TryFrom<&String> for Meta {
+    type Error = ();
+
+    fn try_from(value: &String) -> Result<Self, Self::Error> {
+        TryFrom::try_from(value.as_str())
+    }
+}

@@ -10,6 +10,7 @@ pub struct ChorddownConverter {}
 
 impl ConverterTrait for ChorddownConverter {
     fn convert(&self, node: &Node, meta: &dyn MetaTrait, formatting: Formatting) -> Result<String> {
+        // return Ok(cleanup_output(&self.build_node(node, formatting)?));
         let output = format!(
             "{}{}{}",
             self.build_title(meta),
@@ -154,7 +155,7 @@ impl ChorddownConverter {
 }
 
 fn cleanup_output(output: &str) -> String {
-    format!("{}\n", remove_double_blank_lines(output).trim_end())
+    format!("{}\n", remove_double_blank_lines(output).trim())
 }
 
 fn remove_double_blank_lines(input: &str) -> String {
@@ -170,9 +171,8 @@ mod tests {
     use super::*;
     use crate::format::Format;
     use crate::parser::MetaInformation;
-    use crate::test_helpers::get_test_ast;
+    use crate::test_helpers::{get_test_ast, get_test_ast_with_quote, get_test_ast_w_inline_metadata};
     use crate::test_helpers::get_test_metadata;
-    use crate::tokenizer::Modifier;
 
     #[test]
     fn test_convert() {
@@ -189,9 +189,7 @@ mod tests {
         assert_eq!(
             source,
             //v-- The title is read from the parsed Meta Data. Here none was provided
-            r"
-
-##! Chorus
+            r"##! Chorus
 Swing [D]low, sweet [G]chari[D]ot,
 Comin’ for to carry me [A7]home.
 Swing [D7]low, sweet [G]chari[D]ot,
@@ -251,30 +249,7 @@ Comin’ for to [A7]carry me [D]home.
     #[test]
     fn test_convert_w_inline_metadata() {
         let converter = ChorddownConverter {};
-        let ast = Node::Document(vec![
-            Node::section(
-                1,
-                "Swing Low Sweet Chariot",
-                Modifier::None,
-                vec![Node::newline()],
-            ),
-            Node::meta("Artist: The Fantastic Corns").unwrap(),
-            Node::newline(),
-            Node::meta("Composer: Daniel Corn").unwrap(),
-            Node::newline(),
-            Node::section(
-                2,
-                "Chorus",
-                Modifier::Chorus,
-                vec![
-                    Node::newline(),
-                    Node::text("Swing "),
-                    Node::chord_text_pair("D", "low, sweet ").unwrap(),
-                    Node::chord_text_pair("G", "chari").unwrap(),
-                    Node::chord_text_pair("D", "ot.").unwrap(),
-                ],
-            ),
-        ]);
+        let ast = get_test_ast_w_inline_metadata();
         let result = converter.convert(
             &ast,
             &get_test_metadata(),
@@ -304,28 +279,7 @@ Swing [D]low, sweet [G]chari[D]ot.
     #[test]
     fn test_convert_w_content_after_quote() {
         let converter = ChorddownConverter {};
-        let ast = Node::Document(vec![
-            Node::section(
-                1,
-                "Swing Low Sweet Chariot",
-                Modifier::None,
-                vec![Node::newline()],
-            ),
-            Node::quote("Play slowly"),
-            Node::newline(),
-            Node::section(
-                2,
-                "Chorus",
-                Modifier::Chorus,
-                vec![
-                    Node::newline(),
-                    Node::text("Swing "),
-                    Node::chord_text_pair("D", "low, sweet ").unwrap(),
-                    Node::chord_text_pair("G", "chari").unwrap(),
-                    Node::chord_text_pair("D", "ot.").unwrap(),
-                ],
-            ),
-        ]);
+        let ast = get_test_ast_with_quote();
         let result = converter.convert(
             &ast,
             &MetaInformation::default(),
@@ -337,10 +291,7 @@ Swing [D]low, sweet [G]chari[D]ot.
 
         assert_eq!(
             source,
-            //v-- The title is read from the parsed Meta Data
-            r#"
-
-> Play slowly
+            r#"> Play slowly
 
 ##! Chorus
 Swing [D]low, sweet [G]chari[D]ot.

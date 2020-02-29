@@ -71,7 +71,7 @@ mod tests {
 
     #[test]
     fn test_convert() {
-        let node = Parser::new().parse(token_lines_to_tokens(get_test_tokens()));
+        let node = Parser::new().parse(get_test_tokens());
         let result = PdfConverter::new().convert(
             node.unwrap().node_as_ref(),
             &MetaInformation::default(),

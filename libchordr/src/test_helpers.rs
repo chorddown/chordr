@@ -1,94 +1,8 @@
 use crate::models::meta::BNotation;
 use crate::parser::{MetaInformation, Node};
-use crate::tokenizer::{Modifier, Token, TokenLine};
+use crate::tokenizer::{Modifier, Token};
 
 #[cfg(test)]
-pub fn get_test_tokens() -> Vec<TokenLine> {
-    vec![
-        vec![
-            Token::headline(1, "Swing Low Sweet Chariot", Modifier::None),
-            Token::newline(),
-        ],
-        vec![
-            Token::headline(2, "Chorus", Modifier::Chorus),
-            Token::newline(),
-        ],
-        vec![
-            Token::literal("Swing "),
-            Token::chord("D"),
-            Token::literal("low, sweet "),
-            Token::chord("G"),
-            Token::literal("chari"),
-            Token::chord("D"),
-            Token::literal("ot,"),
-            Token::newline(),
-        ],
-        vec![
-            Token::literal("Comin’ for to carry me "),
-            Token::chord("A7"),
-            Token::literal("home."),
-            Token::newline(),
-        ],
-        vec![
-            Token::literal("Swing "),
-            Token::chord("D7"),
-            Token::literal("low, sweet "),
-            Token::chord("G"),
-            Token::literal("chari"),
-            Token::chord("D"),
-            Token::literal("ot,"),
-            Token::newline(),
-        ],
-        vec![
-            Token::literal("Comin’ for to "),
-            Token::chord("A7"),
-            Token::literal("carry me "),
-            Token::chord("D"),
-            Token::literal("home."),
-            Token::newline(),
-        ],
-        vec![
-            Token::headline(2, "Verse 1", Modifier::None),
-            Token::newline(),
-        ],
-        vec![
-            Token::literal("I "),
-            Token::chord("D"),
-            Token::literal("looked over Jordan, and "),
-            Token::chord("G"),
-            Token::literal("what did I "),
-            Token::chord("D"),
-            Token::literal("see,"),
-            Token::newline(),
-        ],
-        vec![
-            Token::literal("Comin’ for to carry me "),
-            Token::chord("A7"),
-            Token::literal("home."),
-            Token::newline(),
-        ],
-        vec![
-            Token::literal("A "),
-            Token::chord("D"),
-            Token::literal("band of angels "),
-            Token::chord("G"),
-            Token::literal("comin’ after "),
-            Token::chord("D"),
-            Token::literal("me,"),
-            Token::newline(),
-        ],
-        vec![
-            Token::literal("Comin’ for to "),
-            Token::chord("A7"),
-            Token::literal("carry me "),
-            Token::chord("D"),
-            Token::literal("home."),
-            Token::newline(),
-        ],
-        vec![Token::quote("Chorus"), Token::newline()],
-    ]
-}
-
 pub fn get_test_parser_input() -> Vec<Token> {
     vec![
         Token::headline(1, "Swing Low Sweet Chariot", Modifier::None),
@@ -118,6 +32,75 @@ pub fn get_test_parser_input() -> Vec<Token> {
         Token::newline(),
         Token::chord("B"),
         Token::chord("H"),
+    ]
+}
+
+pub fn get_test_tokens() -> Vec<Token> {
+    vec![
+        Token::headline(1, "Swing Low Sweet Chariot", Modifier::None),
+        Token::newline(),
+        Token::newline(),
+        Token::headline(2, "Chorus", Modifier::Chorus),
+        Token::newline(),
+        Token::literal("Swing "),
+        Token::chord("D"),
+        Token::literal("low, sweet "),
+        Token::chord("G"),
+        Token::literal("chari"),
+        Token::chord("D"),
+        Token::literal("ot,"),
+        Token::newline(),
+        Token::literal("Comin’ for to carry me "),
+        Token::chord("A7"),
+        Token::literal("home."),
+        Token::newline(),
+        Token::literal("Swing "),
+        Token::chord("D7"),
+        Token::literal("low, sweet "),
+        Token::chord("G"),
+        Token::literal("chari"),
+        Token::chord("D"),
+        Token::literal("ot,"),
+        Token::newline(),
+        Token::literal("Comin’ for to "),
+        Token::chord("A7"),
+        Token::literal("carry me "),
+        Token::chord("D"),
+        Token::literal("home."),
+        Token::newline(),
+        Token::newline(),
+        Token::newline(),
+        Token::headline(2, "Verse 1", Modifier::None),
+        Token::newline(),
+        Token::newline(),
+        Token::literal("I "),
+        Token::chord("D"),
+        Token::literal("looked over Jordan, and "),
+        Token::chord("G"),
+        Token::literal("what did I "),
+        Token::chord("D"),
+        Token::literal("see,"),
+        Token::newline(),
+        Token::literal("Comin’ for to carry me "),
+        Token::chord("A7"),
+        Token::literal("home."),
+        Token::newline(),
+        Token::literal("A "),
+        Token::chord("D"),
+        Token::literal("band of angels "),
+        Token::chord("G"),
+        Token::literal("comin’ after "),
+        Token::chord("D"),
+        Token::literal("me,"),
+        Token::newline(),
+        Token::literal("Comin’ for to "),
+        Token::chord("A7"),
+        Token::literal("carry me "),
+        Token::chord("D"),
+        Token::literal("home."),
+        Token::newline(),
+        Token::newline(),
+        Token::quote("Chorus"), Token::newline(),
     ]
 }
 
@@ -181,6 +164,58 @@ pub fn get_test_ast() -> Node {
         ),
         Node::quote("Chorus"),
         Node::newline(),
+    ])
+}
+
+pub fn get_test_ast_with_quote() -> Node {
+    Node::Document(vec![
+        Node::section(
+            1,
+            "Swing Low Sweet Chariot",
+            Modifier::None,
+            vec![Node::newline()],
+        ),
+        Node::quote("Play slowly"),
+        Node::newline(),
+        Node::section(
+            2,
+            "Chorus",
+            Modifier::Chorus,
+            vec![
+                Node::newline(),
+                Node::text("Swing "),
+                Node::chord_text_pair("D", "low, sweet ").unwrap(),
+                Node::chord_text_pair("G", "chari").unwrap(),
+                Node::chord_text_pair("D", "ot.").unwrap(),
+            ],
+        ),
+    ])
+}
+
+pub fn get_test_ast_w_inline_metadata() -> Node {
+    Node::Document(vec![
+        Node::section(
+            1,
+            "Swing Low Sweet Chariot",
+            Modifier::None,
+            vec![Node::newline()],
+        ),
+        Node::meta("Artist: The Fantastic Corns").unwrap(),
+        Node::newline(),
+        Node::meta("Composer: Daniel Corn").unwrap(),
+        Node::newline(),
+        Node::section(
+            2,
+            "Chorus",
+            Modifier::Chorus,
+            vec![
+                Node::newline(),
+                Node::text("Swing "),
+                Node::chord_text_pair("D", "low, sweet ").unwrap(),
+                Node::chord_text_pair("G", "chari").unwrap(),
+                Node::chord_text_pair("D", "ot.").unwrap(),
+            ],
+        ),
     ])
 }
 

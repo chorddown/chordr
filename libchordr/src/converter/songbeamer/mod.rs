@@ -151,9 +151,8 @@ mod tests {
     use super::*;
     use crate::format::Format;
     use crate::parser::MetaInformation;
-    use crate::test_helpers::get_test_ast;
+    use crate::test_helpers::{get_test_ast, get_test_ast_with_quote, get_test_ast_w_inline_metadata};
     use crate::test_helpers::get_test_metadata;
-    use crate::tokenizer::Modifier;
 
     #[test]
     fn test_convert() {
@@ -223,30 +222,7 @@ Comin’ for to carry me home.
     #[test]
     fn test_convert_w_inline_metadata() {
         let converter = SongBeamerConverter {};
-        let ast = Node::Document(vec![
-            Node::section(
-                1,
-                "Swing Low Sweet Chariot",
-                Modifier::None,
-                vec![Node::newline()],
-            ),
-            Node::meta("Artist: The Fantastic Corns").unwrap(),
-            Node::newline(),
-            Node::meta("Composer: Daniel Corn").unwrap(),
-            Node::newline(),
-            Node::section(
-                2,
-                "Chorus",
-                Modifier::Chorus,
-                vec![
-                    Node::newline(),
-                    Node::text("Swing "),
-                    Node::chord_text_pair("D", "low, sweet ").unwrap(),
-                    Node::chord_text_pair("G", "chari").unwrap(),
-                    Node::chord_text_pair("D", "ot.").unwrap(),
-                ],
-            ),
-        ]);
+        let ast = get_test_ast_w_inline_metadata();
         let result = converter.convert(
             &ast,
             &get_test_metadata(),
@@ -273,28 +249,7 @@ Swing low, sweet chariot.
     #[test]
     fn test_convert_w_quote() {
         let converter = SongBeamerConverter {};
-        let ast = Node::Document(vec![
-            Node::section(
-                1,
-                "Swing Low Sweet Chariot",
-                Modifier::None,
-                vec![Node::newline()],
-            ),
-            Node::quote("Play slowly"),
-            Node::newline(),
-            Node::section(
-                2,
-                "Chorus",
-                Modifier::Chorus,
-                vec![
-                    Node::newline(),
-                    Node::text("Swing "),
-                    Node::chord_text_pair("D", "low, sweet ").unwrap(),
-                    Node::chord_text_pair("G", "chari").unwrap(),
-                    Node::chord_text_pair("D", "ot.").unwrap(),
-                ],
-            ),
-        ]);
+        let ast = get_test_ast_with_quote();
         let result = converter.convert(
             &ast,
             &MetaInformation::default(),

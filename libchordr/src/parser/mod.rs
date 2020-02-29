@@ -41,6 +41,32 @@ impl ParserTrait for Parser {
     }
 }
 
+impl Parser {
+    pub fn cleanup_tokens(tokens: &[Token]) -> Vec<Token> {
+        let mut tokens_clean: Vec<Token> = vec![];
+
+        let mut token_iterator = tokens.iter();
+        let mut previous_token = None;
+        while let Some(token) = token_iterator.next() {
+            match previous_token {
+                Some(&Token::Newline) if token == &Token::Newline => continue,
+                Some(_) => {
+                    tokens_clean.push(token.clone());
+                    previous_token = Some(token);
+                }
+                None => {
+                    if token != &Token::Newline {
+                        tokens_clean.push(token.clone());
+                    }
+                    previous_token = Some(token);
+                }
+            }
+        }
+
+        tokens_clean
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -100,7 +126,7 @@ mod tests {
             ),
         ]);
 
-        assert_eq!(expected_ast, ast);
+        assert_eq!(ast, expected_ast);
     }
 
     #[test]
@@ -148,5 +174,78 @@ mod tests {
             assert!(result.is_ok());
             assert_eq!(result.unwrap().meta_as_ref().b_notation, BNotation::H);
         }
+    }
+
+    #[test]
+    fn test_cleanup_tokens() {
+        assert_eq!(
+            Parser::cleanup_tokens(&vec![
+                Token::headline(1, "Test", Modifier::None),
+                Token::newline(),
+                Token::chord("H"),
+            ]),
+            vec![
+                Token::headline(1, "Test", Modifier::None),
+                Token::newline(),
+                Token::chord("H"),
+            ]
+        );
+
+        assert_eq!(
+            Parser::cleanup_tokens(&vec![
+                Token::headline(1, "Test", Modifier::None),
+                Token::newline(),
+                Token::newline(),
+                Token::newline(),
+                Token::chord("H"),
+            ]),
+            vec![
+                Token::headline(1, "Test", Modifier::None),
+                Token::newline(),
+                Token::chord("H"),
+            ]
+        );
+
+        assert_eq!(
+            Parser::cleanup_tokens(&vec![
+                Token::headline(1, "Test", Modifier::None),
+                Token::newline(),
+                Token::newline(),
+                Token::chord("H"),
+                Token::newline(),
+            ]),
+            vec![
+                Token::headline(1, "Test", Modifier::None),
+                Token::newline(),
+                Token::chord("H"),
+                Token::newline(),
+            ]
+        );
+
+        assert_eq!(
+            Parser::cleanup_tokens(&vec![
+                Token::newline(),
+                Token::newline(),
+                Token::chord("H"),
+                Token::newline(),
+            ]),
+            vec![
+                Token::chord("H"),
+                Token::newline(),
+            ]
+        );
+        assert_eq!(
+            Parser::cleanup_tokens(&vec![
+                Token::newline(),
+                Token::newline(),
+                Token::chord("H"),
+                Token::newline(),
+                Token::newline(),
+            ]),
+            vec![
+                Token::chord("H"),
+                Token::newline(),
+            ]
+        );
     }
 }

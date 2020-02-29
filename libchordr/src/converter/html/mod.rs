@@ -78,3 +78,28 @@ impl ConverterTrait for HtmlConverter {
         self.html_for_node(node, meta, &tag_builder, formatting)
     }
 }
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::test_helpers::get_test_tokens;
+
+    #[test]
+    fn test_convert() {
+        let content = include_str!("../../../tests/resources/swing_low_sweet_chariot.html");
+        let result = Parser::new().parse(get_test_tokens());
+        assert!(result.is_ok());
+        let parser_result = result.unwrap();
+
+        let converter = HtmlConverter {};
+        let result = converter.convert(
+            parser_result.node_as_ref(),
+            parser_result.meta_as_ref(),
+            Formatting::with_format(Format::HTML),
+        );
+
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), content.trim())
+    }
+}

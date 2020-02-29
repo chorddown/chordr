@@ -138,6 +138,10 @@ impl<'a> Display for Tag /*<'a>*/ {
         if self.is_raw_wrapper() {
             write!(f, "{}", self.content)
         } else if self.is_self_closing() {
+            // if self.tag_name() == None || self.tag_name().unwrap().is_empty() {
+            //     panic!("No tag name provided");
+            // }
+
             write!(f, "<{}/>", self.tag_name().unwrap())
         } else {
             let tag_name = self.tag_name().unwrap();

@@ -16,7 +16,8 @@ impl ParserTrait for NodeParser {
     type OkType = Node;
 
     fn parse(&mut self, tokens: Vec<Token>) -> Result<Self::OkType, Error> {
-        let mut tokens_iterator = tokens.into_iter().peekable();
+        let tokens_clean = Parser::cleanup_tokens(&tokens);
+        let mut tokens_iterator = tokens_clean.into_iter().peekable();
 
         let mut elements = vec![];
 
@@ -121,14 +122,12 @@ fn token_is_start_of_section(token: &Token) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::helper::token_lines_to_tokens;
-    use crate::test_helpers::get_test_ast;
-    use crate::test_helpers::get_test_tokens;
+    use crate::test_helpers::{get_test_ast, get_test_tokens};
 
     #[test]
     fn test_parse() {
         let mut parser = NodeParser::with_b_notation(BNotation::B);
-        let result = parser.parse(token_lines_to_tokens(get_test_tokens()));
+        let result = parser.parse(get_test_tokens());
 
         assert!(result.is_ok());
         let ast = result.unwrap();

@@ -273,7 +273,6 @@ impl PdfBuilder {
 mod tests {
     use super::*;
     use crate::pdf::styles::{PageSize, Style, Styles};
-    use crate::test_helpers::get_test_tokens;
 
     #[test]
     fn test_text_width() {

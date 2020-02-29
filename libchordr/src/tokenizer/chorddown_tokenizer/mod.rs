@@ -1,10 +1,10 @@
 mod mode;
+mod scanner;
+mod state_machine;
 
-use crate::tokenizer::chorddown_tokenizer::mode::ModePartner;
-use crate::tokenizer::modifier::Modifier;
-use crate::tokenizer::{Meta, Token, Tokenizer};
-use mode::Mode;
-use std::convert::TryFrom;
+use self::state_machine::FSM;
+use crate::tokenizer::chorddown_tokenizer::scanner::Scanner;
+use crate::tokenizer::{Token, Tokenizer};
 
 pub(crate) struct ChorddownTokenizer {}
 
@@ -15,113 +15,33 @@ impl ChorddownTokenizer {
 }
 
 impl Tokenizer for ChorddownTokenizer {
-    fn tokenize_line(&self, line: &str) -> Option<Vec<Token>> {
-        if line.trim().is_empty() {
-            return None;
-        }
-
+    fn tokenize(&self, line: &str) -> Vec<Token> {
+        let lexemes_vec = Scanner::new().scan(line);
+        let mut lexemes = lexemes_vec.iter().peekable();
         let mut tokens: Vec<Token> = vec![];
+        let mut fsm = FSM::new();
 
-        let mut literal_buffer = String::from("");
-        let mut header_level: u8 = 1;
+        while let Some(lexeme) = lexemes.next() {
+            if let Some(changed_state) = fsm.characterize_lexeme(lexeme) {
+                let token = fsm.build_token();
 
-        let mut reference_mode = Mode::Literal;
-
-        let mut chars = line.chars().peekable();
-        let mut is_first_frame = true;
-
-        while let Some(current_character) = chars.next() {
-            let last_mode = reference_mode;
-
-            if is_first_frame {
-                reference_mode = Mode::from_char(current_character);
-                is_first_frame = false;
-            }
-
-            let current_mode = Mode::from_char(current_character);
-            if last_mode == Mode::Header && current_mode == Mode::Header {
-                header_level += 1;
-            }
-
-            let next_character = *chars.peek().unwrap_or(&'\n');
-            let next_mode = Mode::from_char(next_character);
-
-            if !current_character.is_signal(last_mode) {
-                literal_buffer.push(current_character);
-            }
-
-            if reference_mode.is_self_closing() {
-                add_token(
-                    &mut tokens,
-                    from_mode_and_literal(reference_mode, &mut literal_buffer, header_level),
-                );
-            } else if current_character.is_end_of(reference_mode)
-                || reference_mode.is_terminated_by_char(next_character)
-            {
-                // Mode changed => build and append a new token
-                build_and_add_token(
-                    &mut tokens,
-                    &mut literal_buffer,
-                    reference_mode,
-                    header_level,
-                );
-                reference_mode = next_mode;
+                if let Some(token) = token {
+                    tokens.push(token);
+                }
+                fsm.set_state(changed_state);
             }
         }
 
-        Some(tokens)
+        tokens
     }
-}
-
-fn from_mode_and_literal(mode: Mode, literal: &str, header_level: u8) -> Token {
-    match mode {
-        Mode::Header => build_headline_token(header_level, literal.trim().to_owned()),
-        Mode::Literal => build_token_from_literal(literal),
-        Mode::Chord => Token::Chord(literal.trim().to_owned()),
-        Mode::Quote => Token::Quote(literal.trim().to_owned()),
-        Mode::Newline => Token::Newline,
-    }
-}
-
-fn build_token_from_literal<S: AsRef<str>>(literal: S) -> Token {
-    match Meta::try_from(literal.as_ref()) {
-        Ok(meta) => Token::Meta(meta),
-        Err(_) => Token::Literal(literal.as_ref().to_owned()),
-    }
-}
-
-fn build_headline_token<S: AsRef<str>>(level: u8, value: S) -> Token {
-    let (modifier, text) = Modifier::split(value.as_ref());
-
-    Token::headline(level, text.trim(), modifier)
-}
-
-fn build_and_add_token(
-    tokens: &mut Vec<Token>,
-    collected_literal: &mut String,
-    mode: Mode,
-    header_level: u8,
-) {
-    if !collected_literal.is_empty() {
-        add_token(
-            tokens,
-            from_mode_and_literal(mode, &collected_literal, header_level),
-        );
-        collected_literal.clear();
-    }
-}
-
-fn add_token(tokens: &mut Vec<Token>, token: Token) -> () {
-    tokens.push(token)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::helper::token_lines_to_tokens;
     use crate::models::meta::BNotation;
     use crate::test_helpers::get_test_tokens;
-    use crate::tokenizer::Meta;
+    use crate::tokenizer::{Meta, Modifier};
 
     #[test]
     fn test_tokenize_long() {
@@ -131,16 +51,48 @@ mod tests {
     }
 
     #[test]
-    fn test_tokenize_meta() {
+    fn test_tokenize_main() {
+        use Token::Newline;
         let content = r"
-Composer: Daniel Corn
+# Swing Low Sweet Chariot
+
+##! Chorus
+Swing [D]low, sweet [G]chari[D]ot
+
+> A quote [D#m7]
+";
+        let token_lines = ChorddownTokenizer::new().tokenize(content);
+        assert_eq!(
+            token_lines,
+            vec![
+                Newline,
+                Token::headline(1, "Swing Low Sweet Chariot", Modifier::None),
+                Newline,
+                Newline,
+                Token::headline(2, "Chorus", Modifier::Chorus),
+                Newline,
+                Token::literal("Swing "),
+                Token::chord("D"),
+                Token::literal("low, sweet "),
+                Token::chord("G"),
+                Token::literal("chari"),
+                Token::chord("D"),
+                Token::literal("ot"),
+                Newline,
+                Newline,
+                Token::quote("A quote [D#m7]"),
+                Newline
+            ]
+        );
+    }
+
+    #[test]
+    fn test_tokenize_meta() {
+        let content = r"Composer: Daniel Corn
 Artist: The Fantastic Corns
 Key: Cm
 ";
-        let token_lines = ChorddownTokenizer::new().tokenize(content);
-        assert_eq!(token_lines.len(), 3);
-        let tokens = token_lines_to_tokens(token_lines);
-
+        let tokens = ChorddownTokenizer::new().tokenize(content);
         assert_eq!(
             tokens.get(0),
             Some(&Token::Meta(Meta::composer("Daniel Corn")))
@@ -156,71 +108,102 @@ Key: Cm
     }
 
     #[test]
+    fn test_tokenize_newline() {
+        let content = "\n\n\n";
+        let tokens = ChorddownTokenizer::new().tokenize(content);
+        assert_eq!(tokens.len(), 3);
+        assert_eq!(tokens, vec![Token::Newline, Token::Newline, Token::Newline]);
+    }
+
+    #[test]
+    fn test_tokenize_meta_key() {
+        let content = r"
+Key: C#m
+";
+        let tokens = ChorddownTokenizer::new().tokenize(content);
+
+        assert_eq!(
+            tokens,
+            vec![
+                Token::Newline,
+                Token::Meta(Meta::key("C#m")),
+                Token::Newline
+            ]
+        );
+    }
+
+    #[test]
+    fn test_tokenize_meta_with_inline_sharp() {
+        let tokens = ChorddownTokenizer::new().tokenize("Album: Song in C#m");
+        assert_eq!(tokens, vec![Token::Meta(Meta::album("Song in C#m"))]);
+    }
+
+    #[test]
     fn test_tokenize_meta_b_notation() {
         let tokenizer = ChorddownTokenizer::new();
         // H
         {
-            let token_lines = tokenizer.tokenize("B Notation: H");
+            let tokens = tokenizer.tokenize("B Notation: H");
 
             assert_eq!(
-                token_lines_to_tokens(token_lines).get(0),
+                tokens.get(0),
                 Some(&Token::Meta(Meta::BNotation(BNotation::H)))
             );
         }
         {
-            let token_lines = tokenizer.tokenize("B_Notation: H");
+            let tokens = tokenizer.tokenize("B_Notation: H");
 
             assert_eq!(
-                token_lines_to_tokens(token_lines).get(0),
+                tokens.get(0),
                 Some(&Token::Meta(Meta::BNotation(BNotation::H)))
             );
         }
         {
-            let token_lines = tokenizer.tokenize("BNotation: H");
+            let tokens = tokenizer.tokenize("BNotation: H");
 
             assert_eq!(
-                token_lines_to_tokens(token_lines).get(0),
+                tokens.get(0),
                 Some(&Token::Meta(Meta::BNotation(BNotation::H)))
             );
         }
         {
-            let token_lines = tokenizer.tokenize("B-Notation: H");
+            let tokens = tokenizer.tokenize("B-Notation: H");
 
             assert_eq!(
-                token_lines_to_tokens(token_lines).get(0),
+                tokens.get(0),
                 Some(&Token::Meta(Meta::BNotation(BNotation::H)))
             );
         }
         // B
         {
-            let token_lines = tokenizer.tokenize("B Notation: B");
+            let tokens = tokenizer.tokenize("B Notation: B");
 
             assert_eq!(
-                token_lines_to_tokens(token_lines).get(0),
+                tokens.get(0),
                 Some(&Token::Meta(Meta::BNotation(BNotation::B)))
             );
         }
         {
-            let token_lines = tokenizer.tokenize("B_Notation: B");
+            let tokens = tokenizer.tokenize("B_Notation: B");
 
             assert_eq!(
-                token_lines_to_tokens(token_lines).get(0),
+                tokens.get(0),
                 Some(&Token::Meta(Meta::BNotation(BNotation::B)))
             );
         }
         {
-            let token_lines = tokenizer.tokenize("BNotation: B");
+            let tokens = tokenizer.tokenize("BNotation: B");
 
             assert_eq!(
-                token_lines_to_tokens(token_lines).get(0),
+                tokens.get(0),
                 Some(&Token::Meta(Meta::BNotation(BNotation::B)))
             );
         }
         {
-            let token_lines = tokenizer.tokenize("B-Notation: B");
+            let tokens = tokenizer.tokenize("B-Notation: B");
 
             assert_eq!(
-                token_lines_to_tokens(token_lines).get(0),
+                tokens.get(0),
                 Some(&Token::Meta(Meta::BNotation(BNotation::B)))
             );
         }

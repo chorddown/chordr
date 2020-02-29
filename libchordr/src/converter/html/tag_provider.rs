@@ -65,6 +65,7 @@ impl TagProvider {
                 }
 
                 if let Some(head) = head {
+                    self.build_tag_for_children(children, formatting).to_string();
                     let inner = format!(
                         "{}{}",
                         self.build_tag_for_node(head, formatting),
@@ -115,6 +116,10 @@ impl TagProvider {
         formatting: Formatting,
     ) -> Tag {
         let mut gtb = TagBuilder::new();
+        if children.is_empty() {
+            return Tag::blank();
+        }
+
         let inner = children
             .iter()
             .map(|n| self.build_tag_for_node(n, formatting).to_string())
