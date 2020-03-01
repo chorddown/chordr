@@ -4,10 +4,10 @@ use crate::models::chord::fmt::Formatting;
 use crate::models::chord::TransposableTrait;
 use crate::models::song_meta_trait::SongMetaTrait;
 use crate::parser::{Parser, ParserResult, ParserTrait};
-use crate::tokenizer::{build_tokenizer, Token, TokenLine, Tokenizer};
+use crate::tokenizer::{build_tokenizer, Token, Tokenizer};
 
 #[deprecated(note = "Please use the `Token`s directly")]
-pub fn token_lines_to_tokens(token_lines: Vec<TokenLine>) -> Vec<Token> {
+pub fn token_lines_to_tokens(token_lines: Vec<Vec<Token>>) -> Vec<Token> {
     let mut stream = vec![];
     for line in token_lines {
         for token in line {

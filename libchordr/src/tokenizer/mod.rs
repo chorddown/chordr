@@ -7,10 +7,6 @@ use self::chorddown_tokenizer::ChorddownTokenizer;
 pub use self::meta::Meta;
 pub use self::modifier::Modifier;
 pub use self::token::Token;
-//use crate::tokenizer::chord_pro_tokenizer::ChordProTokenizer;
-
-//#[deprecated(note = "Please use the `Token`s directly")]
-pub type TokenLine = Vec<Token>;
 
 pub trait Tokenizer {
     /// Tokenize the given input
