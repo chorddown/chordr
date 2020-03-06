@@ -12,10 +12,11 @@ impl TryFrom<&Path> for Song {
     type Error = Error;
 
     fn try_from(path: &Path) -> Result<Self, Self::Error> {
+        let path_buf = path.to_path_buf();
         if !path.is_file() {
             return Err(Error::catalog_builder_error(
                 "Given entry is not a file",
-                path.to_path_buf(),
+                path_buf,
             ));
         }
 
@@ -23,14 +24,20 @@ impl TryFrom<&Path> for Song {
             Ok(c) => c,
             Err(e) => {
                 return Err(Error::catalog_builder_error(
-                    format!("{}", e),
-                    path.to_path_buf(),
+                    e.to_string(),
+                    path_buf,
                 ));
             }
         };
 
         let song_id = path.file_name().unwrap().to_str().unwrap().to_owned();
-        let parser_result = parse_content(&src)?;
+        let parser_result = match parse_content(&src){
+            Ok(p)=>p,
+            Err(e)=> return Err(Error::catalog_builder_error(
+                e.to_string(),
+                path_buf,
+            ))
+        };
         let title = parser_result.meta().title.unwrap_or(song_id.clone());
         let file_type = FileType::try_from(path)?;
         //        let meta = SongMeta::new(song_id, title, file_type);

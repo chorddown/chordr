@@ -91,7 +91,7 @@ impl Display for Kind {
             Kind::ParserError(s) => write!(f, "Parser error: {}", s),
             Kind::TagBuilderError(s) => write!(f, "TagBuilder error: {}", s),
             Kind::CatalogBuilderError(s, p) => {
-                write!(f, "catalog_builder_error error: {} for path {:?}", s, p)
+                write!(f, "Error while building catalog: {} for path {:?}", s, p)
             }
             Kind::FileTypeError(s) => write!(f, "FileTypeError error: {}", s),
             Kind::ChordError(s) => write!(f, "Chord error: {}", s),

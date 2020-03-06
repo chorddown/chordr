@@ -115,19 +115,24 @@ fn build_catalog(args: &ArgMatches) -> Result<()> {
     let dir_path = args.value_of("DIR").unwrap();
     let pretty = args.is_present("pretty");
 
-    let catalog =
-        CatalogBuilder::new().build_catalog_for_directory(dir_path, FileType::Chorddown, true)?;
+    let catalog = CatalogBuilder::new().build_catalog_for_directory(dir_path, FileType::Chorddown, true)?;
 
     let serialization_result = if pretty {
-        serde_json::to_string_pretty(&catalog)
+        serde_json::to_string_pretty(&catalog.catalog)
     } else {
-        serde_json::to_string(&catalog)
+        serde_json::to_string(&catalog.catalog)
     };
 
     let output = match serialization_result {
         Ok(s) => s,
         Err(e) => return Err(Error::unknown_error(format!("{}", e))),
     };
+
+    if catalog.errors.len() > 0 {
+        for error in catalog.errors {
+            eprintln!("{}", error);
+        }
+    }
 
     handle_output(args, output)
 }

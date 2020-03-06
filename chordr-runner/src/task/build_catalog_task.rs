@@ -1,7 +1,7 @@
 use crate::configuration::Configuration;
 use crate::error::Error;
 use crate::task::{RecurringTaskTrait, TaskTrait};
-use libchordr::prelude::{CatalogBuilder, FileType};
+use libchordr::prelude::{CatalogBuilder, FileType, CatalogBuildResult};
 use log::info;
 use std::fs;
 
@@ -27,16 +27,16 @@ impl RecurringTaskTrait for BuildCatalogTask {
     fn run(&self) -> Result<(), Error> {
         info!("Run Build Catalog Task");
         let pretty = true;
-        let catalog = self.catalog_builder.build_catalog_for_directory(
+        let catalog: CatalogBuildResult = self.catalog_builder.build_catalog_for_directory(
             self.configuration.output_directory.as_path(),
             FileType::Chorddown,
             true,
         )?;
 
         let serialization_result = if pretty {
-            serde_json::to_string_pretty(&catalog)
+            serde_json::to_string_pretty(&catalog.catalog)
         } else {
-            serde_json::to_string(&catalog)
+            serde_json::to_string(&catalog.catalog)
         };
 
         let output = match serialization_result {

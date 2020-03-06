@@ -12,6 +12,11 @@ use std::path::Path;
 /// Catalog Builder provides functions to build a Song Catalog from a given directory
 pub struct CatalogBuilder;
 
+pub struct CatalogBuildResult {
+    pub catalog: Catalog,
+    pub errors: Vec<Error>,
+}
+
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
 
@@ -25,13 +30,36 @@ impl CatalogBuilder {
         path: P,
         file_type: FileType,
         recursive: bool,
-    ) -> Result<Catalog> {
-        let mut songs: Vec<Song> = self.collect_songs(path.as_ref(), file_type, recursive)?;
+    ) -> Result<CatalogBuildResult> {
+        let path_ref = path.as_ref();
+        if !path_ref.is_dir() {
+            return Err(Error::catalog_builder_error(
+                "Given path is not a directory",
+                path_ref.to_path_buf(),
+            ));
+        }
 
-        songs.sort_by(|a, b| a.id().cmp(&b.id()));
+        let song_results = self.collect_songs(path_ref, file_type, recursive);
+        let (songs, errors) = self.partition_songs(song_results);
 
         let rand_string: String = thread_rng().sample_iter(&Alphanumeric).take(30).collect();
-        Ok(Catalog::new(rand_string, songs))
+
+        Ok(CatalogBuildResult {
+            catalog: Catalog::new(rand_string, songs),
+            errors,
+        })
+    }
+
+    fn partition_songs(&self, song_results: Vec<Result<Song, Error>>) -> (Vec<Song>, Vec<Error>) {
+        let (songs, errors): (Vec<_>, Vec<_>) = song_results.into_iter().partition(Result::is_ok);
+
+        let mut songs: Vec<Song> = songs.into_iter().map(Result::unwrap).collect();
+        songs.sort_by(|a, b| a.id().cmp(&b.id()));
+
+        (
+            songs,
+            errors.into_iter().map(Result::unwrap_err).collect::<Vec<Error>>()
+        )
     }
 
     fn collect_songs(
@@ -39,20 +67,24 @@ impl CatalogBuilder {
         path: &Path,
         file_type: FileType,
         recursive: bool,
-    ) -> Result<Vec<Song>> {
+    ) -> Vec<Result<Song>> {
         if !path.is_dir() {
-            return Err(Error::catalog_builder_error(
-                "Given path is not a directory",
-                path.to_path_buf(),
-            ));
+            panic!("Given path is not a directory");
         }
 
+        let entry_iterator = match fs::read_dir(path) {
+            Ok(i) => i,
+            Err(e) => return vec![Err(e.into())],
+        };
+
         let mut songs = vec![];
-        for entry in fs::read_dir(path)? {
-            let entry = entry?;
-            songs.append(&mut self.collect_songs_of_entry(entry, file_type, recursive)?);
+        for entry in entry_iterator {
+            match entry {
+                Ok(entry) => songs.append(&mut self.collect_songs_of_entry(entry, file_type, recursive)),
+                Err(error) => songs.push(Err(error.into()))
+            }
         }
-        Ok(songs)
+        songs
     }
 
     fn collect_songs_of_entry(
@@ -60,28 +92,26 @@ impl CatalogBuilder {
         entry: DirEntry,
         file_type: FileType,
         recursive: bool,
-    ) -> Result<Vec<Song>> {
+    ) -> Vec<Result<Song>> {
         let path = entry.path();
         if path.is_file() {
             if file_type.dir_entry_matches(&entry) {
-                let song = Song::try_from(entry)?;
-
-                Ok(vec![song])
+                vec![Song::try_from(entry)]
             } else {
-                // This is **not** an error situation. If `entry` does not is of `file_type` skip the entry
-                Ok(vec![])
+                // This is **not** an error situation. If `entry` is not of `file_type` skip the entry
+                vec![]
             }
         } else if path.is_dir() {
             if recursive {
                 self.collect_songs(path.as_path(), file_type, recursive)
             } else {
-                Ok(vec![])
+                vec![]
             }
         } else {
-            Err(Error::catalog_builder_error(
-                "Given path is not a directory",
+            vec![Err(Error::catalog_builder_error(
+                "Given path is neither a valid file nor a directory",
                 path,
-            ))
+            ))]
         }
     }
 }
@@ -98,7 +128,8 @@ mod tests {
         let result =
             CatalogBuilder::new().build_catalog_for_directory(songs_dir, FileType::Chorddown, true);
         assert!(result.is_ok());
-        let catalog = result.unwrap();
+        let catalog_and_errors = result.unwrap();
+        let catalog = catalog_and_errors.catalog;
         assert!(2 <= catalog.len());
 
         let song_id = "swing_low_sweet_chariot.chorddown";
@@ -116,7 +147,8 @@ mod tests {
         let result =
             CatalogBuilder::new().build_catalog_for_directory(songs_dir, FileType::Chorddown, true);
         assert!(result.is_ok());
-        let catalog = result.unwrap();
+        let catalog_and_errors = result.unwrap();
+        let catalog = catalog_and_errors.catalog;
         assert_eq!(2, catalog.len());
 
         let song_id = "german-test.chorddown";
