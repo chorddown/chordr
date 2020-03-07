@@ -2,8 +2,7 @@
 
 @mixin build-row() {
     @include clearfix;
-    width: 100%;
-    margin: -($grid-gutter-width/2);
+    margin: 0 (-$grid-gutter-width/2);
     display: flex;
     flex-flow: row wrap;
 }

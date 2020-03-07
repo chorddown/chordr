@@ -8,13 +8,31 @@
     <link rel="apple-touch-icon" href="assets/images/logo-120.png">
     <link rel="manifest" href="/manifest.json">
     <meta name="viewport" content="width=device-width">
-    <link rel="stylesheet" href="/stylesheets/chordr-default-styles.css?1580591873"/>
-    <link rel="stylesheet" href="/stylesheets/chordr-app.css?1580591873"/>
+    <style>.reload-button-fallback {
+        text-align: center;
+        display: block;
+        width: 100%;
+    }
+
+    .reload-button-fallback[aria-disabled] {
+        display: none;
+    }</style>
+    <link rel="stylesheet" href="/stylesheets/chordr-default-styles.css?1583601942"/>
+    <link rel="stylesheet" href="/stylesheets/chordr-app.css?1583601942"/>
 </head>
 <body>
 <script src="/webchordr.js"></script>
+
+<a id="reload-button-fallback" class="reload-button reload-button-fallback" aria-disabled="true" href="/"
+   title="Reload the song catalog">
+    <i class="im im-sync"></i>
+    <span>Reload the catalog</span>
+</a>
+
 <script>
-    if ('serviceWorker' in navigator) {
+    if (window.location.hostname === 'localhost') {
+        console.info('INFO:webchordr -- Service Worker is not used on localhost');
+    } else if ('serviceWorker' in navigator) {
         navigator.serviceWorker
             .register('/sw.js')
             .then(function () {
@@ -26,6 +44,16 @@
     } else {
         console.error('ERROR:webchordr -- Service Worker not supported');
     }
+
+    setTimeout(function () {
+        /* If the fallback reload button has not been removed after 4 seconds show it */
+        /** @type {HTMLLinkElement|HTMLElement} */
+        const fallback = document.getElementById('reload-button-fallback');
+        if (fallback) {
+            fallback.href += '?' + (+ new Date());
+            fallback.setAttribute('aria-disabled', 'false')
+        }
+    }, 4000)
 </script>
 </body>
 </html>

@@ -16,6 +16,10 @@ nav {
         background: $dark-mode-nav-bg;
     }
 
+    &.-hidden {
+        //width: $nav-collapsed-width + 2px; // from padding
+    }
+
     &.-visible {
         width: $nav-width;
     }
@@ -31,8 +35,26 @@ nav {
     button {
         margin-bottom: 2px;
     }
-    .song-item.-separator {
-        height: $std-half;
+
+    .song-item {
+        &.-separator {
+            height: $std-half;
+        }
+    }
+
+    &.-hidden {
+        a[role=button].song-item {
+            width: $nav-collapsed-width;
+            overflow: hidden;
+            white-space: nowrap;
+            padding: nth($button-padding, 1);
+        }
+    }
+
+    a[role=button]:not(.discreet):focus,
+    a[role=button]:not(.discreet):hover,
+    button:not(.discreet):focus,
+    button:not(.discreet):hover {
     }
 
     footer {
@@ -42,7 +64,7 @@ nav {
         order: 200;
         border-top: $nav-footer-border-width solid $nav-footer-border-color;
         @include if-dark-mode {
-            border-top: $nav-footer-border-width solid $gray-darker;
+            border-top-color: $gray-darker;
         }
 
         .im {
@@ -78,6 +100,7 @@ nav {
     }
 
     &.-hidden footer button {
-        width: 100%;
+        max-width: 100%;
+        width: $nav-collapsed-width;
     }
 }

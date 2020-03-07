@@ -991,8 +991,7 @@ main {
   position: absolute; }
 
 .row {
-  width: 100%;
-  margin: -3.5px;
+  margin: 0 -3.5px;
   display: flex;
   flex-flow: row wrap; }
   .row::before, .row::after {
@@ -1142,9 +1141,21 @@ button {
     width: 200px;
     margin: 0 auto; }
 
-.reload-button {
+.reload-section {
+  display: flex;
+  flex-flow: row; }
+
+.reload-button,
+.reload-section-version {
   display: inline-block;
   line-height: 40px; }
+
+.reload-button-container {
+  flex: 1 0 75%; }
+
+.reload-section-version {
+  color: #b7b7b0;
+  font-size: 0.8rem; }
 
 .song-browser-home {
   display: inline-block;
@@ -1289,6 +1300,11 @@ nav {
     margin-bottom: 2px; }
   nav .song-item.-separator {
     height: 7px; }
+  nav.-hidden a[role=button].song-item {
+    width: 40px;
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 7px; }
   nav footer {
     margin-top: auto;
     justify-self: flex-end;
@@ -1297,9 +1313,9 @@ nav {
     border-top: 0 solid #8d8d88; }
     @media screen and (prefers-color-scheme: dark) {
       nav footer {
-        border-top: 0 solid #62625e; } }
+        border-top-color: #62625e; } }
     html.dark-mode nav footer {
-      border-top: 0 solid #62625e; }
+      border-top-color: #62625e; }
     nav footer .im {
       vertical-align: middle; }
     nav footer .im + span {
@@ -1322,7 +1338,8 @@ nav {
         float: left;
         line-height: 30px; }
   nav.-hidden footer button {
-    width: 100%; }
+    max-width: 100%;
+    width: 40px; }
 
 .content {
   background: white;

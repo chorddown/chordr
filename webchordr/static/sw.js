@@ -45,6 +45,7 @@ self.addEventListener('fetch', function (event) {
             .then(function (response) {
                 if (!response) {
                     // If not, fetch request, and then cache response
+                    console.info('INFO:webchordr -- Fetch ' + event.request.url + ' from server');
                     return fetchFromServer(event);
                 } else {
                     if (navigator.onLine) {

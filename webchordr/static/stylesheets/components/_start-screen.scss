@@ -14,7 +14,22 @@
     }
 }
 
-.reload-button {
+.reload-section {
+    display: flex;
+    flex-flow: row;
+}
+
+.reload-button,
+.reload-section-version {
     display: inline-block;
     line-height: 40px;
+}
+
+.reload-button-container {
+    flex: 1 0 75%;
+}
+
+.reload-section-version {
+    color: $gray;
+    font-size: $font-size-small;
 }
