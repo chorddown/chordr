@@ -47,7 +47,7 @@ impl<S: SongIdTrait> Setlist<S> {
     /// Replace the given [SongData] instance in the [Setlist]
     pub fn replace(&mut self, song: S) -> Result<()> {
         let song_id = song.id();
-        match self.position(&song_id) {
+        match self.position(song_id.as_str()) {
             Some(pos) => {
                 mem::replace(&mut self.0[pos], song);
                 Ok(())
@@ -82,7 +82,7 @@ impl<S: SongIdTrait> Setlist<S> {
 
     /// Remove the entry with the matching [SongId] from the [Setlist]
     pub fn remove(&mut self, song: &S) -> Result<()> {
-        self.remove_by_id(song.id())
+        self.remove_by_id(song.id().as_str())
     }
 
     pub fn iter(&self) -> Iter<'_, S> {

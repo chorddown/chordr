@@ -116,12 +116,12 @@ impl App {
             };
         }
 
-        match percent_decode_str(&song_id).decode_utf8() {
+        match percent_decode_str(song_id.as_str()).decode_utf8() {
             Ok(decoded) => {
                 let decoded = decoded.to_string();
                 info!("Decoded song ID '{}' to '{}'", song_id, decoded);
-                if decoded != song_id {
-                    self.view_song(decoded)
+                if &decoded != song_id.as_str() {
+                    self.view_song(SongId::new(decoded))
                 } else {
                     html! {}
                 }

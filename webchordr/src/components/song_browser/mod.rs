@@ -62,12 +62,7 @@ impl SongBrowser {
     fn get_back_link(&self) -> Html {
         (if self.has_chars() {
             let chars = &self.props.chars;
-            let sub_string = sub_string(chars, chars.len() - 1);
-            let parameter = if sub_string.is_empty() {
-                SONG_BROWSER_PLACEHOLDER
-            } else {
-                sub_string.as_str()
-            };
+            let parameter = self.get_back_link_parameter(chars);
 
             let href = format!("#/song-browser/{}", parameter);
 
@@ -75,6 +70,19 @@ impl SongBrowser {
         } else {
             html! {}
         }) as Html
+    }
+
+    fn get_back_link_parameter(&self, chars: &String) -> String {
+        let count = char_count(chars);
+        if count < 1 {
+            return SONG_BROWSER_PLACEHOLDER.to_owned();
+        }
+        let sub_string = sub_string(chars, count - 1);
+        if sub_string.is_empty() {
+            SONG_BROWSER_PLACEHOLDER.to_owned()
+        } else {
+            sub_string
+        }
     }
 
     fn render_header(&self) -> Html {
@@ -157,4 +165,8 @@ impl Component for SongBrowser {
 
 fn sub_string(input: &str, length: usize) -> String {
     input.chars().take(length).collect()
+}
+
+fn char_count(input: &str) -> usize {
+    input.chars().collect::<Vec<char>>().len()
 }

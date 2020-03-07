@@ -84,7 +84,8 @@ impl Component for Nav {
         let song_list = if self.props.show_menu {
             self.view_song_list()
         } else {
-            html! {}
+            self.view_song_list()
+            // html! {}
         };
 
         html! {

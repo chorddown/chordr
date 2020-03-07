@@ -7,6 +7,7 @@ use std::fs;
 use std::fs::DirEntry;
 use std::path::Path;
 use super::CatalogBuildError;
+use crate::models::song_id::SongId;
 
 impl TryFrom<&Path> for Song {
     type Error = CatalogBuildError;
@@ -25,12 +26,12 @@ impl TryFrom<&Path> for Song {
             Err(e) => return Err(CatalogBuildError::from_error(e, path_buf))
         };
 
-        let song_id = path.file_name().unwrap().to_str().unwrap().to_owned();
+        let song_id = SongId::from(path);
         let parser_result = match parse_content(&src) {
             Ok(p) => p,
             Err(e) => return Err(CatalogBuildError::from_error(e, path_buf))
         };
-        let title = parser_result.meta().title.unwrap_or(song_id.clone());
+        let title = parser_result.meta().title.unwrap_or(song_id.to_string());
         let file_type = match FileType::try_from(path) {
             Ok(f) => f,
             Err(e) => return Err(CatalogBuildError::from_error(e, path_buf))
@@ -70,7 +71,7 @@ mod tests {
         let result = Song::try_from(song_path);
         assert!(result.is_ok());
         let song = result.unwrap();
-        assert_eq!("swing_low_sweet_chariot.chorddown", &song.id());
+        assert_eq!(SongId::new("swing_low_sweet_chariot.chorddown"), song.id());
         assert_eq!("Swing Low Sweet Chariot", &song.title());
         assert_eq!(FileType::Chorddown, song.file_type());
         assert!(!song.src().is_empty());

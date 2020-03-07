@@ -35,7 +35,7 @@ impl From<&Song> for SetlistEntry {
 }
 
 impl SongIdTrait for SetlistEntry {
-    fn id(&self) -> String {
+    fn id(&self) -> SongId {
         self.song_id.clone()
     }
 }

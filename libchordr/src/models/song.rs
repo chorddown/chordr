@@ -1,6 +1,6 @@
 use crate::models::file_type::FileType;
 use crate::models::song_data::SongData;
-use crate::models::song_id::SongIdTrait;
+use crate::models::song_id::{SongIdTrait, SongId};
 use crate::models::song_meta::SongMeta;
 use serde::Deserialize;
 use serde::Serialize;
@@ -29,7 +29,7 @@ impl Song {
 }
 
 impl SongIdTrait for Song {
-    fn id(&self) -> String {
+    fn id(&self) -> SongId {
         self.meta.id()
     }
 }

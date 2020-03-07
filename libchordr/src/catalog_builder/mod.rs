@@ -118,6 +118,7 @@ impl CatalogBuilder {
 mod tests {
     use super::*;
     use crate::models::song_data::SongData;
+    use crate::models::song_id::SongId;
 
     #[test]
     fn test_build_catalog_for_directory() {
@@ -135,7 +136,7 @@ mod tests {
         assert!(catalog.get(song_id).is_some());
         let song = catalog.get(song_id).unwrap();
         assert_eq!("Swing Low Sweet Chariot", song.title());
-        assert_eq!(song_id, song.id());
+        assert_eq!(SongId::new(song_id), song.id());
     }
 
     #[test]
@@ -147,13 +148,20 @@ mod tests {
         assert!(result.is_ok());
         let catalog_and_errors = result.unwrap();
         let catalog = catalog_and_errors.catalog;
-        assert_eq!(2, catalog.len());
+        assert_eq!(3, catalog.len());
 
         let song_id = "german-test.chorddown";
         assert!(catalog.contains_id(song_id));
         assert!(catalog.get(song_id).is_some());
         let song = catalog.get(song_id).unwrap();
         assert_eq!("Überschrift", song.title());
-        assert_eq!(song_id, song.id());
+        assert_eq!(SongId::new(song_id), song.id());
+
+        let song_id = "song-id-with-spaces.chorddown";
+        println!("{:#?}",catalog);
+        assert!(catalog.contains_id(song_id));
+        assert!(catalog.get(song_id).is_some());
+        let song = catalog.get(song_id).unwrap();
+        assert_eq!(SongId::new(song_id), song.id());
     }
 }

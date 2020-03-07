@@ -29,6 +29,7 @@ pub fn build_indexes(songs: Vec<&Song>, root_chars: &str) -> Vec<Index> {
             Some(mut index) => {
                 index.count += 1;
             }
+            None if chars.is_empty() => { /* do nothing */ }
             None => {
                 map.insert(chars.clone(), Index::new(chars.clone(), 1));
             }

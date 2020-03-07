@@ -46,7 +46,7 @@ impl Component for SongList {
 
         info!(
             "Redraw song list {:?}",
-            songs.iter().map(|s| s.id()).collect::<Vec<String>>()
+            songs.iter().map(|s| s.id()).collect::<Vec<SongId>>()
         );
 
         (html! { for songs.iter().map(render) }) as Html
