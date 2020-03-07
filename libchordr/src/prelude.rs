@@ -30,7 +30,7 @@ pub use crate::models::song_meta::SongMeta;
 pub use crate::models::song_settings::{SongSettings, SongSettingsMap};
 
 /// Catalog management
-pub use crate::catalog_builder::{CatalogBuilder, CatalogBuildResult};
+pub use crate::catalog_builder::{CatalogBuilder, CatalogBuildResult, CatalogBuildError};
 
 /// Helper methods
 pub use crate::helper::*;

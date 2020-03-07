@@ -9,6 +9,10 @@ use libchordr::prelude::Error;
 use libchordr::prelude::Result;
 use libchordr::prelude::*;
 use std::convert::TryFrom;
+use atty::Stream;
+use ansi_term::Colour;
+use std::error::Error as StdError;
+use std::process::exit;
 
 fn main() {
     let output_arg = Arg::with_name("OUTPUT")
@@ -53,11 +57,12 @@ fn main() {
         build_catalog(matches)
     } else {
         eprintln!("Missing argument subcommand");
-        Ok(())
+        exit(1);
     };
 
     if let Err(error) = error {
-        eprintln!("{}", error)
+        eprintln!("{}", error);
+        exit(1);
     }
 }
 
@@ -72,6 +77,7 @@ fn convert(args: &ArgMatches) -> Result<()> {
         parser_result.meta_as_ref(),
         Formatting::with_format(format),
     )?;
+    let output_file_path = args.value_of("OUTPUT").unwrap();
 
     let output = if format == Format::HTML {
         format!(
@@ -98,7 +104,7 @@ fn convert(args: &ArgMatches) -> Result<()> {
         converted
     };
 
-    handle_output(args, output)
+    handle_output(output_file_path, output)
 }
 
 fn get_output_format(args: &ArgMatches) -> Format {
@@ -114,35 +120,67 @@ fn get_output_format(args: &ArgMatches) -> Format {
 fn build_catalog(args: &ArgMatches) -> Result<()> {
     let dir_path = args.value_of("DIR").unwrap();
     let pretty = args.is_present("pretty");
+    let output_file_path = args.value_of("OUTPUT").unwrap();
 
-    let catalog = CatalogBuilder::new().build_catalog_for_directory(dir_path, FileType::Chorddown, true)?;
+    let catalog_result = CatalogBuilder::new().build_catalog_for_directory(dir_path, FileType::Chorddown, true)?;
 
     let serialization_result = if pretty {
-        serde_json::to_string_pretty(&catalog.catalog)
+        serde_json::to_string_pretty(&catalog_result.catalog)
     } else {
-        serde_json::to_string(&catalog.catalog)
+        serde_json::to_string(&catalog_result.catalog)
     };
 
     let output = match serialization_result {
         Ok(s) => s,
         Err(e) => return Err(Error::unknown_error(format!("{}", e))),
     };
-
-    if catalog.errors.len() > 0 {
-        for error in catalog.errors {
-            eprintln!("{}", error);
+    if catalog_result.errors.len() > 0 {
+        for error in catalog_result.errors {
+            handle_error_output(error)
         }
     }
 
-    handle_output(args, output)
+    handle_output(output_file_path, output)?;
+
+    if !output_to_stdout(output_file_path) {
+        let msg = format!(
+            "Successfully saved the catalog revision '{}' at {}",
+            catalog_result.catalog.revision(),
+            output_file_path);
+        if atty::is(Stream::Stdout) {
+            println!("{}", Colour::Green.paint(msg));
+        } else {
+            println!("{}", msg);
+        }
+    }
+    Ok(())
 }
 
-fn handle_output(args: &ArgMatches, output: String) -> Result<(), Error> {
-    let output_file_path = args.value_of("OUTPUT").unwrap();
-    if output_file_path == "-" {
+fn handle_error_output(error: CatalogBuildError) -> () {
+    let header = format!("Error during analysis of file {}:", error.path().to_string_lossy());
+    let description = match error.source() {
+        Some(s) => s.to_string(),
+        None => error.message().to_owned(),
+    };
+
+    if atty::is(Stream::Stderr) {
+        eprintln!("{}", Colour::White.on(Colour::Red).paint(header));
+        eprintln!("{}", Colour::Red.paint(description));
+    } else {
+        eprintln!("{}", header);
+        eprintln!("{}", description);
+    }
+}
+
+fn handle_output(output_file_path: &str, output: String) -> Result<(), Error> {
+    if output_to_stdout(output_file_path) {
         println!("{}", output);
         Ok(())
     } else {
         Ok(fs::write(output_file_path, output)?)
     }
+}
+
+fn output_to_stdout(output_file_path: &str) -> bool {
+    output_file_path == "-"
 }

@@ -21,8 +21,8 @@ impl Error {
         Error::new(Kind::TagBuilderError(description.into()))
     }
 
-    pub fn catalog_builder_error<S: Into<String>>(description: S, path: PathBuf) -> Self {
-        Error::new(Kind::CatalogBuilderError(description.into(), path))
+    pub fn catalog_builder_fatal_error<S: Into<String>>(description: S, path: PathBuf) -> Self {
+        Error::new(Kind::CatalogBuilderFatalError(description.into(), path))
     }
 
     pub fn file_type_error<S: Into<String>>(description: S) -> Self {
@@ -76,7 +76,7 @@ impl From<::std::io::Error> for Error {
 enum Kind {
     ParserError(String),
     TagBuilderError(String),
-    CatalogBuilderError(String, PathBuf),
+    CatalogBuilderFatalError(String, PathBuf),
     FileTypeError(String),
     ChordError(String),
     SetlistError(String),
@@ -88,15 +88,26 @@ impl StdError for Kind {}
 impl Display for Kind {
     fn fmt(&self, f: &mut Formatter) -> Result<(), FmtError> {
         match self {
-            Kind::ParserError(s) => write!(f, "Parser error: {}", s),
-            Kind::TagBuilderError(s) => write!(f, "TagBuilder error: {}", s),
-            Kind::CatalogBuilderError(s, p) => {
+            Kind::ParserError(s) => write!(f, "{}", s),
+            Kind::TagBuilderError(s) => write!(f, "{}", s),
+            Kind::CatalogBuilderFatalError(s, p) => {
                 write!(f, "Error while building catalog: {} for path {:?}", s, p)
             }
-            Kind::FileTypeError(s) => write!(f, "FileTypeError error: {}", s),
-            Kind::ChordError(s) => write!(f, "Chord error: {}", s),
-            Kind::SetlistError(s) => write!(f, "Setlist error: {}", s),
-            Kind::UnknownError(s) => write!(f, "Unknown error: {}", s),
+            Kind::FileTypeError(s) => write!(f, "{}", s),
+            Kind::ChordError(s) => write!(f, "{}", s),
+            Kind::SetlistError(s) => write!(f, "{}", s),
+            Kind::UnknownError(s) => write!(f, "{}", s),
         }
+        // match self {
+        //     Kind::ParserError(s) => write!(f, "Parser error: {}", s),
+        //     Kind::TagBuilderError(s) => write!(f, "TagBuilder error: {}", s),
+        //     Kind::CatalogBuilderError(s, p) => {
+        //         write!(f, "Error while building catalog: {} for path {:?}", s, p)
+        //     }
+        //     Kind::FileTypeError(s) => write!(f, "FileTypeError error: {}", s),
+        //     Kind::ChordError(s) => write!(f, "Chord error: {}", s),
+        //     Kind::SetlistError(s) => write!(f, "Setlist error: {}", s),
+        //     Kind::UnknownError(s) => write!(f, "Unknown error: {}", s),
+        // }
     }
 }
