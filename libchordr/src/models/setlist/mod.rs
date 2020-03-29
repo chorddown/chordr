@@ -2,11 +2,10 @@ mod setlist_entry;
 
 pub use self::setlist_entry::SetlistEntry;
 use crate::error::{Error, Result};
-use crate::models::song_data::SongData;
 use crate::models::song_id::{SongId, SongIdTrait};
 use serde::Deserialize;
 use serde::Serialize;
-use std::mem;
+use std::{mem, ops};
 use std::slice::Iter;
 
 /// A generic set of Songs identified by their [SongId]
@@ -74,6 +73,12 @@ impl<S: SongIdTrait> Setlist<S> {
         }
     }
 
+    /// Move the entry from one index to another one
+    pub fn move_entry(&mut self, from: usize, to: usize) {
+        let item = self.0.remove(from);
+        self.0.insert(to, item);
+    }
+
     /// Get the position of the entry with the given [SongId]
     fn position<I: AsRef<str>>(&mut self, song_id: I) -> Option<usize> {
         let song_id = song_id.as_ref();
@@ -90,8 +95,47 @@ impl<S: SongIdTrait> Setlist<S> {
     }
 }
 
-impl<S: SongData + PartialEq> PartialEq for Setlist<S> {
+impl<S: SongIdTrait + PartialEq> PartialEq for Setlist<S> {
     fn eq(&self, other: &Self) -> bool {
         self.0 == other.0
+    }
+}
+
+impl<S: SongIdTrait> ops::Index<usize> for Setlist<S> {
+    type Output = S;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.0[index]
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[derive(Debug, PartialOrd, PartialEq)]
+    struct TestItem(usize);
+
+    impl SongIdTrait for TestItem {
+        fn id(&self) -> SongId {
+            SongId::new(format!("{}", self.0))
+        }
+    }
+
+    #[test]
+    fn move_entry_test() {
+        let mut list = Setlist(vec![TestItem(0), TestItem(1), TestItem(2), TestItem(3), TestItem(4)]);
+        list.move_entry(1, 3);
+        assert_eq!(list[0], TestItem(0));
+        assert_eq!(list[1], TestItem(2));
+        assert_eq!(list[3], TestItem(1));
+    }
+
+    #[test]
+    fn move_entry_boundary_test() {
+        let mut list = Setlist(vec![TestItem(0), TestItem(1), TestItem(2), TestItem(3), TestItem(4)]);
+        list.move_entry(0, 4);
+        assert_eq!(list[0], TestItem(1));
+        assert_eq!(list[4], TestItem(0));
     }
 }
