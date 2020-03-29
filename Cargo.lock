@@ -2305,7 +2305,7 @@ dependencies = [
 
 [[package]]
 name = "webchordr"
-version = "0.1.2"
+version = "0.1.3"
 dependencies = [
  "failure 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "libchordr 0.1.0",

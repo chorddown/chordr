@@ -2,6 +2,7 @@ use crate::components::song_list::SongList;
 use libchordr::models::setlist::*;
 use std::rc::Rc;
 use yew::prelude::*;
+use crate::events::Event;
 
 #[derive(Properties, PartialEq)]
 pub struct NavProps {
@@ -11,6 +12,8 @@ pub struct NavProps {
     pub show_menu: bool,
     #[props(required)]
     pub on_toggle: Callback<()>,
+    #[props(required)]
+    pub on_setlist_change: Callback<Event>,
 }
 
 #[allow(dead_code)]
@@ -21,10 +24,11 @@ pub struct Nav {
 impl Nav {
     fn view_song_list(&self) -> Html {
         let songs = &self.props.songs;
+        let on_setlist_change = self.props.on_setlist_change.reform(|e| e);
 
         html! {
             <div class="song-list">
-                <SongList songs=songs/>
+                <SongList songs=songs on_setlist_change=on_setlist_change />
             </div>
         }
     }

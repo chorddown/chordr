@@ -3,7 +3,9 @@ extern crate stdweb;
 
 mod components;
 mod helpers;
+mod events;
 mod route;
+mod sortable_service;
 
 use crate::components::nav::Nav;
 use crate::components::reload_section::ReloadSection;
@@ -25,6 +27,7 @@ use yew::services::fetch::{FetchService, FetchTask, Request, Response};
 use yew::services::storage::{Area, StorageService};
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
 use yew_router::prelude::*;
+use crate::events::{Event, SortingChange, SetlistEvent};
 
 const STORAGE_KEY_SETLIST: &'static str = "net.cundd.chordr.setlist";
 const STORAGE_KEY_SETTINGS: &'static str = "net.cundd.chordr.settings";
@@ -52,10 +55,13 @@ pub struct App {
 }
 
 pub enum Msg {
+    Event(Event),
     OpenSongInMainView(SongId),
     FetchCatalogReady(Result<Catalog, Error>),
     FetchCatalog(bool),
+    #[deprecated]
     SetlistAdd(SetlistEntry),
+    #[deprecated]
     SetlistRemove(SongId),
     SongSettingsChange(SongId, SongSettings),
     ToggleMenu,
@@ -179,6 +185,13 @@ impl App {
         self.ft = Some(self.fetch_service.fetch(request, callback));
     }
 
+    fn handle_setlist_event(&mut self, event: SetlistEvent) {
+        match event {
+            SetlistEvent::SortingChange(v) => self.setlist_sorting_changed(v),
+            SetlistEvent::Add(v) => self.setlist_add(v),
+            SetlistEvent::Remove(v) => self.setlist_remove(v),
+        }
+    }
     fn setlist_add(&mut self, song: SetlistEntry) {
         let song_id = song.id();
         match self.setlist.add(song) {
@@ -194,6 +207,13 @@ impl App {
             Ok(_) => info!("Removed song {} from setlist", song_id),
             Err(_) => warn!("Could not remove song {} from setlist", song_id),
         }
+        self.storage_service
+            .store(STORAGE_KEY_SETLIST, Json(&self.setlist));
+    }
+
+    fn setlist_sorting_changed(&mut self, sorting_change: SortingChange) {
+        self.setlist.move_entry(sorting_change.old_index(), sorting_change.new_index());
+
         self.storage_service
             .store(STORAGE_KEY_SETLIST, Json(&self.setlist));
     }
@@ -289,6 +309,12 @@ impl Component for App {
                     top.frames.location.reload()
                 }
             }
+            Msg::Event(e) => {
+                match e {
+                    Event::SetlistEvent(se) => self.handle_setlist_event(se),
+                    _ => debug!("New event {:?}", e)
+                }
+            }
         }
         true
     }
@@ -301,6 +327,7 @@ impl Component for App {
         };
 
         let toggle_menu = self.link.callback(|_| Msg::ToggleMenu);
+        let on_setlist_change = self.link.callback(|e| Msg::Event(e));
         let songs = Rc::new(self.setlist.clone());
 
         html! {
@@ -309,6 +336,7 @@ impl Component for App {
                     show_menu=self.show_menu
                     songs=songs
                     on_toggle=toggle_menu
+                    on_setlist_change=on_setlist_change
                 />
                 <div class="content">
                     { self.route() }
