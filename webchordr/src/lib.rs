@@ -59,10 +59,6 @@ pub enum Msg {
     OpenSongInMainView(SongId),
     FetchCatalogReady(Result<Catalog, Error>),
     FetchCatalog(bool),
-    #[deprecated]
-    SetlistAdd(SetlistEntry),
-    #[deprecated]
-    SetlistRemove(SongId),
     SongSettingsChange(SongId, SongSettings),
     ToggleMenu,
     Reload,
@@ -89,8 +85,8 @@ impl App {
 
         let catalog = self.catalog.as_ref().unwrap();
         if let Some(song) = catalog.get(song_id.clone()) {
-            let add = self.link.callback(|s| Msg::SetlistAdd(s));
-            let remove = self.link.callback(|s| Msg::SetlistRemove(s));
+            let add = self.link.callback(|s| Msg::Event(SetlistEvent::Add(s).into()));
+            let remove = self.link.callback(|s| Msg::Event(SetlistEvent::Remove(s).into()));
             let change = self
                 .link
                 .callback(|s: (SongId, SongSettings)| Msg::SongSettingsChange(s.0, s.1));
@@ -295,8 +291,6 @@ impl Component for App {
                 self.catalog = response.ok();
             }
             Msg::FetchCatalog(no_cache) => self.fetch_catalog(no_cache),
-            Msg::SetlistAdd(song) => self.setlist_add(song),
-            Msg::SetlistRemove(song) => self.setlist_remove(song),
             Msg::SongSettingsChange(song_id, settings) => {
                 self.song_settings_change(song_id, settings)
             }

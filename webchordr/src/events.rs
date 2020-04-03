@@ -14,3 +14,15 @@ pub enum Event {
     SortingChange(SortingChange),
     SetlistEvent(SetlistEvent),
 }
+
+impl From<SortingChange> for Event {
+    fn from(s: SortingChange) -> Self {
+        Event::SortingChange(s)
+    }
+}
+
+impl From<SetlistEvent> for Event {
+    fn from(s: SetlistEvent) -> Self {
+        Event::SetlistEvent(s)
+    }
+}
