@@ -4,6 +4,7 @@ extern crate stdweb;
 mod components;
 mod helpers;
 mod events;
+mod errors;
 mod route;
 mod sortable_service;
 
