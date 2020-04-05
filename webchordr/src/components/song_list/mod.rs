@@ -55,8 +55,8 @@ impl Component for SongList {
             Msg::SetlistChangeSorting(e) => {
                 info!("Handle Setlist sorting change: Move {} to {}", e.old_index(), e.new_index());
                 self.props.on_setlist_change.emit(Event::SetlistEvent(SetlistEvent::SortingChange(e)));
-
-                false
+                self.props.songs = Rc::new(Setlist::new());
+                true
             }
         }
     }
