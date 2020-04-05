@@ -24,7 +24,7 @@ impl Nav {
 
         html! {
             <div class="song-list">
-                <SongList songs=songs on_setlist_change=on_setlist_change />
+                <SongList songs=songs on_setlist_change=on_setlist_change sortable=self.props.expand />
             </div>
         }
     }

@@ -4,16 +4,18 @@ pub use self::item::Item;
 use libchordr::models::setlist::Setlist;
 use libchordr::prelude::*;
 use log::info;
+use log::error;
 use std::rc::Rc;
 use yew::prelude::*;
 use stdweb::web::HtmlElement;
 use crate::events::{SortingChange, Event};
-use crate::sortable_service::SortableService;
+use crate::sortable_service::{SortableService, SortableHandle};
 use crate::events::setlist_events::SetlistEvent;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct SongListProps {
     pub songs: Rc<Setlist<SetlistEntry>>,
+    pub sortable: bool,
 
     pub on_setlist_change: Callback<Event>,
 }
@@ -27,6 +29,7 @@ pub struct SongList {
     link: ComponentLink<Self>,
     node_ref: NodeRef,
     sortable_service: SortableService,
+    sortable_handle: Option<SortableHandle>,
 }
 
 impl Component for SongList {
@@ -39,15 +42,18 @@ impl Component for SongList {
             link,
             node_ref: NodeRef::default(),
             sortable_service: SortableService::new(),
+            sortable_handle: None,
         }
     }
 
     fn mounted(&mut self) -> ShouldRender {
-        if let Some(element) = self.node_ref.cast::<HtmlElement>() {
-            self.sortable_service.make_sortable(element, self.link.callback(|e| Msg::SetlistChangeSorting(e)));
-        }
+        if self.props.sortable {
+            self.make_sortable();
 
-        true
+            true
+        } else {
+            false
+        }
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
@@ -64,6 +70,12 @@ impl Component for SongList {
     fn change(&mut self, props: Self::Properties) -> ShouldRender {
         if self.props != props {
             self.props = props;
+
+            if self.props.sortable {
+                self.make_sortable();
+            } else {
+                self.make_unsortable();
+            }
             true
         } else {
             false
@@ -88,5 +100,27 @@ impl Component for SongList {
                 {for songs.iter().map(render)}
             </div>
         }) as Html
+    }
+}
+
+impl SongList {
+    fn make_sortable(&mut self) {
+        match self.sortable_handle {
+            None =>
+                if let Some(element) = self.node_ref.cast::<HtmlElement>() {
+                    self.sortable_handle = self.sortable_service
+                        .make_sortable(element, self.link.callback(|e| Msg::SetlistChangeSorting(e)))
+                        .ok();
+                },
+            Some(_) => { /* Element is already sortable */ }
+        }
+    }
+
+    fn make_unsortable(&mut self) {
+        if let Some(mut handle) = self.sortable_handle.take() {
+            if let Err(e) = handle.destroy() {
+                error!("{}", e);
+            }
+        };
     }
 }
