@@ -46,7 +46,7 @@ pub struct App {
     link: ComponentLink<App>,
     ft: Option<FetchTask>,
 
-    show_menu: bool,
+    expand: bool,
     fetching: bool,
     catalog: Option<Catalog>,
     current_song: Option<Song>,
@@ -156,7 +156,7 @@ impl App {
 
         let callback =
             self.link
-                .callback(move |response: Response<Json<Result<Catalog, ::anyhow::Error>>>| {
+                .callback(move |response: Response<Json<Result<Catalog, anyhow::Error>>>| {
                     let (meta, Json(data)) = response.into_parts();
                     if meta.status.is_success() {
                         Msg::FetchCatalogReady(data)
@@ -259,7 +259,7 @@ impl Component for App {
             storage_service,
             link,
             fetching: false,
-            show_menu: true,
+            expand: true,
             current_song: None,
             catalog: None,
             ft: None,
@@ -299,7 +299,7 @@ impl Component for App {
             }
             Msg::Ignore => return false,
             Msg::ToggleMenu => {
-                self.show_menu = !self.show_menu;
+                self.expand = !self.expand;
             }
             Msg::Reload => {
                 js! {
@@ -317,7 +317,7 @@ impl Component for App {
     }
 
     fn view(&self) -> Html {
-        let main_classes = if self.show_menu {
+        let main_classes = if self.expand {
             "-menu-visible"
         } else {
             "-menu-hidden"
@@ -330,7 +330,7 @@ impl Component for App {
         html! {
             <main class=main_classes>
                 <Nav
-                    show_menu=self.show_menu
+                    expand=self.expand
                     songs=songs
                     on_toggle=toggle_menu
                     on_setlist_change=on_setlist_change

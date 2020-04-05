@@ -7,7 +7,7 @@ use crate::events::Event;
 #[derive(Properties, PartialEq, Clone)]
 pub struct NavProps {
     pub songs: Rc<Setlist<SetlistEntry>>,
-    pub show_menu: bool,
+    pub expand: bool,
     pub on_toggle: Callback<()>,
     pub on_setlist_change: Callback<Event>,
 }
@@ -32,7 +32,7 @@ impl Nav {
     fn view_nav_footer(&self) -> Html {
         let toggle_menu = self.props.on_toggle.reform(|_| ());
 
-        (if self.props.show_menu {
+        (if self.props.expand {
             html! {
                 <footer>
                     <button class="toggle-menu" onclick=toggle_menu>{ "→" }</button>
@@ -75,24 +75,17 @@ impl Component for Nav {
 
     fn view(&self) -> Html {
         let mut menu_classes = vec!["menu"];
-        if self.props.show_menu {
+        if self.props.expand {
             menu_classes.push("-visible");
         } else {
             menu_classes.push("-hidden");
         };
 
-        let song_list = if self.props.show_menu {
-            self.view_song_list()
-        } else {
-            self.view_song_list()
-            // html! {}
-        };
-
-        html! {
+        (html! {
             <nav class=menu_classes>
-                { song_list }
+                { self.view_song_list() }
                 { self.view_nav_footer() }
             </nav>
-        }
+        })
     }
 }
