@@ -1300,6 +1300,8 @@ nav {
     margin-bottom: 2px; }
   nav .song-item.-separator {
     height: 7px; }
+  nav .song-item.draggable-mirror {
+    width: 300px; }
   nav.-hidden a[role=button].song-item {
     width: 40px;
     overflow: hidden;

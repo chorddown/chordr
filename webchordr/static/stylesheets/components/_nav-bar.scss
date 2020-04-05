@@ -40,6 +40,10 @@ nav {
         &.-separator {
             height: $std-half;
         }
+
+        &.draggable-mirror {
+            width: $nav-width;
+        }
     }
 
     &.-hidden {
