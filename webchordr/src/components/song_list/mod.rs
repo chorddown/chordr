@@ -73,7 +73,9 @@ impl Component for SongList {
     fn view(&self) -> Html {
         let songs = &self.props.songs;
         let render = |song: &SetlistEntry| {
-            html! { <Item<SetlistEntry> song=song.clone() /> }
+            let key = song.title();
+
+            html! { <Item<SetlistEntry> key=key song=song.clone() /> }
         };
 
         info!(

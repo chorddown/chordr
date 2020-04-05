@@ -125,10 +125,12 @@ impl Component for SongBrowser {
                 </div>
             }
         };
-        let render_song_item = |song| {
+        let render_song_item = |song:&Song| {
+            let key = song.title();
             html! {
                 <div class="col-3">
                     <SongItem<Song> class="song-item grid-button"
+                        key=key
                         song=song/>
                 </div>
             }
