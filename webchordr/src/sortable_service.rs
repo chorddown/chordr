@@ -1,11 +1,32 @@
 use yew::Callback;
-use stdweb::js;
+use stdweb::{js, Value};
 use crate::events::{SETLIST_CHANGE_SORTING, SortingChange};
 use stdweb::web::HtmlElement;
 use crate::events::sorting_change::Sorting;
+use crate::errors::WebError;
+
 
 /// Service to make a HtmlElement sortable using [Shopify/draggable](https://github.com/Shopify/draggable)
 pub struct SortableService {}
+
+#[must_use]
+pub struct SortableHandle(Option<Value>);
+
+impl SortableHandle {
+    pub fn destroy(&mut self) -> Result<(), WebError> {
+        if let Some(ref sortable) = self.0.take() {
+            js! { @(no_return)
+                const sortable = @{sortable};
+
+                sortable.destroy();
+            }
+
+            Ok(())
+        } else {
+            Err(WebError::sortable_error("Sortable handle is empty"))
+        }
+    }
+}
 
 impl SortableService {
     pub fn new() -> Self {
@@ -17,8 +38,8 @@ impl SortableService {
         &self,
         element: HtmlElement,
         callback: Callback<SortingChange>,
-    ) {
-        self.register(element, callback);
+    ) -> Result<SortableHandle, ()> {
+        self.register(element, callback)
     }
 
     //noinspection RsLiveness
@@ -26,11 +47,12 @@ impl SortableService {
     fn register(
         &self,
         element: HtmlElement,
-        callback: Callback<SortingChange>) {
+        callback: Callback<SortingChange>) -> Result<SortableHandle, ()>
+    {
         let handler = move |old_index: i64, new_index: i64| {
             callback.emit(SortingChange::new(old_index as Sorting, new_index as Sorting));
         };
-        js!(@(no_return)
+        let handle = js!(
             const element = @{element};
             const sortable = new Sortable.default(element, {
                 draggable: "a",
@@ -57,6 +79,10 @@ impl SortableService {
                 });
                 element.dispatchEvent(customEvent);
             });
+
+            return sortable;
         );
+
+        Ok(SortableHandle(Some(handle)))
     }
 }
