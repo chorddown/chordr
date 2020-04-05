@@ -3,11 +3,9 @@ use yew::prelude::*;
 
 pub type OnSetlist = bool;
 
-#[derive(Properties, PartialEq)]
+#[derive(Properties, PartialEq, Clone)]
 pub struct SetlistProps {
-    #[props(required)]
     pub is_on_setlist: OnSetlist,
-    #[props(required)]
     pub on_click: Callback<OnSetlist>,
 }
 

@@ -19,12 +19,9 @@ pub struct SongBrowser {
 
 const SONG_BROWSER_PLACEHOLDER: &'static str = "_";
 
-#[derive(Properties, PartialEq)]
+#[derive(Properties, PartialEq, Clone)]
 pub struct SongBrowserProps {
-    #[props(required)]
     pub chars: String,
-
-    #[props(required)]
     pub catalog: Catalog,
 }
 

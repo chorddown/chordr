@@ -1,11 +1,9 @@
 use libchordr::models::meta::SemitoneNotation;
 use yew::prelude::*;
 
-#[derive(Properties, PartialEq)]
+#[derive(Properties, PartialEq, Clone)]
 pub struct SemitoneNotationToolProps {
-    #[props(required)]
     pub semitone_notation: SemitoneNotation,
-    #[props(required)]
     pub on_change: Callback<SemitoneNotation>,
 }
 

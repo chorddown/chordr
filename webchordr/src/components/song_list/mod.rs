@@ -11,12 +11,10 @@ use crate::events::{SortingChange, Event};
 use crate::sortable_service::SortableService;
 use crate::events::setlist_events::SetlistEvent;
 
-#[derive(Properties, PartialEq)]
+#[derive(Properties, PartialEq, Clone)]
 pub struct SongListProps {
-    #[props(required)]
     pub songs: Rc<Setlist<SetlistEntry>>,
 
-    #[props(required)]
     pub on_setlist_change: Callback<Event>,
 }
 
@@ -45,7 +43,7 @@ impl Component for SongList {
     }
 
     fn mounted(&mut self) -> ShouldRender {
-        if let Some(element) = self.node_ref.try_into::<HtmlElement>() {
+        if let Some(element) = self.node_ref.cast::<HtmlElement>() {
             self.sortable_service.make_sortable(element, self.link.callback(|e| Msg::SetlistChangeSorting(e)));
         }
 

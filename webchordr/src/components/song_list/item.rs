@@ -4,23 +4,23 @@ use yew::prelude::*;
 use yew::virtual_dom::VNode;
 use yew::{Component, ComponentLink};
 
-#[derive(Properties, PartialEq)]
-pub struct SongListItemProps<S: SongData> {
-    #[props(required)]
+#[derive(Properties, PartialEq, Clone)]
+pub struct SongListItemProps<S: SongData + Clone> {
     pub song: S,
 
+    #[prop_or_default]
     pub class: Class,
 }
 
 #[allow(dead_code)]
-pub struct Item<S: SongData + PartialEq + 'static> {
+pub struct Item<S: SongData + PartialEq + 'static + Clone> {
     /// State from the parent
     props: SongListItemProps<S>,
     /// Utility object
     link: ComponentLink<Self>,
 }
 
-impl<S: SongData + PartialEq + 'static> Component for Item<S> {
+impl<S: SongData + PartialEq + 'static + Clone> Component for Item<S> {
     type Message = ();
     type Properties = SongListItemProps<S>;
 

@@ -14,24 +14,19 @@ mod semitone_notation_tool;
 mod setlist_tool;
 mod transpose_tool;
 
-#[derive(Properties, PartialEq)]
+#[derive(Properties, PartialEq, Clone)]
 pub struct SongViewProps {
-    #[props(required)]
     pub song: Song,
-    #[props(required)]
     pub song_settings: SongSettings,
-    #[props(required)]
     pub enable_setlists: bool,
-    #[props(required)]
     pub is_on_setlist: bool,
-    #[props(required)]
+
     pub on_setlist_add: Callback<SetlistEntry>,
-    #[props(required)]
     pub on_setlist_remove: Callback<SongId>,
-    #[props(required)]
     pub on_settings_change: Callback<(SongId, SongSettings)>,
 
     /// Display the Transpose tool with an input field
+    #[prop_or_default]
     pub show_input_field: Option<()>,
 }
 

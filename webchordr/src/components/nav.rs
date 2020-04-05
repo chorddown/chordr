@@ -4,15 +4,11 @@ use std::rc::Rc;
 use yew::prelude::*;
 use crate::events::Event;
 
-#[derive(Properties, PartialEq)]
+#[derive(Properties, PartialEq, Clone)]
 pub struct NavProps {
-    #[props(required)]
     pub songs: Rc<Setlist<SetlistEntry>>,
-    #[props(required)]
     pub show_menu: bool,
-    #[props(required)]
     pub on_toggle: Callback<()>,
-    #[props(required)]
     pub on_setlist_change: Callback<Event>,
 }
 

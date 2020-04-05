@@ -13,7 +13,6 @@ use crate::components::song_browser::SongBrowser;
 use crate::components::song_view::SongView;
 use crate::components::start_screen::StartScreen;
 use crate::route::AppRoute;
-use failure::Error;
 use libchordr::models::setlist::{Setlist, SetlistEntry};
 use libchordr::models::song_id::SongIdTrait;
 use libchordr::models::song_settings::SongSettings;
@@ -57,7 +56,7 @@ pub struct App {
 pub enum Msg {
     Event(Event),
     OpenSongInMainView(SongId),
-    FetchCatalogReady(Result<Catalog, Error>),
+    FetchCatalogReady(Result<Catalog, ::anyhow::Error>),
     FetchCatalog(bool),
     SongSettingsChange(SongId, SongSettings),
     ToggleMenu,
@@ -156,7 +155,7 @@ impl App {
 
         let callback =
             self.link
-                .callback(move |response: Response<Json<Result<Catalog, Error>>>| {
+                .callback(move |response: Response<Json<Result<Catalog, ::anyhow::Error>>>| {
                     let (meta, Json(data)) = response.into_parts();
                     if meta.status.is_success() {
                         Msg::FetchCatalogReady(data)
@@ -178,7 +177,10 @@ impl App {
         let request = Request::get(uri)
             .body(Nothing)
             .expect("Request could not be built");
-        self.ft = Some(self.fetch_service.fetch(request, callback));
+        match self.fetch_service.fetch(request, callback) {
+            Ok(task) => self.ft = Some(task),
+            Err(e) => error!("Fetch Task count not be built: {:?}", e),
+        }
     }
 
     fn handle_setlist_event(&mut self, event: SetlistEvent) {
@@ -247,7 +249,7 @@ impl Component for App {
         let callback = link.callback(Msg::RouteChanged);
         route_service.register_callback(callback);
 
-        let storage_service = StorageService::new(Area::Local);
+        let storage_service = StorageService::new(Area::Local).unwrap();
         let setlist = App::get_setlist(&storage_service);
         let settings = App::get_settings(&storage_service);
 
