@@ -74,9 +74,22 @@ impl<S: SongIdTrait> Setlist<S> {
     }
 
     /// Move the entry from one index to another one
-    pub fn move_entry(&mut self, from: usize, to: usize) {
+    pub fn move_entry(&mut self, from: usize, to: usize) -> Result<(), Error> {
+        if from >= self.0.len() {
+            return Err(Error::setlist_error(format!(
+                "Invalid 'from' value {} given",
+                from
+            )));
+        }
+        if to >= self.0.len() {
+            return Err(Error::setlist_error(format!(
+                "Invalid 'to' value {} given",
+                from
+            )));
+        }
         let item = self.0.remove(from);
         self.0.insert(to, item);
+        Ok(())
     }
 
     /// Get the position of the entry with the given [SongId]

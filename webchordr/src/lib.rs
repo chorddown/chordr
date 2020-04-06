@@ -211,10 +211,12 @@ impl App {
     }
 
     fn setlist_sorting_changed(&mut self, sorting_change: SortingChange) {
-        self.setlist.move_entry(sorting_change.old_index(), sorting_change.new_index());
-
-        self.storage_service
-            .store(STORAGE_KEY_SETLIST, Json(&self.setlist));
+        match self.setlist.move_entry(sorting_change.old_index(), sorting_change.new_index()) {
+            Ok(_) => {
+                self.storage_service.store(STORAGE_KEY_SETLIST, Json(&self.setlist));
+            }
+            Err(e) => error!("{}", e)
+        }
     }
 
     fn song_settings_change(&mut self, song_id: SongId, settings: SongSettings) {
