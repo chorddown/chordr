@@ -1,6 +1,10 @@
 #![recursion_limit = "128000"]
 extern crate stdweb;
 
+// Use `wee_alloc` as the global allocator.
+#[global_allocator]
+static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+
 mod components;
 mod helpers;
 mod events;
