@@ -158,7 +158,6 @@ mod tests {
         assert_eq!(SongId::new(song_id), song.id());
 
         let song_id = "song-id-with-spaces.chorddown";
-        println!("{:#?}",catalog);
         assert!(catalog.contains_id(song_id));
         assert!(catalog.get(song_id).is_some());
         let song = catalog.get(song_id).unwrap();

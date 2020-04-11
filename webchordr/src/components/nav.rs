@@ -2,15 +2,14 @@ use crate::components::song_list::SongList;
 use libchordr::models::setlist::*;
 use std::rc::Rc;
 use yew::prelude::*;
+use crate::events::Event;
 
-#[derive(Properties, PartialEq)]
+#[derive(Properties, PartialEq, Clone)]
 pub struct NavProps {
-    #[props(required)]
     pub songs: Rc<Setlist<SetlistEntry>>,
-    #[props(required)]
-    pub show_menu: bool,
-    #[props(required)]
+    pub expand: bool,
     pub on_toggle: Callback<()>,
+    pub on_setlist_change: Callback<Event>,
 }
 
 #[allow(dead_code)]
@@ -21,18 +20,17 @@ pub struct Nav {
 impl Nav {
     fn view_song_list(&self) -> Html {
         let songs = &self.props.songs;
+        let on_setlist_change = self.props.on_setlist_change.reform(|e| e);
 
         html! {
-            <div class="song-list">
-                <SongList songs=songs/>
-            </div>
+            <SongList songs=songs on_setlist_change=on_setlist_change sortable=self.props.expand />
         }
     }
 
     fn view_nav_footer(&self) -> Html {
         let toggle_menu = self.props.on_toggle.reform(|_| ());
 
-        (if self.props.show_menu {
+        (if self.props.expand {
             html! {
                 <footer>
                     <button class="toggle-menu" onclick=toggle_menu>{ "→" }</button>
@@ -75,24 +73,17 @@ impl Component for Nav {
 
     fn view(&self) -> Html {
         let mut menu_classes = vec!["menu"];
-        if self.props.show_menu {
+        if self.props.expand {
             menu_classes.push("-visible");
         } else {
             menu_classes.push("-hidden");
         };
 
-        let song_list = if self.props.show_menu {
-            self.view_song_list()
-        } else {
-            self.view_song_list()
-            // html! {}
-        };
-
-        html! {
+        (html! {
             <nav class=menu_classes>
-                { song_list }
+                { self.view_song_list() }
                 { self.view_nav_footer() }
             </nav>
-        }
+        })
     }
 }

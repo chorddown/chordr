@@ -17,6 +17,11 @@ impl Class {
             self.clone()
         }
     }
+
+    /// Return a new class with the given string appended
+    pub fn add(&self, class: &str) -> Self {
+        Self(format!("{} {}", self.0, class))
+    }
 }
 
 impl Default for Class {

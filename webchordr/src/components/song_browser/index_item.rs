@@ -5,11 +5,9 @@ use yew::prelude::*;
 use yew::virtual_dom::VNode;
 use yew::{Component, ComponentLink};
 
-#[derive(Properties, PartialEq, Debug)]
+#[derive(Properties, PartialEq, Debug, Clone)]
 pub struct SongBrowserIndexItemProps {
-    #[props(required)]
     pub index: Index,
-
     pub class: Class,
 }
 

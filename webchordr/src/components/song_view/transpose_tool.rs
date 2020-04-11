@@ -2,17 +2,13 @@ use log::error;
 use log::info;
 use yew::prelude::*;
 
-#[derive(Properties, PartialEq)]
+#[derive(Properties, PartialEq, Clone)]
 pub struct TransposeToolProps {
-    #[props(required)]
     pub transpose_semitone: isize,
-    #[props(required)]
     pub show_input_field: bool,
-    #[props(required)]
+
     pub on_click_up: Callback<()>,
-    #[props(required)]
     pub on_click_down: Callback<()>,
-    #[props(required)]
     pub on_set: Callback<isize>,
 }
 

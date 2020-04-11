@@ -4,23 +4,27 @@ use yew::prelude::*;
 use yew::virtual_dom::VNode;
 use yew::{Component, ComponentLink};
 
-#[derive(Properties, PartialEq)]
-pub struct SongListItemProps<S: SongData> {
-    #[props(required)]
+#[derive(Properties, PartialEq, Clone)]
+pub struct SongListItemProps<S: SongData + Clone> {
     pub song: S,
+    pub key: String,
 
+    #[prop_or_default]
+    pub sortable: bool,
+
+    #[prop_or_default]
     pub class: Class,
 }
 
 #[allow(dead_code)]
-pub struct Item<S: SongData + PartialEq + 'static> {
+pub struct Item<S: SongData + PartialEq + 'static + Clone> {
     /// State from the parent
     props: SongListItemProps<S>,
     /// Utility object
     link: ComponentLink<Self>,
 }
 
-impl<S: SongData + PartialEq + 'static> Component for Item<S> {
+impl<S: SongData + PartialEq + 'static + Clone> Component for Item<S> {
     type Message = ();
     type Properties = SongListItemProps<S>;
 
@@ -33,6 +37,12 @@ impl<S: SongData + PartialEq + 'static> Component for Item<S> {
     }
 
     fn change(&mut self, props: Self::Properties) -> bool {
+        // info!("{:?} vs {:?}", self.props, props);
+        // let new_name = props.song.title();
+        // let old_name = self.props.song.title();
+        // js!(console.log("%c" + @{old_name} + " -> " + @{new_name}, "color:Orange"));
+        // self.props = props;
+        // return true;
         if self.props != props {
             self.props = props;
             true
@@ -43,9 +53,17 @@ impl<S: SongData + PartialEq + 'static> Component for Item<S> {
 
     fn view(&self) -> VNode {
         let title = &self.props.song.title();
+        let key = &self.props.key;
         let href = format!("#/song/{}", self.props.song.id());
         let class = self.props.class.or("song-item");
 
-        html! { <a role="button" class=class href=href>{ title }</a> }
+        let link = html! { <a role="button" class="discreet" data-key=key href=href>{title}</a> };
+
+        (if self.props.sortable {
+            let class = class.add("-sortable");
+            html! { <div class=class>{link}<span class="sortable-handle">{"::"}</span></div> }
+        } else {
+            html! { <div class=class>{link}</div> }
+        }) as Html
     }
 }

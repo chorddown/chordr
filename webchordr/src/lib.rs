@@ -1,9 +1,16 @@
 #![recursion_limit = "128000"]
 extern crate stdweb;
 
+// Use `wee_alloc` as the global allocator.
+#[global_allocator]
+static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+
 mod components;
 mod helpers;
+mod events;
+mod errors;
 mod route;
+mod sortable_service;
 
 use crate::components::nav::Nav;
 use crate::components::reload_section::ReloadSection;
@@ -11,7 +18,6 @@ use crate::components::song_browser::SongBrowser;
 use crate::components::song_view::SongView;
 use crate::components::start_screen::StartScreen;
 use crate::route::AppRoute;
-use failure::Error;
 use libchordr::models::setlist::{Setlist, SetlistEntry};
 use libchordr::models::song_id::SongIdTrait;
 use libchordr::models::song_settings::SongSettings;
@@ -25,6 +31,7 @@ use yew::services::fetch::{FetchService, FetchTask, Request, Response};
 use yew::services::storage::{Area, StorageService};
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
 use yew_router::prelude::*;
+use crate::events::{Event, SortingChange, SetlistEvent};
 
 const STORAGE_KEY_SETLIST: &'static str = "net.cundd.chordr.setlist";
 const STORAGE_KEY_SETTINGS: &'static str = "net.cundd.chordr.settings";
@@ -43,7 +50,7 @@ pub struct App {
     link: ComponentLink<App>,
     ft: Option<FetchTask>,
 
-    show_menu: bool,
+    expand: bool,
     fetching: bool,
     catalog: Option<Catalog>,
     current_song: Option<Song>,
@@ -52,11 +59,10 @@ pub struct App {
 }
 
 pub enum Msg {
+    Event(Event),
     OpenSongInMainView(SongId),
-    FetchCatalogReady(Result<Catalog, Error>),
+    FetchCatalogReady(Result<Catalog, ::anyhow::Error>),
     FetchCatalog(bool),
-    SetlistAdd(SetlistEntry),
-    SetlistRemove(SongId),
     SongSettingsChange(SongId, SongSettings),
     ToggleMenu,
     Reload,
@@ -83,8 +89,8 @@ impl App {
 
         let catalog = self.catalog.as_ref().unwrap();
         if let Some(song) = catalog.get(song_id.clone()) {
-            let add = self.link.callback(|s| Msg::SetlistAdd(s));
-            let remove = self.link.callback(|s| Msg::SetlistRemove(s));
+            let add = self.link.callback(|s| Msg::Event(SetlistEvent::Add(s).into()));
+            let remove = self.link.callback(|s| Msg::Event(SetlistEvent::Remove(s).into()));
             let change = self
                 .link
                 .callback(|s: (SongId, SongSettings)| Msg::SongSettingsChange(s.0, s.1));
@@ -154,7 +160,7 @@ impl App {
 
         let callback =
             self.link
-                .callback(move |response: Response<Json<Result<Catalog, Error>>>| {
+                .callback(move |response: Response<Json<Result<Catalog, anyhow::Error>>>| {
                     let (meta, Json(data)) = response.into_parts();
                     if meta.status.is_success() {
                         Msg::FetchCatalogReady(data)
@@ -176,9 +182,19 @@ impl App {
         let request = Request::get(uri)
             .body(Nothing)
             .expect("Request could not be built");
-        self.ft = Some(self.fetch_service.fetch(request, callback));
+        match self.fetch_service.fetch(request, callback) {
+            Ok(task) => self.ft = Some(task),
+            Err(e) => error!("Fetch Task count not be built: {:?}", e),
+        }
     }
 
+    fn handle_setlist_event(&mut self, event: SetlistEvent) {
+        match event {
+            SetlistEvent::SortingChange(v) => self.setlist_sorting_changed(v),
+            SetlistEvent::Add(v) => self.setlist_add(v),
+            SetlistEvent::Remove(v) => self.setlist_remove(v),
+        }
+    }
     fn setlist_add(&mut self, song: SetlistEntry) {
         let song_id = song.id();
         match self.setlist.add(song) {
@@ -196,6 +212,15 @@ impl App {
         }
         self.storage_service
             .store(STORAGE_KEY_SETLIST, Json(&self.setlist));
+    }
+
+    fn setlist_sorting_changed(&mut self, sorting_change: SortingChange) {
+        match self.setlist.move_entry(sorting_change.old_index(), sorting_change.new_index()) {
+            Ok(_) => {
+                self.storage_service.store(STORAGE_KEY_SETLIST, Json(&self.setlist));
+            }
+            Err(e) => error!("{}", e)
+        }
     }
 
     fn song_settings_change(&mut self, song_id: SongId, settings: SongSettings) {
@@ -231,7 +256,7 @@ impl Component for App {
         let callback = link.callback(Msg::RouteChanged);
         route_service.register_callback(callback);
 
-        let storage_service = StorageService::new(Area::Local);
+        let storage_service = StorageService::new(Area::Local).unwrap();
         let setlist = App::get_setlist(&storage_service);
         let settings = App::get_settings(&storage_service);
 
@@ -240,7 +265,7 @@ impl Component for App {
             storage_service,
             link,
             fetching: false,
-            show_menu: true,
+            expand: true,
             current_song: None,
             catalog: None,
             ft: None,
@@ -275,18 +300,22 @@ impl Component for App {
                 self.catalog = response.ok();
             }
             Msg::FetchCatalog(no_cache) => self.fetch_catalog(no_cache),
-            Msg::SetlistAdd(song) => self.setlist_add(song),
-            Msg::SetlistRemove(song) => self.setlist_remove(song),
             Msg::SongSettingsChange(song_id, settings) => {
                 self.song_settings_change(song_id, settings)
             }
             Msg::Ignore => return false,
             Msg::ToggleMenu => {
-                self.show_menu = !self.show_menu;
+                self.expand = !self.expand;
             }
             Msg::Reload => {
                 js! {
                     top.frames.location.reload()
+                }
+            }
+            Msg::Event(e) => {
+                match e {
+                    Event::SetlistEvent(se) => self.handle_setlist_event(se),
+                    _ => debug!("New event {:?}", e)
                 }
             }
         }
@@ -294,21 +323,23 @@ impl Component for App {
     }
 
     fn view(&self) -> Html {
-        let main_classes = if self.show_menu {
+        let main_classes = if self.expand {
             "-menu-visible"
         } else {
             "-menu-hidden"
         };
 
         let toggle_menu = self.link.callback(|_| Msg::ToggleMenu);
+        let on_setlist_change = self.link.callback(|e| Msg::Event(e));
         let songs = Rc::new(self.setlist.clone());
 
         html! {
             <main class=main_classes>
                 <Nav
-                    show_menu=self.show_menu
+                    expand=self.expand
                     songs=songs
                     on_toggle=toggle_menu
+                    on_setlist_change=on_setlist_change
                 />
                 <div class="content">
                     { self.route() }
