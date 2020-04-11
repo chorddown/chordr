@@ -9,7 +9,7 @@ use std::rc::Rc;
 use yew::prelude::*;
 use stdweb::web::HtmlElement;
 use crate::events::{SortingChange, Event};
-use crate::sortable_service::{SortableService, SortableHandle};
+use crate::sortable_service::{SortableService, SortableHandle, SortableOptions};
 use crate::events::setlist_events::SetlistEvent;
 
 #[derive(Properties, PartialEq, Clone)]
@@ -59,8 +59,8 @@ impl Component for SongList {
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
             Msg::SetlistChangeSorting(e) => {
-                info!("Handle Setlist sorting change: Move {} to {}", e.old_index(), e.new_index());
-                self.props.on_setlist_change.emit(Event::SetlistEvent(SetlistEvent::SortingChange(e)));
+                let sorting_change = self.patch_sorting_change(e);
+                self.props.on_setlist_change.emit(Event::SetlistEvent(SetlistEvent::SortingChange(sorting_change)));
                 self.props.songs = Rc::new(Setlist::new());
                 true
             }
@@ -84,10 +84,11 @@ impl Component for SongList {
 
     fn view(&self) -> Html {
         let songs = &self.props.songs;
+        let sortable = self.props.sortable;
         let render = |song: &SetlistEntry| {
             let key = song.title();
 
-            html! { <Item<SetlistEntry> key=key song=song.clone() /> }
+            html! { <Item<SetlistEntry> key=key song=song.clone() sortable=sortable/> }
         };
 
         info!(
@@ -96,20 +97,24 @@ impl Component for SongList {
         );
 
         (html! {
-            <div ref=self.node_ref.clone()>
+            <div class="song-list" ref=self.node_ref.clone()>
                 {for songs.iter().map(render)}
             </div>
         }) as Html
     }
 }
 
+
 impl SongList {
     fn make_sortable(&mut self) {
         match self.sortable_handle {
             None =>
                 if let Some(element) = self.node_ref.cast::<HtmlElement>() {
+                    let mut options = SortableOptions::default();
+                    options.handle = Some(".sortable-handle".into());
+                    options.force_fallback = true;
                     self.sortable_handle = self.sortable_service
-                        .make_sortable(element, self.link.callback(|e| Msg::SetlistChangeSorting(e)))
+                        .make_sortable(element, self.link.callback(|e| Msg::SetlistChangeSorting(e)), options)
                         .ok();
                 },
             Some(_) => { /* Element is already sortable */ }
@@ -122,5 +127,21 @@ impl SongList {
                 error!("{}", e);
             }
         };
+    }
+
+    /// Patch the Sorting Change value
+    ///
+    /// The JS library may report that the element was moved to index `self.props.songs.len()`. If
+    /// that's the case, patch the value
+    fn patch_sorting_change(&self, e: SortingChange) -> SortingChange {
+        let song_count = self.props.songs.len();
+        if e.new_index() == song_count {
+            let last_index = song_count - 1;
+            info!("Handle Setlist sorting change: Move {} to {} (patched: {})", e.old_index(), last_index, e.new_index());
+            SortingChange::new(e.old_index(), last_index)
+        } else {
+            info!("Handle Setlist sorting change: Move {} to {}", e.old_index(), e.new_index());
+            e
+        }
     }
 }

@@ -1,5 +1,6 @@
 @import "prelude";
 
+$sort-handle-width: 40px !default;
 nav {
     background: $nav-bg;
     order: 2;
@@ -29,25 +30,62 @@ nav {
         flex-flow: column;
         overflow: scroll;
         height: calc(100vh - #{$nav-button-height + $nav-footer-border-width});
+
+        &:focus,
+        & > div:focus {
+            outline: none;
+        }
+
     }
 
     a[role=button],
     button {
-        margin-bottom: 2px;
+        //margin-bottom: 2px;
     }
 
     .song-item {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        margin-bottom: 2px;
+        @extend %button;
+        @extend %button-default;
+        padding: 0;
+
         &.-separator {
             height: $std-half;
         }
 
-        &.draggable-mirror {
-            width: $nav-width;
+        .sortable-handle,
+        a[role=button] {
+            padding: $button-padding;
+
+            &:focus,
+            &:hover {
+                color: $button-hover-color;
+                @include if-dark-mode {
+                    color: $dark-mode-button-hover-color;
+                }
+            }
+        }
+
+        &.-sortable a[role=button] {
+            width: $nav-width - $sort-handle-width;
+            border-right: none;
+        }
+
+        .sortable-handle {
+            font-family: $ui-font;
+            width: $sort-handle-width;
+            margin-top: -4px;
+            border-left: none;
+            cursor: move;
+            cursor: -webkit-grabbing;
         }
     }
 
     &.-hidden {
-        a[role=button].song-item {
+        .song-item a[role=button] {
             width: $nav-collapsed-width;
             overflow: hidden;
             white-space: nowrap;

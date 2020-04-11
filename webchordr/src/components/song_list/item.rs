@@ -10,6 +10,9 @@ pub struct SongListItemProps<S: SongData + Clone> {
     pub key: String,
 
     #[prop_or_default]
+    pub sortable: bool,
+
+    #[prop_or_default]
     pub class: Class,
 }
 
@@ -54,6 +57,13 @@ impl<S: SongData + PartialEq + 'static + Clone> Component for Item<S> {
         let href = format!("#/song/{}", self.props.song.id());
         let class = self.props.class.or("song-item");
 
-        html! { <a role="button" class=class data-key=key href=href>{title}</a> }
+        let link = html! { <a role="button" class="discreet" data-key=key href=href>{title}</a> };
+
+        (if self.props.sortable {
+            let class = class.add("-sortable");
+            html! { <div class=class>{link}<span class="sortable-handle">{"::"}</span></div> }
+        } else {
+            html! { <div class=class>{link}</div> }
+        }) as Html
     }
 }

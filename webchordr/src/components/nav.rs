@@ -23,9 +23,7 @@ impl Nav {
         let on_setlist_change = self.props.on_setlist_change.reform(|e| e);
 
         html! {
-            <div class="song-list">
-                <SongList songs=songs on_setlist_change=on_setlist_change sortable=self.props.expand />
-            </div>
+            <SongList songs=songs on_setlist_change=on_setlist_change sortable=self.props.expand />
         }
     }
 

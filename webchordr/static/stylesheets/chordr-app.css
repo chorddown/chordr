@@ -946,6 +946,9 @@
 *::after {
   box-sizing: border-box; }
 
+:focus {
+  outline: none; }
+
 img {
   display: block; }
 
@@ -1072,7 +1075,7 @@ a {
       color: #d8d8d0; }
 
 a[role=button],
-button {
+button, .grid-button, nav .song-item {
   display: block;
   appearance: none;
   line-height: 26px;
@@ -1080,55 +1083,68 @@ button {
   border: 1px solid #8d8d88;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
   text-decoration: none; }
-  a[role=button]:focus, a[role=button]:hover,
-  button:focus,
-  button:hover {
+  a[role=button]:focus,
+  button:focus, .grid-button:focus, nav .song-item:focus, a[role=button]:hover,
+  button:hover, .grid-button:hover, nav .song-item:hover {
     outline: none; }
-  a[role=button]:not(.discreet),
-  button:not(.discreet) {
-    background: #b7b7b0;
+
+a[role=button]:not(.discreet),
+button:not(.discreet), .grid-button, nav .song-item {
+  background: #b7b7b0;
+  color: #62625e;
+  width: 100%;
+  padding: 7px 14px;
+  text-align: center; }
+  a[role=button]:focus:not(.discreet),
+  button:focus:not(.discreet), .grid-button:focus, nav .song-item:focus, a[role=button]:hover:not(.discreet),
+  button:hover:not(.discreet), .grid-button:hover, nav .song-item:hover {
     color: #62625e;
-    width: 100%;
-    padding: 7px 14px;
-    text-align: center; }
-    a[role=button]:not(.discreet):focus, a[role=button]:not(.discreet):hover,
-    button:not(.discreet):focus,
-    button:not(.discreet):hover {
-      color: #62625e;
-      background: #8d8d88; }
-    @media screen and (prefers-color-scheme: dark) {
-      a[role=button]:not(.discreet),
-      button:not(.discreet) {
-        background: #221d1c;
-        color: white; }
-        a[role=button]:not(.discreet):focus, a[role=button]:not(.discreet):hover,
-        button:not(.discreet):focus,
-        button:not(.discreet):hover {
-          color: white;
-          background: #62625e; } }
-    html.dark-mode a[role=button]:not(.discreet), html.dark-mode
-    button:not(.discreet) {
+    background: #8d8d88; }
+  @media screen and (prefers-color-scheme: dark) {
+    a[role=button]:not(.discreet),
+    button:not(.discreet), .grid-button, nav .song-item {
       background: #221d1c;
       color: white; }
-      html.dark-mode a[role=button]:not(.discreet):focus, html.dark-mode a[role=button]:not(.discreet):hover, html.dark-mode
-      button:not(.discreet):focus, html.dark-mode
-      button:not(.discreet):hover {
+      a[role=button]:focus:not(.discreet),
+      button:focus:not(.discreet), .grid-button:focus, nav .song-item:focus, a[role=button]:hover:not(.discreet),
+      button:hover:not(.discreet), .grid-button:hover, nav .song-item:hover {
         color: white;
-        background: #62625e; }
-  a[role=button].-inline,
-  button.-inline {
-    display: inline-block;
-    width: auto; }
-  a[role=button].grid-button,
-  button.grid-button {
-    height: 100%;
+        background: #62625e; } }
+  html.dark-mode a[role=button]:not(.discreet),
+  html.dark-mode button:not(.discreet), html.dark-mode .grid-button, html.dark-mode nav .song-item, nav html.dark-mode .song-item {
+    background: #221d1c;
+    color: white; }
+    html.dark-mode a[role=button]:focus:not(.discreet),
+    html.dark-mode button:focus:not(.discreet), html.dark-mode .grid-button:focus, html.dark-mode nav .song-item:focus, nav html.dark-mode .song-item:focus, html.dark-mode a[role=button]:hover:not(.discreet),
+    html.dark-mode button:hover:not(.discreet), html.dark-mode .grid-button:hover, html.dark-mode nav .song-item:hover, nav html.dark-mode .song-item:hover {
+      color: white;
+      background: #62625e; }
+
+a[role=button].-inline,
+button.-inline {
+  display: inline-block;
+  width: auto; }
+
+a[role=button].discreet,
+button.discreet {
+  background: transparent;
+  border: none; }
+
+.grid-button {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center; }
+  .grid-button a[role=button],
+  .grid-button button {
     display: flex;
     align-items: center;
-    justify-content: center; }
-  a[role=button].discreet,
-  button.discreet {
-    background: transparent;
-    border: none; }
+    justify-content: center;
+    color: inherit; }
+    .grid-button a[role=button]:focus, .grid-button a[role=button]:hover,
+    .grid-button button:focus,
+    .grid-button button:hover {
+      color: inherit; }
 
 .start-screen {
   display: flex;
@@ -1295,14 +1311,44 @@ nav {
     flex-flow: column;
     overflow: scroll;
     height: calc(100vh - 40px); }
-  nav a[role=button],
-  nav button {
-    margin-bottom: 2px; }
-  nav .song-item.-separator {
-    height: 7px; }
-  nav .song-item.draggable-mirror {
-    width: 300px; }
-  nav.-hidden a[role=button].song-item {
+    nav .song-list:focus,
+    nav .song-list > div:focus {
+      outline: none; }
+  nav .song-item {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    margin-bottom: 2px;
+    padding: 0; }
+    nav .song-item.-separator {
+      height: 7px; }
+    nav .song-item .sortable-handle,
+    nav .song-item a[role=button] {
+      padding: 7px 14px; }
+      nav .song-item .sortable-handle:focus, nav .song-item .sortable-handle:hover,
+      nav .song-item a[role=button]:focus,
+      nav .song-item a[role=button]:hover {
+        color: #62625e; }
+        @media screen and (prefers-color-scheme: dark) {
+          nav .song-item .sortable-handle:focus, nav .song-item .sortable-handle:hover,
+          nav .song-item a[role=button]:focus,
+          nav .song-item a[role=button]:hover {
+            color: white; } }
+        html.dark-mode nav .song-item .sortable-handle:focus, html.dark-mode nav .song-item .sortable-handle:hover, html.dark-mode
+        nav .song-item a[role=button]:focus, html.dark-mode
+        nav .song-item a[role=button]:hover {
+          color: white; }
+    nav .song-item.-sortable a[role=button] {
+      width: 260px;
+      border-right: none; }
+    nav .song-item .sortable-handle {
+      font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+      width: 40px;
+      margin-top: -4px;
+      border-left: none;
+      cursor: move;
+      cursor: -webkit-grabbing; }
+  nav.-hidden .song-item a[role=button] {
     width: 40px;
     overflow: hidden;
     white-space: nowrap;
@@ -1342,6 +1388,20 @@ nav {
   nav.-hidden footer button {
     max-width: 100%;
     width: 40px; }
+
+.sortable-ghost {
+  color: #62625e !important;
+  background: #8d8d88 !important; }
+  @media screen and (prefers-color-scheme: dark) {
+    .sortable-ghost {
+      color: white !important;
+      background: #62625e !important; } }
+  html.dark-mode .sortable-ghost {
+    color: white !important;
+    background: #62625e !important; }
+
+.sortable-drag {
+  opacity: 0 !important; }
 
 .content {
   background: white;
