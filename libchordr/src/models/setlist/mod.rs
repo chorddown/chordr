@@ -30,6 +30,10 @@ impl<S: SongIdTrait> Setlist<S> {
         self.0.iter().find(|s| s.id() == song_id)
     }
 
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
+
     /// Add the given [SongData] instance to the [Setlist] if it's [SongId] is not already registered
     pub fn add(&mut self, song: S) -> Result<()> {
         if !self.contains(&song) {
@@ -75,16 +79,19 @@ impl<S: SongIdTrait> Setlist<S> {
 
     /// Move the entry from one index to another one
     pub fn move_entry(&mut self, from: usize, to: usize) -> Result<(), Error> {
-        if from >= self.0.len() {
+        let length = self.0.len();
+        if from >= length {
             return Err(Error::setlist_error(format!(
-                "Invalid 'from' value {} given",
-                from
+                "Invalid 'from' value {} given. Length is {}",
+                from,
+                length,
             )));
         }
-        if to >= self.0.len() {
+        if to >= length {
             return Err(Error::setlist_error(format!(
-                "Invalid 'to' value {} given",
-                from
+                "Invalid 'to' value {} given. Length is {}",
+                to,
+                length,
             )));
         }
         let item = self.0.remove(from);
