@@ -63,7 +63,7 @@ impl SongBrowser {
 
             let href = format!("#/song-browser/{}", parameter);
 
-            html! { <a class="song-browser-back -inline" href=href><i class="im im-angle-left"></i>{ "Back" }</a> }
+            html! { <a class="song-browser-back back-link -inline" href=href><i class="im im-angle-left"></i>{ "Back" }</a> }
         } else {
             html! {}
         }) as Html

@@ -32,6 +32,7 @@ use yew::services::storage::{Area, StorageService};
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
 use yew_router::prelude::*;
 use crate::events::{Event, SortingChange, SetlistEvent};
+use crate::components::song_search::SongSearch;
 
 const STORAGE_KEY_SETLIST: &'static str = "net.cundd.chordr.setlist";
 const STORAGE_KEY_SETTINGS: &'static str = "net.cundd.chordr.settings";
@@ -75,11 +76,21 @@ impl App {
         (match AppRoute::switch(self.route.clone()) {
             Some(AppRoute::Song(id)) => self.view_song(id),
             Some(AppRoute::SongBrowser(chars)) => self.view_song_browser(chars),
-            Some(AppRoute::Index) => {
-                html! {<><StartScreen/>{self.view_song_browser("")}<ReloadSection /></>}
-            }
-            None => html! {<><StartScreen/>{self.view_song_browser("")}<ReloadSection /></>},
+            Some(AppRoute::SongSearch) => self.view_song_search(true),
+            Some(AppRoute::Index) => self.view_index(),
+            None => self.view_index(),
         }) as Html
+    }
+
+    fn view_index(&self) -> Html {
+        html! {
+            <>
+                <StartScreen />
+                {self.view_song_browser("")}
+                <ReloadSection />
+                {self.view_song_search(false)}
+            </>
+        }
     }
 
     fn view_song(&self, song_id: SongId) -> Html {
@@ -150,6 +161,15 @@ impl App {
             Some(catalog) => {
                 info!("New chars from router: {}", chars);
                 html! {<SongBrowser chars=chars catalog=catalog/>}
+            }
+            None => html! {},
+        }) as Html
+    }
+
+    fn view_song_search(&self,show_back_button:bool) -> Html {
+        (match &self.catalog {
+            Some(catalog) => {
+                html! {<SongSearch catalog=catalog show_back_button=show_back_button />}
             }
             None => html! {},
         }) as Html

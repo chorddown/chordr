@@ -41,7 +41,8 @@
 }
 
 a[role=button],
-button {
+button,
+.button {
     @extend %button;
 
     &:not(.discreet) {

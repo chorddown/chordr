@@ -7,6 +7,8 @@ pub enum AppRoute {
     Song(SongId),
     #[to = "/#/song-browser/{id}"]
     SongBrowser(String),
+    #[to = "/#/song-search"]
+    SongSearch,
     #[to = "/index"]
     Index,
 }

@@ -1074,8 +1074,13 @@ a {
     html.dark-mode a:focus, html.dark-mode a:hover {
       color: #d8d8d0; }
 
+.back-link {
+  display: inline-block;
+  margin-top: 14px; }
+
 a[role=button],
-button, .grid-button, nav .song-item {
+button,
+.button, .grid-button, nav .song-item {
   display: block;
   appearance: none;
   line-height: 26px;
@@ -1084,49 +1089,62 @@ button, .grid-button, nav .song-item {
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
   text-decoration: none; }
   a[role=button]:focus,
-  button:focus, .grid-button:focus, nav .song-item:focus, a[role=button]:hover,
-  button:hover, .grid-button:hover, nav .song-item:hover {
+  button:focus,
+  .button:focus, .grid-button:focus, nav .song-item:focus, a[role=button]:hover,
+  button:hover,
+  .button:hover, .grid-button:hover, nav .song-item:hover {
     outline: none; }
 
 a[role=button]:not(.discreet),
-button:not(.discreet), .grid-button, nav .song-item {
+button:not(.discreet),
+.button:not(.discreet), .grid-button, nav .song-item {
   background: #b7b7b0;
   color: #62625e;
   width: 100%;
   padding: 7px 14px;
   text-align: center; }
   a[role=button]:focus:not(.discreet),
-  button:focus:not(.discreet), .grid-button:focus, nav .song-item:focus, a[role=button]:hover:not(.discreet),
-  button:hover:not(.discreet), .grid-button:hover, nav .song-item:hover {
+  button:focus:not(.discreet),
+  .button:focus:not(.discreet), .grid-button:focus, nav .song-item:focus, a[role=button]:hover:not(.discreet),
+  button:hover:not(.discreet),
+  .button:hover:not(.discreet), .grid-button:hover, nav .song-item:hover {
     color: #62625e;
     background: #8d8d88; }
   @media screen and (prefers-color-scheme: dark) {
     a[role=button]:not(.discreet),
-    button:not(.discreet), .grid-button, nav .song-item {
+    button:not(.discreet),
+    .button:not(.discreet), .grid-button, nav .song-item {
       background: #221d1c;
       color: white; }
       a[role=button]:focus:not(.discreet),
-      button:focus:not(.discreet), .grid-button:focus, nav .song-item:focus, a[role=button]:hover:not(.discreet),
-      button:hover:not(.discreet), .grid-button:hover, nav .song-item:hover {
+      button:focus:not(.discreet),
+      .button:focus:not(.discreet), .grid-button:focus, nav .song-item:focus, a[role=button]:hover:not(.discreet),
+      button:hover:not(.discreet),
+      .button:hover:not(.discreet), .grid-button:hover, nav .song-item:hover {
         color: white;
         background: #62625e; } }
   html.dark-mode a[role=button]:not(.discreet),
-  html.dark-mode button:not(.discreet), html.dark-mode .grid-button, html.dark-mode nav .song-item, nav html.dark-mode .song-item {
+  html.dark-mode button:not(.discreet),
+  html.dark-mode .button:not(.discreet), html.dark-mode .grid-button, html.dark-mode nav .song-item, nav html.dark-mode .song-item {
     background: #221d1c;
     color: white; }
     html.dark-mode a[role=button]:focus:not(.discreet),
-    html.dark-mode button:focus:not(.discreet), html.dark-mode .grid-button:focus, html.dark-mode nav .song-item:focus, nav html.dark-mode .song-item:focus, html.dark-mode a[role=button]:hover:not(.discreet),
-    html.dark-mode button:hover:not(.discreet), html.dark-mode .grid-button:hover, html.dark-mode nav .song-item:hover, nav html.dark-mode .song-item:hover {
+    html.dark-mode button:focus:not(.discreet),
+    html.dark-mode .button:focus:not(.discreet), html.dark-mode .grid-button:focus, html.dark-mode nav .song-item:focus, nav html.dark-mode .song-item:focus, html.dark-mode a[role=button]:hover:not(.discreet),
+    html.dark-mode button:hover:not(.discreet),
+    html.dark-mode .button:hover:not(.discreet), html.dark-mode .grid-button:hover, html.dark-mode nav .song-item:hover, nav html.dark-mode .song-item:hover {
       color: white;
       background: #62625e; }
 
 a[role=button].-inline,
-button.-inline {
+button.-inline,
+.button.-inline {
   display: inline-block;
   width: auto; }
 
 a[role=button].discreet,
-button.discreet {
+button.discreet,
+.button.discreet {
   background: transparent;
   border: none; }
 
@@ -1177,10 +1195,6 @@ button.discreet {
   display: inline-block;
   margin-right: 7px; }
 
-.song-browser-back {
-  display: inline-block;
-  margin-top: 14px; }
-
 .song-browser-header-suffix {
   text-transform: uppercase;
   margin-left: .3em; }
@@ -1196,6 +1210,35 @@ button.discreet {
 .song-browser-index-list .index-item-count {
   display: block;
   font-size: .6em; }
+
+.song-search-home {
+  display: inline-block;
+  margin-right: 7px; }
+
+.song-search-song-list input[type=text],
+.song-search-song-list input[type=search],
+.song-search-song-list .song-item {
+  margin-bottom: 2px; }
+
+.song-search-song-list input[type=text],
+.song-search-song-list input[type=search] {
+  line-height: 26px;
+  padding: 7px 14px;
+  display: block;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: 1px solid #8d8d88;
+  width: 100%;
+  border-radius: 0;
+  background: transparent; }
+  @media screen and (prefers-color-scheme: dark) {
+    .song-search-song-list input[type=text],
+    .song-search-song-list input[type=search] {
+      color: white; } }
+  html.dark-mode .song-search-song-list input[type=text], html.dark-mode
+  .song-search-song-list input[type=search] {
+    color: white; }
 
 .song-tools {
   position: fixed;
