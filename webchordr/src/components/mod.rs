@@ -1,5 +1,6 @@
 pub mod nav;
 pub mod nbsp;
+pub mod modal;
 pub mod reload_section;
 pub mod song_browser;
 pub mod song_list;

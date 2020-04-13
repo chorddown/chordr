@@ -1102,7 +1102,8 @@ button:not(.discreet),
   width: 100%;
   padding: 7px 14px;
   text-align: center;
-  letter-spacing: -0.01em; }
+  letter-spacing: -0.01em;
+  cursor: pointer; }
   a[role=button]:focus:not(.discreet),
   button:focus:not(.discreet),
   .button:focus:not(.discreet), .grid-button:focus, nav .song-item:focus, a[role=button]:hover:not(.discreet),
@@ -1163,6 +1164,40 @@ button.discreet,
     .grid-button button:focus,
     .grid-button button:hover {
       color: inherit; }
+
+.button-group {
+  display: flex;
+  flex-flow: row;
+  margin-left: -7px;
+  margin-right: -7px; }
+  .button-group > button {
+    margin-left: 7px;
+    margin-right: 7px; }
+
+.modal-outer {
+  z-index: 100;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.8); }
+  @media screen and (prefers-color-scheme: dark) {
+    .modal-outer {
+      background: rgba(0, 0, 0, 0.8); } }
+  html.dark-mode .modal-outer {
+    background: rgba(0, 0, 0, 0.8); }
+  .modal-outer .modal {
+    width: 100%;
+    max-width: 500px;
+    background: #d8d8d0;
+    padding: 14px; }
+  .modal-outer .modal-question {
+    margin-bottom: 14px;
+    text-align: center; }
 
 .start-screen {
   display: flex;

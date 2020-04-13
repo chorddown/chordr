@@ -22,6 +22,7 @@
     padding: $button-padding;
     text-align: center;
     letter-spacing: $button-letter-spacing;
+    cursor: pointer;
 
     &:focus,
     &:hover {
@@ -82,5 +83,17 @@ button,
         &:hover {
             color: inherit;
         }
+    }
+}
+
+.button-group {
+    display: flex;
+    flex-flow: row;
+    margin-left: -$std-half;
+    margin-right: -$std-half;
+
+    > button {
+        margin-left: $std-half;
+        margin-right: $std-half;
     }
 }
