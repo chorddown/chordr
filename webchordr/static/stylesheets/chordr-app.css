@@ -956,7 +956,6 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
   font-size: 16px;
   line-height: 1.3em;
-  letter-spacing: 0.05em;
   margin: 0;
   color: #221d1c; }
   @media screen and (prefers-color-scheme: dark) {
@@ -1102,7 +1101,8 @@ button:not(.discreet),
   color: #62625e;
   width: 100%;
   padding: 7px 14px;
-  text-align: center; }
+  text-align: center;
+  letter-spacing: -0.01em; }
   a[role=button]:focus:not(.discreet),
   button:focus:not(.discreet),
   .button:focus:not(.discreet), .grid-button:focus, nav .song-item:focus, a[role=button]:hover:not(.discreet),
@@ -1182,7 +1182,8 @@ button.discreet,
 .reload-button,
 .reload-section-version {
   display: inline-block;
-  line-height: 40px; }
+  line-height: 40px;
+  letter-spacing: -0.01em; }
 
 .reload-button-container {
   flex: 1 0 75%; }

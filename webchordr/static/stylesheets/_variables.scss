@@ -35,9 +35,11 @@ $link-color: $gray-darker !default;
 $link-hover-color: $gray-ultra-dark !default;
 $dark-mode-link-color: $text-color-dark-mode !default;
 $dark-mode-link-hover-color: $gray-light !default;
+
 $button-line-height: 26px !default;
 $button-font-size: $font-size-h3 !default;
 $button-padding: $std-half $std-space !default;
+$button-letter-spacing: -.01em !default;
 $button-bg: $gray !default;
 $button-color: $gray-darker !default;
 $button-border: 1px solid $gray-dark !default;
