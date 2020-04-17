@@ -272,10 +272,8 @@ impl Component for App {
 
     fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
         let mut route_service: RouteService<()> = RouteService::new();
-        let route = route_service.get_route();
-        let route = Route::from(route);
-        let callback = link.callback(Msg::RouteChanged);
-        route_service.register_callback(callback);
+        let route = Route::from(route_service.get_route());
+        route_service.register_callback(link.callback(Msg::RouteChanged));
 
         let storage_service = StorageService::new(Area::Local).unwrap();
         let setlist = App::get_setlist(&storage_service);
