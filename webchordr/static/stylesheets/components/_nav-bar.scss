@@ -45,6 +45,17 @@ nav {
         flex-flow: row nowrap;
         align-items: center;
         margin-bottom: 2px;
+        &:focus {
+            color: $button-color;
+            background: $button-bg;
+        }
+
+        @include if-dark-mode {
+            &:focus {
+                color: $dark-mode-button-color;
+                background: $dark-mode-button-bg;
+            }
+        }
 
         &.-separator {
             height: $std-half;
