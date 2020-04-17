@@ -10,6 +10,7 @@ mod helpers;
 mod events;
 mod errors;
 mod route;
+mod setlist_serializer_service;
 mod sortable_service;
 
 use crate::components::nav::Nav;

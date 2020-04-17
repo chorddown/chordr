@@ -3,6 +3,7 @@ use libchordr::models::setlist::*;
 use std::rc::Rc;
 use yew::prelude::*;
 use crate::events::Event;
+use crate::components::setlist::SetlistShareButton;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct NavProps {
@@ -34,6 +35,7 @@ impl Nav {
             html! {
                 <footer>
                     <button class="toggle-menu" onclick=toggle_menu>{ "→" }</button>
+                    <SetlistShareButton setlist=self.props.songs.clone()/>
                     <a role="button" class="home" href="/#" title="Go to home screen">
                         <i class="im im-home"></i>
                         <span>{ "Home" }</span>
