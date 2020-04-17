@@ -52,3 +52,45 @@
         margin-bottom: 0;
     }
 }
+
+@mixin button($display: block) {
+    display: $display;
+    appearance: none;
+    line-height: $button-line-height;
+    font-size: $button-font-size;
+    font-family: $ui-font;
+    text-decoration: none;
+
+    &:focus,
+    &:hover {
+        outline: none;
+    }
+}
+
+@mixin button-default($padding: $button-padding, $border: $button-border, $width: 100%) {
+    background: $button-bg;
+    border: $border;
+    color: $button-color;
+    width: $width;
+    padding: $padding;
+    text-align: center;
+    letter-spacing: $button-letter-spacing;
+    cursor: pointer;
+
+    &:focus,
+    &:hover {
+        color: $button-hover-color;
+        background: $button-hover-bg;
+    }
+
+    @include if-dark-mode {
+        background: $dark-mode-button-bg;
+        color: $dark-mode-button-color;
+
+        &:focus,
+        &:hover {
+            color: $dark-mode-button-hover-color;
+            background: $dark-mode-button-hover-bg;
+        }
+    }
+}

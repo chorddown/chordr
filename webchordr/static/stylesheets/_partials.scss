@@ -1,0 +1,10 @@
+@import "variables";
+@import "mixins";
+
+%button {
+    @include button();
+}
+
+%button-default {
+    @include button-default();
+}

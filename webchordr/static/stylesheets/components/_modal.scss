@@ -23,8 +23,29 @@ $modal-padding: $std-space !default;
         background: $modal-bg;
         padding: $modal-padding;
     }
+
     .modal-question {
         margin-bottom: $std-space;
         text-align: center;
+    }
+
+    .modal-header {
+        margin: (-$std-space) (-$std-space) $std-space (-$std-space);
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        justify-content: space-between;
+        background: $gray;
+
+        .modal-header-text {
+            padding: 0 $std-space;
+        }
+
+        .modal-close {
+            @include button();
+            @include button-default($width: 40px);
+            height: auto;
+            border: none;
+        }
     }
 }

@@ -38,19 +38,13 @@ nav {
 
     }
 
-    a[role=button],
-    button {
-        //margin-bottom: 2px;
-    }
-
     .song-item {
+        @include button(flex);
+        @include button-default($padding: 0);
         display: flex;
         flex-flow: row nowrap;
         align-items: center;
         margin-bottom: 2px;
-        @extend %button;
-        @extend %button-default;
-        padding: 0;
 
         &.-separator {
             height: $std-half;

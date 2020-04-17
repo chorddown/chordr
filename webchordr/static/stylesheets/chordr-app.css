@@ -1,3 +1,63 @@
+a[role=button],
+button,
+.button, .grid-button {
+  display: block;
+  appearance: none;
+  line-height: 26px;
+  font-size: 1em;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  text-decoration: none; }
+  a[role=button]:focus,
+  button:focus,
+  .button:focus, .grid-button:focus, a[role=button]:hover,
+  button:hover,
+  .button:hover, .grid-button:hover {
+    outline: none; }
+
+a[role=button]:not(.discreet),
+button:not(.discreet),
+.button:not(.discreet), .grid-button {
+  background: #b7b7b0;
+  border: 1px solid #8d8d88;
+  color: #62625e;
+  width: 100%;
+  padding: 7px 14px;
+  text-align: center;
+  letter-spacing: -0.01em;
+  cursor: pointer; }
+  a[role=button]:focus:not(.discreet),
+  button:focus:not(.discreet),
+  .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+  button:hover:not(.discreet),
+  .button:hover:not(.discreet), .grid-button:hover {
+    color: #62625e;
+    background: #8d8d88; }
+  @media screen and (prefers-color-scheme: dark) {
+    a[role=button]:not(.discreet),
+    button:not(.discreet),
+    .button:not(.discreet), .grid-button {
+      background: #221d1c;
+      color: white; }
+      a[role=button]:focus:not(.discreet),
+      button:focus:not(.discreet),
+      .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+      button:hover:not(.discreet),
+      .button:hover:not(.discreet), .grid-button:hover {
+        color: white;
+        background: #62625e; } }
+  html.dark-mode a[role=button]:not(.discreet),
+  html.dark-mode button:not(.discreet),
+  html.dark-mode .button:not(.discreet), html.dark-mode .grid-button {
+    background: #221d1c;
+    color: white; }
+    html.dark-mode a[role=button]:focus:not(.discreet),
+    html.dark-mode button:focus:not(.discreet),
+    html.dark-mode .button:focus:not(.discreet), html.dark-mode .grid-button:focus, html.dark-mode a[role=button]:hover:not(.discreet),
+    html.dark-mode button:hover:not(.discreet),
+    html.dark-mode .button:hover:not(.discreet), html.dark-mode .grid-button:hover {
+      color: white;
+      background: #62625e; }
+
 @font-face {
   font-family: 'Libre Baskerville';
   font-style: normal;
@@ -985,12 +1045,132 @@ main {
 .im {
   font-size: .8em; }
 
+a[role=button],
+button,
+.button, .grid-button {
+  display: block;
+  appearance: none;
+  line-height: 26px;
+  font-size: 1em;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  text-decoration: none; }
+  a[role=button]:focus,
+  button:focus,
+  .button:focus, .grid-button:focus, a[role=button]:hover,
+  button:hover,
+  .button:hover, .grid-button:hover {
+    outline: none; }
+
+a[role=button]:not(.discreet),
+button:not(.discreet),
+.button:not(.discreet), .grid-button {
+  background: #b7b7b0;
+  border: 1px solid #8d8d88;
+  color: #62625e;
+  width: 100%;
+  padding: 7px 14px;
+  text-align: center;
+  letter-spacing: -0.01em;
+  cursor: pointer; }
+  a[role=button]:focus:not(.discreet),
+  button:focus:not(.discreet),
+  .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+  button:hover:not(.discreet),
+  .button:hover:not(.discreet), .grid-button:hover {
+    color: #62625e;
+    background: #8d8d88; }
+  @media screen and (prefers-color-scheme: dark) {
+    a[role=button]:not(.discreet),
+    button:not(.discreet),
+    .button:not(.discreet), .grid-button {
+      background: #221d1c;
+      color: white; }
+      a[role=button]:focus:not(.discreet),
+      button:focus:not(.discreet),
+      .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+      button:hover:not(.discreet),
+      .button:hover:not(.discreet), .grid-button:hover {
+        color: white;
+        background: #62625e; } }
+  html.dark-mode a[role=button]:not(.discreet),
+  html.dark-mode button:not(.discreet),
+  html.dark-mode .button:not(.discreet), html.dark-mode .grid-button {
+    background: #221d1c;
+    color: white; }
+    html.dark-mode a[role=button]:focus:not(.discreet),
+    html.dark-mode button:focus:not(.discreet),
+    html.dark-mode .button:focus:not(.discreet), html.dark-mode .grid-button:focus, html.dark-mode a[role=button]:hover:not(.discreet),
+    html.dark-mode button:hover:not(.discreet),
+    html.dark-mode .button:hover:not(.discreet), html.dark-mode .grid-button:hover {
+      color: white;
+      background: #62625e; }
+
 .sr-only {
   text-indent: -10000px;
   font-size: 0;
   height: 0;
   width: 0;
   position: absolute; }
+
+a[role=button],
+button,
+.button, .grid-button {
+  display: block;
+  appearance: none;
+  line-height: 26px;
+  font-size: 1em;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  text-decoration: none; }
+  a[role=button]:focus,
+  button:focus,
+  .button:focus, .grid-button:focus, a[role=button]:hover,
+  button:hover,
+  .button:hover, .grid-button:hover {
+    outline: none; }
+
+a[role=button]:not(.discreet),
+button:not(.discreet),
+.button:not(.discreet), .grid-button {
+  background: #b7b7b0;
+  border: 1px solid #8d8d88;
+  color: #62625e;
+  width: 100%;
+  padding: 7px 14px;
+  text-align: center;
+  letter-spacing: -0.01em;
+  cursor: pointer; }
+  a[role=button]:focus:not(.discreet),
+  button:focus:not(.discreet),
+  .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+  button:hover:not(.discreet),
+  .button:hover:not(.discreet), .grid-button:hover {
+    color: #62625e;
+    background: #8d8d88; }
+  @media screen and (prefers-color-scheme: dark) {
+    a[role=button]:not(.discreet),
+    button:not(.discreet),
+    .button:not(.discreet), .grid-button {
+      background: #221d1c;
+      color: white; }
+      a[role=button]:focus:not(.discreet),
+      button:focus:not(.discreet),
+      .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+      button:hover:not(.discreet),
+      .button:hover:not(.discreet), .grid-button:hover {
+        color: white;
+        background: #62625e; } }
+  html.dark-mode a[role=button]:not(.discreet),
+  html.dark-mode button:not(.discreet),
+  html.dark-mode .button:not(.discreet), html.dark-mode .grid-button {
+    background: #221d1c;
+    color: white; }
+    html.dark-mode a[role=button]:focus:not(.discreet),
+    html.dark-mode button:focus:not(.discreet),
+    html.dark-mode .button:focus:not(.discreet), html.dark-mode .grid-button:focus, html.dark-mode a[role=button]:hover:not(.discreet),
+    html.dark-mode button:hover:not(.discreet),
+    html.dark-mode .button:hover:not(.discreet), html.dark-mode .grid-button:hover {
+      color: white;
+      background: #62625e; }
 
 .row {
   margin: 0 -3.5px;
@@ -1057,6 +1237,66 @@ main {
 .grid .col-1, .grid .col-2, .grid .col-3, .grid .col-4, .grid .col-5, .grid .col-6, .grid .col-7, .grid .col-8, .grid .col-9, .grid .col-10, .grid .col-11, .grid .col-12 {
   padding-bottom: 7px; }
 
+a[role=button],
+button,
+.button, .grid-button {
+  display: block;
+  appearance: none;
+  line-height: 26px;
+  font-size: 1em;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  text-decoration: none; }
+  a[role=button]:focus,
+  button:focus,
+  .button:focus, .grid-button:focus, a[role=button]:hover,
+  button:hover,
+  .button:hover, .grid-button:hover {
+    outline: none; }
+
+a[role=button]:not(.discreet),
+button:not(.discreet),
+.button:not(.discreet), .grid-button {
+  background: #b7b7b0;
+  border: 1px solid #8d8d88;
+  color: #62625e;
+  width: 100%;
+  padding: 7px 14px;
+  text-align: center;
+  letter-spacing: -0.01em;
+  cursor: pointer; }
+  a[role=button]:focus:not(.discreet),
+  button:focus:not(.discreet),
+  .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+  button:hover:not(.discreet),
+  .button:hover:not(.discreet), .grid-button:hover {
+    color: #62625e;
+    background: #8d8d88; }
+  @media screen and (prefers-color-scheme: dark) {
+    a[role=button]:not(.discreet),
+    button:not(.discreet),
+    .button:not(.discreet), .grid-button {
+      background: #221d1c;
+      color: white; }
+      a[role=button]:focus:not(.discreet),
+      button:focus:not(.discreet),
+      .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+      button:hover:not(.discreet),
+      .button:hover:not(.discreet), .grid-button:hover {
+        color: white;
+        background: #62625e; } }
+  html.dark-mode a[role=button]:not(.discreet),
+  html.dark-mode button:not(.discreet),
+  html.dark-mode .button:not(.discreet), html.dark-mode .grid-button {
+    background: #221d1c;
+    color: white; }
+    html.dark-mode a[role=button]:focus:not(.discreet),
+    html.dark-mode button:focus:not(.discreet),
+    html.dark-mode .button:focus:not(.discreet), html.dark-mode .grid-button:focus, html.dark-mode a[role=button]:hover:not(.discreet),
+    html.dark-mode button:hover:not(.discreet),
+    html.dark-mode .button:hover:not(.discreet), html.dark-mode .grid-button:hover {
+      color: white;
+      background: #62625e; }
+
 a {
   color: #62625e;
   text-decoration: none; }
@@ -1079,25 +1319,25 @@ a {
 
 a[role=button],
 button,
-.button, .grid-button, nav .song-item {
+.button, .grid-button {
   display: block;
   appearance: none;
   line-height: 26px;
   font-size: 1em;
-  border: 1px solid #8d8d88;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
   text-decoration: none; }
   a[role=button]:focus,
   button:focus,
-  .button:focus, .grid-button:focus, nav .song-item:focus, a[role=button]:hover,
+  .button:focus, .grid-button:focus, a[role=button]:hover,
   button:hover,
-  .button:hover, .grid-button:hover, nav .song-item:hover {
+  .button:hover, .grid-button:hover {
     outline: none; }
 
 a[role=button]:not(.discreet),
 button:not(.discreet),
-.button:not(.discreet), .grid-button, nav .song-item {
+.button:not(.discreet), .grid-button {
   background: #b7b7b0;
+  border: 1px solid #8d8d88;
   color: #62625e;
   width: 100%;
   padding: 7px 14px;
@@ -1106,34 +1346,34 @@ button:not(.discreet),
   cursor: pointer; }
   a[role=button]:focus:not(.discreet),
   button:focus:not(.discreet),
-  .button:focus:not(.discreet), .grid-button:focus, nav .song-item:focus, a[role=button]:hover:not(.discreet),
+  .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
   button:hover:not(.discreet),
-  .button:hover:not(.discreet), .grid-button:hover, nav .song-item:hover {
+  .button:hover:not(.discreet), .grid-button:hover {
     color: #62625e;
     background: #8d8d88; }
   @media screen and (prefers-color-scheme: dark) {
     a[role=button]:not(.discreet),
     button:not(.discreet),
-    .button:not(.discreet), .grid-button, nav .song-item {
+    .button:not(.discreet), .grid-button {
       background: #221d1c;
       color: white; }
       a[role=button]:focus:not(.discreet),
       button:focus:not(.discreet),
-      .button:focus:not(.discreet), .grid-button:focus, nav .song-item:focus, a[role=button]:hover:not(.discreet),
+      .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
       button:hover:not(.discreet),
-      .button:hover:not(.discreet), .grid-button:hover, nav .song-item:hover {
+      .button:hover:not(.discreet), .grid-button:hover {
         color: white;
         background: #62625e; } }
   html.dark-mode a[role=button]:not(.discreet),
   html.dark-mode button:not(.discreet),
-  html.dark-mode .button:not(.discreet), html.dark-mode .grid-button, html.dark-mode nav .song-item, nav html.dark-mode .song-item {
+  html.dark-mode .button:not(.discreet), html.dark-mode .grid-button {
     background: #221d1c;
     color: white; }
     html.dark-mode a[role=button]:focus:not(.discreet),
     html.dark-mode button:focus:not(.discreet),
-    html.dark-mode .button:focus:not(.discreet), html.dark-mode .grid-button:focus, html.dark-mode nav .song-item:focus, nav html.dark-mode .song-item:focus, html.dark-mode a[role=button]:hover:not(.discreet),
+    html.dark-mode .button:focus:not(.discreet), html.dark-mode .grid-button:focus, html.dark-mode a[role=button]:hover:not(.discreet),
     html.dark-mode button:hover:not(.discreet),
-    html.dark-mode .button:hover:not(.discreet), html.dark-mode .grid-button:hover, html.dark-mode nav .song-item:hover, nav html.dark-mode .song-item:hover {
+    html.dark-mode .button:hover:not(.discreet), html.dark-mode .grid-button:hover {
       color: white;
       background: #62625e; }
 
@@ -1174,6 +1414,66 @@ button.discreet,
     margin-left: 7px;
     margin-right: 7px; }
 
+a[role=button],
+button,
+.button, .grid-button {
+  display: block;
+  appearance: none;
+  line-height: 26px;
+  font-size: 1em;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  text-decoration: none; }
+  a[role=button]:focus,
+  button:focus,
+  .button:focus, .grid-button:focus, a[role=button]:hover,
+  button:hover,
+  .button:hover, .grid-button:hover {
+    outline: none; }
+
+a[role=button]:not(.discreet),
+button:not(.discreet),
+.button:not(.discreet), .grid-button {
+  background: #b7b7b0;
+  border: 1px solid #8d8d88;
+  color: #62625e;
+  width: 100%;
+  padding: 7px 14px;
+  text-align: center;
+  letter-spacing: -0.01em;
+  cursor: pointer; }
+  a[role=button]:focus:not(.discreet),
+  button:focus:not(.discreet),
+  .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+  button:hover:not(.discreet),
+  .button:hover:not(.discreet), .grid-button:hover {
+    color: #62625e;
+    background: #8d8d88; }
+  @media screen and (prefers-color-scheme: dark) {
+    a[role=button]:not(.discreet),
+    button:not(.discreet),
+    .button:not(.discreet), .grid-button {
+      background: #221d1c;
+      color: white; }
+      a[role=button]:focus:not(.discreet),
+      button:focus:not(.discreet),
+      .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+      button:hover:not(.discreet),
+      .button:hover:not(.discreet), .grid-button:hover {
+        color: white;
+        background: #62625e; } }
+  html.dark-mode a[role=button]:not(.discreet),
+  html.dark-mode button:not(.discreet),
+  html.dark-mode .button:not(.discreet), html.dark-mode .grid-button {
+    background: #221d1c;
+    color: white; }
+    html.dark-mode a[role=button]:focus:not(.discreet),
+    html.dark-mode button:focus:not(.discreet),
+    html.dark-mode .button:focus:not(.discreet), html.dark-mode .grid-button:focus, html.dark-mode a[role=button]:hover:not(.discreet),
+    html.dark-mode button:hover:not(.discreet),
+    html.dark-mode .button:hover:not(.discreet), html.dark-mode .grid-button:hover {
+      color: white;
+      background: #62625e; }
+
 .modal-outer {
   z-index: 100;
   position: fixed;
@@ -1198,6 +1498,200 @@ button.discreet,
   .modal-outer .modal-question {
     margin-bottom: 14px;
     text-align: center; }
+  .modal-outer .modal-header {
+    margin: -14px -14px 14px -14px;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: space-between;
+    background: #b7b7b0; }
+    .modal-outer .modal-header .modal-header-text {
+      padding: 0 14px; }
+    .modal-outer .modal-header .modal-close {
+      display: block;
+      appearance: none;
+      line-height: 26px;
+      font-size: 1em;
+      font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+      text-decoration: none;
+      background: #b7b7b0;
+      border: 1px solid #8d8d88;
+      color: #62625e;
+      width: 40px;
+      padding: 7px 14px;
+      text-align: center;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      height: auto;
+      border: none; }
+      .modal-outer .modal-header .modal-close:focus, .modal-outer .modal-header .modal-close:hover {
+        outline: none; }
+      .modal-outer .modal-header .modal-close:focus, .modal-outer .modal-header .modal-close:hover {
+        color: #62625e;
+        background: #8d8d88; }
+      @media screen and (prefers-color-scheme: dark) {
+        .modal-outer .modal-header .modal-close {
+          background: #221d1c;
+          color: white; }
+          .modal-outer .modal-header .modal-close:focus, .modal-outer .modal-header .modal-close:hover {
+            color: white;
+            background: #62625e; } }
+      html.dark-mode .modal-outer .modal-header .modal-close {
+        background: #221d1c;
+        color: white; }
+        html.dark-mode .modal-outer .modal-header .modal-close:focus, html.dark-mode .modal-outer .modal-header .modal-close:hover {
+          color: white;
+          background: #62625e; }
+
+a[role=button],
+button,
+.button, .grid-button {
+  display: block;
+  appearance: none;
+  line-height: 26px;
+  font-size: 1em;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  text-decoration: none; }
+  a[role=button]:focus,
+  button:focus,
+  .button:focus, .grid-button:focus, a[role=button]:hover,
+  button:hover,
+  .button:hover, .grid-button:hover {
+    outline: none; }
+
+a[role=button]:not(.discreet),
+button:not(.discreet),
+.button:not(.discreet), .grid-button {
+  background: #b7b7b0;
+  border: 1px solid #8d8d88;
+  color: #62625e;
+  width: 100%;
+  padding: 7px 14px;
+  text-align: center;
+  letter-spacing: -0.01em;
+  cursor: pointer; }
+  a[role=button]:focus:not(.discreet),
+  button:focus:not(.discreet),
+  .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+  button:hover:not(.discreet),
+  .button:hover:not(.discreet), .grid-button:hover {
+    color: #62625e;
+    background: #8d8d88; }
+  @media screen and (prefers-color-scheme: dark) {
+    a[role=button]:not(.discreet),
+    button:not(.discreet),
+    .button:not(.discreet), .grid-button {
+      background: #221d1c;
+      color: white; }
+      a[role=button]:focus:not(.discreet),
+      button:focus:not(.discreet),
+      .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+      button:hover:not(.discreet),
+      .button:hover:not(.discreet), .grid-button:hover {
+        color: white;
+        background: #62625e; } }
+  html.dark-mode a[role=button]:not(.discreet),
+  html.dark-mode button:not(.discreet),
+  html.dark-mode .button:not(.discreet), html.dark-mode .grid-button {
+    background: #221d1c;
+    color: white; }
+    html.dark-mode a[role=button]:focus:not(.discreet),
+    html.dark-mode button:focus:not(.discreet),
+    html.dark-mode .button:focus:not(.discreet), html.dark-mode .grid-button:focus, html.dark-mode a[role=button]:hover:not(.discreet),
+    html.dark-mode button:hover:not(.discreet),
+    html.dark-mode .button:hover:not(.discreet), html.dark-mode .grid-button:hover {
+      color: white;
+      background: #62625e; }
+
+.clipboard-widget {
+  display: flex;
+  flex-flow: row nowrap; }
+  .clipboard-widget input {
+    flex: 1 1 auto;
+    display: block;
+    appearance: none;
+    line-height: 26px;
+    font-size: 1em;
+    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+    text-decoration: none;
+    background: #b7b7b0;
+    color: #62625e;
+    border: 1px solid #8d8d88;
+    border-right: none;
+    padding: 0 0 0 14px;
+    text-align: center;
+    letter-spacing: -0.01em; }
+    .clipboard-widget input:focus, .clipboard-widget input:hover {
+      outline: none; }
+    @media screen and (prefers-color-scheme: dark) {
+      .clipboard-widget input {
+        background: #221d1c;
+        color: white; } }
+    html.dark-mode .clipboard-widget input {
+      background: #221d1c;
+      color: white; }
+  .clipboard-widget button {
+    flex: 0 0 auto; }
+
+a[role=button],
+button,
+.button, .grid-button {
+  display: block;
+  appearance: none;
+  line-height: 26px;
+  font-size: 1em;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  text-decoration: none; }
+  a[role=button]:focus,
+  button:focus,
+  .button:focus, .grid-button:focus, a[role=button]:hover,
+  button:hover,
+  .button:hover, .grid-button:hover {
+    outline: none; }
+
+a[role=button]:not(.discreet),
+button:not(.discreet),
+.button:not(.discreet), .grid-button {
+  background: #b7b7b0;
+  border: 1px solid #8d8d88;
+  color: #62625e;
+  width: 100%;
+  padding: 7px 14px;
+  text-align: center;
+  letter-spacing: -0.01em;
+  cursor: pointer; }
+  a[role=button]:focus:not(.discreet),
+  button:focus:not(.discreet),
+  .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+  button:hover:not(.discreet),
+  .button:hover:not(.discreet), .grid-button:hover {
+    color: #62625e;
+    background: #8d8d88; }
+  @media screen and (prefers-color-scheme: dark) {
+    a[role=button]:not(.discreet),
+    button:not(.discreet),
+    .button:not(.discreet), .grid-button {
+      background: #221d1c;
+      color: white; }
+      a[role=button]:focus:not(.discreet),
+      button:focus:not(.discreet),
+      .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+      button:hover:not(.discreet),
+      .button:hover:not(.discreet), .grid-button:hover {
+        color: white;
+        background: #62625e; } }
+  html.dark-mode a[role=button]:not(.discreet),
+  html.dark-mode button:not(.discreet),
+  html.dark-mode .button:not(.discreet), html.dark-mode .grid-button {
+    background: #221d1c;
+    color: white; }
+    html.dark-mode a[role=button]:focus:not(.discreet),
+    html.dark-mode button:focus:not(.discreet),
+    html.dark-mode .button:focus:not(.discreet), html.dark-mode .grid-button:focus, html.dark-mode a[role=button]:hover:not(.discreet),
+    html.dark-mode button:hover:not(.discreet),
+    html.dark-mode .button:hover:not(.discreet), html.dark-mode .grid-button:hover {
+      color: white;
+      background: #62625e; }
 
 .start-screen {
   display: flex;
@@ -1227,6 +1721,66 @@ button.discreet,
   color: #b7b7b0;
   font-size: 0.8rem; }
 
+a[role=button],
+button,
+.button, .grid-button {
+  display: block;
+  appearance: none;
+  line-height: 26px;
+  font-size: 1em;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  text-decoration: none; }
+  a[role=button]:focus,
+  button:focus,
+  .button:focus, .grid-button:focus, a[role=button]:hover,
+  button:hover,
+  .button:hover, .grid-button:hover {
+    outline: none; }
+
+a[role=button]:not(.discreet),
+button:not(.discreet),
+.button:not(.discreet), .grid-button {
+  background: #b7b7b0;
+  border: 1px solid #8d8d88;
+  color: #62625e;
+  width: 100%;
+  padding: 7px 14px;
+  text-align: center;
+  letter-spacing: -0.01em;
+  cursor: pointer; }
+  a[role=button]:focus:not(.discreet),
+  button:focus:not(.discreet),
+  .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+  button:hover:not(.discreet),
+  .button:hover:not(.discreet), .grid-button:hover {
+    color: #62625e;
+    background: #8d8d88; }
+  @media screen and (prefers-color-scheme: dark) {
+    a[role=button]:not(.discreet),
+    button:not(.discreet),
+    .button:not(.discreet), .grid-button {
+      background: #221d1c;
+      color: white; }
+      a[role=button]:focus:not(.discreet),
+      button:focus:not(.discreet),
+      .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+      button:hover:not(.discreet),
+      .button:hover:not(.discreet), .grid-button:hover {
+        color: white;
+        background: #62625e; } }
+  html.dark-mode a[role=button]:not(.discreet),
+  html.dark-mode button:not(.discreet),
+  html.dark-mode .button:not(.discreet), html.dark-mode .grid-button {
+    background: #221d1c;
+    color: white; }
+    html.dark-mode a[role=button]:focus:not(.discreet),
+    html.dark-mode button:focus:not(.discreet),
+    html.dark-mode .button:focus:not(.discreet), html.dark-mode .grid-button:focus, html.dark-mode a[role=button]:hover:not(.discreet),
+    html.dark-mode button:hover:not(.discreet),
+    html.dark-mode .button:hover:not(.discreet), html.dark-mode .grid-button:hover {
+      color: white;
+      background: #62625e; }
+
 .song-browser-home {
   display: inline-block;
   margin-right: 7px; }
@@ -1246,6 +1800,66 @@ button.discreet,
 .song-browser-index-list .index-item-count {
   display: block;
   font-size: .6em; }
+
+a[role=button],
+button,
+.button, .grid-button {
+  display: block;
+  appearance: none;
+  line-height: 26px;
+  font-size: 1em;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  text-decoration: none; }
+  a[role=button]:focus,
+  button:focus,
+  .button:focus, .grid-button:focus, a[role=button]:hover,
+  button:hover,
+  .button:hover, .grid-button:hover {
+    outline: none; }
+
+a[role=button]:not(.discreet),
+button:not(.discreet),
+.button:not(.discreet), .grid-button {
+  background: #b7b7b0;
+  border: 1px solid #8d8d88;
+  color: #62625e;
+  width: 100%;
+  padding: 7px 14px;
+  text-align: center;
+  letter-spacing: -0.01em;
+  cursor: pointer; }
+  a[role=button]:focus:not(.discreet),
+  button:focus:not(.discreet),
+  .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+  button:hover:not(.discreet),
+  .button:hover:not(.discreet), .grid-button:hover {
+    color: #62625e;
+    background: #8d8d88; }
+  @media screen and (prefers-color-scheme: dark) {
+    a[role=button]:not(.discreet),
+    button:not(.discreet),
+    .button:not(.discreet), .grid-button {
+      background: #221d1c;
+      color: white; }
+      a[role=button]:focus:not(.discreet),
+      button:focus:not(.discreet),
+      .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+      button:hover:not(.discreet),
+      .button:hover:not(.discreet), .grid-button:hover {
+        color: white;
+        background: #62625e; } }
+  html.dark-mode a[role=button]:not(.discreet),
+  html.dark-mode button:not(.discreet),
+  html.dark-mode .button:not(.discreet), html.dark-mode .grid-button {
+    background: #221d1c;
+    color: white; }
+    html.dark-mode a[role=button]:focus:not(.discreet),
+    html.dark-mode button:focus:not(.discreet),
+    html.dark-mode .button:focus:not(.discreet), html.dark-mode .grid-button:focus, html.dark-mode a[role=button]:hover:not(.discreet),
+    html.dark-mode button:hover:not(.discreet),
+    html.dark-mode .button:hover:not(.discreet), html.dark-mode .grid-button:hover {
+      color: white;
+      background: #62625e; }
 
 .song-search-home {
   display: inline-block;
@@ -1275,6 +1889,66 @@ button.discreet,
   html.dark-mode .song-search-song-list input[type=text], html.dark-mode
   .song-search-song-list input[type=search] {
     color: white; }
+
+a[role=button],
+button,
+.button, .grid-button {
+  display: block;
+  appearance: none;
+  line-height: 26px;
+  font-size: 1em;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  text-decoration: none; }
+  a[role=button]:focus,
+  button:focus,
+  .button:focus, .grid-button:focus, a[role=button]:hover,
+  button:hover,
+  .button:hover, .grid-button:hover {
+    outline: none; }
+
+a[role=button]:not(.discreet),
+button:not(.discreet),
+.button:not(.discreet), .grid-button {
+  background: #b7b7b0;
+  border: 1px solid #8d8d88;
+  color: #62625e;
+  width: 100%;
+  padding: 7px 14px;
+  text-align: center;
+  letter-spacing: -0.01em;
+  cursor: pointer; }
+  a[role=button]:focus:not(.discreet),
+  button:focus:not(.discreet),
+  .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+  button:hover:not(.discreet),
+  .button:hover:not(.discreet), .grid-button:hover {
+    color: #62625e;
+    background: #8d8d88; }
+  @media screen and (prefers-color-scheme: dark) {
+    a[role=button]:not(.discreet),
+    button:not(.discreet),
+    .button:not(.discreet), .grid-button {
+      background: #221d1c;
+      color: white; }
+      a[role=button]:focus:not(.discreet),
+      button:focus:not(.discreet),
+      .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+      button:hover:not(.discreet),
+      .button:hover:not(.discreet), .grid-button:hover {
+        color: white;
+        background: #62625e; } }
+  html.dark-mode a[role=button]:not(.discreet),
+  html.dark-mode button:not(.discreet),
+  html.dark-mode .button:not(.discreet), html.dark-mode .grid-button {
+    background: #221d1c;
+    color: white; }
+    html.dark-mode a[role=button]:focus:not(.discreet),
+    html.dark-mode button:focus:not(.discreet),
+    html.dark-mode .button:focus:not(.discreet), html.dark-mode .grid-button:focus, html.dark-mode a[role=button]:hover:not(.discreet),
+    html.dark-mode button:hover:not(.discreet),
+    html.dark-mode .button:hover:not(.discreet), html.dark-mode .grid-button:hover {
+      color: white;
+      background: #62625e; }
 
 .song-tools {
   position: fixed;
@@ -1336,6 +2010,66 @@ button.discreet,
     display: none;
     right: 40px; }
 
+a[role=button],
+button,
+.button, .grid-button {
+  display: block;
+  appearance: none;
+  line-height: 26px;
+  font-size: 1em;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  text-decoration: none; }
+  a[role=button]:focus,
+  button:focus,
+  .button:focus, .grid-button:focus, a[role=button]:hover,
+  button:hover,
+  .button:hover, .grid-button:hover {
+    outline: none; }
+
+a[role=button]:not(.discreet),
+button:not(.discreet),
+.button:not(.discreet), .grid-button {
+  background: #b7b7b0;
+  border: 1px solid #8d8d88;
+  color: #62625e;
+  width: 100%;
+  padding: 7px 14px;
+  text-align: center;
+  letter-spacing: -0.01em;
+  cursor: pointer; }
+  a[role=button]:focus:not(.discreet),
+  button:focus:not(.discreet),
+  .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+  button:hover:not(.discreet),
+  .button:hover:not(.discreet), .grid-button:hover {
+    color: #62625e;
+    background: #8d8d88; }
+  @media screen and (prefers-color-scheme: dark) {
+    a[role=button]:not(.discreet),
+    button:not(.discreet),
+    .button:not(.discreet), .grid-button {
+      background: #221d1c;
+      color: white; }
+      a[role=button]:focus:not(.discreet),
+      button:focus:not(.discreet),
+      .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+      button:hover:not(.discreet),
+      .button:hover:not(.discreet), .grid-button:hover {
+        color: white;
+        background: #62625e; } }
+  html.dark-mode a[role=button]:not(.discreet),
+  html.dark-mode button:not(.discreet),
+  html.dark-mode .button:not(.discreet), html.dark-mode .grid-button {
+    background: #221d1c;
+    color: white; }
+    html.dark-mode a[role=button]:focus:not(.discreet),
+    html.dark-mode button:focus:not(.discreet),
+    html.dark-mode .button:focus:not(.discreet), html.dark-mode .grid-button:focus, html.dark-mode a[role=button]:hover:not(.discreet),
+    html.dark-mode button:hover:not(.discreet),
+    html.dark-mode .button:hover:not(.discreet), html.dark-mode .grid-button:hover {
+      color: white;
+      background: #62625e; }
+
 .transpose-tool {
   margin-bottom: 7px;
   margin-right: -7px; }
@@ -1347,6 +2081,129 @@ button.discreet,
     min-width: 42px;
     text-align: center; }
 
+a[role=button],
+button,
+.button, .grid-button {
+  display: block;
+  appearance: none;
+  line-height: 26px;
+  font-size: 1em;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  text-decoration: none; }
+  a[role=button]:focus,
+  button:focus,
+  .button:focus, .grid-button:focus, a[role=button]:hover,
+  button:hover,
+  .button:hover, .grid-button:hover {
+    outline: none; }
+
+a[role=button]:not(.discreet),
+button:not(.discreet),
+.button:not(.discreet), .grid-button {
+  background: #b7b7b0;
+  border: 1px solid #8d8d88;
+  color: #62625e;
+  width: 100%;
+  padding: 7px 14px;
+  text-align: center;
+  letter-spacing: -0.01em;
+  cursor: pointer; }
+  a[role=button]:focus:not(.discreet),
+  button:focus:not(.discreet),
+  .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+  button:hover:not(.discreet),
+  .button:hover:not(.discreet), .grid-button:hover {
+    color: #62625e;
+    background: #8d8d88; }
+  @media screen and (prefers-color-scheme: dark) {
+    a[role=button]:not(.discreet),
+    button:not(.discreet),
+    .button:not(.discreet), .grid-button {
+      background: #221d1c;
+      color: white; }
+      a[role=button]:focus:not(.discreet),
+      button:focus:not(.discreet),
+      .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+      button:hover:not(.discreet),
+      .button:hover:not(.discreet), .grid-button:hover {
+        color: white;
+        background: #62625e; } }
+  html.dark-mode a[role=button]:not(.discreet),
+  html.dark-mode button:not(.discreet),
+  html.dark-mode .button:not(.discreet), html.dark-mode .grid-button {
+    background: #221d1c;
+    color: white; }
+    html.dark-mode a[role=button]:focus:not(.discreet),
+    html.dark-mode button:focus:not(.discreet),
+    html.dark-mode .button:focus:not(.discreet), html.dark-mode .grid-button:focus, html.dark-mode a[role=button]:hover:not(.discreet),
+    html.dark-mode button:hover:not(.discreet),
+    html.dark-mode .button:hover:not(.discreet), html.dark-mode .grid-button:hover {
+      color: white;
+      background: #62625e; }
+
+.setlist-share.modal .modal-body button {
+  width: 42px; }
+
+a[role=button],
+button,
+.button, .grid-button {
+  display: block;
+  appearance: none;
+  line-height: 26px;
+  font-size: 1em;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  text-decoration: none; }
+  a[role=button]:focus,
+  button:focus,
+  .button:focus, .grid-button:focus, a[role=button]:hover,
+  button:hover,
+  .button:hover, .grid-button:hover {
+    outline: none; }
+
+a[role=button]:not(.discreet),
+button:not(.discreet),
+.button:not(.discreet), .grid-button {
+  background: #b7b7b0;
+  border: 1px solid #8d8d88;
+  color: #62625e;
+  width: 100%;
+  padding: 7px 14px;
+  text-align: center;
+  letter-spacing: -0.01em;
+  cursor: pointer; }
+  a[role=button]:focus:not(.discreet),
+  button:focus:not(.discreet),
+  .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+  button:hover:not(.discreet),
+  .button:hover:not(.discreet), .grid-button:hover {
+    color: #62625e;
+    background: #8d8d88; }
+  @media screen and (prefers-color-scheme: dark) {
+    a[role=button]:not(.discreet),
+    button:not(.discreet),
+    .button:not(.discreet), .grid-button {
+      background: #221d1c;
+      color: white; }
+      a[role=button]:focus:not(.discreet),
+      button:focus:not(.discreet),
+      .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+      button:hover:not(.discreet),
+      .button:hover:not(.discreet), .grid-button:hover {
+        color: white;
+        background: #62625e; } }
+  html.dark-mode a[role=button]:not(.discreet),
+  html.dark-mode button:not(.discreet),
+  html.dark-mode .button:not(.discreet), html.dark-mode .grid-button {
+    background: #221d1c;
+    color: white; }
+    html.dark-mode a[role=button]:focus:not(.discreet),
+    html.dark-mode button:focus:not(.discreet),
+    html.dark-mode .button:focus:not(.discreet), html.dark-mode .grid-button:focus, html.dark-mode a[role=button]:hover:not(.discreet),
+    html.dark-mode button:hover:not(.discreet),
+    html.dark-mode .button:hover:not(.discreet), html.dark-mode .grid-button:hover {
+      color: white;
+      background: #62625e; }
+
 .setlist-tool {
   margin-bottom: 7px; }
   .setlist-tool:last-child {
@@ -1356,6 +2213,66 @@ button.discreet,
   .setlist-tool i.im {
     vertical-align: middle; }
 
+a[role=button],
+button,
+.button, .grid-button {
+  display: block;
+  appearance: none;
+  line-height: 26px;
+  font-size: 1em;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  text-decoration: none; }
+  a[role=button]:focus,
+  button:focus,
+  .button:focus, .grid-button:focus, a[role=button]:hover,
+  button:hover,
+  .button:hover, .grid-button:hover {
+    outline: none; }
+
+a[role=button]:not(.discreet),
+button:not(.discreet),
+.button:not(.discreet), .grid-button {
+  background: #b7b7b0;
+  border: 1px solid #8d8d88;
+  color: #62625e;
+  width: 100%;
+  padding: 7px 14px;
+  text-align: center;
+  letter-spacing: -0.01em;
+  cursor: pointer; }
+  a[role=button]:focus:not(.discreet),
+  button:focus:not(.discreet),
+  .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+  button:hover:not(.discreet),
+  .button:hover:not(.discreet), .grid-button:hover {
+    color: #62625e;
+    background: #8d8d88; }
+  @media screen and (prefers-color-scheme: dark) {
+    a[role=button]:not(.discreet),
+    button:not(.discreet),
+    .button:not(.discreet), .grid-button {
+      background: #221d1c;
+      color: white; }
+      a[role=button]:focus:not(.discreet),
+      button:focus:not(.discreet),
+      .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+      button:hover:not(.discreet),
+      .button:hover:not(.discreet), .grid-button:hover {
+        color: white;
+        background: #62625e; } }
+  html.dark-mode a[role=button]:not(.discreet),
+  html.dark-mode button:not(.discreet),
+  html.dark-mode .button:not(.discreet), html.dark-mode .grid-button {
+    background: #221d1c;
+    color: white; }
+    html.dark-mode a[role=button]:focus:not(.discreet),
+    html.dark-mode button:focus:not(.discreet),
+    html.dark-mode .button:focus:not(.discreet), html.dark-mode .grid-button:focus, html.dark-mode a[role=button]:hover:not(.discreet),
+    html.dark-mode button:hover:not(.discreet),
+    html.dark-mode .button:hover:not(.discreet), html.dark-mode .grid-button:hover {
+      color: white;
+      background: #62625e; }
+
 .semitone-notation-tool {
   margin-bottom: 7px; }
   .semitone-notation-tool:last-child {
@@ -1363,6 +2280,66 @@ button.discreet,
   .semitone-notation-tool button {
     width: 50%;
     border: 1px solid #b7b7b0; }
+
+a[role=button],
+button,
+.button, .grid-button {
+  display: block;
+  appearance: none;
+  line-height: 26px;
+  font-size: 1em;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  text-decoration: none; }
+  a[role=button]:focus,
+  button:focus,
+  .button:focus, .grid-button:focus, a[role=button]:hover,
+  button:hover,
+  .button:hover, .grid-button:hover {
+    outline: none; }
+
+a[role=button]:not(.discreet),
+button:not(.discreet),
+.button:not(.discreet), .grid-button {
+  background: #b7b7b0;
+  border: 1px solid #8d8d88;
+  color: #62625e;
+  width: 100%;
+  padding: 7px 14px;
+  text-align: center;
+  letter-spacing: -0.01em;
+  cursor: pointer; }
+  a[role=button]:focus:not(.discreet),
+  button:focus:not(.discreet),
+  .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+  button:hover:not(.discreet),
+  .button:hover:not(.discreet), .grid-button:hover {
+    color: #62625e;
+    background: #8d8d88; }
+  @media screen and (prefers-color-scheme: dark) {
+    a[role=button]:not(.discreet),
+    button:not(.discreet),
+    .button:not(.discreet), .grid-button {
+      background: #221d1c;
+      color: white; }
+      a[role=button]:focus:not(.discreet),
+      button:focus:not(.discreet),
+      .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+      button:hover:not(.discreet),
+      .button:hover:not(.discreet), .grid-button:hover {
+        color: white;
+        background: #62625e; } }
+  html.dark-mode a[role=button]:not(.discreet),
+  html.dark-mode button:not(.discreet),
+  html.dark-mode .button:not(.discreet), html.dark-mode .grid-button {
+    background: #221d1c;
+    color: white; }
+    html.dark-mode a[role=button]:focus:not(.discreet),
+    html.dark-mode button:focus:not(.discreet),
+    html.dark-mode .button:focus:not(.discreet), html.dark-mode .grid-button:focus, html.dark-mode a[role=button]:hover:not(.discreet),
+    html.dark-mode button:hover:not(.discreet),
+    html.dark-mode .button:hover:not(.discreet), html.dark-mode .grid-button:hover {
+      color: white;
+      background: #62625e; }
 
 nav {
   background: #d8d8d0;
@@ -1395,10 +2372,41 @@ nav {
       outline: none; }
   nav .song-item {
     display: flex;
+    appearance: none;
+    line-height: 26px;
+    font-size: 1em;
+    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+    text-decoration: none;
+    background: #b7b7b0;
+    border: 1px solid #8d8d88;
+    color: #62625e;
+    width: 100%;
+    padding: 0;
+    text-align: center;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    display: flex;
     flex-flow: row nowrap;
     align-items: center;
-    margin-bottom: 2px;
-    padding: 0; }
+    margin-bottom: 2px; }
+    nav .song-item:focus, nav .song-item:hover {
+      outline: none; }
+    nav .song-item:focus, nav .song-item:hover {
+      color: #62625e;
+      background: #8d8d88; }
+    @media screen and (prefers-color-scheme: dark) {
+      nav .song-item {
+        background: #221d1c;
+        color: white; }
+        nav .song-item:focus, nav .song-item:hover {
+          color: white;
+          background: #62625e; } }
+    html.dark-mode nav .song-item {
+      background: #221d1c;
+      color: white; }
+      html.dark-mode nav .song-item:focus, html.dark-mode nav .song-item:hover {
+        color: white;
+        background: #62625e; }
     nav .song-item.-separator {
       height: 7px; }
     nav .song-item .sortable-handle,
@@ -1467,6 +2475,66 @@ nav {
   nav.-hidden footer button {
     max-width: 100%;
     width: 40px; }
+
+a[role=button],
+button,
+.button, .grid-button {
+  display: block;
+  appearance: none;
+  line-height: 26px;
+  font-size: 1em;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  text-decoration: none; }
+  a[role=button]:focus,
+  button:focus,
+  .button:focus, .grid-button:focus, a[role=button]:hover,
+  button:hover,
+  .button:hover, .grid-button:hover {
+    outline: none; }
+
+a[role=button]:not(.discreet),
+button:not(.discreet),
+.button:not(.discreet), .grid-button {
+  background: #b7b7b0;
+  border: 1px solid #8d8d88;
+  color: #62625e;
+  width: 100%;
+  padding: 7px 14px;
+  text-align: center;
+  letter-spacing: -0.01em;
+  cursor: pointer; }
+  a[role=button]:focus:not(.discreet),
+  button:focus:not(.discreet),
+  .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+  button:hover:not(.discreet),
+  .button:hover:not(.discreet), .grid-button:hover {
+    color: #62625e;
+    background: #8d8d88; }
+  @media screen and (prefers-color-scheme: dark) {
+    a[role=button]:not(.discreet),
+    button:not(.discreet),
+    .button:not(.discreet), .grid-button {
+      background: #221d1c;
+      color: white; }
+      a[role=button]:focus:not(.discreet),
+      button:focus:not(.discreet),
+      .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
+      button:hover:not(.discreet),
+      .button:hover:not(.discreet), .grid-button:hover {
+        color: white;
+        background: #62625e; } }
+  html.dark-mode a[role=button]:not(.discreet),
+  html.dark-mode button:not(.discreet),
+  html.dark-mode .button:not(.discreet), html.dark-mode .grid-button {
+    background: #221d1c;
+    color: white; }
+    html.dark-mode a[role=button]:focus:not(.discreet),
+    html.dark-mode button:focus:not(.discreet),
+    html.dark-mode .button:focus:not(.discreet), html.dark-mode .grid-button:focus, html.dark-mode a[role=button]:hover:not(.discreet),
+    html.dark-mode button:hover:not(.discreet),
+    html.dark-mode .button:hover:not(.discreet), html.dark-mode .grid-button:hover {
+      color: white;
+      background: #62625e; }
 
 .sortable-ghost {
   color: #62625e !important;
