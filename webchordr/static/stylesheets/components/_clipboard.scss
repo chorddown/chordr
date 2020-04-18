@@ -21,6 +21,7 @@ $dark-mode-clipboard-input-color: $dark-mode-button-color !default;
         padding: 0 0 0 nth($clipboard-input-padding, 2) ;
         text-align: center;
         letter-spacing: $clipboard-input-letter-spacing;
+        border-radius: 0;
 
         @include if-dark-mode {
             background: $dark-mode-clipboard-input-bg;
