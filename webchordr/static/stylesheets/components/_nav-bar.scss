@@ -10,7 +10,6 @@ nav {
     right: 0;
     top: 0;
     bottom: 0;
-    overflow: scroll;
     padding-left: 2px;
     @include print-hidden;
     @include if-dark-mode {
