@@ -57,6 +57,15 @@ impl Component for SetlistShareButton {
         true
     }
 
+    fn change(&mut self, props: Self::Properties) -> ShouldRender {
+        if self.props != props {
+            self.props = props;
+            true
+        } else {
+            false
+        }
+    }
+
     fn view(&self) -> Html {
         let handle_click = self.link.callback(|_| Msg::ToggleModal);
         let button = html! { <button onclick=handle_click><i class="im im-share"></i></button> };
@@ -101,7 +110,7 @@ impl SetlistShareButton {
                         on_close=handle_modal_close
                         >
                         <div class="clipboard-widget setlist-share">
-                            <input id="setlist-share" value=share_url/>
+                            <input type="text" id="setlist-share" readonly=true value=share_url/>
                             <button class="btn" data-clipboard-target="#setlist-share">
                                 <i class="im im-copy"></i>
                             </button>
