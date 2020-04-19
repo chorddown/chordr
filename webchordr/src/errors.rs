@@ -7,6 +7,7 @@ use stdweb::web::error::{IError, SecurityError};
 pub enum WebError {
     SortableError(String),
     JsError(String),
+    SetlistDeserializeError(String),
 }
 
 impl WebError {
@@ -16,6 +17,10 @@ impl WebError {
 
     pub fn js_error<S: Into<String>>(s: S) -> Self {
         WebError::JsError(s.into())
+    }
+
+    pub fn setlist_deserialize_error<S: Into<String>>(s: S) -> Self {
+        WebError::SetlistDeserializeError(s.into())
     }
 }
 
@@ -27,6 +32,7 @@ impl Display for WebError {
             match self {
                 WebError::SortableError(s) => s,
                 WebError::JsError(s) => s,
+                WebError::SetlistDeserializeError(s) => s,
             }
         )
     }

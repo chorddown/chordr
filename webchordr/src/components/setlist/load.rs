@@ -3,8 +3,10 @@ use crate::events::Event;
 use crate::events::SetlistEvent;
 use libchordr::prelude::{Catalog, Setlist, SetlistEntry};
 use std::rc::Rc;
+use log::error;
 use stdweb::console;
 use yew::prelude::*;
+use crate::data_exchange::SetlistDeserializeService;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct SetlistProps {
@@ -29,16 +31,14 @@ pub enum Msg {
 
 impl SetlistLoad {
     fn build_setlist(&self) -> Setlist<SetlistEntry> {
-        Setlist::with_entries(self.collect_setlist_entries())
-    }
+        let deserialize_result = SetlistDeserializeService::deserialize(&self.props.serialized_setlist, &self.props.catalog);
 
-    fn collect_setlist_entries(&self) -> Vec<SetlistEntry> {
-        self.props
-            .serialized_setlist
-            .split(',')
-            .filter_map(|song_id| self.props.catalog.get(song_id))
-            .map(|song| SetlistEntry::from_song(song))
-            .collect()
+        if deserialize_result.errors.len() > 0 {
+            let errors = deserialize_result.errors.iter().map(|e| e.to_string()).collect::<Vec<String>>().join(", ");
+            error!("{}", errors);
+        }
+
+        deserialize_result.setlist
     }
 }
 

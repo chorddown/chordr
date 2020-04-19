@@ -10,8 +10,10 @@ mod errors;
 mod events;
 mod helpers;
 mod route;
-mod setlist_serializer_service;
+mod data_exchange;
 mod sortable_service;
+#[cfg(test)]
+mod test_helpers;
 
 use crate::components::nav::Nav;
 use crate::components::reload_section::ReloadSection;
