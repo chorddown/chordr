@@ -14,6 +14,9 @@ self.addEventListener('install', function (e) {
                 '/stylesheets/chordr-app.css',
                 '/webchordr.js',
                 '/webchordr.wasm',
+                '/setup.js',
+                '/assets/libraries/clipboard.min.js',
+                '/assets/libraries/Sortable.min.js',
                 '/catalog.json'
             ]);
         })
@@ -27,7 +30,7 @@ const fetchFromServer = function (event) {
                 return response;
             }
 
-            // Stash copy of response
+            /* Stash copy of response */
             const cachedResponse = response.clone();
             caches.open(CACHE_NAME)
                 .then(function (cache) {
@@ -43,11 +46,13 @@ self.addEventListener('fetch', function (event) {
     event.respondWith(
         caches.match(event.request)
             .then(function (response) {
+                /* Check if there is a cached entry for the request */
                 if (!response) {
-                    // If not, fetch request, and then cache response
                     console.info('INFO:webchordr -- Fetch ' + event.request.url + ' from server');
+
                     return fetchFromServer(event);
                 } else {
+                    /* If online try to fetch the latest version in the background */
                     if (navigator.onLine) {
                         fetchFromServer(event).then(function () {
                             console.info('INFO:webchordr -- Did load ' + event.request.url + ' in background');
@@ -55,7 +60,6 @@ self.addEventListener('fetch', function (event) {
                             console.error('ERROR:webchordr -- Failed loading ' + event.request.url + ' in background', e);
                         });
                     }
-                    // If already cached
                     return response;
                 }
             })
@@ -82,19 +86,19 @@ self.addEventListener('fetch', function (event) {
     // }
 });
 
-self.addEventListener('activate', function (event) {
-    event.waitUntil(
-        caches.keys().then(function (cacheNames) {
-            return Promise.all(
-                cacheNames.filter(function (cacheName) {
-                    // Return true if you want to remove this cache,
-                    // but remember that caches are shared across
-                    // the whole origin
-                    // return true;
-                }).map(function (cacheName) {
-                    return caches.delete(cacheName);
-                })
-            );
-        })
-    );
-});
+// self.addEventListener('activate', function (event) {
+//     event.waitUntil(
+//         caches.keys().then(function (cacheNames) {
+//             return Promise.all(
+//                 cacheNames.filter(function (cacheName) {
+//                     // Return true if you want to remove this cache,
+//                     // but remember that caches are shared across
+//                     // the whole origin
+//                     // return true;
+//                 }).map(function (cacheName) {
+//                     return caches.delete(cacheName);
+//                 })
+//             );
+//         })
+//     );
+// });

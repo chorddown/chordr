@@ -8,16 +8,6 @@
     <link rel="apple-touch-icon" href="assets/images/logo-120.png">
     <link rel="manifest" href="/manifest.json">
     <meta name="viewport" content="width=device-width">
-    <style>.reload-button-fallback {
-        text-align: center;
-        display: block;
-        width: 100%;
-    }
-
-    .reload-button-fallback[aria-disabled] {
-        display: none;
-    }</style>
-
 
     <script src="/assets/libraries/clipboard.min.js"></script>
     <script src="/assets/libraries/Sortable.min.js"></script>
@@ -27,15 +17,64 @@
 </head>
 <body>
 <script src="/webchordr.js"></script>
-<script src="/setup.js"></script>
 
-<a id="reload-button-fallback" class="reload-button reload-button-fallback" aria-disabled="true" href="/"
-   title="Reload the song catalog">
-    <i class="im im-sync"></i>
-    <span>Reload the catalog</span>
-</a>
+<div class="center-fullscreen loading">
+    <div class="loading-inner">
+        <i class="im im-spinner"></i>
+    </div>
+</div>
+
+<div class="center-fullscreen reload-button-fallback-container">
+    <div>
+        <a id="reload-button-fallback" class="reload-button reload-button-fallback" href="/"
+           title="Reload the song catalog">
+            <i class="im im-sync"></i>
+            <span>Reload the app</span>
+        </a>
+    </div>
+</div>
 
 <script>
+    const CACHE_NAME = 'chordr';
+    const getReloadButtonFallback = function () {
+        /** @type {HTMLLinkElement|HTMLElement} */
+        return document.getElementById('reload-button-fallback');
+    };
+
+    /**
+     * Wait for a few seconds for the App to be running.
+     * If everything was successful the fallback-reload-button will have been removed.
+     * If not try to clear the caches.
+     */
+    const checkWebApp = function () {
+        setTimeout(function () {
+            if (!getReloadButtonFallback()) {
+                /* Button has been removed by the Web App - everything seems ok */
+                return;
+            }
+            const message = 'DEBUG:webchordr -- Web App did not start successfully.';
+            if (!navigator.onLine) {
+                console.debug(message + ' But device appears to be offline');
+                return;
+            }
+
+            console.debug(message + ' Clearing caches and reload');
+            caches.keys().then(function (cacheNames) {
+                Promise.all(
+                    cacheNames.filter(function (cacheName) {
+                        return cacheName === CACHE_NAME;
+                    }).map(function (cacheName) {
+                        return caches.delete(cacheName);
+                    })
+                ).then(function () {
+                    setTimeout(function () {
+                        // window.location.reload()
+                    }, 4000)
+                })
+            })
+        }, 10000);
+    };
+
     if (window.location.hostname === 'localhost') {
         console.info('INFO:webchordr -- Service Worker is not used on localhost');
     } else if ('serviceWorker' in navigator) {
@@ -43,23 +82,23 @@
             .register('/sw.js')
             .then(function () {
                 console.log('INFO:webchordr -- Service Worker registered');
+                checkWebApp()
             }).catch(function (e) {
                 console.error('ERROR:webchordr -- Service Worker could not be registered', e);
             }
         );
     } else {
-        console.error('ERROR:webchordr -- Service Worker not supported');
+        console.error('WARN:webchordr -- Service Worker not supported');
     }
 
-    setTimeout(function () {
-        /* If the fallback reload button has not been removed after 4 seconds show it */
-        /** @type {HTMLLinkElement|HTMLElement} */
-        const fallback = document.getElementById('reload-button-fallback');
-        if (fallback) {
-            fallback.href += '?' + (+ new Date());
-            fallback.setAttribute('aria-disabled', 'false')
-        }
-    }, 4000)
+    /* Add the current timestamp to the reload-button's URI */
+    /** @type {HTMLLinkElement|HTMLElement} */
+    const fallback = getReloadButtonFallback();
+    if (fallback) {
+        fallback.href += '?' + (+new Date());
+    }
 </script>
+<script src="/setup.js"></script>
+
 </body>
 </html>

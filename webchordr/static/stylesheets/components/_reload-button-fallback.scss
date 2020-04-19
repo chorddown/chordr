@@ -1,0 +1,22 @@
+@import "prelude";
+
+.reload-button-fallback {
+    text-align: center;
+    display: block;
+    width: 100%;
+}
+
+
+@keyframes fade_in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.reload-button-fallback-container {
+    opacity: 0;
+    animation: fade_in 300ms linear 4s forwards;
+}

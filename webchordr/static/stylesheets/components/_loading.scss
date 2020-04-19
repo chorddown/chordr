@@ -1,0 +1,30 @@
+@import "prelude";
+
+$loading-size: 40px !default;
+
+@keyframes rotate {
+    from {
+        transform: rotate(0);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading .loading-inner {
+    width: $loading-size;
+    height: $loading-size;
+    text-align: center;
+    animation: rotate 3s linear infinite;
+
+    .im {
+        //line-height: 1;
+        line-height: 49px;
+        display: inline-block;
+        font-size: $loading-size;
+        color: $gray-dark;
+        @include if-dark-mode {
+            color: $text-color-dark-mode;
+        }
+    }
+}
