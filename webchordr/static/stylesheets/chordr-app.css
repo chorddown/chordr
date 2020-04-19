@@ -1399,6 +1399,7 @@ button.discreet,
     display: flex;
     align-items: center;
     justify-content: center;
+    height: 100%;
     color: inherit; }
     .grid-button a[role=button]:focus, .grid-button a[role=button]:hover,
     .grid-button button:focus,
