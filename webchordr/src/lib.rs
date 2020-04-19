@@ -18,7 +18,7 @@ use crate::components::reload_section::ReloadSection;
 use crate::components::song_browser::SongBrowser;
 use crate::components::song_view::SongView;
 use crate::components::start_screen::StartScreen;
-use crate::route::AppRoute;
+use crate::route::{AppRoute, SetlistRoute};
 use libchordr::models::setlist::{Setlist, SetlistEntry};
 use libchordr::models::song_id::SongIdTrait;
 use libchordr::models::song_settings::SongSettings;
@@ -34,6 +34,7 @@ use yew::{html, Component, ComponentLink, Html, ShouldRender};
 use yew_router::prelude::*;
 use crate::events::{Event, SortingChange, SetlistEvent};
 use crate::components::song_search::SongSearch;
+use crate::components::setlist::SetlistLoad;
 
 const STORAGE_KEY_SETLIST: &'static str = "net.cundd.chordr.setlist";
 const STORAGE_KEY_SETTINGS: &'static str = "net.cundd.chordr.settings";
@@ -78,6 +79,7 @@ impl App {
             Some(AppRoute::Song(id)) => self.view_song(id),
             Some(AppRoute::SongBrowser(chars)) => self.view_song_browser(chars),
             Some(AppRoute::SongSearch) => self.view_song_search(true),
+            Some(AppRoute::Setlist(route)) => self.view_setlist_route(route),
             Some(AppRoute::Index) => self.view_index(),
             None => self.view_index(),
         }) as Html
@@ -134,7 +136,7 @@ impl App {
             };
         }
 
-        match percent_decode_str(song_id.as_str()).decode_utf8() {
+        (match percent_decode_str(song_id.as_str()).decode_utf8() {
             Ok(decoded) => {
                 let decoded = decoded.to_string();
                 info!("Decoded song ID '{}' to '{}'", song_id, decoded);
@@ -148,7 +150,7 @@ impl App {
                 error!("Could not decode the song ID {}", e);
                 (html! {}) as Html
             }
-        }
+        }) as Html
     }
 
     fn view_song_browser<S: Into<String>>(&self, chars: S) -> Html {
@@ -167,12 +169,28 @@ impl App {
         }) as Html
     }
 
-    fn view_song_search(&self,show_back_button:bool) -> Html {
+    fn view_song_search(&self, show_back_button: bool) -> Html {
         (match &self.catalog {
             Some(catalog) => {
                 html! {<SongSearch catalog=catalog show_back_button=show_back_button />}
             }
             None => html! {},
+        }) as Html
+    }
+
+    fn view_setlist_route(&self, route: SetlistRoute) -> Html {
+        (match route {
+            SetlistRoute::Load { serialized_setlist } => {
+                match &self.catalog {
+                    None => html! {},
+                    Some(catalog) => {
+                        let replace = self.link.callback(|e| Msg::Event(e));
+                        let catalog = Rc::new(catalog.clone());
+
+                        html! {<SetlistLoad catalog=catalog serialized_setlist=serialized_setlist on_load=replace />}
+                    }
+                }
+            }
         }) as Html
     }
 
@@ -214,8 +232,10 @@ impl App {
             SetlistEvent::SortingChange(v) => self.setlist_sorting_changed(v),
             SetlistEvent::Add(v) => self.setlist_add(v),
             SetlistEvent::Remove(v) => self.setlist_remove(v),
+            SetlistEvent::Replace(v) => self.setlist_replace(v),
         }
     }
+
     fn setlist_add(&mut self, song: SetlistEntry) {
         let song_id = song.id();
         match self.setlist.add(song) {
@@ -231,6 +251,13 @@ impl App {
             Ok(_) => info!("Removed song {} from setlist", song_id),
             Err(_) => warn!("Could not remove song {} from setlist", song_id),
         }
+        self.storage_service
+            .store(STORAGE_KEY_SETLIST, Json(&self.setlist));
+    }
+
+    fn setlist_replace(&mut self, setlist: Setlist<SetlistEntry>) {
+        info!("Replace setlist {:?} with {:?}", self.setlist, setlist);
+        self.setlist = setlist;
         self.storage_service
             .store(STORAGE_KEY_SETLIST, Json(&self.setlist));
     }

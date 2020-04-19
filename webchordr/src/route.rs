@@ -9,6 +9,14 @@ pub enum AppRoute {
     SongBrowser(String),
     #[to = "/#/song-search"]
     SongSearch,
+    #[to = "/#/setlist{*:rest}"]
+    Setlist(SetlistRoute),
     #[to = "/index"]
     Index,
+}
+
+#[derive(Switch, Debug, Clone)]
+pub enum SetlistRoute {
+    #[to = "/load/{serialized_setlist}"]
+    Load { serialized_setlist: String },
 }
