@@ -1,7 +1,7 @@
-use serde::{Deserialize, Serialize};
 use super::SortingChange;
-use libchordr::prelude::{SetlistEntry, SongId, Setlist};
 use crate::events::EventTrait;
+use libchordr::prelude::{Setlist, SetlistEntry, SongId};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum SetlistEvent {

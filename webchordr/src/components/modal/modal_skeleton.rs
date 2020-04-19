@@ -1,5 +1,5 @@
-use yew::prelude::*;
 use crate::helpers::Class;
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct ModalProps {
@@ -45,4 +45,3 @@ impl Component for ModalSkeleton {
         }
     }
 }
-

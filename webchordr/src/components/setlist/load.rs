@@ -1,10 +1,10 @@
-use yew::prelude::*;
-use stdweb::console;
 use crate::components::modal::Question;
-use crate::events::SetlistEvent;
-use std::rc::Rc;
-use libchordr::prelude::{Catalog, Setlist, SetlistEntry};
 use crate::events::Event;
+use crate::events::SetlistEvent;
+use libchordr::prelude::{Catalog, Setlist, SetlistEntry};
+use std::rc::Rc;
+use stdweb::console;
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct SetlistProps {
@@ -33,11 +33,10 @@ impl SetlistLoad {
     }
 
     fn collect_setlist_entries(&self) -> Vec<SetlistEntry> {
-        self.props.serialized_setlist
+        self.props
+            .serialized_setlist
             .split(',')
-            .filter_map(|song_id| {
-                self.props.catalog.get(song_id)
-            })
+            .filter_map(|song_id| self.props.catalog.get(song_id))
             .map(|song| SetlistEntry::from_song(song))
             .collect()
     }
@@ -63,7 +62,9 @@ impl Component for SetlistLoad {
             }
             Msg::ChooseYes => {
                 let new_setlist = self.build_setlist();
-                self.props.on_load.emit(Event::SetlistEvent(SetlistEvent::Replace(new_setlist)));
+                self.props
+                    .on_load
+                    .emit(Event::SetlistEvent(SetlistEvent::Replace(new_setlist)));
                 self.visible = false;
             }
         }
@@ -84,4 +85,3 @@ impl Component for SetlistLoad {
         }
     }
 }
-

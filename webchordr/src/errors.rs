@@ -1,7 +1,7 @@
+use std::convert::From;
 use std::error::Error;
 use std::fmt::{Display, Formatter, Result};
-use stdweb::web::error::{SecurityError, IError};
-use std::convert::From;
+use stdweb::web::error::{IError, SecurityError};
 
 #[derive(Debug)]
 pub enum WebError {
@@ -21,10 +21,14 @@ impl WebError {
 
 impl Display for WebError {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        write!(f, "{}", match self {
-            WebError::SortableError(s) => s,
-            WebError::JsError(s) => s
-        })
+        write!(
+            f,
+            "{}",
+            match self {
+                WebError::SortableError(s) => s,
+                WebError::JsError(s) => s,
+            }
+        )
     }
 }
 

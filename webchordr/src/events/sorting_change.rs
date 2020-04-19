@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use crate::events::EventTrait;
+use serde::{Deserialize, Serialize};
 
 pub type Sorting = usize;
 

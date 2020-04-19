@@ -1,16 +1,16 @@
 mod item;
 
 pub use self::item::Item;
+use crate::events::setlist_events::SetlistEvent;
+use crate::events::{Event, SortingChange};
+use crate::sortable_service::{SortableHandle, SortableOptions, SortableService};
 use libchordr::models::setlist::Setlist;
 use libchordr::prelude::*;
-use log::info;
 use log::error;
+use log::info;
 use std::rc::Rc;
-use yew::prelude::*;
 use stdweb::web::HtmlElement;
-use crate::events::{SortingChange, Event};
-use crate::sortable_service::{SortableService, SortableHandle, SortableOptions};
-use crate::events::setlist_events::SetlistEvent;
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct SongListProps {
@@ -60,7 +60,9 @@ impl Component for SongList {
         match msg {
             Msg::SetlistChangeSorting(e) => {
                 let sorting_change = self.patch_sorting_change(e);
-                self.props.on_setlist_change.emit(Event::SetlistEvent(SetlistEvent::SortingChange(sorting_change)));
+                self.props.on_setlist_change.emit(Event::SetlistEvent(
+                    SetlistEvent::SortingChange(sorting_change),
+                ));
                 self.props.songs = Rc::new(Setlist::new());
                 true
             }
@@ -104,19 +106,24 @@ impl Component for SongList {
     }
 }
 
-
 impl SongList {
     fn make_sortable(&mut self) {
         match self.sortable_handle {
-            None =>
+            None => {
                 if let Some(element) = self.node_ref.cast::<HtmlElement>() {
                     let mut options = SortableOptions::default();
                     options.handle = Some(".sortable-handle".into());
                     options.force_fallback = true;
-                    self.sortable_handle = self.sortable_service
-                        .make_sortable(element, self.link.callback(|e| Msg::SetlistChangeSorting(e)), options)
+                    self.sortable_handle = self
+                        .sortable_service
+                        .make_sortable(
+                            element,
+                            self.link.callback(|e| Msg::SetlistChangeSorting(e)),
+                            options,
+                        )
                         .ok();
-                },
+                }
+            }
             Some(_) => { /* Element is already sortable */ }
         }
     }
@@ -137,10 +144,19 @@ impl SongList {
         let song_count = self.props.songs.len();
         if e.new_index() == song_count {
             let last_index = song_count - 1;
-            info!("Handle Setlist sorting change: Move {} to {} (patched: {})", e.old_index(), last_index, e.new_index());
+            info!(
+                "Handle Setlist sorting change: Move {} to {} (patched: {})",
+                e.old_index(),
+                last_index,
+                e.new_index()
+            );
             SortingChange::new(e.old_index(), last_index)
         } else {
-            info!("Handle Setlist sorting change: Move {} to {}", e.old_index(), e.new_index());
+            info!(
+                "Handle Setlist sorting change: Move {} to {}",
+                e.old_index(),
+                e.new_index()
+            );
             e
         }
     }

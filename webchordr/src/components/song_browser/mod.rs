@@ -125,7 +125,7 @@ impl Component for SongBrowser {
                 </div>
             }
         };
-        let render_song_item = |song:&Song| {
+        let render_song_item = |song: &Song| {
             let key = song.title();
             html! {
                 <div class="col-3">

@@ -1,12 +1,12 @@
-use yew::prelude::*;
-use log::debug;
 use crate::components::modal::Modal;
-use stdweb::web::window;
 use crate::errors::WebError;
-use libchordr::models::setlist::Setlist;
-use std::rc::Rc;
-use libchordr::prelude::SetlistEntry;
 use crate::setlist_serializer_service::SetlistSerializerService;
+use libchordr::models::setlist::Setlist;
+use libchordr::prelude::SetlistEntry;
+use log::debug;
+use std::rc::Rc;
+use stdweb::web::window;
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct SetlistProps {
@@ -85,12 +85,11 @@ impl Component for SetlistShareButton {
     }
 }
 
-
 impl SetlistShareButton {
     fn build_share_url(&self) -> Result<String, WebError> {
         let host = match window().location() {
             Some(location) => location.host()?,
-            None => return Err(WebError::js_error("Could not fetch current location"))
+            None => return Err(WebError::js_error("Could not fetch current location")),
         };
         let serialized = SetlistSerializerService::build_share_url(self.props.setlist.as_ref())?;
 

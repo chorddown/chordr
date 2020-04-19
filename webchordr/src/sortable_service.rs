@@ -1,9 +1,9 @@
-use yew::Callback;
-use stdweb::{js, Value};
-use stdweb::web::HtmlElement;
-use crate::events::{SETLIST_CHANGE_SORTING, SortingChange};
-use crate::events::sorting_change::Sorting;
 use crate::errors::WebError;
+use crate::events::sorting_change::Sorting;
+use crate::events::{SortingChange, SETLIST_CHANGE_SORTING};
+use stdweb::web::HtmlElement;
+use stdweb::{js, Value};
+use yew::Callback;
 
 /// Service to make a HtmlElement sortable using [Shopify/draggable](https://github.com/Shopify/draggable)
 pub struct SortableService {}
@@ -41,7 +41,10 @@ impl SortableService {
         options: SortableOptions,
     ) -> Result<SortableHandle, ()> {
         let handler = move |old_index: i64, new_index: i64| {
-            callback.emit(SortingChange::new(old_index as Sorting, new_index as Sorting));
+            callback.emit(SortingChange::new(
+                old_index as Sorting,
+                new_index as Sorting,
+            ));
         };
 
         let handle = js!(

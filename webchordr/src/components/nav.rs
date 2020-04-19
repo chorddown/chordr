@@ -1,9 +1,9 @@
+use crate::components::setlist::SetlistShareButton;
 use crate::components::song_list::SongList;
+use crate::events::Event;
 use libchordr::models::setlist::*;
 use std::rc::Rc;
 use yew::prelude::*;
-use crate::events::Event;
-use crate::components::setlist::SetlistShareButton;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct NavProps {

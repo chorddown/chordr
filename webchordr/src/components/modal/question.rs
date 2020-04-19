@@ -1,6 +1,6 @@
-use yew::prelude::*;
-use crate::helpers::Class;
 use crate::components::modal::modal_skeleton::ModalSkeleton;
+use crate::helpers::Class;
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct QuestionProps {
@@ -62,7 +62,6 @@ impl Component for Question {
         }
     }
 
-
     fn view(&self) -> Html {
         let props = &self.props;
 
@@ -88,27 +87,26 @@ impl Component for Question {
                     </div>
                 </ModalSkeleton>
             }
-            // html! {
-            //     <div class="modal-outer">
-            //         <div class="modal">
-            //             <div class="modal-question">
-            //                 {&props.question_text}
-            //             </div>
-            //             <div class="modal-buttons button-group">
-            //                 <button class=answer_1_class onclick=on_answer_1>
-            //                     {&props.answer_1_text}
-            //                 </button>
-            //                 <button class=answer_2_class onclick=on_answer_2>
-            //                     {&props.answer_2_text}
-            //                 </button>
-            //             </div>
-            //
-            //         </div>
-            //     </div>
-            // }
+        // html! {
+        //     <div class="modal-outer">
+        //         <div class="modal">
+        //             <div class="modal-question">
+        //                 {&props.question_text}
+        //             </div>
+        //             <div class="modal-buttons button-group">
+        //                 <button class=answer_1_class onclick=on_answer_1>
+        //                     {&props.answer_1_text}
+        //                 </button>
+        //                 <button class=answer_2_class onclick=on_answer_2>
+        //                     {&props.answer_2_text}
+        //                 </button>
+        //             </div>
+        //
+        //         </div>
+        //     </div>
+        // }
         } else {
             html! {}
         }) as Html
     }
 }
-

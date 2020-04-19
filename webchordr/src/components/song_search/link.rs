@@ -20,4 +20,3 @@ impl Component for SongSearchLink {
         html! { <a class="song-search-home" href=href><i class="im im-magnifier"></i></a> }
     }
 }
-

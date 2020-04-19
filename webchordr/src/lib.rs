@@ -6,18 +6,21 @@ extern crate stdweb;
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 mod components;
-mod helpers;
-mod events;
 mod errors;
+mod events;
+mod helpers;
 mod route;
 mod setlist_serializer_service;
 mod sortable_service;
 
 use crate::components::nav::Nav;
 use crate::components::reload_section::ReloadSection;
+use crate::components::setlist::SetlistLoad;
 use crate::components::song_browser::SongBrowser;
+use crate::components::song_search::SongSearch;
 use crate::components::song_view::SongView;
 use crate::components::start_screen::StartScreen;
+use crate::events::{Event, SetlistEvent, SortingChange};
 use crate::route::{AppRoute, SetlistRoute};
 use libchordr::models::setlist::{Setlist, SetlistEntry};
 use libchordr::models::song_id::SongIdTrait;
@@ -32,9 +35,6 @@ use yew::services::fetch::{FetchService, FetchTask, Request, Response};
 use yew::services::storage::{Area, StorageService};
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
 use yew_router::prelude::*;
-use crate::events::{Event, SortingChange, SetlistEvent};
-use crate::components::song_search::SongSearch;
-use crate::components::setlist::SetlistLoad;
 
 const STORAGE_KEY_SETLIST: &'static str = "net.cundd.chordr.setlist";
 const STORAGE_KEY_SETTINGS: &'static str = "net.cundd.chordr.settings";
@@ -103,8 +103,12 @@ impl App {
 
         let catalog = self.catalog.as_ref().unwrap();
         if let Some(song) = catalog.get(song_id.clone()) {
-            let add = self.link.callback(|s| Msg::Event(SetlistEvent::Add(s).into()));
-            let remove = self.link.callback(|s| Msg::Event(SetlistEvent::Remove(s).into()));
+            let add = self
+                .link
+                .callback(|s| Msg::Event(SetlistEvent::Add(s).into()));
+            let remove = self
+                .link
+                .callback(|s| Msg::Event(SetlistEvent::Remove(s).into()));
             let change = self
                 .link
                 .callback(|s: (SongId, SongSettings)| Msg::SongSettingsChange(s.0, s.1));
@@ -180,37 +184,35 @@ impl App {
 
     fn view_setlist_route(&self, route: SetlistRoute) -> Html {
         (match route {
-            SetlistRoute::Load { serialized_setlist } => {
-                match &self.catalog {
-                    None => html! {},
-                    Some(catalog) => {
-                        let replace = self.link.callback(|e| Msg::Event(e));
-                        let catalog = Rc::new(catalog.clone());
+            SetlistRoute::Load { serialized_setlist } => match &self.catalog {
+                None => html! {},
+                Some(catalog) => {
+                    let replace = self.link.callback(|e| Msg::Event(e));
+                    let catalog = Rc::new(catalog.clone());
 
-                        html! {<SetlistLoad catalog=catalog serialized_setlist=serialized_setlist on_load=replace />}
-                    }
+                    html! {<SetlistLoad catalog=catalog serialized_setlist=serialized_setlist on_load=replace />}
                 }
-            }
+            },
         }) as Html
     }
 
     fn fetch_catalog(&mut self, no_cache: bool) {
         use stdweb::web::Date;
 
-        let callback =
-            self.link
-                .callback(move |response: Response<Json<Result<Catalog, anyhow::Error>>>| {
-                    let (meta, Json(data)) = response.into_parts();
-                    if meta.status.is_success() {
-                        Msg::FetchCatalogReady(data)
-                    } else if no_cache {
-                        info!("Could not fetch catalog without cache. Try again");
-                        Msg::FetchCatalog(false)
-                    } else {
-                        error!("Could not fetch catalog: {:?}", meta);
-                        Msg::Ignore
-                    }
-                });
+        let callback = self.link.callback(
+            move |response: Response<Json<Result<Catalog, anyhow::Error>>>| {
+                let (meta, Json(data)) = response.into_parts();
+                if meta.status.is_success() {
+                    Msg::FetchCatalogReady(data)
+                } else if no_cache {
+                    info!("Could not fetch catalog without cache. Try again");
+                    Msg::FetchCatalog(false)
+                } else {
+                    error!("Could not fetch catalog: {:?}", meta);
+                    Msg::Ignore
+                }
+            },
+        );
 
         let uri_base = "/catalog.json".to_owned();
         let uri = if no_cache {
@@ -263,11 +265,15 @@ impl App {
     }
 
     fn setlist_sorting_changed(&mut self, sorting_change: SortingChange) {
-        match self.setlist.move_entry(sorting_change.old_index(), sorting_change.new_index()) {
+        match self
+            .setlist
+            .move_entry(sorting_change.old_index(), sorting_change.new_index())
+        {
             Ok(_) => {
-                self.storage_service.store(STORAGE_KEY_SETLIST, Json(&self.setlist));
+                self.storage_service
+                    .store(STORAGE_KEY_SETLIST, Json(&self.setlist));
             }
-            Err(e) => error!("{}", e)
+            Err(e) => error!("{}", e),
         }
     }
 
@@ -358,12 +364,10 @@ impl Component for App {
                     top.frames.location.reload()
                 }
             }
-            Msg::Event(e) => {
-                match e {
-                    Event::SetlistEvent(se) => self.handle_setlist_event(se),
-                    _ => debug!("New event {:?}", e)
-                }
-            }
+            Msg::Event(e) => match e {
+                Event::SetlistEvent(se) => self.handle_setlist_event(se),
+                _ => debug!("New event {:?}", e),
+            },
         }
         true
     }

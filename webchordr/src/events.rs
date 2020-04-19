@@ -1,9 +1,9 @@
-pub mod sorting_change;
 pub mod setlist_events;
+pub mod sorting_change;
 
-use serde::{Deserialize, Serialize};
-pub use self::sorting_change::SortingChange;
 pub use self::setlist_events::SetlistEvent;
+pub use self::sorting_change::SortingChange;
+use serde::{Deserialize, Serialize};
 
 pub const SETLIST_CHANGE_SORTING: &str = "chordr:setlist-change-sorting";
 

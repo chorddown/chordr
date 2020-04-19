@@ -1,6 +1,6 @@
-use yew::prelude::*;
 use crate::components::modal::modal_skeleton::ModalSkeleton;
 use crate::helpers::Class;
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct ModalProps {
@@ -22,7 +22,7 @@ pub struct Modal {
 }
 
 pub enum Msg {
-    Close
+    Close,
 }
 
 impl Component for Modal {
@@ -83,4 +83,3 @@ impl Component for Modal {
         }) as Html
     }
 }
-
