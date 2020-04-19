@@ -1,12 +1,11 @@
 use crate::components::modal::Question;
+use crate::data_exchange::SetlistDeserializeService;
 use crate::events::Event;
 use crate::events::SetlistEvent;
 use libchordr::prelude::{Catalog, Setlist, SetlistEntry};
+use log::{error, info};
 use std::rc::Rc;
-use log::error;
-use stdweb::console;
 use yew::prelude::*;
-use crate::data_exchange::SetlistDeserializeService;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct SetlistProps {
@@ -31,10 +30,18 @@ pub enum Msg {
 
 impl SetlistLoad {
     fn build_setlist(&self) -> Setlist<SetlistEntry> {
-        let deserialize_result = SetlistDeserializeService::deserialize(&self.props.serialized_setlist, &self.props.catalog);
+        let deserialize_result = SetlistDeserializeService::deserialize(
+            &self.props.serialized_setlist,
+            &*self.props.catalog,
+        );
 
         if deserialize_result.errors.len() > 0 {
-            let errors = deserialize_result.errors.iter().map(|e| e.to_string()).collect::<Vec<String>>().join(", ");
+            let errors = deserialize_result
+                .errors
+                .iter()
+                .map(|e| e.to_string())
+                .collect::<Vec<String>>()
+                .join(", ");
             error!("{}", errors);
         }
 
@@ -58,6 +65,7 @@ impl Component for SetlistLoad {
         match msg {
             Msg::Ignore => {}
             Msg::ChooseNo => {
+                info!("User canceled Setlist import");
                 self.visible = false;
             }
             Msg::ChooseYes => {
@@ -73,13 +81,16 @@ impl Component for SetlistLoad {
     }
 
     fn view(&self) -> Html {
+        let on_answer_1 = self.link.callback(|_| Msg::ChooseNo);
+        let on_answer_2 = self.link.callback(|_| Msg::ChooseYes);
+
         html! {
             <Question
                 question_text="Do you want to load the Setlist and delete yours?"
                 answer_1_text="No"
                 answer_2_text="Yes"
-                on_answer_1=self.link.callback(|_|{console!(log, "choose 1");Msg::ChooseNo})
-                on_answer_2=self.link.callback(|_|{console!(log, "choose 2");Msg::ChooseYes})
+                on_answer_1=on_answer_1
+                on_answer_2=on_answer_2
                 visible=self.visible
             />
         }

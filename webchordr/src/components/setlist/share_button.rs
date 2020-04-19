@@ -1,4 +1,5 @@
 use crate::components::modal::Modal;
+use crate::data_exchange::SetlistSerializeService;
 use crate::errors::WebError;
 use libchordr::models::setlist::Setlist;
 use libchordr::prelude::SetlistEntry;
@@ -6,7 +7,6 @@ use log::debug;
 use std::rc::Rc;
 use stdweb::web::window;
 use yew::prelude::*;
-use crate::data_exchange::SetlistSerializeService;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct SetlistProps {

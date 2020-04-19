@@ -18,7 +18,7 @@ pub use crate::parser::Parser;
 pub use crate::parser::ParserTrait;
 
 /// Data structures
-pub use crate::models::catalog::Catalog;
+pub use crate::models::catalog::{Catalog, CatalogTrait};
 pub use crate::models::chord::fmt::Formatting;
 pub use crate::models::file_type::FileType;
 pub use crate::models::meta::{BNotation, MetaTrait, SemitoneNotation};

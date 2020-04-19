@@ -2,13 +2,13 @@ mod song_from_dir_entry;
 mod catalog_build_error;
 
 use crate::error::{Error, Result};
-use crate::models::catalog::Catalog;
+use crate::models::catalog::*;
 use crate::models::file_type::FileType;
 use crate::models::song::Song;
 use crate::models::song_id::SongIdTrait;
 use std::convert::TryFrom;
 use std::fs::{self, DirEntry};
-use std::path::{Path};
+use std::path::Path;
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
 pub use self::catalog_build_error::CatalogBuildError;

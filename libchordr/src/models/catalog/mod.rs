@@ -1,5 +1,8 @@
+pub mod catalog_trait;
+
 use crate::models::song::Song;
 use crate::models::song_id::{SongId, SongIdTrait};
+pub use self::catalog_trait::CatalogTrait;
 use serde::{Deserialize, Serialize};
 use std::slice::Iter;
 
@@ -16,25 +19,23 @@ impl Catalog {
             songs,
         }
     }
+}
 
-    pub fn len(&self) -> usize {
-        self.songs.len()
-    }
-
-    pub fn revision(&self) -> String {
-        self.revision.clone()
-    }
-
-    pub fn contains_id<S: Into<SongId>>(&self, song_id: S) -> bool {
-        self.get(song_id).is_some()
-    }
-
-    pub fn get<S: Into<SongId>>(&self, song_id: S) -> Option<&Song> {
+impl CatalogTrait<Song> for Catalog {
+    fn get<S: Into<SongId>>(&self, song_id: S) -> Option<&Song> {
         let song_id = song_id.into();
         self.songs.iter().find(|s| s.id() == song_id)
     }
 
-    pub fn iter(&self) -> Iter<Song> {
+    fn len(&self) -> usize {
+        self.songs.len()
+    }
+
+    fn iter(&self) -> Iter<Song> {
         self.songs.iter()
+    }
+
+    fn revision(&self) -> String {
+        self.revision.clone()
     }
 }

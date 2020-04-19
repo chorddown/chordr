@@ -1,12 +1,16 @@
-use libchordr::prelude::{SongData, SongIdTrait, SetlistEntry};
 use libchordr::models::file_type::FileType;
 use libchordr::models::song_id::SongId;
+use libchordr::prelude::{SetlistEntry, SongData, SongIdTrait};
 
 pub fn entry<S: Into<String>>(id: S) -> SetlistEntry {
-    SetlistEntry::from_song(&TestSong { id: id.into() })
+    SetlistEntry::from_song(&test_song(id))
 }
 
-struct TestSong {
+pub fn test_song<S: Into<String>>(id: S) -> TestSong {
+    TestSong { id: id.into() }
+}
+
+pub struct TestSong {
     id: String,
 }
 
@@ -25,4 +29,3 @@ impl SongData for TestSong {
         FileType::Chorddown
     }
 }
-

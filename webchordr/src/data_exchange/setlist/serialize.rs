@@ -1,6 +1,6 @@
 use crate::errors::WebError;
 use libchordr::models::setlist::Setlist;
-use libchordr::prelude::{ SetlistEntry, SongIdTrait};
+use libchordr::prelude::{SetlistEntry, SongIdTrait};
 
 pub struct SerializeService {}
 
@@ -22,7 +22,13 @@ mod test {
 
     #[test]
     fn serialize_test() {
-        let mut list = Setlist::with_entries(vec![entry("0"), entry("1"), entry("2"), entry("3"), entry("4")]);
+        let list = Setlist::with_entries(vec![
+            entry("0"),
+            entry("1"),
+            entry("2"),
+            entry("3"),
+            entry("4"),
+        ]);
         let result = SerializeService::serialize(&list);
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), "0,1,2,3,4");

@@ -6,11 +6,11 @@ extern crate stdweb;
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 mod components;
+mod data_exchange;
 mod errors;
 mod events;
 mod helpers;
 mod route;
-mod data_exchange;
 mod sortable_service;
 #[cfg(test)]
 mod test_helpers;

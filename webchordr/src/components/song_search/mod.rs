@@ -2,7 +2,7 @@ mod link;
 
 use self::link::SongSearchLink;
 use crate::components::song_list::Item as SongItem;
-use libchordr::models::catalog::Catalog;
+use libchordr::models::catalog::*;
 use libchordr::models::song_data::SongData;
 use libchordr::prelude::Song;
 use log::info;

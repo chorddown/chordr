@@ -151,7 +151,7 @@ mod test {
     #[test]
     fn move_entry_test() {
         let mut list = Setlist(vec![TestItem(0), TestItem(1), TestItem(2), TestItem(3), TestItem(4)]);
-        list.move_entry(1, 3);
+        assert!(list.move_entry(1, 3).is_ok());
         assert_eq!(list[0], TestItem(0));
         assert_eq!(list[1], TestItem(2));
         assert_eq!(list[3], TestItem(1));
@@ -160,7 +160,7 @@ mod test {
     #[test]
     fn move_entry_boundary_test() {
         let mut list = Setlist(vec![TestItem(0), TestItem(1), TestItem(2), TestItem(3), TestItem(4)]);
-        list.move_entry(0, 4);
+        assert!(list.move_entry(0, 4).is_ok());
         assert_eq!(list[0], TestItem(1));
         assert_eq!(list[4], TestItem(0));
     }
