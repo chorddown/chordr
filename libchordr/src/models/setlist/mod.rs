@@ -115,6 +115,12 @@ impl<S: SongIdTrait> Setlist<S> {
     }
 }
 
+impl Setlist<SetlistEntry> {
+    pub fn with_entries(entries: Vec<SetlistEntry>) -> Self {
+        Self { 0: entries }
+    }
+}
+
 impl<S: SongIdTrait + PartialEq> PartialEq for Setlist<S> {
     fn eq(&self, other: &Self) -> bool {
         self.0 == other.0
