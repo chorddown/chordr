@@ -191,8 +191,16 @@ impl App {
                 Some(catalog) => {
                     let replace = self.link.callback(|e| Msg::Event(e));
                     let catalog = Rc::new(catalog.clone());
+                    let setlist = Rc::new(self.setlist.clone());
 
-                    html! {<SetlistLoad catalog=catalog serialized_setlist=serialized_setlist on_load=replace />}
+                    html! {
+                        <SetlistLoad
+                            catalog=catalog
+                            serialized_setlist=serialized_setlist
+                            on_load=replace
+                            current_setlist=setlist
+                        />
+                    }
                 }
             },
         }) as Html

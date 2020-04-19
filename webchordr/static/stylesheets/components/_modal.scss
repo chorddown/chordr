@@ -50,7 +50,8 @@ $dark-mode-modal-header-bg: $gray-ultra-dark !default;
         }
 
         .modal-header-text {
-            padding: 0 $std-space;
+            padding: $button-padding;
+            line-height: $button-line-height;
         }
 
         .modal-close {

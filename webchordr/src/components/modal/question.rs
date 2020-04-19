@@ -9,6 +9,8 @@ pub struct QuestionProps {
     pub answer_2_text: String,
 
     #[prop_or_default]
+    pub class: Class,
+    #[prop_or_default]
     pub answer_1_class: Class,
     #[prop_or_default]
     pub answer_2_class: Class,
@@ -17,6 +19,9 @@ pub struct QuestionProps {
     pub on_answer_2: Callback<()>,
 
     pub visible: bool,
+
+    #[prop_or_default]
+    pub children: Children,
 }
 
 pub struct Question {
@@ -70,13 +75,17 @@ impl Component for Question {
 
         let answer_1_class = props.answer_1_class.or("model-answer answer-1");
         let answer_2_class = props.answer_2_class.or("model-answer answer-2");
+        let class = props.class.or("");
 
         (if self.visible {
             html! {
-                <ModalSkeleton class="">
-                    <div class="modal-question">
-                        {&props.question_text}
+                <ModalSkeleton class=class>
+                    <div class="modal-header modal-question">
+                        <div class="modal-header-text">
+                            {&props.question_text}
+                        </div>
                     </div>
+                    {{ self.props.children.iter().collect::<Html>() }}
                     <div class="modal-buttons button-group">
                         <button class=answer_1_class onclick=on_answer_1>
                             {&props.answer_1_text}
@@ -87,24 +96,6 @@ impl Component for Question {
                     </div>
                 </ModalSkeleton>
             }
-        // html! {
-        //     <div class="modal-outer">
-        //         <div class="modal">
-        //             <div class="modal-question">
-        //                 {&props.question_text}
-        //             </div>
-        //             <div class="modal-buttons button-group">
-        //                 <button class=answer_1_class onclick=on_answer_1>
-        //                     {&props.answer_1_text}
-        //                 </button>
-        //                 <button class=answer_2_class onclick=on_answer_2>
-        //                     {&props.answer_2_text}
-        //                 </button>
-        //             </div>
-        //
-        //         </div>
-        //     </div>
-        // }
         } else {
             html! {}
         }) as Html

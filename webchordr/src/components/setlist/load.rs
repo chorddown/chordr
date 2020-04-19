@@ -2,16 +2,19 @@ use crate::components::modal::Question;
 use crate::data_exchange::SetlistDeserializeService;
 use crate::events::Event;
 use crate::events::SetlistEvent;
-use libchordr::prelude::{Catalog, Setlist, SetlistEntry};
+use libchordr::prelude::{Catalog, Setlist as OriginalSetlist, SetlistEntry, SongData};
 use log::{error, info};
 use std::rc::Rc;
+use stdweb::js;
 use yew::prelude::*;
+
+type Setlist = OriginalSetlist<SetlistEntry>;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct SetlistProps {
     pub catalog: Rc<Catalog>,
     pub serialized_setlist: String,
-
+    pub current_setlist: Rc<Setlist>,
     pub on_load: Callback<Event>,
 }
 
@@ -29,7 +32,7 @@ pub enum Msg {
 }
 
 impl SetlistLoad {
-    fn build_setlist(&self) -> Setlist<SetlistEntry> {
+    fn build_setlist(&self) -> Setlist {
         let deserialize_result = SetlistDeserializeService::deserialize(
             &self.props.serialized_setlist,
             &*self.props.catalog,
@@ -46,6 +49,22 @@ impl SetlistLoad {
         }
 
         deserialize_result.setlist
+    }
+
+    fn render_setlist(&self, setlist: &Setlist) -> Html {
+        let render = |song: &SetlistEntry| {
+            let key = song.title();
+
+            html! { <li key=key>{key}</li> }
+        };
+
+        (html! {
+            <div class="setlist-load-preview-viewport">
+                <ul>
+                    {for setlist.iter().map(render)}
+                </ul>
+            </div>
+        }) as Html
     }
 }
 
@@ -67,6 +86,10 @@ impl Component for SetlistLoad {
             Msg::ChooseNo => {
                 info!("User canceled Setlist import");
                 self.visible = false;
+                js! { @(no_return)
+                    window.location.href = "#/";
+                }
+                // window().history().push_state("new","bubble", Some("#/"))
             }
             Msg::ChooseYes => {
                 let new_setlist = self.build_setlist();
@@ -84,6 +107,9 @@ impl Component for SetlistLoad {
         let on_answer_1 = self.link.callback(|_| Msg::ChooseNo);
         let on_answer_2 = self.link.callback(|_| Msg::ChooseYes);
 
+        let current_setlist = self.render_setlist(&self.props.current_setlist);
+        let new_setlist = self.render_setlist(&self.build_setlist());
+
         html! {
             <Question
                 question_text="Do you want to load the Setlist and delete yours?"
@@ -92,7 +118,19 @@ impl Component for SetlistLoad {
                 on_answer_1=on_answer_1
                 on_answer_2=on_answer_2
                 visible=self.visible
-            />
+                class="setlist-load-preview-modal"
+            >
+                <div class="setlist-load-preview-container">
+                    <div class="setlist-load-preview-col">
+                        <h3>{"Your Setlist"}</h3>
+                        {current_setlist}
+                    </div>
+                    <div class="setlist-load-preview-col">
+                        <h3>{"New Setlist"}</h3>
+                        {new_setlist}
+                    </div>
+                </div>
+            </Question>
         }
     }
 }

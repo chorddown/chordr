@@ -10,3 +10,51 @@
         }
     }
 }
+
+.setlist-load-preview-container {
+    display: flex;
+    flex-flow: row nowrap;
+    margin: 0 (-$std-half);
+
+    .setlist-load-preview-col {
+        flex: 0 0 50%;
+        padding: 0 $std-half;
+    }
+
+    h3 {
+        text-align: center;
+        margin: $std-half 0;
+        font-size: $font-size-web;
+    }
+
+    .setlist-load-preview-viewport {
+        border: $button-border;
+        max-height: 40vh;
+        overflow-y: scroll;
+        position: relative;
+
+        ul {
+            margin: 0;
+            list-style: none;
+            padding: $std-half $std-half 0;
+
+            li {
+                padding-left: $std-space;
+                margin-bottom: $std-half;
+
+                &::before {
+                    content: "𝄞";
+                    position: absolute;
+                    left: $std-half;
+                    color: $gray-dark;
+                }
+            }
+        }
+    }
+}
+
+.setlist-load-preview-modal {
+    .modal-buttons {
+        margin-top: -1px; // Collapse the top border with the bottom border of the preview
+    }
+}
