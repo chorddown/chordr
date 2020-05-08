@@ -1,3 +1,4 @@
+use crate::domain::setlist::db::SetlistDb;
 use crate::schema::setlist_entry;
 use crate::schema::setlist_entry::dsl::setlist_entry as setlist_entries;
 use crate::ConnectionType;
@@ -5,11 +6,12 @@ use diesel::{self, prelude::*};
 use libchordr::models::file_type::FileType;
 use libchordr::models::song_data::SongData;
 use libchordr::models::song_id::{SongId, SongIdTrait};
-use std::convert::TryFrom;
-use crate::domain::setlist::db::SetlistDb;
 use libchordr::prelude::SetlistEntry;
+use std::convert::TryFrom;
 
-#[derive(Serialize, Identifiable, Associations, Queryable, Insertable, AsChangeset, Debug, Clone)]
+#[derive(
+Serialize, Identifiable, Associations, Queryable, Insertable, AsChangeset, Debug, Clone,
+)]
 #[table_name = "setlist_entry"]
 #[belongs_to(SetlistDb)]
 pub struct SetlistDbEntry {

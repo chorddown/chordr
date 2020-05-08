@@ -1,6 +1,6 @@
+use crate::DbConn;
 use parking_lot::Mutex;
 use rocket::local::Client;
-use crate::{DbConn};
 
 // We use a lock to synchronize between tests so DB operations don't collide.
 // For now. In the future, we'll have a nice way to run each test in a DB
@@ -24,8 +24,10 @@ macro_rules! run_test {
     }};
 }
 
-pub fn run_test_fn<F>(test_body: F) -> () where
-    F: Fn(Client, DbConn) -> () {
+pub fn run_test_fn<F>(test_body: F) -> ()
+    where
+        F: Fn(Client, DbConn) -> (),
+{
     let _lock = crate::tests::DB_LOCK.lock();
     let rocket = crate::rocket();
     let db = crate::DbConn::get_one(&rocket);
@@ -35,8 +37,10 @@ pub fn run_test_fn<F>(test_body: F) -> () where
     test_body(client, conn)
 }
 
-pub fn run_database_test<F>(test_body: F) -> () where
-    F: Fn(DbConn) -> () {
+pub fn run_database_test<F>(test_body: F) -> ()
+    where
+        F: Fn(DbConn) -> (),
+{
     let _lock = crate::tests::DB_LOCK.lock();
     let rocket = rocket::ignite().attach(DbConn::fairing());
     let db = crate::DbConn::get_one(&rocket);
