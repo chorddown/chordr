@@ -23,67 +23,20 @@ impl RepositoryTrait for UserSetlistRepository {
     type Error = SrvError;
 
     fn find_all(&self, connection: &ConnectionType) -> Result<Vec<Self::ManagedType>, Self::Error> {
-        let all_setlist_instances = all_setlists
+        let all_setlist_instances: Vec<SetlistDb> = all_setlists
             .order(setlist::id.desc())
-            .load::<SetlistDb>(connection)?;
+            .load(connection)?;
+        let entries: Vec<SetlistDbEntry> = SetlistDbEntry::belonging_to(&all_setlist_instances)
+            .load(connection)?;
+        let grouped_entries: Vec<Vec<SetlistDbEntry>> = entries
+            .into_iter()
+            .grouped_by(&all_setlist_instances);
 
         Ok(all_setlist_instances
             .into_iter()
-            .map(|setlist_db| {
-                let entries = SetlistDbEntry::belonging_to(&setlist_db)
-                    .load::<SetlistDbEntry>(connection)
-                    .expect("Error loading entries");
-                UserSetlist::from_data(setlist_db, entries)
-            })
+            .zip(grouped_entries)
+            .map(|t| UserSetlist::from(t))
             .collect())
-
-        // TODO: avoid n+1 queries
-        // let users: Vec<User> = users::table.load::<User>(&connection)
-        //     .expect("error loading users");
-        // let posts: Vec<Post> = Post::belonging_to(&users)
-        //     .load::<Post>(&connection)
-        //     .expect("error loading posts");
-        // let comments: Vec<Comment> = Comment::belonging_to(&posts)
-        //     .load::<Comment>(&connection)
-        //     .expect("Error loading comments");
-        // let grouped_comments: Vec<Vec<Comment>> = comments.grouped_by(&posts);
-        // let posts_and_comments: Vec<Vec<(Post, Vec<Comment>)>> = posts
-        //     .into_iter()
-        //     .zip(grouped_comments)
-        //     .grouped_by(&users);
-        // let result: Vec<(User, Vec<(Post, Vec<Comment>)>)> = users
-        //     .into_iter()
-        //     .zip(posts_and_comments)
-        //     .collect();
-        // let expected = vec![
-        //     (
-        //         User { id: 1, name: "Sean".to_string() },
-        //         vec![
-        //             (
-        //                 Post { id: 1, user_id: 1, title: "My first post".to_string() },
-        //                 vec![ Comment { id: 1, post_id: 1, body: "Great post".to_string() } ]
-        //             ),
-        //             (
-        //                 Post { id: 2, user_id: 1, title: "About Rust".to_string() },
-        //                 vec![
-        //                     Comment { id: 2, post_id: 2, body: "Yay! I am learning Rust".to_string() }
-        //                 ]
-        //
-        //             )
-        //         ]
-        //     ),
-        //     (
-        //         User { id: 2, name: "Tess".to_string() },
-        //         vec![
-        //             (
-        //                 Post { id: 3, user_id: 2, title: "My first post too".to_string() },
-        //                 vec![ Comment { id: 3, post_id: 3, body: "I enjoyed your post".to_string() } ]
-        //             )
-        //         ]
-        //     )
-        // ];
-        //
-        // assert_eq!(result, expected);
     }
 
     fn count_all(&self, connection: &ConnectionType) -> Result<Count, Self::Error> {
@@ -147,16 +100,29 @@ mod test {
         run_database_test(|conn| {
             clear_database(&conn);
             let repository = UserSetlistRepository::new();
-            assert_eq!(repository.count_all(conn).unwrap(), 0);
-            assert_eq!(repository.find_all(conn).unwrap(), vec![]);
+            assert_eq!(repository.count_all(&conn).unwrap(), 0);
+            assert_eq!(repository.find_all(&conn).unwrap(), vec![]);
 
             let inserted_setlists = vec![
                 insert_test_setlist(&conn, 918, 819),
                 insert_test_setlist(&conn, 8, 819)
             ];
 
-            assert_eq!(repository.count_all(conn).unwrap(), 2);
-            assert_eq!(repository.find_all(conn).unwrap(), inserted_setlists);
+            assert_eq!(repository.count_all(&conn).unwrap(), 2);
+            assert_eq!(repository.find_all(&conn).unwrap(), inserted_setlists);
+        })
+    }
+
+    #[test]
+    fn test_find_by_id() {
+        run_database_test(|conn| {
+            clear_database(&conn);
+
+            let random_id = rand::random::<i32>();
+            insert_test_setlist(&conn, random_id, 819);
+
+            let repository = UserSetlistRepository::new();
+            assert_eq!(repository.find_by_id(&conn, random_id).unwrap().id, random_id);
         })
     }
 
@@ -165,14 +131,14 @@ mod test {
         run_database_test(|conn| {
             clear_database(&conn);
             let repository = UserSetlistRepository::new();
-            assert_eq!(repository.count_all(conn).unwrap(), 0);
+            assert_eq!(repository.count_all(&conn).unwrap(), 0);
 
             insert_test_setlist(&conn, 1, 819);
             insert_test_setlist(&conn, 2, 819);
             insert_test_setlist(&conn, 3, 819);
             insert_test_setlist(&conn, 4, 819);
 
-            assert_eq!(repository.count_all(conn).unwrap(), 4);
+            assert_eq!(repository.count_all(&conn).unwrap(), 4);
         })
     }
 
@@ -181,8 +147,8 @@ mod test {
         run_database_test(|conn| {
             clear_database(&conn);
 
-            let init_setlists = SetlistDb::all(conn);
-            let init_setlist_entries = SetlistDbEntry::all(conn);
+            let init_setlists = SetlistDb::all(&conn);
+            let init_setlist_entries = SetlistDbEntry::all(&conn);
 
             let new_setlist = UserSetlist {
                 id: 918,
@@ -192,14 +158,14 @@ mod test {
             };
 
             UserSetlistRepository::new()
-                .add(conn, new_setlist)
+                .add(&conn, new_setlist)
                 .unwrap();
 
-            let new_setlists = SetlistDb::all(conn);
+            let new_setlists = SetlistDb::all(&conn);
             assert_eq!(new_setlists.len(), init_setlists.len() + 1);
             assert_eq!(new_setlists.len(), 1);
 
-            let new_setlist_entries = SetlistDbEntry::all(conn);
+            let new_setlist_entries = SetlistDbEntry::all(&conn);
             // There should be no new entries
             assert_eq!(new_setlist_entries.len(), init_setlist_entries.len());
         })
@@ -210,7 +176,7 @@ mod test {
         run_database_test(|conn| {
             clear_database(&conn);
 
-            let init_setlists = SetlistDb::all(conn);
+            let init_setlists = SetlistDb::all(&conn);
 
             let new_setlist = UserSetlist {
                 id: 918,
@@ -224,14 +190,14 @@ mod test {
             };
 
             UserSetlistRepository::new()
-                .add(conn, new_setlist)
+                .add(&conn, new_setlist)
                 .unwrap();
 
-            let new_setlists = SetlistDb::all(conn);
+            let new_setlists = SetlistDb::all(&conn);
             assert_eq!(new_setlists.len(), init_setlists.len() + 1);
             assert_eq!(new_setlists.len(), 1);
 
-            let new_setlist_entries = SetlistDbEntry::all(conn);
+            let new_setlist_entries = SetlistDbEntry::all(&conn);
             assert_eq!(new_setlist_entries.len(), 3);
         })
     }
@@ -243,11 +209,11 @@ mod test {
             insert_test_setlist(&conn, 918, 819);
             insert_test_setlist(&conn, 8, 819);
 
-            assert_eq!(SetlistDbEntry::count_all(conn), 6);
+            assert_eq!(SetlistDbEntry::count_all(&conn), 6);
 
             UserSetlistRepository::new()
                 .update(
-                    conn,
+                    &conn,
                     UserSetlist {
                         id: 918,                       // Same ID
                         user: 8190,                    // New User
@@ -257,8 +223,8 @@ mod test {
                 )
                 .unwrap();
 
-            assert_eq!(SetlistDb::count_all(conn), 2);
-            assert_eq!(SetlistDbEntry::count_all(conn), 3);
+            assert_eq!(SetlistDb::count_all(&conn), 2);
+            assert_eq!(SetlistDbEntry::count_all(&conn), 3);
         })
     }
 
@@ -269,11 +235,11 @@ mod test {
             insert_test_setlist(&conn, 918, 819);
             insert_test_setlist(&conn, 8, 819);
 
-            assert_eq!(SetlistDbEntry::count_all(conn), 6);
+            assert_eq!(SetlistDbEntry::count_all(&conn), 6);
 
             UserSetlistRepository::new()
                 .update(
-                    conn,
+                    &conn,
                     UserSetlist {
                         id: 918,                       // Same ID
                         user: 8190,                    // New User
@@ -283,8 +249,8 @@ mod test {
                 )
                 .unwrap();
 
-            assert_eq!(SetlistDb::count_all(conn), 2);
-            assert_eq!(SetlistDbEntry::count_all(conn), 4);
+            assert_eq!(SetlistDb::count_all(&conn), 2);
+            assert_eq!(SetlistDbEntry::count_all(&conn), 4);
         })
     }
 
@@ -298,7 +264,7 @@ mod test {
 
             UserSetlistRepository::new()
                 .delete(
-                    conn,
+                    &conn,
                     UserSetlist {
                         id: 918, // This is important
                         user: 0,
@@ -308,7 +274,7 @@ mod test {
                 )
                 .unwrap();
 
-            assert_eq!(SetlistDb::count_all(conn), 1);
+            assert_eq!(SetlistDb::count_all(&conn), 1);
         })
     }
 

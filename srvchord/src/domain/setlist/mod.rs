@@ -31,6 +31,12 @@ impl UserSetlist {
     }
 }
 
+impl From<(SetlistDb, Vec<SetlistDbEntry>)> for UserSetlist {
+    fn from(tuple: (SetlistDb, Vec<SetlistDbEntry>)) -> Self {
+        Self::from_data(tuple.0, tuple.1)
+    }
+}
+
 impl RecordIdTrait for UserSetlist {
     type Id = i32;
 

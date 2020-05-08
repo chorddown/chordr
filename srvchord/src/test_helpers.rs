@@ -37,7 +37,7 @@ pub fn run_test_fn<F>(test_body: F) -> ()
 
 pub fn run_database_test<F>(test_body: F) -> ()
     where
-        F: Fn(&ConnectionType) -> (),
+        F: Fn(ConnectionType) -> (),
 {
     let _lock = crate::tests::DB_LOCK.lock();
 
@@ -54,5 +54,5 @@ pub fn run_database_test<F>(test_body: F) -> ()
     let conn = <ConnectionType as Connection>::establish(&database_url.as_str().unwrap())
         .expect(&format!("Error connecting to {}", database_url));
 
-    test_body(&conn)
+    test_body(conn)
 }
