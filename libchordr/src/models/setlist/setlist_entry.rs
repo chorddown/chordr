@@ -13,6 +13,14 @@ pub struct SetlistEntry {
 }
 
 impl SetlistEntry {
+    pub fn new<I: Into<SongId>, S: Into<String>>(song_id: I, file_type: FileType, title: S) -> Self {
+        Self {
+            song_id: song_id.into(),
+            file_type,
+            title: title.into(),
+        }
+    }
+
     pub fn from_song<S: SongData>(song: &S) -> Self {
         Self {
             song_id: song.id(),
@@ -28,8 +36,8 @@ impl From<Song> for SetlistEntry {
     }
 }
 
-impl From<&Song> for SetlistEntry {
-    fn from(s: &Song) -> Self {
+impl<S: SongData> From<&S> for SetlistEntry {
+    fn from(s: &S) -> Self {
         SetlistEntry::from_song(s)
     }
 }
