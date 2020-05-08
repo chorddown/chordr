@@ -90,8 +90,4 @@ table! {
 
 joinable!(setlist_entry -> setlist (setlist_db_id));
 
-allow_tables_to_appear_in_same_query!(
-    setlist,
-    setlist_entry,
-    tasks,
-);
+allow_tables_to_appear_in_same_query!(setlist, setlist_entry, tasks,);

@@ -1,8 +1,8 @@
-use crate::domain::setlist::user_setlist::UserSetlist;
-use rocket_contrib::json::Json;
-use crate::DbConn;
 use crate::domain::setlist::db::SetlistDb;
+use crate::domain::setlist::UserSetlist;
+use crate::DbConn;
 use rocket::{get, post};
+use rocket_contrib::json::Json;
 // use rocket::data::{Transformed, FromData, Outcome, Transform};
 
 #[get("/")]
@@ -19,9 +19,7 @@ pub fn setlist_index(conn: DbConn) -> Json<Vec<UserSetlist>> {
     )
 }
 
-
-#[derive(FromForm)]
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(FromForm, Serialize, Deserialize, Debug)]
 pub struct SetlistData {
     id: i32,
 }
@@ -41,7 +39,12 @@ pub struct SetlistData {
 // }
 
 #[post("/<username>/<id>", format = "application/json", data = "<setlist>")]
-pub fn setlist_put(username: String, id: i32, conn: DbConn, setlist: Json<UserSetlist>) -> Json<Vec<UserSetlist>> {
+pub fn setlist_put(
+    username: String,
+    id: i32,
+    conn: DbConn,
+    setlist: Json<UserSetlist>,
+) -> Json<Vec<UserSetlist>> {
     println!("user {} {} {:?}", username, id, setlist);
     Json(
         SetlistDb::all(&conn.0)
@@ -57,9 +60,9 @@ pub fn setlist_put(username: String, id: i32, conn: DbConn, setlist: Json<UserSe
 
 #[cfg(test)]
 mod test {
-    use rocket::http::{ContentType};
     use crate::domain::setlist::db::SetlistDb;
     use crate::test_helpers::run_test_fn;
+    use rocket::http::ContentType;
 
     #[test]
     fn test_insertion_deletion() {
