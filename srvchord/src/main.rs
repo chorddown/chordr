@@ -187,13 +187,7 @@ fn rocket() -> Rocket {
         // .mount("/", StaticFiles::from("../target/deploy/"))
         .mount("/", routes![index, catalog])
         // .mount("/todo", routes![new, toggle, delete])
-        .mount(
-            "/setlist",
-            routes![
-                crate::routes::setlist::setlist_index,
-                crate::routes::setlist::setlist_put
-            ],
-        )
+        .mount("/setlist", crate::routes::setlist::get_routes())
         .attach(Template::fairing())
 }
 
