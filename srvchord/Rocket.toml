@@ -1,0 +1,15 @@
+[global]
+# Path to the directory of chorddown files
+song_dir = "../webchordr/static/songs"
+
+# Path to the static files
+static_files_dir = "../target/deploy"
+
+template_dir = "static"
+
+
+[production.databases.main_database]
+url = "db/db.sqlite"
+
+[development.databases.main_database]
+url = "db/test-db.sqlite"
