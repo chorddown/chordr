@@ -107,15 +107,16 @@ mod test {
     use crate::domain::setlist_entry::db::SetlistDbEntry;
     use crate::test_helpers::*;
     use crate::ConnectionType;
-    use libchordr::models::file_type::FileType;
+    use libchordr::prelude::FileType;
+    use libchordr::prelude::SetlistEntry;
 
     #[test]
     fn test_add_empty() {
         run_database_test(|conn| {
-            clear_database(conn);
+            clear_database(&conn);
 
-            let init_setlists = SetlistDb::all(conn);
-            let init_setlist_entries = SetlistDbEntry::all(conn);
+            let init_setlists = SetlistDb::all(&conn);
+            let init_setlist_entries = SetlistDbEntry::all(&conn);
 
             let new_setlist = UserSetlist {
                 id: 918,
@@ -124,13 +125,13 @@ mod test {
                 entries: vec![],
             };
 
-            CommandExecutor::perform(new_setlist, Command::add(conn)).unwrap();
+            CommandExecutor::perform(new_setlist, Command::add(&conn)).unwrap();
 
-            let new_setlists = SetlistDb::all(conn);
+            let new_setlists = SetlistDb::all(&conn);
             assert_eq!(new_setlists.len(), init_setlists.len() + 1);
             assert_eq!(new_setlists.len(), 1);
 
-            let new_setlist_entries = SetlistDbEntry::all(conn);
+            let new_setlist_entries = SetlistDbEntry::all(&conn);
             // There should be no new entries
             assert_eq!(new_setlist_entries.len(), init_setlist_entries.len());
         })
@@ -139,9 +140,9 @@ mod test {
     #[test]
     fn test_add() {
         run_database_test(|conn| {
-            clear_database(conn);
+            clear_database(&conn);
 
-            let init_setlists = SetlistDb::all(conn);
+            let init_setlists = SetlistDb::all(&conn);
 
             let new_setlist = UserSetlist {
                 id: 918,
@@ -154,13 +155,13 @@ mod test {
                 ],
             };
 
-            CommandExecutor::perform(new_setlist, Command::add(conn)).unwrap();
+            CommandExecutor::perform(new_setlist, Command::add(&conn)).unwrap();
 
-            let new_setlists = SetlistDb::all(conn);
+            let new_setlists = SetlistDb::all(&conn);
             assert_eq!(new_setlists.len(), init_setlists.len() + 1);
             assert_eq!(new_setlists.len(), 1);
 
-            let new_setlist_entries = SetlistDbEntry::all(conn);
+            let new_setlist_entries = SetlistDbEntry::all(&conn);
             assert_eq!(new_setlist_entries.len(), 3);
         })
     }
@@ -168,11 +169,11 @@ mod test {
     #[test]
     fn test_update_empty() {
         run_database_test(|conn| {
-            clear_database(conn);
-            insert_test_setlist(conn, 918, 819);
-            insert_test_setlist(conn, 8, 819);
+            clear_database(&conn);
+            insert_test_setlist(&conn, 918, 819);
+            insert_test_setlist(&conn, 8, 819);
 
-            assert_eq!(SetlistDbEntry::count_all(conn), 6);
+            assert_eq!(SetlistDbEntry::count_all(&conn), 6);
 
             CommandExecutor::perform(
                 UserSetlist {
@@ -181,23 +182,23 @@ mod test {
                     user_name: "Paul".to_string(), // New name
                     entries: vec![],
                 },
-                Command::update(conn),
+                Command::update(&conn),
             )
                 .unwrap();
 
-            assert_eq!(SetlistDb::count_all(conn), 2);
-            assert_eq!(SetlistDbEntry::count_all(conn), 3);
+            assert_eq!(SetlistDb::count_all(&conn), 2);
+            assert_eq!(SetlistDbEntry::count_all(&conn), 3);
         })
     }
 
     #[test]
     fn test_update() {
         run_database_test(|conn| {
-            clear_database(conn);
-            insert_test_setlist(conn, 918, 819);
-            insert_test_setlist(conn, 8, 819);
+            clear_database(&conn);
+            insert_test_setlist(&conn, 918, 819);
+            insert_test_setlist(&conn, 8, 819);
 
-            assert_eq!(SetlistDbEntry::count_all(conn), 6);
+            assert_eq!(SetlistDbEntry::count_all(&conn), 6);
 
             CommandExecutor::perform(
                 UserSetlist {
@@ -206,22 +207,22 @@ mod test {
                     user_name: "Paul".to_string(), // New name
                     entries: vec![SetlistEntry::new("song-4", FileType::Chorddown, "Song 4")],
                 },
-                Command::update(conn),
+                Command::update(&conn),
             )
                 .unwrap();
 
-            assert_eq!(SetlistDb::count_all(conn), 2);
-            assert_eq!(SetlistDbEntry::count_all(conn), 4);
+            assert_eq!(SetlistDb::count_all(&conn), 2);
+            assert_eq!(SetlistDbEntry::count_all(&conn), 4);
         })
     }
 
     #[test]
     fn test_delete() {
         run_database_test(|conn| {
-            clear_database(conn);
+            clear_database(&conn);
 
-            insert_test_setlist(conn, 918, 819);
-            insert_test_setlist(conn, 1918, 1819);
+            insert_test_setlist(&conn, 918, 819);
+            insert_test_setlist(&conn, 1918, 1819);
 
             CommandExecutor::perform(
                 UserSetlist {
@@ -230,11 +231,11 @@ mod test {
                     user_name: "".to_string(),
                     entries: vec![],
                 },
-                Command::delete(conn),
+                Command::delete(&conn),
             )
                 .unwrap();
 
-            assert_eq!(SetlistDb::count_all(conn), 1);
+            assert_eq!(SetlistDb::count_all(&conn), 1);
         })
     }
 
