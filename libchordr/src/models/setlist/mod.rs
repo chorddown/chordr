@@ -52,7 +52,7 @@ impl<S: SongIdTrait> Setlist<S> {
         let song_id = song.id();
         match self.position(song_id.as_str()) {
             Some(pos) => {
-                mem::replace(&mut self.0[pos], song);
+                let _ = mem::replace(&mut self.0[pos], song);
                 Ok(())
             }
             None => Err(Error::setlist_error(format!(
