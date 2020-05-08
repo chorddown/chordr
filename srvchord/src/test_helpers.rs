@@ -1,6 +1,8 @@
-use crate::DbConn;
+use crate::{DbConn, ConnectionType};
 use parking_lot::Mutex;
 use rocket::local::Client;
+use rocket::config::RocketConfig;
+use diesel::Connection;
 
 // We use a lock to synchronize between tests so DB operations don't collide.
 // For now. In the future, we'll have a nice way to run each test in a DB
@@ -15,10 +17,6 @@ macro_rules! run_test {
         let db = $crate::DbConn::get_one(&rocket);
         let $client = Client::new(rocket).expect("Rocket client");
         let $conn = db.expect("Failed to get database connection for testing");
-        // assert!(
-        //     Task::delete_all(&$conn),
-        //     "Failed to delete all tasks for testing"
-        // );
 
         $block
     }};
@@ -39,12 +37,22 @@ pub fn run_test_fn<F>(test_body: F) -> ()
 
 pub fn run_database_test<F>(test_body: F) -> ()
     where
-        F: Fn(DbConn) -> (),
+        F: Fn(&ConnectionType) -> (),
 {
     let _lock = crate::tests::DB_LOCK.lock();
-    let rocket = rocket::ignite().attach(DbConn::fairing());
-    let db = crate::DbConn::get_one(&rocket);
-    let conn = db.expect("Failed to get database connection for testing");
 
-    test_body(conn)
+    let missing_database_error = "Failed to get database connection for testing";
+    let config = RocketConfig::read().unwrap().active().clone();
+    let database_url = config
+        .get_table("databases")
+        .expect(missing_database_error)
+        .get("main_database")
+        .expect(missing_database_error)
+        .get("url")
+        .expect(missing_database_error);
+
+    let conn = <ConnectionType as Connection>::establish(&database_url.as_str().unwrap())
+        .expect(&format!("Error connecting to {}", database_url));
+
+    test_body(&conn)
 }

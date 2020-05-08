@@ -11,9 +11,13 @@ impl SrvError {
         Self::from_kind(SrvErrorKind::PersistenceError(msg.into()))
     }
 
+    pub fn object_not_found_error<S: Into<String>>(msg: S) -> Self {
+        Self::from_kind(SrvErrorKind::ObjectNotFound(msg.into()))
+    }
+
     fn from_kind(error: SrvErrorKind) -> Self {
         Self {
-            inner: Box::new(error)
+            inner: Box::new(error),
         }
     }
 
@@ -45,13 +49,15 @@ impl From<::diesel::result::Error> for SrvError {
 
 #[derive(Debug)]
 pub enum SrvErrorKind {
-    PersistenceError(String)
+    PersistenceError(String),
+    ObjectNotFound(String),
 }
 
 impl fmt::Display for SrvErrorKind {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             SrvErrorKind::PersistenceError(s) => write!(f, "{}", s),
+            SrvErrorKind::ObjectNotFound(s) => write!(f, "{}", s),
         }
     }
 }

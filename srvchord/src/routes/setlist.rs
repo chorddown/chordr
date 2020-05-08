@@ -3,19 +3,22 @@ use crate::domain::setlist::UserSetlist;
 use crate::DbConn;
 use rocket::{get, post};
 use rocket_contrib::json::Json;
+use crate::domain::setlist::repository::UserSetlistRepository;
+use crate::traits::RepositoryTrait;
 // use rocket::data::{Transformed, FromData, Outcome, Transform};
+
+pub fn get_routes() -> Vec<rocket::Route> {
+    routes![
+        crate::routes::setlist::setlist_index,
+        crate::routes::setlist::setlist_get,
+        crate::routes::setlist::setlist_put
+    ]
+}
 
 #[get("/")]
 pub fn setlist_index(conn: DbConn) -> Json<Vec<UserSetlist>> {
     Json(
-        SetlistDb::all(&conn.0)
-            .into_iter()
-            .map(|setlist_db| {
-                let entries = setlist_db.entries(&conn.0);
-
-                UserSetlist::from_data(setlist_db, entries)
-            })
-            .collect(),
+        UserSetlistRepository::new().find_all(&conn.0).unwrap()
     )
 }
 
@@ -37,6 +40,17 @@ pub struct SetlistData {
 //         unimplemented!()
 //     }
 // }
+
+#[get("/<username>")]
+pub fn setlist_get(
+    username: String,
+    conn: DbConn,
+) -> Json<Vec<UserSetlist>> {
+    println!("user {}", username);
+    Json(
+        UserSetlistRepository::new().find_all(&conn.0).unwrap()
+    )
+}
 
 #[post("/<username>/<id>", format = "application/json", data = "<setlist>")]
 pub fn setlist_put(

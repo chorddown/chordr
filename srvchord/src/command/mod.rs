@@ -33,8 +33,8 @@ impl<'a> Command<'a> {
 }
 
 pub trait CommandExecutor
-    where
-        Self: Sized,
+where
+    Self: Sized,
 {
     type Error;
 
