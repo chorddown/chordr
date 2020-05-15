@@ -13,6 +13,7 @@ extern crate serde_derive;
 #[macro_use]
 extern crate rocket_contrib;
 
+mod authentication;
 mod command;
 mod config;
 mod domain;
@@ -22,8 +23,6 @@ mod schema;
 mod task;
 #[cfg(test)]
 mod test_helpers;
-#[cfg(test)]
-mod tests;
 mod traits;
 
 use crate::config::Config;

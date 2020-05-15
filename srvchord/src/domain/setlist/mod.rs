@@ -12,6 +12,7 @@ pub struct UserSetlist {
     pub id: i32,
     pub user: i32,
     pub user_name: String,
+    pub sorting: i32,
     pub entries: Vec<SetlistEntry>,
 }
 
@@ -26,6 +27,7 @@ impl UserSetlist {
             id: setlist_db.id,
             user: setlist_db.user,
             user_name: setlist_db.user_name,
+            sorting: setlist_db.sorting,
             entries,
         }
     }

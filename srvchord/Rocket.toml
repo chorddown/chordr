@@ -11,5 +11,11 @@ template_dir = "static"
 [production.databases.main_database]
 url = "db/db.sqlite"
 
+[staging.databases.main_database]
+url = "db/stage-db.sqlite"
+
+[development]
+#log = "debug"
+
 [development.databases.main_database]
-url = "db/test-db.sqlite"
+url = "db/dev-db.sqlite"

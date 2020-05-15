@@ -47,6 +47,32 @@ impl From<::diesel::result::Error> for SrvError {
     }
 }
 
+impl From<::argon2::Error> for SrvError {
+    fn from(error: ::argon2::Error) -> Self {
+        SrvError::from_error(error)
+    }
+}
+
+#[derive(Debug)]
+pub enum AuthorizationError {
+    MissingCredentials,
+    IncorrectPassword,
+    IncorrectUsername,
+}
+
+impl fmt::Display for AuthorizationError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            AuthorizationError::MissingCredentials => write!(f, "No credentials given"),
+            AuthorizationError::IncorrectPassword
+            | AuthorizationError::IncorrectUsername => write!(f, "Incorrect username or password"),
+        }
+    }
+}
+
+impl Error for AuthorizationError {}
+
+
 #[derive(Debug)]
 pub enum SrvErrorKind {
     PersistenceError(String),
