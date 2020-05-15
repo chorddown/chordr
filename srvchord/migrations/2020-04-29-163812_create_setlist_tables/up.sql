@@ -2,7 +2,8 @@ CREATE TABLE setlist
 (
     "id"        INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "user"      INTEGER NOT NULL,
-    "user_name" VARCHAR NOT NULL
+    "user_name" VARCHAR NOT NULL,
+    "sorting"   INTEGER NOT NULL
 );
 
 CREATE TABLE setlist_entry
@@ -18,11 +19,10 @@ CREATE TABLE setlist_entry
             ON DELETE CASCADE
 );
 
-INSERT INTO setlist (user, user_name)
-VALUES (1, "yvi");
-INSERT INTO setlist (user, user_name)
-VALUES (2, "daniel");
+INSERT INTO setlist (id, user, user_name, sorting)
+VALUES (1, 1, 'yvi', 100),
+       (2, 2, 'daniel', 200);
 
 INSERT INTO setlist_entry (song_id, title, setlist_db_id, file_type)
-VALUES ("bubbles", "song 1", 1, "chorddown"),
-       ("great", "song 2", 2, "chorddown");
+VALUES ('bubbles', 'song 1', 1, 'chorddown'),
+       ('great', 'song 2', 2, 'chorddown');

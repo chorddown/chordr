@@ -1,4 +1,5 @@
 use crate::domain::setlist::db::SetlistDb;
+use crate::error::SrvError;
 use crate::schema::setlist_entry;
 use crate::schema::setlist_entry::dsl::setlist_entry as setlist_entries;
 use crate::ConnectionType;
@@ -31,11 +32,13 @@ impl SetlistDbEntry {
         setlist_entries.count().get_result(conn).unwrap()
     }
 
-    pub fn find_by_setlist(conn: &ConnectionType, setlist: &SetlistDb) -> Vec<SetlistDbEntry> {
-        SetlistDbEntry::belonging_to(setlist)
-            .load::<SetlistDbEntry>(conn)
-            .expect("Error loading entries")
+    pub fn find_by_setlist(
+        conn: &ConnectionType,
+        setlist: &SetlistDb,
+    ) -> Result<Vec<SetlistDbEntry>, SrvError> {
+        Ok(SetlistDbEntry::belonging_to(setlist).load::<SetlistDbEntry>(conn)?)
     }
+
     pub fn delete_all(conn: &ConnectionType) -> bool {
         diesel::delete(setlist_entries).execute(conn).is_ok()
     }

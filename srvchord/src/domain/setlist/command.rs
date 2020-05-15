@@ -13,6 +13,7 @@ impl UserSetlist {
             id: self.id,
             user: self.user,
             user_name: self.user_name.clone(),
+            sorting: self.sorting,
         }
     }
 
@@ -122,6 +123,7 @@ mod test {
                 id: 918,
                 user: 819,
                 user_name: "Paul".to_string(),
+                sorting: 918,
                 entries: vec![],
             };
 
@@ -148,6 +150,7 @@ mod test {
                 id: 918,
                 user: 819,
                 user_name: "Paul".to_string(),
+                sorting: 918,
                 entries: vec![
                     SetlistEntry::new("song-1", FileType::Chorddown, "Song 1"),
                     SetlistEntry::new("song-2", FileType::Chorddown, "Song 2"),
@@ -180,6 +183,7 @@ mod test {
                     id: 918,                       // Same ID
                     user: 8190,                    // New User
                     user_name: "Paul".to_string(), // New name
+                    sorting: 918,
                     entries: vec![],
                 },
                 Command::update(&conn),
@@ -205,6 +209,7 @@ mod test {
                     id: 918,                       // Same ID
                     user: 8190,                    // New User
                     user_name: "Paul".to_string(), // New name
+                    sorting: 918,
                     entries: vec![SetlistEntry::new("song-4", FileType::Chorddown, "Song 4")],
                 },
                 Command::update(&conn),
@@ -213,6 +218,28 @@ mod test {
 
             assert_eq!(SetlistDb::count_all(&conn), 2);
             assert_eq!(SetlistDbEntry::count_all(&conn), 4);
+        })
+    }
+
+
+    #[test]
+    fn test_update_not_existing() {
+        run_database_test(|conn| {
+            clear_database(&conn);
+            let result = CommandExecutor::perform(
+                UserSetlist {
+                    id: 10001,
+                    user: 1,
+                    user_name: "Paul".to_string(),
+                    sorting: 1,
+                    entries: vec![],
+                },
+                Command::update(&conn),
+            );
+            assert_eq!(
+                result.unwrap_err().to_string(),
+                "Original object with ID '10001' could not be found".to_owned(),
+            );
         })
     }
 
@@ -229,6 +256,7 @@ mod test {
                     id: 918, // This is important
                     user: 0,
                     user_name: "".to_string(),
+                    sorting: 918,
                     entries: vec![],
                 },
                 Command::delete(&conn),
@@ -245,6 +273,7 @@ mod test {
                 id,
                 user,
                 user_name: "Saul".to_string(),
+                sorting: id,
                 entries: vec![
                     SetlistEntry::new("song-1", FileType::Chorddown, "Song 1"),
                     SetlistEntry::new("song-2", FileType::Chorddown, "Song 2"),

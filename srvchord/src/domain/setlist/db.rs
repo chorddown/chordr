@@ -11,6 +11,7 @@ pub struct SetlistDb {
     pub id: i32,
     pub user: i32,
     pub user_name: String,
+    pub sorting: i32,
 }
 
 impl SetlistDb {
