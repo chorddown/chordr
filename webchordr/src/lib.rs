@@ -1,6 +1,3 @@
-#![recursion_limit = "128000"]
-// extern crate stdweb;
-
 // Use `wee_alloc` as the global allocator.
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
@@ -16,8 +13,8 @@ mod sortable_service;
 #[cfg(test)]
 mod test_helpers;
 
-use wasm_bindgen::JsValue;
 use wasm_bindgen::prelude::*;
+use wasm_bindgen::JsValue;
 
 // This is the entry point for the web app
 #[wasm_bindgen]

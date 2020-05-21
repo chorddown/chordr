@@ -9,6 +9,8 @@ use libchordr::models::song_settings::SongSettings;
 use libchordr::prelude::*;
 use log::error;
 use log::info;
+use web_sys::window;
+use web_sys::Document;
 use yew::prelude::*;
 use yew::virtual_dom::VNode;
 use yew::{Component, ComponentLink};
@@ -182,9 +184,10 @@ impl SongView {
         let html = self.convert_song_to_html_string();
 
         // Use `web_sys`'s global `window` function to get a handle on the global
-        // window object.
-        let window = web_sys::window().expect("no global `window` exists");
-        let document: web_sys::Document = window.document().expect("should have a document on window");
+        let window = window().expect("Could not detect the JS window object");
+        let document: Document = window
+            .document()
+            .expect("Could not get document from JS window");
 
         // Manufacture the element we're gonna append
         match document.create_element("div") {
@@ -192,7 +195,7 @@ impl SongView {
                 e.set_inner_html(&html);
                 VNode::VRef((&e as &web_sys::Node).clone())
             }
-            Err(_) => html! {}
+            Err(_) => html! {},
         }
     }
 

@@ -1,6 +1,6 @@
+use js_sys::Function;
 use wasm_bindgen::prelude::*;
 use web_sys::HtmlElement;
-use js_sys::Function;
 
 #[wasm_bindgen(module = "/static/assets/javascripts/SortableWrapper.js")]
 extern "C" {

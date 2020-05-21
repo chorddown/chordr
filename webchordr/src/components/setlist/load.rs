@@ -5,8 +5,8 @@ use crate::events::SetlistEvent;
 use libchordr::prelude::{Catalog, Setlist as OriginalSetlist, SetlistEntry, SongData};
 use log::{error, info};
 use std::rc::Rc;
-use yew::prelude::*;
 use web_sys::window;
+use yew::prelude::*;
 
 type Setlist = OriginalSetlist<SetlistEntry>;
 

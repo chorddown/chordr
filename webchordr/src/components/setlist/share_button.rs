@@ -6,8 +6,8 @@ use libchordr::prelude::SetlistEntry;
 use log::debug;
 use std::rc::Rc;
 // use stdweb::web::window;
-use yew::prelude::*;
 use web_sys::window;
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct SetlistProps {

@@ -1,13 +1,13 @@
 mod sortable_wasm_binding;
 
+use self::sortable_wasm_binding::SortableWrapper;
 use crate::events::sorting_change::Sorting;
 use crate::events::SortingChange;
-use yew::Callback;
-use web_sys::HtmlElement;
+use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
-use self::sortable_wasm_binding::SortableWrapper;
-use serde::{Serialize, Deserialize};
+use web_sys::HtmlElement;
+use yew::Callback;
 
 type SortingChangeFn = dyn Fn(i32, i32);
 
@@ -54,10 +54,12 @@ impl SortableService {
         let options_js = JsValue::from_serde(&options).unwrap();
         let wrapper = SortableWrapper::new(&element, closure.as_ref().unchecked_ref(), &options_js);
 
-        Ok(SortableHandle { sortable: wrapper, _closure: closure })
+        Ok(SortableHandle {
+            sortable: wrapper,
+            _closure: closure,
+        })
     }
 }
-
 
 #[derive(Serialize, Deserialize)]
 pub struct SortableOptions {
