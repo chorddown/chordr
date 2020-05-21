@@ -6,10 +6,10 @@ use crate::events::{Event, SortingChange};
 use crate::sortable_service::{SortableHandle, SortableOptions, SortableService};
 use libchordr::models::setlist::Setlist;
 use libchordr::prelude::*;
-use log::error;
 use log::info;
 use std::rc::Rc;
-use stdweb::web::HtmlElement;
+use web_sys::HtmlElement;
+// use stdweb::web::HtmlElement;
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq, Clone)]
@@ -43,16 +43,6 @@ impl Component for SongList {
             node_ref: NodeRef::default(),
             sortable_service: SortableService::new(),
             sortable_handle: None,
-        }
-    }
-
-    fn mounted(&mut self) -> ShouldRender {
-        if self.props.sortable {
-            self.make_sortable();
-
-            true
-        } else {
-            false
         }
     }
 
@@ -90,7 +80,7 @@ impl Component for SongList {
         let render = |song: &SetlistEntry| {
             let key = song.title();
 
-            html! { <Item<SetlistEntry> key=key song=song.clone() sortable=sortable/> }
+            html! { <Item<SetlistEntry> data_key=key song=song.clone() sortable=sortable/> }
         };
 
         info!(
@@ -103,6 +93,12 @@ impl Component for SongList {
                 {for songs.iter().map(render)}
             </div>
         }) as Html
+    }
+
+    fn rendered(&mut self, _: bool) -> () {
+        if self.props.sortable {
+            self.make_sortable();
+        }
     }
 }
 
@@ -130,9 +126,7 @@ impl SongList {
 
     fn make_unsortable(&mut self) {
         if let Some(mut handle) = self.sortable_handle.take() {
-            if let Err(e) = handle.destroy() {
-                error!("{}", e);
-            }
+            handle.destroy()
         };
     }
 

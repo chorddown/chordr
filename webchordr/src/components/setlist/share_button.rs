@@ -5,8 +5,9 @@ use libchordr::models::setlist::Setlist;
 use libchordr::prelude::SetlistEntry;
 use log::debug;
 use std::rc::Rc;
-use stdweb::web::window;
+// use stdweb::web::window;
 use yew::prelude::*;
+use web_sys::window;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct SetlistProps {
@@ -87,10 +88,11 @@ impl Component for SetlistShareButton {
 
 impl SetlistShareButton {
     fn build_share_url(&self) -> Result<String, WebError> {
-        let host = match window().location() {
-            Some(location) => location.host()?,
-            None => return Err(WebError::js_error("Could not fetch current location")),
-        };
+        let host = window().unwrap().location().host()?;
+        // let host = match window().unwrap().location() {
+        //     Some(location) => location.host()?,
+        //     None => return Err(WebError::js_error("Could not fetch current location")),
+        // };
         let serialized = SetlistSerializeService::serialize(self.props.setlist.as_ref())?;
 
         Ok(format!("{}/#/setlist/load/{}", host, serialized))

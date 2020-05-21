@@ -15,6 +15,10 @@ impl Component for SongBrowserLink {
         true
     }
 
+    fn change(&mut self, _props: Self::Properties) -> ShouldRender {
+        false
+    }
+
     fn view(&self) -> Html {
         let href = format!("#/song-browser/{}", SONG_BROWSER_PLACEHOLDER);
 

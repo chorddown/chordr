@@ -1,7 +1,6 @@
-use std::convert::From;
 use std::error::Error;
 use std::fmt::{Display, Formatter, Result};
-use stdweb::web::error::{IError, SecurityError};
+use wasm_bindgen::JsValue;
 
 #[derive(Debug)]
 pub enum WebError {
@@ -10,6 +9,7 @@ pub enum WebError {
     SetlistDeserializeError(String),
 }
 
+#[allow(unused)]
 impl WebError {
     pub fn sortable_error<S: Into<String>>(s: S) -> Self {
         WebError::SortableError(s.into())
@@ -40,8 +40,8 @@ impl Display for WebError {
 
 impl Error for WebError {}
 
-impl From<SecurityError> for WebError {
-    fn from(e: SecurityError) -> Self {
-        WebError::JsError(e.message())
+impl ::std::convert::From<wasm_bindgen::JsValue> for WebError {
+    fn from(v: JsValue) -> Self {
+        WebError::JsError(format!("{:?}", v))
     }
 }

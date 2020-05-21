@@ -104,7 +104,7 @@ impl Component for SongSearch {
             let key = song.title();
             html! {
                 <SongItem<Song> class="song-item button"
-                    key=key
+                    data_key=key
                     song=song/>
             }
         };

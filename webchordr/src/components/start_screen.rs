@@ -16,6 +16,10 @@ impl Component for StartScreen {
         true
     }
 
+    fn change(&mut self, _: Self::Properties) -> ShouldRender {
+        true
+    }
+
     fn view(&self) -> VNode {
         html! {
             <div class="start-screen">

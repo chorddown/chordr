@@ -5,8 +5,8 @@ use crate::events::SetlistEvent;
 use libchordr::prelude::{Catalog, Setlist as OriginalSetlist, SetlistEntry, SongData};
 use log::{error, info};
 use std::rc::Rc;
-use stdweb::js;
 use yew::prelude::*;
+use web_sys::window;
 
 type Setlist = OriginalSetlist<SetlistEntry>;
 
@@ -55,7 +55,7 @@ impl SetlistLoad {
         let render = |song: &SetlistEntry| {
             let key = song.title();
 
-            html! { <li key=key>{key}</li> }
+            html! { <li key=key.clone()>{key}</li> }
         };
 
         (html! {
@@ -86,10 +86,11 @@ impl Component for SetlistLoad {
             Msg::ChooseNo => {
                 info!("User canceled Setlist import");
                 self.visible = false;
-                js! { @(no_return)
-                    window.location.href = "#/";
-                }
-                // window().history().push_state("new","bubble", Some("#/"))
+                window()
+                    .expect("Could not detect the JS window object")
+                    .location()
+                    .set_href("#/")
+                    .expect("Could not change the location href");
             }
             Msg::ChooseYes => {
                 let new_setlist = self.build_setlist();
@@ -101,6 +102,15 @@ impl Component for SetlistLoad {
         }
 
         true
+    }
+
+    fn change(&mut self, props: Self::Properties) -> ShouldRender {
+        if self.props != props {
+            self.props = props;
+            true
+        } else {
+            false
+        }
     }
 
     fn view(&self) -> Html {

@@ -1,6 +1,5 @@
 use super::index::Index;
 use crate::helpers::Class;
-use log::info;
 use yew::prelude::*;
 use yew::virtual_dom::VNode;
 use yew::{Component, ComponentLink};
@@ -32,7 +31,7 @@ impl Component for IndexItem {
     }
 
     fn change(&mut self, props: Self::Properties) -> bool {
-        info!("Change the Song Browser Item props: {:?}", props);
+        // info!("Change the Song Browser Item props: {:?}", props);
         self.props = props;
         true
     }

@@ -15,6 +15,10 @@ impl Component for ReloadSection {
         true
     }
 
+    fn change(&mut self, _props: Self::Properties) -> ShouldRender {
+        false
+    }
+
     fn view(&self) -> Html {
         html! {
             <div class="reload-section">

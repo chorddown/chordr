@@ -86,6 +86,6 @@ impl Component for Nav {
                 { self.view_song_list() }
                 { self.view_nav_footer() }
             </nav>
-        })
+        }) as Html
     }
 }

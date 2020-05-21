@@ -5,6 +5,7 @@ pub use self::setlist_events::SetlistEvent;
 pub use self::sorting_change::SortingChange;
 use serde::{Deserialize, Serialize};
 
+#[allow(unused)]
 pub const SETLIST_CHANGE_SORTING: &str = "chordr:setlist-change-sorting";
 
 pub trait EventTrait {}

@@ -4,20 +4,47 @@ version = "0.1.5"
 authors = ["Daniel Corn <info@cundd.net>"]
 edition = "2018"
 
+[lib]
+crate-type = ["cdylib", "rlib"]
+
 [dependencies]
 log = "0.4"
-web_logger = "0.2"
 serde = "1"
 serde_derive = "1"
-stdweb = "0.4.20"
 rand = "0.7.2"
 libchordr = { path = "../libchordr" }
 anyhow = "1.0.28"
 failure = "0.1"
-yew = { version="0.14.3", features = ["std_web"] }
-yew-router = { version = "0.11.0", features = ["std_web"] }
+yew = "0.16"
+yew-router = "0.13.0"
 percent-encoding = "2.1.0"
 wee_alloc = "0.4.5"
+wasm-logger = "0.2"
+js-sys = "0.3.35"
 
-#yew = { git = "https://github.com/yewstack/yew", branch = "master", features = ["std_web"] }
-#yew-router = { git = "https://github.com/yewstack/yew_router", branch="master", features = ["std_web"] }
+[dev-dependencies]
+wasm-bindgen-test = "0.3"
+
+[dependencies.wasm-bindgen]
+version = "0.2.58"
+features = ["serde-serialize"]
+
+[dependencies.web-sys]
+version = "0.3.4"
+features = [
+  'KeyboardEvent',
+    'HtmlElement',
+    'Document',
+    'Url',
+    'DateTimeValue',
+    'Window',
+    'Location',
+]
+
+[package.metadata.wasm-pack.profile.dev.wasm-bindgen]
+# Should we enable wasm-bindgen's debug assertions in its generated JS glue?
+#debug-js-glue = true
+# Should wasm-bindgen demangle the symbols in the "name" custom section?
+#demangle-name-section = true
+# Should we emit the DWARF debug info custom sections?
+dwarf-debug-info = true

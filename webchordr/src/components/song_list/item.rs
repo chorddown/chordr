@@ -7,7 +7,7 @@ use yew::{Component, ComponentLink};
 #[derive(Properties, PartialEq, Clone)]
 pub struct SongListItemProps<S: SongData + Clone> {
     pub song: S,
-    pub key: String,
+    pub data_key: String,
 
     #[prop_or_default]
     pub sortable: bool,
@@ -53,7 +53,7 @@ impl<S: SongData + PartialEq + 'static + Clone> Component for Item<S> {
 
     fn view(&self) -> VNode {
         let title = &self.props.song.title();
-        let key = &self.props.key;
+        let key = &self.props.data_key;
         let href = format!("#/song/{}", self.props.song.id());
         let class = self.props.class.or("song-item");
 

@@ -130,7 +130,7 @@ impl Component for SongBrowser {
             html! {
                 <div class="col-3">
                     <SongItem<Song> class="song-item grid-button"
-                        key=key
+                        data_key=key
                         song=song/>
                 </div>
             }
