@@ -23,6 +23,8 @@ use yew::services::storage::{Area, StorageService};
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
 use yew_router::prelude::*;
 use serde::{Serialize, Deserialize};
+use crate::handler_traits::setlist_handler::SetlistHandler;
+use crate::handler_traits::settings_handler::SettingsHandler;
 
 const STORAGE_KEY_SETLIST: &'static str = "net.cundd.chordr.setlist";
 const STORAGE_KEY_SETTINGS: &'static str = "net.cundd.chordr.settings";
@@ -274,7 +276,9 @@ impl App {
             Err(e) => error!("Fetch Task count not be built: {:?}", e),
         }
     }
+}
 
+impl SetlistHandler for App {
     fn handle_setlist_event(&mut self, event: SetlistEvent) {
         match event {
             SetlistEvent::SortingChange(v) => self.setlist_sorting_changed(v),
@@ -323,18 +327,20 @@ impl App {
         }
     }
 
-    fn song_settings_change(&mut self, song_id: SongId, settings: SongSettings) {
-        self.settings.store(song_id, settings);
-        self.storage_service
-            .store(STORAGE_KEY_SETTINGS, Json(&self.settings));
-    }
-
     fn get_setlist(storage_service: &StorageService) -> Setlist<SetlistEntry> {
         if let Json(Ok(restored_model)) = storage_service.restore(STORAGE_KEY_SETLIST) {
             restored_model
         } else {
             Setlist::new()
         }
+    }
+}
+
+impl SettingsHandler for App {
+    fn song_settings_change(&mut self, song_id: SongId, settings: SongSettings) {
+        self.settings.store(song_id, settings);
+        self.storage_service
+            .store(STORAGE_KEY_SETTINGS, Json(&self.settings));
     }
 
     fn get_settings(storage_service: &StorageService) -> SongSettingsMap {
