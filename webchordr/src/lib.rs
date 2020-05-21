@@ -2,12 +2,12 @@
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
-mod handler_traits;
 mod app;
 mod components;
 mod data_exchange;
 mod errors;
 mod events;
+mod handler_traits;
 mod helpers;
 mod route;
 mod sortable_service;

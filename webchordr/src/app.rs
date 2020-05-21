@@ -6,6 +6,8 @@ use crate::components::song_search::SongSearch;
 use crate::components::song_view::SongView;
 use crate::components::start_screen::StartScreen;
 use crate::events::{Event, SetlistEvent, SortingChange};
+use crate::handler_traits::setlist_handler::SetlistHandler;
+use crate::handler_traits::settings_handler::SettingsHandler;
 use crate::route::{AppRoute, SetlistRoute};
 use js_sys::Date;
 use libchordr::models::setlist::{Setlist, SetlistEntry};
@@ -14,6 +16,7 @@ use libchordr::models::song_settings::SongSettings;
 use libchordr::prelude::*;
 use log::{debug, error, info, warn};
 use percent_encoding::percent_decode_str;
+use serde::{Deserialize, Serialize};
 use std::rc::Rc;
 use web_sys;
 use web_sys::window;
@@ -22,13 +25,9 @@ use yew::services::fetch::{FetchService, FetchTask, Request, Response};
 use yew::services::storage::{Area, StorageService};
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
 use yew_router::prelude::*;
-use serde::{Serialize, Deserialize};
-use crate::handler_traits::setlist_handler::SetlistHandler;
-use crate::handler_traits::settings_handler::SettingsHandler;
 
 const STORAGE_KEY_SETLIST: &'static str = "net.cundd.chordr.setlist";
 const STORAGE_KEY_SETTINGS: &'static str = "net.cundd.chordr.settings";
-
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct AppRouteState {}
@@ -159,10 +158,7 @@ impl App {
     }
 
     fn view_song_browser<S: Into<String>>(&self, chars: S) -> Html {
-        self.compose(
-            self.render_song_browser(chars),
-            self.view_nav(None),
-        )
+        self.compose(self.render_song_browser(chars), self.view_nav(None))
     }
 
     fn render_song_browser<S: Into<String>>(&self, chars: S) -> Html {
@@ -190,7 +186,9 @@ impl App {
 
     fn render_song_search(&self, show_back_button: bool) -> Html {
         (match &self.catalog {
-            Some(catalog) => html! {<SongSearch catalog=catalog show_back_button=show_back_button />},
+            Some(catalog) => {
+                html! {<SongSearch catalog=catalog show_back_button=show_back_button />}
+            }
             None => html! {},
         }) as Html
     }

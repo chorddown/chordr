@@ -1,5 +1,5 @@
 use crate::events::{SetlistEvent, SortingChange};
-use libchordr::prelude::{SetlistEntry, Setlist, SongId};
+use libchordr::prelude::{Setlist, SetlistEntry, SongId};
 use yew::services::StorageService;
 
 pub trait SetlistHandler {
