@@ -22,23 +22,33 @@ use yew::services::fetch::{FetchService, FetchTask, Request, Response};
 use yew::services::storage::{Area, StorageService};
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
 use yew_router::prelude::*;
+use serde::{Serialize, Deserialize};
 
 const STORAGE_KEY_SETLIST: &'static str = "net.cundd.chordr.setlist";
 const STORAGE_KEY_SETTINGS: &'static str = "net.cundd.chordr.settings";
 
-#[allow(dead_code)]
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct AppRouteState {}
+
+impl Default for AppRouteState {
+    fn default() -> Self {
+        Self {}
+    }
+}
+
 pub struct App {
     fetch_service: FetchService,
     storage_service: StorageService,
-    route_service: RouteService<()>,
-    route: Route<()>,
+    /// Keep a reference to the RouteService so that it doesn't get dropped
+    _route_service: RouteService<AppRouteState>,
+    route: Route<AppRouteState>,
     link: ComponentLink<App>,
     ft: Option<FetchTask>,
 
     expand: bool,
     fetching: bool,
     catalog: Option<Catalog>,
-    current_song: Option<Song>,
     setlist: Setlist<SetlistEntry>,
     settings: SongSettingsMap,
 }
@@ -53,7 +63,7 @@ pub enum Msg {
     ToggleMenu,
     Reload,
     Ignore,
-    RouteChanged(Route<()>),
+    RouteChanged(Route<AppRouteState>),
 }
 
 impl App {
@@ -65,19 +75,21 @@ impl App {
             Some(AppRoute::Setlist(route)) => self.view_setlist_route(route),
             Some(AppRoute::Index) => self.view_index(),
             None => self.view_index(),
-            // _ => self.view_index()
         }) as Html
     }
 
     fn view_index(&self) -> Html {
-        html! {
-            <>
-                <StartScreen />
-                {self.view_song_browser("")}
-                <ReloadSection />
-                {self.view_song_search(false)}
-            </>
-        }
+        self.compose(
+            html! {
+                <>
+                    <StartScreen />
+                    {self.render_song_browser("")}
+                    <ReloadSection />
+                    {self.render_song_search(false)}
+                </>
+            },
+            self.view_nav(None),
+        )
     }
 
     fn view_song(&self, song_id: SongId) -> Html {
@@ -100,28 +112,31 @@ impl App {
 
             let song_settings = match self.settings.get(&song_id) {
                 Some(s) => {
-                    info!("Found settings for song {}: {:?}", song_id, s);
+                    debug!("Found settings for song {}: {:?}", song_id, s);
                     s.clone()
                 }
                 None => {
-                    info!("No settings for song {} found in setlist", song_id);
+                    debug!("No settings for song {} found in setlist", song_id);
                     SongSettings::new(0, Formatting::default())
                 }
             };
 
-            info!("Song {} is on list? {}", song.id(), is_on_setlist);
+            debug!("Song {} is on list? {}", song.id(), is_on_setlist);
 
-            return html! {
-                <SongView
-                    song=song
-                    song_settings=song_settings
-                    enable_setlists=true
-                    on_setlist_add=add
-                    on_setlist_remove=remove
-                    on_settings_change=change
-                    is_on_setlist=is_on_setlist
-                />
-            };
+            return self.compose(
+                html! {
+                    <SongView
+                        song=song
+                        song_settings=song_settings
+                        enable_setlists=true
+                        on_setlist_add=add
+                        on_setlist_remove=remove
+                        on_settings_change=change
+                        is_on_setlist=is_on_setlist
+                    />
+                },
+                self.view_nav(Some(song_id)),
+            );
         }
 
         (match percent_decode_str(song_id.as_str()).decode_utf8() {
@@ -136,12 +151,19 @@ impl App {
             }
             Err(e) => {
                 error!("Could not decode the song ID {}", e);
-                (html! {}) as Html
+                html! {}
             }
         }) as Html
     }
 
     fn view_song_browser<S: Into<String>>(&self, chars: S) -> Html {
+        self.compose(
+            self.render_song_browser(chars),
+            self.view_nav(None),
+        )
+    }
+
+    fn render_song_browser<S: Into<String>>(&self, chars: S) -> Html {
         let chars_as_string = chars.into();
         let chars = match percent_decode_str(&chars_as_string).decode_utf8() {
             Ok(decoded) => decoded.to_string(),
@@ -158,16 +180,21 @@ impl App {
     }
 
     fn view_song_search(&self, show_back_button: bool) -> Html {
+        self.compose(
+            self.render_song_search(show_back_button),
+            self.view_nav(None),
+        )
+    }
+
+    fn render_song_search(&self, show_back_button: bool) -> Html {
         (match &self.catalog {
-            Some(catalog) => {
-                html! {<SongSearch catalog=catalog show_back_button=show_back_button />}
-            }
+            Some(catalog) => html! {<SongSearch catalog=catalog show_back_button=show_back_button />},
             None => html! {},
         }) as Html
     }
 
     fn view_setlist_route(&self, route: SetlistRoute) -> Html {
-        (match route {
+        match route {
             SetlistRoute::Load { serialized_setlist } => match &self.catalog {
                 None => html! {},
                 Some(catalog) => {
@@ -175,17 +202,46 @@ impl App {
                     let catalog = Rc::new(catalog.clone());
                     let setlist = Rc::new(self.setlist.clone());
 
-                    html! {
-                        <SetlistLoad
-                            catalog=catalog
-                            serialized_setlist=serialized_setlist
-                            on_load=replace
-                            current_setlist=setlist
-                        />
-                    }
+                    self.compose(
+                        html! {
+                            <SetlistLoad
+                                catalog=catalog
+                                serialized_setlist=serialized_setlist
+                                on_load=replace
+                                current_setlist=setlist
+                            />
+                        },
+                        self.view_nav(None),
+                    )
                 }
             },
-        }) as Html
+        }
+    }
+
+    fn view_nav(&self, current_song_id: Option<SongId>) -> Html {
+        let toggle_menu = self.link.callback(|_| Msg::ToggleMenu);
+        let on_setlist_change = self.link.callback(|e| Msg::Event(e));
+        let songs = Rc::new(self.setlist.clone());
+
+        html! {
+            <Nav
+                expand=self.expand
+                songs=songs
+                current_song_id=current_song_id
+                on_toggle=toggle_menu
+                on_setlist_change=on_setlist_change
+            />
+        }
+    }
+
+    /// Wrap `content` and `navigation` blocks into the required HTML structure
+    fn compose(&self, content: Html, nav: Html) -> Html {
+        return html! {
+            <>
+                { nav }
+                <div class="content">{ content }</div>
+            </>
+        };
     }
 
     fn fetch_catalog(&mut self, no_cache: bool) {
@@ -280,6 +336,7 @@ impl App {
             Setlist::new()
         }
     }
+
     fn get_settings(storage_service: &StorageService) -> SongSettingsMap {
         if let Json(Ok(restored_model)) = storage_service.restore(STORAGE_KEY_SETTINGS) {
             restored_model
@@ -294,7 +351,7 @@ impl Component for App {
     type Properties = ();
 
     fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
-        let mut route_service: RouteService<()> = RouteService::new();
+        let mut route_service: RouteService<AppRouteState> = RouteService::new();
         let route = Route::from(route_service.get_route());
         route_service.register_callback(link.callback(Msg::RouteChanged));
 
@@ -308,19 +365,12 @@ impl Component for App {
             link,
             fetching: false,
             expand: true,
-            current_song: None,
             catalog: None,
             ft: None,
             settings,
             setlist,
-            route_service,
+            _route_service: route_service,
             route,
-        }
-    }
-
-    fn rendered(&mut self, first_render: bool) -> () {
-        if first_render {
-            self.fetch_catalog(true);
         }
     }
 
@@ -369,22 +419,13 @@ impl Component for App {
         };
 
         debug!("Redraw App");
-        let toggle_menu = self.link.callback(|_| Msg::ToggleMenu);
-        let on_setlist_change = self.link.callback(|e| Msg::Event(e));
-        let songs = Rc::new(self.setlist.clone());
 
-        html! {
-            <main class=main_classes>
-                <Nav
-                    expand=self.expand
-                    songs=songs
-                    on_toggle=toggle_menu
-                    on_setlist_change=on_setlist_change
-                />
-                <div class="content">
-                    { self.route() }
-                </div>
-            </main>
+        (html! {<main class=main_classes>{ self.route() }</main>}) as Html
+    }
+
+    fn rendered(&mut self, first_render: bool) -> () {
+        if first_render {
+            self.fetch_catalog(true);
         }
     }
 }

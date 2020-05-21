@@ -9,13 +9,14 @@ use libchordr::prelude::*;
 use log::info;
 use std::rc::Rc;
 use web_sys::HtmlElement;
-// use stdweb::web::HtmlElement;
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct SongListProps {
     pub songs: Rc<Setlist<SetlistEntry>>,
     pub sortable: bool,
+    #[prop_or_default]
+    pub highlighted_song_id: Option<SongId>,
 
     pub on_setlist_change: Callback<Event>,
 }
@@ -77,10 +78,17 @@ impl Component for SongList {
     fn view(&self) -> Html {
         let songs = &self.props.songs;
         let sortable = self.props.sortable;
+        let highlighted_song_id = &self.props.highlighted_song_id;
         let render = |song: &SetlistEntry| {
             let key = song.title();
 
-            html! { <Item<SetlistEntry> data_key=key song=song.clone() sortable=sortable/> }
+            let highlight = if let Some(highlighted_song_id) = highlighted_song_id {
+                &song.id() == highlighted_song_id
+            } else {
+                false
+            };
+
+            html! { <Item<SetlistEntry> data_key=key song=song.clone() sortable=sortable highlight=highlight /> }
         };
 
         info!(

@@ -44,6 +44,7 @@ nav {
         flex-flow: row nowrap;
         align-items: center;
         margin-bottom: 2px;
+
         &:focus {
             color: $button-color;
             background: $button-bg;
@@ -70,6 +71,15 @@ nav {
                 @include if-dark-mode {
                     color: $dark-mode-button-hover-color;
                 }
+            }
+        }
+
+        &.-highlight {
+            color: $button-hover-color;
+            background: $button-hover-bg;
+            @include if-dark-mode {
+                color: $dark-mode-button-hover-color;
+                background: $dark-mode-button-hover-bg;
             }
         }
 

@@ -13,6 +13,9 @@ pub struct SongListItemProps<S: SongData + Clone> {
     pub sortable: bool,
 
     #[prop_or_default]
+    pub highlight: bool,
+
+    #[prop_or_default]
     pub class: Class,
 }
 
@@ -22,6 +25,23 @@ pub struct Item<S: SongData + PartialEq + 'static + Clone> {
     props: SongListItemProps<S>,
     /// Utility object
     link: ComponentLink<Self>,
+}
+
+impl<S: SongData + PartialEq + 'static + Clone> Item<S> {
+    fn get_class(&self) -> Class {
+        let base_class = self.props.class.or("song-item");
+        let class = if self.props.highlight {
+            base_class.add("-highlight")
+        } else {
+            base_class
+        };
+
+        if self.props.sortable {
+            class.add("-sortable")
+        } else {
+            class
+        }
+    }
 }
 
 impl<S: SongData + PartialEq + 'static + Clone> Component for Item<S> {
@@ -55,12 +75,11 @@ impl<S: SongData + PartialEq + 'static + Clone> Component for Item<S> {
         let title = &self.props.song.title();
         let key = &self.props.data_key;
         let href = format!("#/song/{}", self.props.song.id());
-        let class = self.props.class.or("song-item");
+        let class = self.get_class();
 
         let link = html! { <a role="button" class="discreet" data-key=key href=href>{title}</a> };
 
         (if self.props.sortable {
-            let class = class.add("-sortable");
             html! { <div class=class>{link}<span class="sortable-handle">{"::"}</span></div> }
         } else {
             html! { <div class=class>{link}</div> }

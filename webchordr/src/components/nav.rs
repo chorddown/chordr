@@ -4,11 +4,13 @@ use crate::events::Event;
 use libchordr::models::setlist::*;
 use std::rc::Rc;
 use yew::prelude::*;
+use libchordr::prelude::SongId;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct NavProps {
     pub songs: Rc<Setlist<SetlistEntry>>,
     pub expand: bool,
+    pub current_song_id: Option<SongId>,
     pub on_toggle: Callback<()>,
     pub on_setlist_change: Callback<Event>,
 }
@@ -24,7 +26,12 @@ impl Nav {
         let on_setlist_change = self.props.on_setlist_change.reform(|e| e);
 
         html! {
-            <SongList songs=songs on_setlist_change=on_setlist_change sortable=self.props.expand />
+            <SongList
+                songs=songs
+                on_setlist_change=on_setlist_change
+                sortable=self.props.expand
+                highlighted_song_id=self.props.current_song_id.clone()
+            />
         }
     }
 

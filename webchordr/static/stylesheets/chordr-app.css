@@ -1,23 +1,26 @@
 @charset "UTF-8";
-a[role=button],
+.grid-button, a[role=button],
 button,
-.button, .grid-button {
+.button {
   display: block;
   appearance: none;
   line-height: 26px;
   font-size: 1em;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
-  text-decoration: none; }
-  a[role=button]:focus,
-  button:focus,
-  .button:focus, .grid-button:focus, a[role=button]:hover,
-  button:hover,
-  .button:hover, .grid-button:hover {
-    outline: none; }
+  text-decoration: none;
+}
 
-a[role=button]:not(.discreet),
+.grid-button:focus, a[role=button]:focus,
+button:focus,
+.button:focus, .grid-button:hover, a[role=button]:hover,
+button:hover,
+.button:hover {
+  outline: none;
+}
+
+.grid-button, a[role=button]:not(.discreet),
 button:not(.discreet),
-.button:not(.discreet), .grid-button {
+.button:not(.discreet) {
   background: #b7b7b0;
   border: 1px solid #8d8d88;
   color: #62625e;
@@ -25,39 +28,49 @@ button:not(.discreet),
   padding: 7px 14px;
   text-align: center;
   letter-spacing: -0.01em;
-  cursor: pointer; }
-  a[role=button]:focus:not(.discreet),
-  button:focus:not(.discreet),
-  .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
-  button:hover:not(.discreet),
-  .button:hover:not(.discreet), .grid-button:hover {
-    color: #62625e;
-    background: #8d8d88; }
+  cursor: pointer;
+}
+
+.grid-button:focus, a[role=button]:focus:not(.discreet),
+button:focus:not(.discreet),
+.button:focus:not(.discreet), .grid-button:hover, a[role=button]:hover:not(.discreet),
+button:hover:not(.discreet),
+.button:hover:not(.discreet) {
+  color: #62625e;
+  background: #8d8d88;
+}
   @media screen and (prefers-color-scheme: dark) {
-    a[role=button]:not(.discreet),
+    .grid-button, a[role=button]:not(.discreet),
     button:not(.discreet),
-    .button:not(.discreet), .grid-button {
+    .button:not(.discreet) {
       background: #221d1c;
-      color: white; }
-      a[role=button]:focus:not(.discreet),
-      button:focus:not(.discreet),
-      .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
-      button:hover:not(.discreet),
-      .button:hover:not(.discreet), .grid-button:hover {
-        color: white;
-        background: #62625e; } }
-  html.dark-mode a[role=button]:not(.discreet),
-  html.dark-mode button:not(.discreet),
-  html.dark-mode .button:not(.discreet), html.dark-mode .grid-button {
-    background: #221d1c;
-    color: white; }
-    html.dark-mode a[role=button]:focus:not(.discreet),
-    html.dark-mode button:focus:not(.discreet),
-    html.dark-mode .button:focus:not(.discreet), html.dark-mode .grid-button:focus, html.dark-mode a[role=button]:hover:not(.discreet),
-    html.dark-mode button:hover:not(.discreet),
-    html.dark-mode .button:hover:not(.discreet), html.dark-mode .grid-button:hover {
       color: white;
-      background: #62625e; }
+    }
+
+    .grid-button:focus, a[role=button]:focus:not(.discreet),
+    button:focus:not(.discreet),
+    .button:focus:not(.discreet), .grid-button:hover, a[role=button]:hover:not(.discreet),
+    button:hover:not(.discreet),
+    .button:hover:not(.discreet) {
+      color: white;
+      background: #62625e;
+    } }
+
+html.dark-mode .grid-button, html.dark-mode a[role=button]:not(.discreet),
+html.dark-mode button:not(.discreet),
+html.dark-mode .button:not(.discreet) {
+  background: #221d1c;
+  color: white;
+}
+
+html.dark-mode .grid-button:focus, html.dark-mode a[role=button]:focus:not(.discreet),
+html.dark-mode button:focus:not(.discreet),
+html.dark-mode .button:focus:not(.discreet), html.dark-mode .grid-button:hover, html.dark-mode a[role=button]:hover:not(.discreet),
+html.dark-mode button:hover:not(.discreet),
+html.dark-mode .button:hover:not(.discreet) {
+  color: white;
+  background: #62625e;
+}
 
 @font-face {
   font-family: 'Libre Baskerville';
@@ -1046,25 +1059,28 @@ main {
 .im {
   font-size: .8em; }
 
-a[role=button],
+.grid-button, a[role=button],
 button,
-.button, .grid-button {
+.button {
   display: block;
   appearance: none;
   line-height: 26px;
   font-size: 1em;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
-  text-decoration: none; }
-  a[role=button]:focus,
-  button:focus,
-  .button:focus, .grid-button:focus, a[role=button]:hover,
-  button:hover,
-  .button:hover, .grid-button:hover {
-    outline: none; }
+  text-decoration: none;
+}
 
-a[role=button]:not(.discreet),
+.grid-button:focus, a[role=button]:focus,
+button:focus,
+.button:focus, .grid-button:hover, a[role=button]:hover,
+button:hover,
+.button:hover {
+  outline: none;
+}
+
+.grid-button, a[role=button]:not(.discreet),
 button:not(.discreet),
-.button:not(.discreet), .grid-button {
+.button:not(.discreet) {
   background: #b7b7b0;
   border: 1px solid #8d8d88;
   color: #62625e;
@@ -1072,39 +1088,49 @@ button:not(.discreet),
   padding: 7px 14px;
   text-align: center;
   letter-spacing: -0.01em;
-  cursor: pointer; }
-  a[role=button]:focus:not(.discreet),
-  button:focus:not(.discreet),
-  .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
-  button:hover:not(.discreet),
-  .button:hover:not(.discreet), .grid-button:hover {
-    color: #62625e;
-    background: #8d8d88; }
+  cursor: pointer;
+}
+
+.grid-button:focus, a[role=button]:focus:not(.discreet),
+button:focus:not(.discreet),
+.button:focus:not(.discreet), .grid-button:hover, a[role=button]:hover:not(.discreet),
+button:hover:not(.discreet),
+.button:hover:not(.discreet) {
+  color: #62625e;
+  background: #8d8d88;
+}
   @media screen and (prefers-color-scheme: dark) {
-    a[role=button]:not(.discreet),
+    .grid-button, a[role=button]:not(.discreet),
     button:not(.discreet),
-    .button:not(.discreet), .grid-button {
+    .button:not(.discreet) {
       background: #221d1c;
-      color: white; }
-      a[role=button]:focus:not(.discreet),
-      button:focus:not(.discreet),
-      .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
-      button:hover:not(.discreet),
-      .button:hover:not(.discreet), .grid-button:hover {
-        color: white;
-        background: #62625e; } }
-  html.dark-mode a[role=button]:not(.discreet),
-  html.dark-mode button:not(.discreet),
-  html.dark-mode .button:not(.discreet), html.dark-mode .grid-button {
-    background: #221d1c;
-    color: white; }
-    html.dark-mode a[role=button]:focus:not(.discreet),
-    html.dark-mode button:focus:not(.discreet),
-    html.dark-mode .button:focus:not(.discreet), html.dark-mode .grid-button:focus, html.dark-mode a[role=button]:hover:not(.discreet),
-    html.dark-mode button:hover:not(.discreet),
-    html.dark-mode .button:hover:not(.discreet), html.dark-mode .grid-button:hover {
       color: white;
-      background: #62625e; }
+    }
+
+    .grid-button:focus, a[role=button]:focus:not(.discreet),
+    button:focus:not(.discreet),
+    .button:focus:not(.discreet), .grid-button:hover, a[role=button]:hover:not(.discreet),
+    button:hover:not(.discreet),
+    .button:hover:not(.discreet) {
+      color: white;
+      background: #62625e;
+    } }
+
+html.dark-mode .grid-button, html.dark-mode a[role=button]:not(.discreet),
+html.dark-mode button:not(.discreet),
+html.dark-mode .button:not(.discreet) {
+  background: #221d1c;
+  color: white;
+}
+
+html.dark-mode .grid-button:focus, html.dark-mode a[role=button]:focus:not(.discreet),
+html.dark-mode button:focus:not(.discreet),
+html.dark-mode .button:focus:not(.discreet), html.dark-mode .grid-button:hover, html.dark-mode a[role=button]:hover:not(.discreet),
+html.dark-mode button:hover:not(.discreet),
+html.dark-mode .button:hover:not(.discreet) {
+  color: white;
+  background: #62625e;
+}
 
 .sr-only {
   text-indent: -10000px;
@@ -1113,25 +1139,28 @@ button:not(.discreet),
   width: 0;
   position: absolute; }
 
-a[role=button],
+.grid-button, a[role=button],
 button,
-.button, .grid-button {
+.button {
   display: block;
   appearance: none;
   line-height: 26px;
   font-size: 1em;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
-  text-decoration: none; }
-  a[role=button]:focus,
-  button:focus,
-  .button:focus, .grid-button:focus, a[role=button]:hover,
-  button:hover,
-  .button:hover, .grid-button:hover {
-    outline: none; }
+  text-decoration: none;
+}
 
-a[role=button]:not(.discreet),
+.grid-button:focus, a[role=button]:focus,
+button:focus,
+.button:focus, .grid-button:hover, a[role=button]:hover,
+button:hover,
+.button:hover {
+  outline: none;
+}
+
+.grid-button, a[role=button]:not(.discreet),
 button:not(.discreet),
-.button:not(.discreet), .grid-button {
+.button:not(.discreet) {
   background: #b7b7b0;
   border: 1px solid #8d8d88;
   color: #62625e;
@@ -1139,39 +1168,49 @@ button:not(.discreet),
   padding: 7px 14px;
   text-align: center;
   letter-spacing: -0.01em;
-  cursor: pointer; }
-  a[role=button]:focus:not(.discreet),
-  button:focus:not(.discreet),
-  .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
-  button:hover:not(.discreet),
-  .button:hover:not(.discreet), .grid-button:hover {
-    color: #62625e;
-    background: #8d8d88; }
+  cursor: pointer;
+}
+
+.grid-button:focus, a[role=button]:focus:not(.discreet),
+button:focus:not(.discreet),
+.button:focus:not(.discreet), .grid-button:hover, a[role=button]:hover:not(.discreet),
+button:hover:not(.discreet),
+.button:hover:not(.discreet) {
+  color: #62625e;
+  background: #8d8d88;
+}
   @media screen and (prefers-color-scheme: dark) {
-    a[role=button]:not(.discreet),
+    .grid-button, a[role=button]:not(.discreet),
     button:not(.discreet),
-    .button:not(.discreet), .grid-button {
+    .button:not(.discreet) {
       background: #221d1c;
-      color: white; }
-      a[role=button]:focus:not(.discreet),
-      button:focus:not(.discreet),
-      .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
-      button:hover:not(.discreet),
-      .button:hover:not(.discreet), .grid-button:hover {
-        color: white;
-        background: #62625e; } }
-  html.dark-mode a[role=button]:not(.discreet),
-  html.dark-mode button:not(.discreet),
-  html.dark-mode .button:not(.discreet), html.dark-mode .grid-button {
-    background: #221d1c;
-    color: white; }
-    html.dark-mode a[role=button]:focus:not(.discreet),
-    html.dark-mode button:focus:not(.discreet),
-    html.dark-mode .button:focus:not(.discreet), html.dark-mode .grid-button:focus, html.dark-mode a[role=button]:hover:not(.discreet),
-    html.dark-mode button:hover:not(.discreet),
-    html.dark-mode .button:hover:not(.discreet), html.dark-mode .grid-button:hover {
       color: white;
-      background: #62625e; }
+    }
+
+    .grid-button:focus, a[role=button]:focus:not(.discreet),
+    button:focus:not(.discreet),
+    .button:focus:not(.discreet), .grid-button:hover, a[role=button]:hover:not(.discreet),
+    button:hover:not(.discreet),
+    .button:hover:not(.discreet) {
+      color: white;
+      background: #62625e;
+    } }
+
+html.dark-mode .grid-button, html.dark-mode a[role=button]:not(.discreet),
+html.dark-mode button:not(.discreet),
+html.dark-mode .button:not(.discreet) {
+  background: #221d1c;
+  color: white;
+}
+
+html.dark-mode .grid-button:focus, html.dark-mode a[role=button]:focus:not(.discreet),
+html.dark-mode button:focus:not(.discreet),
+html.dark-mode .button:focus:not(.discreet), html.dark-mode .grid-button:hover, html.dark-mode a[role=button]:hover:not(.discreet),
+html.dark-mode button:hover:not(.discreet),
+html.dark-mode .button:hover:not(.discreet) {
+  color: white;
+  background: #62625e;
+}
 
 .row {
   margin: 0 -3.5px;
@@ -1238,25 +1277,28 @@ button:not(.discreet),
 .grid .col-1, .grid .col-2, .grid .col-3, .grid .col-4, .grid .col-5, .grid .col-6, .grid .col-7, .grid .col-8, .grid .col-9, .grid .col-10, .grid .col-11, .grid .col-12 {
   padding-bottom: 7px; }
 
-a[role=button],
+.grid-button, a[role=button],
 button,
-.button, .grid-button {
+.button {
   display: block;
   appearance: none;
   line-height: 26px;
   font-size: 1em;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
-  text-decoration: none; }
-  a[role=button]:focus,
-  button:focus,
-  .button:focus, .grid-button:focus, a[role=button]:hover,
-  button:hover,
-  .button:hover, .grid-button:hover {
-    outline: none; }
+  text-decoration: none;
+}
 
-a[role=button]:not(.discreet),
+.grid-button:focus, a[role=button]:focus,
+button:focus,
+.button:focus, .grid-button:hover, a[role=button]:hover,
+button:hover,
+.button:hover {
+  outline: none;
+}
+
+.grid-button, a[role=button]:not(.discreet),
 button:not(.discreet),
-.button:not(.discreet), .grid-button {
+.button:not(.discreet) {
   background: #b7b7b0;
   border: 1px solid #8d8d88;
   color: #62625e;
@@ -1264,39 +1306,49 @@ button:not(.discreet),
   padding: 7px 14px;
   text-align: center;
   letter-spacing: -0.01em;
-  cursor: pointer; }
-  a[role=button]:focus:not(.discreet),
-  button:focus:not(.discreet),
-  .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
-  button:hover:not(.discreet),
-  .button:hover:not(.discreet), .grid-button:hover {
-    color: #62625e;
-    background: #8d8d88; }
+  cursor: pointer;
+}
+
+.grid-button:focus, a[role=button]:focus:not(.discreet),
+button:focus:not(.discreet),
+.button:focus:not(.discreet), .grid-button:hover, a[role=button]:hover:not(.discreet),
+button:hover:not(.discreet),
+.button:hover:not(.discreet) {
+  color: #62625e;
+  background: #8d8d88;
+}
   @media screen and (prefers-color-scheme: dark) {
-    a[role=button]:not(.discreet),
+    .grid-button, a[role=button]:not(.discreet),
     button:not(.discreet),
-    .button:not(.discreet), .grid-button {
+    .button:not(.discreet) {
       background: #221d1c;
-      color: white; }
-      a[role=button]:focus:not(.discreet),
-      button:focus:not(.discreet),
-      .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
-      button:hover:not(.discreet),
-      .button:hover:not(.discreet), .grid-button:hover {
-        color: white;
-        background: #62625e; } }
-  html.dark-mode a[role=button]:not(.discreet),
-  html.dark-mode button:not(.discreet),
-  html.dark-mode .button:not(.discreet), html.dark-mode .grid-button {
-    background: #221d1c;
-    color: white; }
-    html.dark-mode a[role=button]:focus:not(.discreet),
-    html.dark-mode button:focus:not(.discreet),
-    html.dark-mode .button:focus:not(.discreet), html.dark-mode .grid-button:focus, html.dark-mode a[role=button]:hover:not(.discreet),
-    html.dark-mode button:hover:not(.discreet),
-    html.dark-mode .button:hover:not(.discreet), html.dark-mode .grid-button:hover {
       color: white;
-      background: #62625e; }
+    }
+
+    .grid-button:focus, a[role=button]:focus:not(.discreet),
+    button:focus:not(.discreet),
+    .button:focus:not(.discreet), .grid-button:hover, a[role=button]:hover:not(.discreet),
+    button:hover:not(.discreet),
+    .button:hover:not(.discreet) {
+      color: white;
+      background: #62625e;
+    } }
+
+html.dark-mode .grid-button, html.dark-mode a[role=button]:not(.discreet),
+html.dark-mode button:not(.discreet),
+html.dark-mode .button:not(.discreet) {
+  background: #221d1c;
+  color: white;
+}
+
+html.dark-mode .grid-button:focus, html.dark-mode a[role=button]:focus:not(.discreet),
+html.dark-mode button:focus:not(.discreet),
+html.dark-mode .button:focus:not(.discreet), html.dark-mode .grid-button:hover, html.dark-mode a[role=button]:hover:not(.discreet),
+html.dark-mode button:hover:not(.discreet),
+html.dark-mode .button:hover:not(.discreet) {
+  color: white;
+  background: #62625e;
+}
 
 a {
   color: #62625e;
@@ -1318,25 +1370,28 @@ a {
   display: inline-block;
   margin-top: 14px; }
 
-a[role=button],
+.grid-button, a[role=button],
 button,
-.button, .grid-button {
+.button {
   display: block;
   appearance: none;
   line-height: 26px;
   font-size: 1em;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
-  text-decoration: none; }
-  a[role=button]:focus,
-  button:focus,
-  .button:focus, .grid-button:focus, a[role=button]:hover,
-  button:hover,
-  .button:hover, .grid-button:hover {
-    outline: none; }
+  text-decoration: none;
+}
 
-a[role=button]:not(.discreet),
+.grid-button:focus, a[role=button]:focus,
+button:focus,
+.button:focus, .grid-button:hover, a[role=button]:hover,
+button:hover,
+.button:hover {
+  outline: none;
+}
+
+.grid-button, a[role=button]:not(.discreet),
 button:not(.discreet),
-.button:not(.discreet), .grid-button {
+.button:not(.discreet) {
   background: #b7b7b0;
   border: 1px solid #8d8d88;
   color: #62625e;
@@ -1344,47 +1399,57 @@ button:not(.discreet),
   padding: 7px 14px;
   text-align: center;
   letter-spacing: -0.01em;
-  cursor: pointer; }
-  a[role=button]:focus:not(.discreet),
-  button:focus:not(.discreet),
-  .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
-  button:hover:not(.discreet),
-  .button:hover:not(.discreet), .grid-button:hover {
-    color: #62625e;
-    background: #8d8d88; }
-  @media screen and (prefers-color-scheme: dark) {
-    a[role=button]:not(.discreet),
-    button:not(.discreet),
-    .button:not(.discreet), .grid-button {
-      background: #221d1c;
-      color: white; }
-      a[role=button]:focus:not(.discreet),
-      button:focus:not(.discreet),
-      .button:focus:not(.discreet), .grid-button:focus, a[role=button]:hover:not(.discreet),
-      button:hover:not(.discreet),
-      .button:hover:not(.discreet), .grid-button:hover {
-        color: white;
-        background: #62625e; } }
-  html.dark-mode a[role=button]:not(.discreet),
-  html.dark-mode button:not(.discreet),
-  html.dark-mode .button:not(.discreet), html.dark-mode .grid-button {
-    background: #221d1c;
-    color: white; }
-    html.dark-mode a[role=button]:focus:not(.discreet),
-    html.dark-mode button:focus:not(.discreet),
-    html.dark-mode .button:focus:not(.discreet), html.dark-mode .grid-button:focus, html.dark-mode a[role=button]:hover:not(.discreet),
-    html.dark-mode button:hover:not(.discreet),
-    html.dark-mode .button:hover:not(.discreet), html.dark-mode .grid-button:hover {
-      color: white;
-      background: #62625e; }
+  cursor: pointer;
+}
 
-a[role=button].-inline,
+.grid-button:focus, a[role=button]:focus:not(.discreet),
+button:focus:not(.discreet),
+.button:focus:not(.discreet), .grid-button:hover, a[role=button]:hover:not(.discreet),
+button:hover:not(.discreet),
+.button:hover:not(.discreet) {
+  color: #62625e;
+  background: #8d8d88;
+}
+  @media screen and (prefers-color-scheme: dark) {
+    .grid-button, a[role=button]:not(.discreet),
+    button:not(.discreet),
+    .button:not(.discreet) {
+      background: #221d1c;
+      color: white;
+    }
+
+    .grid-button:focus, a[role=button]:focus:not(.discreet),
+    button:focus:not(.discreet),
+    .button:focus:not(.discreet), .grid-button:hover, a[role=button]:hover:not(.discreet),
+    button:hover:not(.discreet),
+    .button:hover:not(.discreet) {
+      color: white;
+      background: #62625e;
+    } }
+
+html.dark-mode .grid-button, html.dark-mode a[role=button]:not(.discreet),
+html.dark-mode button:not(.discreet),
+html.dark-mode .button:not(.discreet) {
+  background: #221d1c;
+  color: white;
+}
+
+html.dark-mode .grid-button:focus, html.dark-mode a[role=button]:focus:not(.discreet),
+html.dark-mode button:focus:not(.discreet),
+html.dark-mode .button:focus:not(.discreet), html.dark-mode .grid-button:hover, html.dark-mode a[role=button]:hover:not(.discreet),
+html.dark-mode button:hover:not(.discreet),
+html.dark-mode .button:hover:not(.discreet) {
+  color: white;
+  background: #62625e;
+}
+
+a.-inline[role=button],
 button.-inline,
 .button.-inline {
   display: inline-block;
   width: auto; }
 
-a[role=button].discreet,
+a.discreet[role=button],
 button.discreet,
 .button.discreet {
   background: transparent;
@@ -2139,9 +2204,10 @@ button:not(.discreet),
     .song-search-song-list input[type=text],
     .song-search-song-list input[type=search] {
       color: white; } }
-  html.dark-mode .song-search-song-list input[type=text], html.dark-mode
-  .song-search-song-list input[type=search] {
-    color: white; }
+
+html.dark-mode .song-search-song-list input[type=text], html.dark-mode .song-search-song-list input[type=search] {
+  color: white;
+}
 
 a[role=button],
 button,
@@ -2646,23 +2712,27 @@ nav {
     background: #8d8d88; }
   nav.-visible {
     width: 300px; }
-  nav .song-list {
-    display: flex;
-    flex-flow: column;
-    overflow: scroll;
-    height: calc(100vh - 40px); }
-    nav .song-list:focus,
-    nav .song-list > div:focus {
-      outline: none; }
-  nav .song-item {
-    display: flex;
-    appearance: none;
-    line-height: 26px;
-    font-size: 1em;
-    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
-    text-decoration: none;
-    background: #b7b7b0;
-    border: 1px solid #8d8d88;
+
+nav .song-list {
+  display: flex;
+  flex-flow: column;
+  overflow: scroll;
+  height: calc(100vh - 40px);
+}
+
+nav .song-list:focus, nav .song-list > div:focus {
+  outline: none;
+}
+
+nav .song-item {
+  display: flex;
+  appearance: none;
+  line-height: 26px;
+  font-size: 1em;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  text-decoration: none;
+  background: #b7b7b0;
+  border: 1px solid #8d8d88;
     color: #62625e;
     width: 100%;
     padding: 0;
@@ -2709,26 +2779,51 @@ nav {
       nav .song-item .sortable-handle:focus, nav .song-item .sortable-handle:hover,
       nav .song-item a[role=button]:focus,
       nav .song-item a[role=button]:hover {
-        color: #62625e; }
-        @media screen and (prefers-color-scheme: dark) {
-          nav .song-item .sortable-handle:focus, nav .song-item .sortable-handle:hover,
-          nav .song-item a[role=button]:focus,
-          nav .song-item a[role=button]:hover {
-            color: white; } }
-        html.dark-mode nav .song-item .sortable-handle:focus, html.dark-mode nav .song-item .sortable-handle:hover, html.dark-mode
-        nav .song-item a[role=button]:focus, html.dark-mode
-        nav .song-item a[role=button]:hover {
-          color: white; }
-    nav .song-item.-sortable a[role=button] {
-      width: 260px;
-      border-right: none; }
-    nav .song-item .sortable-handle {
-      font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
-      width: 40px;
-      margin-top: -4px;
-      border-left: none;
-      cursor: move;
-      cursor: -webkit-grabbing; }
+        color: #62625e;
+      }
+
+@media screen and (prefers-color-scheme: dark) {
+  nav .song-item .sortable-handle:focus, nav .song-item .sortable-handle:hover,
+  nav .song-item a[role=button]:focus,
+  nav .song-item a[role=button]:hover {
+    color: white;
+  }
+}
+
+html.dark-mode nav .song-item .sortable-handle:focus, html.dark-mode nav .song-item .sortable-handle:hover, html.dark-mode nav .song-item a[role=button]:focus, html.dark-mode nav .song-item a[role=button]:hover {
+  color: white;
+}
+
+nav .song-item.-highlight {
+  color: #62625e;
+  background: #8d8d88;
+}
+
+@media screen and (prefers-color-scheme: dark) {
+  nav .song-item.-highlight {
+    color: white;
+    background: #62625e;
+  }
+}
+
+html.dark-mode nav .song-item.-highlight {
+  color: white;
+  background: #62625e;
+}
+
+nav .song-item.-sortable a[role=button] {
+  width: 260px;
+  border-right: none;
+}
+
+nav .song-item .sortable-handle {
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  width: 40px;
+  margin-top: -4px;
+  border-left: none;
+  cursor: move;
+  cursor: -webkit-grabbing;
+}
   nav.-hidden .song-item a[role=button] {
     width: 40px;
     overflow: hidden;
@@ -2758,11 +2853,13 @@ nav {
       nav footer a[role=button]:only-child,
       nav footer button:only-child {
         width: 100%; }
-    nav footer a[role=button].reload-songs,
-    nav footer button.reload-songs {
+
+nav footer a.reload-songs[role=button],
+nav footer button.reload-songs {
       margin-bottom: 0; }
-      nav footer a[role=button].reload-songs .im,
-      nav footer button.reload-songs .im {
+
+nav footer a.reload-songs[role=button] .im,
+nav footer button.reload-songs .im {
         font-size: 1em;
         float: left;
         line-height: 30px; }
