@@ -2,9 +2,7 @@
 // import './static/stylesheets/chordr-default-styles.scss';
 // import './static/stylesheets/chordr-app.scss';
 import ClipboardJS from 'clipboard'
-import {SortableWrapper} from './static/assets/javascripts/SortableWrapper'
-
-// window.SortableWrapper = SortableWrapper;
+import './static/assets/javascripts/SortableWrapper'
 
 new ClipboardJS('[data-clipboard-target]');
 
