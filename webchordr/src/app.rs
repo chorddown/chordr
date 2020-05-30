@@ -5,7 +5,9 @@ use crate::components::song_browser::SongBrowser;
 use crate::components::song_search::SongSearch;
 use crate::components::song_view::SongView;
 use crate::components::start_screen::StartScreen;
+use crate::errors::WebError;
 use crate::events::{Event, SetlistEvent, SortingChange};
+use crate::fetch;
 use crate::handler_traits::setlist_handler::SetlistHandler;
 use crate::handler_traits::settings_handler::SettingsHandler;
 use crate::route::{AppRoute, SetlistRoute};
@@ -18,10 +20,10 @@ use log::{debug, error, info, warn};
 use percent_encoding::percent_decode_str;
 use serde::{Deserialize, Serialize};
 use std::rc::Rc;
+use wasm_bindgen_futures::spawn_local;
 use web_sys;
 use web_sys::window;
-use yew::format::{Json, Nothing};
-use yew::services::fetch::{FetchService, FetchTask, Request, Response};
+use yew::format::Json;
 use yew::services::storage::{Area, StorageService};
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
 use yew_router::prelude::*;
@@ -39,13 +41,11 @@ impl Default for AppRouteState {
 }
 
 pub struct App {
-    fetch_service: FetchService,
     storage_service: StorageService,
     /// Keep a reference to the RouteService so that it doesn't get dropped
     _route_service: RouteService<AppRouteState>,
     route: Route<AppRouteState>,
     link: ComponentLink<App>,
-    ft: Option<FetchTask>,
 
     expand: bool,
     fetching: bool,
@@ -58,7 +58,7 @@ pub struct App {
 #[derive(Debug)]
 pub enum Msg {
     Event(Event),
-    FetchCatalogReady(Result<Catalog, ::anyhow::Error>),
+    FetchCatalogReady(Result<Catalog, WebError>),
     FetchCatalog(bool),
     SongSettingsChange(SongId, SongSettings),
     ToggleMenu,
@@ -245,20 +245,10 @@ impl App {
     }
 
     fn fetch_catalog(&mut self, no_cache: bool) {
-        let callback = self.link.callback(
-            move |response: Response<Json<Result<Catalog, anyhow::Error>>>| {
-                let (meta, Json(data)) = response.into_parts();
-                if meta.status.is_success() {
-                    Msg::FetchCatalogReady(data)
-                } else if no_cache {
-                    info!("Could not fetch catalog without cache. Try again");
-                    Msg::FetchCatalog(false)
-                } else {
-                    error!("Could not fetch catalog: {:?}", meta);
-                    Msg::Ignore
-                }
-            },
-        );
+        let callback = self.link.callback(move |result| {
+            info!("Catalog response {:?}", result);
+            Msg::FetchCatalogReady(result)
+        });
 
         let uri_base = "/catalog.json".to_owned();
         let uri = if no_cache {
@@ -266,13 +256,10 @@ impl App {
         } else {
             uri_base
         };
-        let request = Request::get(uri)
-            .body(Nothing)
-            .expect("Request could not be built");
-        match self.fetch_service.fetch(request, callback) {
-            Ok(task) => self.ft = Some(task),
-            Err(e) => error!("Fetch Task count not be built: {:?}", e),
-        }
+
+        spawn_local(async move {
+            let _ = fetch::fetch::<Catalog>(&uri, callback).await.unwrap();
+        });
     }
 }
 
@@ -364,13 +351,11 @@ impl Component for App {
         let settings = App::get_settings(&storage_service);
 
         Self {
-            fetch_service: FetchService::new(),
             storage_service,
             link,
             fetching: false,
             expand: true,
             catalog: None,
-            ft: None,
             settings,
             setlist,
             _route_service: route_service,

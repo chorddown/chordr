@@ -45,3 +45,9 @@ impl ::std::convert::From<wasm_bindgen::JsValue> for WebError {
         WebError::JsError(format!("{:?}", v))
     }
 }
+
+impl ::std::convert::From<serde_json::error::Error> for WebError {
+    fn from(e: serde_json::error::Error) -> Self {
+        WebError::JsError(format!("{:?}", e))
+    }
+}

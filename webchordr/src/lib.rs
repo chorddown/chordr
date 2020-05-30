@@ -7,6 +7,7 @@ mod components;
 mod data_exchange;
 mod errors;
 mod events;
+mod fetch;
 mod handler_traits;
 mod helpers;
 mod route;
@@ -19,7 +20,7 @@ use wasm_bindgen::JsValue;
 
 // This is the entry point for the web app
 #[wasm_bindgen]
-pub fn run_app() -> Result<(), JsValue> {
+pub async fn run_app() -> Result<(), JsValue> {
     wasm_logger::init(wasm_logger::Config::default());
     yew::start_app::<app::App>();
     Ok(())
