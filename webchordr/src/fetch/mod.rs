@@ -8,6 +8,15 @@ use yew::Callback;
 
 type FetchResult<OUT> = Result<OUT, WebError>;
 
+/// Fetch a URI
+///
+/// # Example
+/// ```rust,no_run
+/// use wasm_bindgen_futures::spawn_local;
+/// spawn_local(async move {
+///     let _ = fetch::fetch::<TargetType>(&uri, callback).await.unwrap();
+/// });
+/// ```
 pub async fn fetch<OUT>(uri: &str, callback: Callback<FetchResult<OUT>>) -> FetchResult<OUT>
     where
         OUT: for<'a> serde::de::Deserialize<'a> + Clone,
