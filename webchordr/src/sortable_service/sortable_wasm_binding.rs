@@ -2,7 +2,7 @@ use js_sys::Function;
 use wasm_bindgen::prelude::*;
 use web_sys::HtmlElement;
 
-#[wasm_bindgen(module = "/static/assets/javascripts/SortableWrapper.js")]
+#[wasm_bindgen(module = "/src-typescript/SortableWrapper.ts")]
 extern "C" {
     #[derive(Debug)]
     pub type SortableWrapper;

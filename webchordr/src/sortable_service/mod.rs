@@ -1,6 +1,13 @@
+#[cfg(not(test))]
 mod sortable_wasm_binding;
+#[cfg(test)]
+mod sortable_wasm_fixture;
 
+#[cfg(not(test))]
 use self::sortable_wasm_binding::SortableWrapper;
+#[cfg(test)]
+use self::sortable_wasm_fixture::SortableWrapper;
+
 use crate::events::sorting_change::Sorting;
 use crate::events::SortingChange;
 use serde::{Deserialize, Serialize};
