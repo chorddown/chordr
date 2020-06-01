@@ -258,7 +258,8 @@ impl App {
         };
 
         spawn_local(async move {
-            let _ = fetch::fetch::<Catalog>(&uri, callback).await.unwrap();
+            let result = fetch::<Catalog>(&uri).await;
+            callback.emit(result);
         });
     }
 }

@@ -2,7 +2,7 @@ use std::error::Error;
 use std::fmt::{Display, Formatter, Result};
 use wasm_bindgen::JsValue;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum WebError {
     SortableError(String),
     JsError(String),
