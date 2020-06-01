@@ -7,13 +7,16 @@ mod components;
 mod data_exchange;
 mod errors;
 mod events;
-mod fetch;
+mod fetch_helper;
 mod handler_traits;
 mod helpers;
 mod route;
 mod sortable_service;
 #[cfg(test)]
 mod test_helpers;
+
+pub use fetch_helper::*;
+pub use errors::WebError;
 
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsValue;
