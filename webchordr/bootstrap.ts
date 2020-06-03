@@ -2,10 +2,11 @@
 // import './static/stylesheets/chordr-default-styles.scss';
 // import './static/stylesheets/chordr-app.scss';
 import ClipboardJS from 'clipboard'
-import './static/assets/javascripts/SortableWrapper'
+import './src-typescript/SortableWrapper'
 
 new ClipboardJS('[data-clipboard-target]');
 
+// @ts-ignore
 import("./pkg").then(module => {
     module.run_app();
 });

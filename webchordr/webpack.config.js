@@ -10,7 +10,7 @@ module.exports = (env, argv) => {
       compress: argv.mode === 'production',
       port: 8000
     },
-    entry: './bootstrap.js',
+    entry: './bootstrap.ts',
     output: {
       path: distPath,
       filename: "webchordr.js",
@@ -26,7 +26,15 @@ module.exports = (env, argv) => {
             'sass-loader',
           ],
         },
+        {
+          test: /\.tsx?$/,
+          use: 'ts-loader',
+          exclude: /node_modules/,
+        },
       ],
+    },
+    resolve: {
+      extensions: ['.tsx', '.ts', '.js'],
     },
     plugins: [
       new CopyWebpackPlugin([
@@ -34,7 +42,7 @@ module.exports = (env, argv) => {
       ]),
       new WasmPackPlugin({
         crateDirectory: ".",
-        extraArgs: "--no-typescript",
+        withTypeScript: true
       })
     ],
     watch: argv.mode !== 'production'

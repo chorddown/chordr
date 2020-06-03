@@ -1,13 +1,21 @@
-import Sortable from 'sortablejs';
+import Sortable, {SortableEvent} from 'sortablejs' ;
 
 const SETLIST_CHANGE_SORTING = "chordr:setlist-change-sorting";
 
+type Options = Sortable.Options;
+
 export class SortableWrapper {
-    constructor(element, callback, options) {
+    private sortable: Sortable | undefined;
+
+    constructor(
+        element: HTMLElement,
+        callback: (oldIndex: number | undefined, newIndex: number | undefined) => void,
+        options?: Options
+    ) {
         console.log('[SortableWrapper] New', element, options)
         options = options || {};
 
-        options.onEnd = function (e) {
+        options.onEnd = function (e: SortableEvent) {
             setTimeout(() => {
                 callback(e.oldIndex, e.newIndex);
             }, 100);
@@ -32,7 +40,7 @@ export class SortableWrapper {
             console.debug("[SortableWrapper] Destroy", this.sortable);
 
             this.sortable.destroy();
-            this.sortable = null;
+            this.sortable = undefined;
         } else {
             console.debug("[SortableWrapper] Already destroyed");
         }
