@@ -1,11 +1,11 @@
 use crate::errors::WebError;
 use libchordr::prelude::*;
+use serde::Deserialize;
 use wasm_bindgen::JsCast;
 use wasm_bindgen_futures::JsFuture;
 use web_sys;
 use web_sys::{Request as WebRequest, RequestInit, RequestMode, Response as WebResponse};
 use yew::Callback;
-use serde::Deserialize;
 
 type FetchResult<OUT> = Result<OUT, WebError>;
 
@@ -23,8 +23,8 @@ type FetchResult<OUT> = Result<OUT, WebError>;
 /// });
 /// ```
 pub async fn fetch<OUT>(uri: &str) -> FetchResult<OUT>
-    where
-        OUT: for<'a> Deserialize<'a>,
+where
+    OUT: for<'a> Deserialize<'a>,
 {
     let mut options = RequestInit::new();
     options.method("GET");
@@ -51,9 +51,12 @@ pub async fn fetch<OUT>(uri: &str) -> FetchResult<OUT>
 ///     let _ = fetch_with_callback::<TargetType>(&uri, callback).await.unwrap();
 /// });
 /// ```
-pub async fn fetch_with_callback<OUT>(uri: &str, callback: Callback<FetchResult<OUT>>) -> FetchResult<OUT>
-    where
-        OUT: for<'a> Deserialize<'a> + Clone,
+pub async fn fetch_with_callback<OUT>(
+    uri: &str,
+    callback: Callback<FetchResult<OUT>>,
+) -> FetchResult<OUT>
+where
+    OUT: for<'a> Deserialize<'a> + Clone,
 {
     let mut options = RequestInit::new();
     options.method("GET");
@@ -66,8 +69,8 @@ pub async fn fetch_with_callback<OUT>(uri: &str, callback: Callback<FetchResult<
 }
 
 pub async fn fetch_with_options<OUT>(uri: &str, options: &RequestInit) -> FetchResult<OUT>
-    where
-        OUT: for<'a> Deserialize<'a>,
+where
+    OUT: for<'a> Deserialize<'a>,
 {
     let request = WebRequest::new_with_str_and_init(uri, options).unwrap();
     let window = web_sys::window().unwrap();
