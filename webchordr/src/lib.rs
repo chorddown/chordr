@@ -10,6 +10,7 @@ mod events;
 mod fetch_helper;
 mod handler_traits;
 mod helpers;
+mod persistence;
 mod route;
 mod sortable_service;
 #[cfg(test)]

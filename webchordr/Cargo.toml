@@ -46,6 +46,7 @@ features = [
     'RequestInit',
     'RequestMode',
     'Response',
+    'Storage',
 ]
 
 [package.metadata.wasm-pack.profile.dev.wasm-bindgen]

@@ -7,6 +7,7 @@ pub enum WebError {
     SortableError(String),
     JsError(String),
     SetlistDeserializeError(String),
+    PersistenceError(String),
 }
 
 #[allow(unused)]
@@ -17,6 +18,10 @@ impl WebError {
 
     pub fn js_error<S: Into<String>>(s: S) -> Self {
         WebError::JsError(s.into())
+    }
+
+    pub fn persistence_error<S: Into<String>>(s: S) -> Self {
+        WebError::PersistenceError(s.into())
     }
 
     pub fn setlist_deserialize_error<S: Into<String>>(s: S) -> Self {
@@ -33,6 +38,7 @@ impl Display for WebError {
                 WebError::SortableError(s) => s,
                 WebError::JsError(s) => s,
                 WebError::SetlistDeserializeError(s) => s,
+                WebError::PersistenceError(s) => s,
             }
         )
     }
