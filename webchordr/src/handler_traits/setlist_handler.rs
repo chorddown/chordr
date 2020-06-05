@@ -1,6 +1,5 @@
 use crate::events::{SetlistEvent, SortingChange};
 use libchordr::prelude::{Setlist, SetlistEntry, SongId};
-use yew::services::StorageService;
 
 pub trait SetlistHandler {
     fn handle_setlist_event(&mut self, event: SetlistEvent) -> ();
@@ -13,5 +12,5 @@ pub trait SetlistHandler {
 
     fn setlist_sorting_changed(&mut self, sorting_change: SortingChange) -> ();
 
-    fn get_setlist(storage_service: &StorageService) -> Setlist<SetlistEntry>;
+    fn commit_changes(&mut self);
 }

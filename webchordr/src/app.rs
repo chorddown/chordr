@@ -10,6 +10,8 @@ use crate::events::{Event, SetlistEvent, SortingChange};
 use crate::fetch;
 use crate::handler_traits::setlist_handler::SetlistHandler;
 use crate::handler_traits::settings_handler::SettingsHandler;
+use crate::persistence::browser_storage::BrowserStorage;
+use crate::persistence::PersistenceManager;
 use crate::route::{AppRoute, SetlistRoute};
 use js_sys::Date;
 use libchordr::models::setlist::{Setlist, SetlistEntry};
@@ -28,8 +30,9 @@ use yew::services::storage::{Area, StorageService};
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
 use yew_router::prelude::*;
 
-const STORAGE_KEY_SETLIST: &'static str = "net.cundd.chordr.setlist";
-const STORAGE_KEY_SETTINGS: &'static str = "net.cundd.chordr.settings";
+const STORAGE_NAMESPACE: &'static str = "net.cundd.chordr";
+const STORAGE_KEY_SETLIST: &'static str = "setlist";
+const STORAGE_KEY_SETTINGS: &'static str = "settings";
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct AppRouteState {}
@@ -41,7 +44,7 @@ impl Default for AppRouteState {
 }
 
 pub struct App {
-    storage_service: StorageService,
+    persistence_manager: PersistenceManager<BrowserStorage>,
     /// Keep a reference to the RouteService so that it doesn't get dropped
     _route_service: RouteService<AppRouteState>,
     route: Route<AppRouteState>,
@@ -262,6 +265,22 @@ impl App {
             callback.emit(result);
         });
     }
+
+    fn fetch_setlist(&mut self) {
+        let mut pm = self.persistence_manager.clone();
+        let callback = self
+            .link
+            .callback(move |setlist| Msg::Event(SetlistEvent::Replace(setlist).into()));
+
+        spawn_local(async move {
+            let result = pm.load(STORAGE_NAMESPACE, STORAGE_KEY_SETLIST).await;
+            match result {
+                Ok(Some(setlist)) => callback.emit(setlist),
+                Ok(None) => { /* noop */ }
+                Err(e) => error!("{}", e),
+            }
+        });
+    }
 }
 
 impl SetlistHandler for App {
@@ -280,8 +299,7 @@ impl SetlistHandler for App {
             Ok(_) => debug!("Did add song to setlist {}", song_id),
             Err(e) => error!("Could not add song to setlist: {:?}", e),
         }
-        self.storage_service
-            .store(STORAGE_KEY_SETLIST, Json(&self.setlist));
+        <App as SetlistHandler>::commit_changes(self);
     }
 
     fn setlist_remove(&mut self, song_id: SongId) {
@@ -289,15 +307,13 @@ impl SetlistHandler for App {
             Ok(_) => info!("Removed song {} from setlist", song_id),
             Err(_) => warn!("Could not remove song {} from setlist", song_id),
         }
-        self.storage_service
-            .store(STORAGE_KEY_SETLIST, Json(&self.setlist));
+        <App as SetlistHandler>::commit_changes(self);
     }
 
     fn setlist_replace(&mut self, setlist: Setlist<SetlistEntry>) {
         info!("Replace setlist {:?} with {:?}", self.setlist, setlist);
         self.setlist = setlist;
-        self.storage_service
-            .store(STORAGE_KEY_SETLIST, Json(&self.setlist));
+        <App as SetlistHandler>::commit_changes(self);
     }
 
     fn setlist_sorting_changed(&mut self, sorting_change: SortingChange) {
@@ -306,27 +322,32 @@ impl SetlistHandler for App {
             .move_entry(sorting_change.old_index(), sorting_change.new_index())
         {
             Ok(_) => {
-                self.storage_service
-                    .store(STORAGE_KEY_SETLIST, Json(&self.setlist));
+                <App as SetlistHandler>::commit_changes(self);
             }
             Err(e) => error!("{}", e),
         }
     }
 
-    fn get_setlist(storage_service: &StorageService) -> Setlist<SetlistEntry> {
-        if let Json(Ok(restored_model)) = storage_service.restore(STORAGE_KEY_SETLIST) {
-            restored_model
-        } else {
-            Setlist::new()
-        }
+    fn commit_changes(&mut self) {
+        let mut pm = self.persistence_manager.clone();
+        let setlist = self.setlist.clone();
+        spawn_local(async move {
+            let result = pm
+                .store(STORAGE_NAMESPACE, STORAGE_KEY_SETLIST, &setlist)
+                .await;
+            if let Err(e) = result {
+                error!("Could not commit setlist changes: {}", e.to_string())
+            }
+        });
     }
 }
 
 impl SettingsHandler for App {
     fn song_settings_change(&mut self, song_id: SongId, settings: SongSettings) {
         self.settings.store(song_id, settings);
-        self.storage_service
-            .store(STORAGE_KEY_SETTINGS, Json(&self.settings));
+        <App as SettingsHandler>::commit_changes(self);
+        // self.storage_service
+        //     .store(STORAGE_KEY_SETTINGS, Json(&self.settings));
     }
 
     fn get_settings(storage_service: &StorageService) -> SongSettingsMap {
@@ -335,6 +356,19 @@ impl SettingsHandler for App {
         } else {
             SongSettingsMap::new()
         }
+    }
+
+    fn commit_changes(&mut self) {
+        let mut pm = self.persistence_manager.clone();
+        let setlist = self.setlist.clone();
+        spawn_local(async move {
+            let result = pm
+                .store(STORAGE_NAMESPACE, STORAGE_KEY_SETTINGS, &setlist)
+                .await;
+            if let Err(e) = result {
+                error!("Could not commit setting changes: {}", e.to_string())
+            }
+        });
     }
 }
 
@@ -348,11 +382,15 @@ impl Component for App {
         route_service.register_callback(link.callback(Msg::RouteChanged));
 
         let storage_service = StorageService::new(Area::Local).unwrap();
-        let setlist = App::get_setlist(&storage_service);
+
+        let persistence_manager = PersistenceManager::new(BrowserStorage::new().unwrap());
+
+        let setlist = Setlist::new();
         let settings = App::get_settings(&storage_service);
 
         Self {
-            storage_service,
+            persistence_manager,
+            // storage_service,
             link,
             fetching: false,
             expand: true,
@@ -416,6 +454,7 @@ impl Component for App {
     fn rendered(&mut self, first_render: bool) -> () {
         if first_render {
             self.fetch_catalog(true);
+            self.fetch_setlist();
         }
     }
 }
