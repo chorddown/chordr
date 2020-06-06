@@ -353,7 +353,7 @@ impl SettingsHandler for App {
 
     fn get_settings(storage_service: &StorageService) -> SongSettingsMap {
         if let Json(Ok(restored_model)) =
-        storage_service.restore(crate::constants::STORAGE_KEY_SETTINGS)
+        storage_service.restore(format!("{}.{}", crate::constants::STORAGE_NAMESPACE, crate::constants::STORAGE_KEY_SETTINGS).as_str())
         {
             restored_model
         } else {
@@ -363,13 +363,13 @@ impl SettingsHandler for App {
 
     fn commit_changes(&mut self) {
         let mut pm = self.persistence_manager.clone();
-        let setlist = self.setlist.clone();
+        let settings = self.settings.clone();
         spawn_local(async move {
             let result = pm
                 .store(
                     crate::constants::STORAGE_NAMESPACE,
                     crate::constants::STORAGE_KEY_SETTINGS,
-                    &setlist,
+                    &settings,
                 )
                 .await;
             if let Err(e) = result {
