@@ -1,6 +1,6 @@
 [package]
 name = "webchordr"
-version = "0.1.5"
+version = "0.1.6"
 authors = ["Daniel Corn <info@cundd.net>"]
 edition = "2018"
 
@@ -23,6 +23,7 @@ wee_alloc = "0.4.5"
 wasm-logger = "0.2"
 js-sys = "0.3.35"
 wasm-bindgen-futures = "0.4.12"
+async-trait = "0.1.33"
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3"

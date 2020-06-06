@@ -12,5 +12,7 @@ pub trait SetlistHandler {
 
     fn setlist_sorting_changed(&mut self, sorting_change: SortingChange) -> ();
 
+    fn fetch_setlist(&mut self);
+
     fn commit_changes(&mut self);
 }

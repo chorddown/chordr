@@ -17,8 +17,11 @@ mod sortable_service;
 #[cfg(test)]
 mod test_helpers;
 
-pub use fetch_helper::*;
 pub use errors::WebError;
+pub use fetch_helper::*;
+use libchordr::prelude::{Setlist as LibchordrSetlist, SetlistEntry};
+
+pub type Setlist = LibchordrSetlist<SetlistEntry>;
 
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsValue;

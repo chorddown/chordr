@@ -6,14 +6,14 @@ use crate::components::song_search::SongSearch;
 use crate::components::song_view::SongView;
 use crate::components::start_screen::StartScreen;
 use crate::errors::WebError;
-use crate::events::{Event, SetlistEvent, SortingChange};
-use crate::fetch;
+use crate::events::{Event, SetlistEvent, SettingsEvent, SortingChange};
+use crate::handler_traits::catalog_handler::CatalogHandler;
 use crate::handler_traits::setlist_handler::SetlistHandler;
 use crate::handler_traits::settings_handler::SettingsHandler;
-use crate::persistence::browser_storage::BrowserStorage;
-use crate::persistence::PersistenceManager;
+use crate::helpers::window;
+use crate::persistence::prelude::*;
+use crate::persistence::web_repository::{CatalogWebRepository, SettingsWebRepository};
 use crate::route::{AppRoute, SetlistRoute};
-use js_sys::Date;
 use libchordr::models::setlist::{Setlist, SetlistEntry};
 use libchordr::models::song_id::SongIdTrait;
 use libchordr::models::song_settings::SongSettings;
@@ -23,10 +23,6 @@ use percent_encoding::percent_decode_str;
 use serde::{Deserialize, Serialize};
 use std::rc::Rc;
 use wasm_bindgen_futures::spawn_local;
-use web_sys;
-use web_sys::window;
-use yew::format::Json;
-use yew::services::storage::{Area, StorageService};
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
 use yew_router::prelude::*;
 
@@ -53,15 +49,16 @@ pub struct App {
     settings: SongSettingsMap,
 }
 
-#[allow(dead_code)]
+//#[allow(dead_code)]
+
 #[derive(Debug)]
 pub enum Msg {
     Event(Event),
     FetchCatalogReady(Result<Catalog, WebError>),
-    FetchCatalog(bool),
-    SongSettingsChange(SongId, SongSettings),
     ToggleMenu,
+    #[allow(dead_code)]
     Reload,
+    #[allow(dead_code)]
     Ignore,
     RouteChanged(Route<AppRouteState>),
 }
@@ -105,9 +102,9 @@ impl App {
             let remove = self
                 .link
                 .callback(|s| Msg::Event(SetlistEvent::Remove(s).into()));
-            let change = self
-                .link
-                .callback(|s: (SongId, SongSettings)| Msg::SongSettingsChange(s.0, s.1));
+            let change = self.link.callback(|s: (SongId, SongSettings)| {
+                Msg::Event(SettingsEvent::Change(s.0, s.1).into())
+            });
             let is_on_setlist = self.setlist.contains(song);
 
             let song_settings = match self.settings.get(&song_id) {
@@ -242,43 +239,37 @@ impl App {
             </>
         };
     }
+}
 
-    fn fetch_catalog(&mut self, no_cache: bool) {
+impl CatalogHandler for App {
+    fn fetch_catalog(&mut self) {
+        let mut pm = self.persistence_manager.clone();
         let callback = self.link.callback(move |result| {
-            info!("Catalog response {:?}", result);
+            debug!("Catalog response {:?}", result);
             Msg::FetchCatalogReady(result)
         });
 
-        let uri_base = "/catalog.json".to_owned();
-        let uri = if no_cache {
-            uri_base + &format!("?{}", Date::now())
-        } else {
-            uri_base
-        };
-
         spawn_local(async move {
-            let result = fetch::<Catalog>(&uri).await;
-            callback.emit(result);
+            type Repository<'a> = CatalogWebRepository<'a, PersistenceManager<BrowserStorage>>;
+            let result = Repository::new(&mut pm).load().await;
+
+            match result {
+                Ok(Some(catalog)) => callback.emit(Ok(catalog)),
+                Ok(None) => { /* noop */ }
+                Err(e) => callback.emit(Err(e)),
+            }
         });
     }
 
-    fn fetch_setlist(&mut self) {
+    fn commit_changes(&mut self) {
         let mut pm = self.persistence_manager.clone();
-        let callback = self
-            .link
-            .callback(move |setlist| Msg::Event(SetlistEvent::Replace(setlist).into()));
-
+        let catalog = self.catalog.clone();
         spawn_local(async move {
-            let result = pm
-                .load(
-                    crate::constants::STORAGE_NAMESPACE,
-                    crate::constants::STORAGE_KEY_SETLIST,
-                )
-                .await;
-            match result {
-                Ok(Some(setlist)) => callback.emit(setlist),
-                Ok(None) => { /* noop */ }
-                Err(e) => error!("{}", e),
+            type Repository<'a> = CatalogWebRepository<'a, PersistenceManager<BrowserStorage>>;
+            let result = Repository::new(&mut pm).store(&catalog.unwrap()).await;
+
+            if let Err(e) = result {
+                error!("Could not commit Catalog changes: {}", e.to_string())
             }
         });
     }
@@ -318,24 +309,41 @@ impl SetlistHandler for App {
     }
 
     fn setlist_sorting_changed(&mut self, sorting_change: SortingChange) {
-        match self
+        let move_result = self
             .setlist
-            .move_entry(sorting_change.old_index(), sorting_change.new_index())
-        {
-            Ok(_) => {
-                <App as SetlistHandler>::commit_changes(self);
-            }
+            .move_entry(sorting_change.old_index(), sorting_change.new_index());
+
+        match move_result {
+            Ok(_) => <App as SetlistHandler>::commit_changes(self),
             Err(e) => error!("{}", e),
         }
+    }
+
+    fn fetch_setlist(&mut self) {
+        let mut pm = self.persistence_manager.clone();
+        let callback = self
+            .link
+            .callback(move |setlist| Msg::Event(SetlistEvent::Replace(setlist).into()));
+
+        spawn_local(async move {
+            type Repository<'a> = SetlistWebRepository<'a, PersistenceManager<BrowserStorage>>;
+            let result = Repository::new(&mut pm).load().await;
+
+            match result {
+                Ok(Some(setlist)) => callback.emit(setlist),
+                Ok(None) => { /* noop */ }
+                Err(e) => error!("{}", e),
+            }
+        });
     }
 
     fn commit_changes(&mut self) {
         let mut pm = self.persistence_manager.clone();
         let setlist = self.setlist.clone();
         spawn_local(async move {
-            let result = pm
-                .store(crate::constants::STORAGE_NAMESPACE, crate::constants::STORAGE_KEY_SETLIST, &setlist)
-                .await;
+            type Repository<'a> = SetlistWebRepository<'a, PersistenceManager<BrowserStorage>>;
+            let result = Repository::new(&mut pm).store(&setlist).await;
+
             if let Err(e) = result {
                 error!("Could not commit setlist changes: {}", e.to_string())
             }
@@ -344,34 +352,54 @@ impl SetlistHandler for App {
 }
 
 impl SettingsHandler for App {
+    fn handle_settings_event(&mut self, event: SettingsEvent) {
+        match event {
+            SettingsEvent::Change(song_id, settings) => {
+                self.song_settings_change(song_id, settings)
+            }
+            SettingsEvent::Replace(v) => self.song_settings_replace(v),
+        }
+    }
+
     fn song_settings_change(&mut self, song_id: SongId, settings: SongSettings) {
         self.settings.store(song_id, settings);
         <App as SettingsHandler>::commit_changes(self);
-        // self.storage_service
-        //     .store(STORAGE_KEY_SETTINGS, Json(&self.settings));
     }
 
-    fn get_settings(storage_service: &StorageService) -> SongSettingsMap {
-        if let Json(Ok(restored_model)) =
-        storage_service.restore(format!("{}.{}", crate::constants::STORAGE_NAMESPACE, crate::constants::STORAGE_KEY_SETTINGS).as_str())
-        {
-            restored_model
-        } else {
-            SongSettingsMap::new()
-        }
+    fn song_settings_replace(&mut self, settings: SongSettingsMap) {
+        info!(
+            "Replace Map of Song Settings {:?} with {:?}",
+            self.settings, settings
+        );
+        self.settings = settings;
+        <App as SettingsHandler>::commit_changes(self);
+    }
+
+    fn fetch_song_settings(&mut self) {
+        let mut pm = self.persistence_manager.clone();
+        let callback = self
+            .link
+            .callback(move |settings_map| Msg::Event(SettingsEvent::Replace(settings_map).into()));
+
+        spawn_local(async move {
+            type Repository<'a> = SettingsWebRepository<'a, PersistenceManager<BrowserStorage>>;
+            let result = Repository::new(&mut pm).load().await;
+
+            match result {
+                Ok(Some(settings)) => callback.emit(settings),
+                Ok(None) => { /* noop */ }
+                Err(e) => error!("{}", e),
+            }
+        });
     }
 
     fn commit_changes(&mut self) {
         let mut pm = self.persistence_manager.clone();
         let settings = self.settings.clone();
         spawn_local(async move {
-            let result = pm
-                .store(
-                    crate::constants::STORAGE_NAMESPACE,
-                    crate::constants::STORAGE_KEY_SETTINGS,
-                    &settings,
-                )
-                .await;
+            type Repository<'a> = SettingsWebRepository<'a, PersistenceManager<BrowserStorage>>;
+            let result = Repository::new(&mut pm).store(&settings).await;
+
             if let Err(e) = result {
                 error!("Could not commit setting changes: {}", e.to_string())
             }
@@ -388,12 +416,10 @@ impl Component for App {
         let route = Route::from(route_service.get_route());
         route_service.register_callback(link.callback(Msg::RouteChanged));
 
-        let storage_service = StorageService::new(Area::Local).unwrap();
-
         let persistence_manager = PersistenceManager::new(BrowserStorage::new().unwrap());
 
         let setlist = Setlist::new();
-        let settings = App::get_settings(&storage_service);
+        let settings = SongSettingsMap::new();
 
         Self {
             persistence_manager,
@@ -416,17 +442,12 @@ impl Component for App {
                 self.fetching = false;
                 self.catalog = response.ok();
             }
-            Msg::FetchCatalog(no_cache) => self.fetch_catalog(no_cache),
-            Msg::SongSettingsChange(song_id, settings) => {
-                self.song_settings_change(song_id, settings)
-            }
             Msg::Ignore => return false,
             Msg::ToggleMenu => {
                 self.expand = !self.expand;
             }
             Msg::Reload => {
                 window()
-                    .expect("Could not detect the JS window object")
                     .top()
                     .unwrap()
                     .unwrap()
@@ -436,6 +457,7 @@ impl Component for App {
             }
             Msg::Event(e) => match e {
                 Event::SetlistEvent(se) => self.handle_setlist_event(se),
+                Event::SettingsEvent(se) => self.handle_settings_event(se),
                 _ => debug!("New event {:?}", e),
             },
         }
@@ -460,8 +482,9 @@ impl Component for App {
 
     fn rendered(&mut self, first_render: bool) -> () {
         if first_render {
-            self.fetch_catalog(true);
+            self.fetch_catalog();
             self.fetch_setlist();
+            self.fetch_song_settings();
         }
     }
 }
