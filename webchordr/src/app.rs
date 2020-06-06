@@ -30,10 +30,6 @@ use yew::services::storage::{Area, StorageService};
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
 use yew_router::prelude::*;
 
-const STORAGE_NAMESPACE: &'static str = "net.cundd.chordr";
-const STORAGE_KEY_SETLIST: &'static str = "setlist";
-const STORAGE_KEY_SETTINGS: &'static str = "settings";
-
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct AppRouteState {}
 
@@ -273,7 +269,12 @@ impl App {
             .callback(move |setlist| Msg::Event(SetlistEvent::Replace(setlist).into()));
 
         spawn_local(async move {
-            let result = pm.load(STORAGE_NAMESPACE, STORAGE_KEY_SETLIST).await;
+            let result = pm
+                .load(
+                    crate::constants::STORAGE_NAMESPACE,
+                    crate::constants::STORAGE_KEY_SETLIST,
+                )
+                .await;
             match result {
                 Ok(Some(setlist)) => callback.emit(setlist),
                 Ok(None) => { /* noop */ }
@@ -333,7 +334,7 @@ impl SetlistHandler for App {
         let setlist = self.setlist.clone();
         spawn_local(async move {
             let result = pm
-                .store(STORAGE_NAMESPACE, STORAGE_KEY_SETLIST, &setlist)
+                .store(crate::constants::STORAGE_NAMESPACE, crate::constants::STORAGE_KEY_SETLIST, &setlist)
                 .await;
             if let Err(e) = result {
                 error!("Could not commit setlist changes: {}", e.to_string())
@@ -351,7 +352,9 @@ impl SettingsHandler for App {
     }
 
     fn get_settings(storage_service: &StorageService) -> SongSettingsMap {
-        if let Json(Ok(restored_model)) = storage_service.restore(STORAGE_KEY_SETTINGS) {
+        if let Json(Ok(restored_model)) =
+        storage_service.restore(crate::constants::STORAGE_KEY_SETTINGS)
+        {
             restored_model
         } else {
             SongSettingsMap::new()
@@ -363,7 +366,11 @@ impl SettingsHandler for App {
         let setlist = self.setlist.clone();
         spawn_local(async move {
             let result = pm
-                .store(STORAGE_NAMESPACE, STORAGE_KEY_SETTINGS, &setlist)
+                .store(
+                    crate::constants::STORAGE_NAMESPACE,
+                    crate::constants::STORAGE_KEY_SETTINGS,
+                    &setlist,
+                )
                 .await;
             if let Err(e) = result {
                 error!("Could not commit setting changes: {}", e.to_string())
