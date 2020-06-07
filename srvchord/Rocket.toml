@@ -3,7 +3,7 @@
 song_dir = "../webchordr/static/songs"
 
 # Path to the static files
-static_files_dir = "../target/deploy"
+static_files_dir = "../webchordr/dist"
 
 template_dir = "static"
 
