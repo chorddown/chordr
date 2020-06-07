@@ -1,4 +1,4 @@
-pub mod traits;
+pub mod credentials;
 pub mod setlist;
 pub mod setlist_entry;
-// pub mod repository;
+pub mod user;

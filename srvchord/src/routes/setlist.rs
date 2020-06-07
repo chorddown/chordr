@@ -1,102 +1,276 @@
-use crate::domain::setlist::user_setlist::UserSetlist;
-use rocket_contrib::json::Json;
+use crate::domain::setlist::repository::UserSetlistRepository;
+use crate::domain::setlist::UserSetlist;
+use crate::domain::user::User;
+use crate::traits::RepositoryTrait;
 use crate::DbConn;
-use crate::domain::setlist::db::SetlistDb;
 use rocket::{get, post};
-// use rocket::data::{Transformed, FromData, Outcome, Transform};
+use rocket_contrib::json::Json;
+
+pub fn get_routes() -> Vec<rocket::Route> {
+    routes![
+        crate::routes::setlist::setlist_index,
+        crate::routes::setlist::setlist_list,
+        crate::routes::setlist::setlist_get,
+        crate::routes::setlist::setlist_put,
+        crate::routes::setlist::setlist_delete
+    ]
+}
 
 #[get("/")]
 pub fn setlist_index(conn: DbConn) -> Json<Vec<UserSetlist>> {
-    Json(
-        SetlistDb::all(&conn.0)
-            .into_iter()
-            .map(|setlist_db| {
-                let entries = setlist_db.entries(&conn.0);
-
-                UserSetlist::from_data(setlist_db, entries)
-            })
-            .collect(),
-    )
+    Json(UserSetlistRepository::new().find_all(&conn.0).unwrap())
 }
 
+#[get("/<username>")]
+pub fn setlist_list(username: String, conn: DbConn, user: User) -> Option<Json<Vec<UserSetlist>>> {
+    println!("{:?}", user);
 
-#[derive(FromForm)]
-#[derive(Serialize, Deserialize, Debug)]
-pub struct SetlistData {
-    id: i32,
+    match UserSetlistRepository::new().find_by_user(&conn.0, &user) {
+        Ok(setlist) => Some(Json(setlist)),
+        Err(_) => {
+            warn!("No setlists for user {} found", username);
+            None
+        }
+    }
 }
 
-// impl ::rocket::data::FromData for SetlistData{
-//     type Error = ();
-//     type Owned = ();
-//     type Borrowed = ();
-//
-//     fn transform(request: &Request<'r>, data: Data) -> Transform<Outcome<Self::Owned, Self::Error>, T> {
-//         unimplemented!()
-//     }
-//
-//     fn from_data(request: &Request<'r>, outcome: Transformed<'a, Self>) -> Outcome<Self, Self::Error> {
-//         unimplemented!()
-//     }
-// }
+#[get("/<username>/<setlist>")]
+pub fn setlist_get(
+    username: String,
+    setlist: i32,
+    conn: DbConn,
+    user: User,
+) -> Option<Json<UserSetlist>> {
+    println!("{:?}", user);
 
-#[post("/<username>/<id>", format = "application/json", data = "<setlist>")]
-pub fn setlist_put(username: String, id: i32, conn: DbConn, setlist: Json<UserSetlist>) -> Json<Vec<UserSetlist>> {
-    println!("user {} {} {:?}", username, id, setlist);
-    Json(
-        SetlistDb::all(&conn.0)
-            .into_iter()
-            .map(|setlist_db| {
-                let entries = setlist_db.entries(&conn.0);
+    match UserSetlistRepository::new().find_by_user_and_setlist_id(&conn.0, &user, setlist) {
+        Ok(setlist) => Some(Json(setlist)),
+        Err(_) => {
+            warn!("No setlists for user {} found", username);
+            None
+        }
+    }
+}
 
-                UserSetlist::from_data(setlist_db, entries)
-            })
-            .collect(),
-    )
+#[delete("/<username>/<setlist>")]
+pub fn setlist_delete(
+    username: String,
+    setlist: i32,
+    conn: DbConn,
+    user: User,
+) -> Option<()> {
+    println!("{:?}", user);
+
+    let repo = UserSetlistRepository::new();
+    match repo.find_by_user_and_setlist_id(&conn.0, &user, setlist) {
+        Ok(setlist) => {
+            repo.delete(&conn.0, setlist).ok()
+        }
+        Err(_) => {
+            warn!("No setlists for user {} found", username);
+            None
+        }
+    }
+}
+
+#[post("/<username>", format = "application/json", data = "<setlist>")]
+pub fn setlist_put(
+    username: String,
+    conn: DbConn,
+    setlist: Json<UserSetlist>,
+    user: User,
+) -> Option<Json<UserSetlist>> {
+    println!("Add/update setlist {} {:?}", username, setlist);
+    let setlist = setlist.into_inner();
+
+    let repo = UserSetlistRepository::new();
+    match repo.find_by_user_and_setlist_id(&conn.0, &user, setlist.id) {
+        Ok(_) => {
+            println!("Perform update setlist {} #{}", username, setlist.id);
+            match repo.update(&conn.0, setlist.clone()) {
+                Ok(_) => Some(Json(setlist)),
+                Err(e) => {
+                    error!("{}", e);
+                    None
+                }
+            }
+        }
+        Err(_) => {
+            println!("Perform add setlist {} #{}", username, setlist.id);
+            match repo.add(&conn.0, setlist.clone()) {
+                Ok(_) => Some(Json(setlist)),
+                Err(e) => {
+                    error!("{}", e);
+                    None
+                }
+            }
+        }
+    }
 }
 
 #[cfg(test)]
 mod test {
-    use rocket::http::{ContentType};
-    use crate::domain::setlist::db::SetlistDb;
-    use crate::test_helpers::run_test_fn;
+    use crate::test_helpers::{run_test_fn, json_format, JsonTemplateValue, create_random_user, create_setlist};
+    use rocket::http::ContentType;
+    use crate::traits::RepositoryTrait;
+    use crate::domain::setlist::repository::UserSetlistRepository;
+    use rand::Rng;
+    use rocket::http::Status;
+    use rocket::http::Header;
+
+    #[test]
+    fn test_get() {
+        run_test_fn(|client, conn| {
+            let user = create_random_user(&conn.0);
+            let username = user.username;
+            let password = user.password;
+            let user_id = user.id;
+
+            let mut rng = rand::thread_rng();
+            let random_id = rng.gen_range(10000, i32::MAX);
+            create_setlist(&conn.0, random_id, user_id);
+
+            // Issue a request to insert a new setlist
+            let encoded_credentials = base64::encode(format!("{}:{}", username, password));
+            let authorization_header = Header::new("Authorization", format!("Basic {}", encoded_credentials));
+
+            let mut get_response = client
+                .get(format!("/setlist/{}/{}", username, random_id))
+                .header(authorization_header.clone())
+                .dispatch();
+            assert_eq!(
+                get_response.status(),
+                Status::Ok
+            );
+
+            let response_body = get_response.body_string().unwrap();
+
+            assert_eq!(
+                response_body,
+                json_format::<JsonTemplateValue>(
+                    r#"{"id":$,"user":$,"user_name":"Saul","sorting":$,"entries":[{"song_id":"song-1","file_type":"chorddown","title":"Song 1"},{"song_id":"song-2","file_type":"chorddown","title":"Song 2"},{"song_id":"song-3","file_type":"chorddown","title":"Song 3"}]}"#,
+                    vec![
+                        random_id.into(),
+                        user_id.into(),
+                        random_id.into(),
+                    ],
+                )
+            );
+        })
+    }
 
     #[test]
     fn test_insertion_deletion() {
-        // Setlist
         run_test_fn(|client, conn| {
-            assert!(
-                SetlistDb::delete_all(&conn.0),
-                "Failed to delete all data before testing"
-            );
-            // Get the tasks before making changes.
-            let init_tasks = SetlistDb::all(&conn.0);
+            let mut rng = rand::thread_rng();
+            let user_setlist_repository = UserSetlistRepository::new();
+            let initial_count = user_setlist_repository.count_all(&conn.0).unwrap();
 
-            // Issue a request to insert a new task.
-            client
-                .post("/setlist/daniel/1")
+            let user = create_random_user(&conn.0);
+            let username = user.username;
+            let password = user.password;
+            let user_id = user.id;
+
+            let random_id = rng.gen_range(10000, i32::MAX);
+
+            // Issue a request to insert a new setlist
+            let encoded_credentials = base64::encode(format!("{}:{}", username, password));
+            let authorization_header = Header::new("Authorization", format!("Basic {}", encoded_credentials));
+            let post_response = client
+                .post(format!("/setlist/{}", username))
                 .header(ContentType::JSON)
-                .body(r#"{"id":2,"user":2,"user_name":"daniel","entries":[{"song_id":"swing_low_sweet_chariot.chorddown","file_type":"chorddown","title":"Swing Low Sweet Chariot"},{"song_id":"amazing_grace.chorddown","file_type":"chorddown","title":"Amazing Grace"}]}"#)
+                .header(authorization_header.clone())
+                .body(
+                    json_format::<JsonTemplateValue>(
+                        r#"{"id":$,"user":$,"user_name":"$","sorting":200,"entries":[{"song_id":"great","file_type":"chorddown","title":"song 2"},{"song_id":"tune","file_type":"chorddown","title":"song 1"}]}"#,
+                        vec![
+                            random_id.into(),
+                            user_id.into(),
+                            username.clone().into()
+                        ],
+                    )
+                )
                 .dispatch();
+            assert_eq!(post_response.status(), Status::Ok);
 
-            // Ensure we have one more task in the database.
-            let new_tasks = SetlistDb::all(&conn.0);
-            assert_eq!(new_tasks.len(), init_tasks.len() + 1);
+            // Ensure we have one more setlist in the database
+            assert_eq!(user_setlist_repository.count_all(&conn.0).unwrap(), initial_count + 1);
 
-            // Ensure the task is what we expect.
-            // assert_eq!(new_tasks[0].description, "My first task");
-            // assert_eq!(new_tasks[0].completed, false);
+            assert_eq!(
+                client
+                    .get(format!("/setlist/{}/{}", username, random_id))
+                    .header(authorization_header.clone())
+                    .dispatch().status(),
+                Status::Ok
+            );
 
-            // Issue a request to delete the task.
-            let id = new_tasks[0].id;
-            client.delete(format!("/todo/{}", id)).dispatch();
+            // Ensure the setlist is what we expect
+            let setlist = user_setlist_repository.find_by_id(&conn.0, random_id).expect("New setlist not found");
+            assert_eq!(setlist.entries.len(), 2);
+            assert_eq!(setlist.user_name, username);
 
-            // Ensure it's gone.
-            let final_tasks = SetlistDb::all(&conn.0);
-            assert_eq!(final_tasks.len(), init_tasks.len());
-            if final_tasks.len() > 0 {
-                // assert_ne!(final_tasks[0].description, "My first task");
-            }
+            // Issue a request to delete the setlist
+            let delete_response = client
+                .delete(format!("/setlist/{}/{}", username, random_id))
+                .header(authorization_header.clone())
+                .dispatch();
+            println!("{}", delete_response.status());
+            assert_eq!(delete_response.status(), Status::Ok);
+
+            // Ensure it's gone
+            assert_eq!(user_setlist_repository.count_all(&conn.0).unwrap(), initial_count);
+            assert_eq!(
+                client
+                    .get(format!("/setlist/{}/{}", username, random_id))
+                    .header(authorization_header.clone())
+                    .dispatch().status(),
+                Status::NotFound
+            );
+        })
+    }
+
+    #[test]
+    fn test_update() {
+        run_test_fn(|client, conn| {
+            let mut rng = rand::thread_rng();
+            let user_setlist_repository = UserSetlistRepository::new();
+
+            let user = create_random_user(&conn.0);
+            let username = user.username;
+            let password = user.password;
+            let user_id = user.id;
+
+            let random_id = rng.gen_range(10000, i32::MAX);
+            create_setlist(&conn.0, random_id, user_id);
+            let initial_count = user_setlist_repository.count_all(&conn.0).unwrap();
+
+            // Issue a request to insert a new setlist
+            let encoded_credentials = base64::encode(format!("{}:{}", username, password));
+            let authorization_header = Header::new("Authorization", format!("Basic {}", encoded_credentials));
+            let post_response = client
+                .post(format!("/setlist/{}", username))
+                .header(ContentType::JSON)
+                .header(authorization_header.clone())
+                .body(
+                    json_format::<JsonTemplateValue>(
+                        r#"{"id":$,"user":$,"user_name":"$","sorting":200,"entries":[]}"#,
+                        vec![
+                            random_id.into(),
+                            user_id.into(),
+                            "Daniel".into()
+                        ],
+                    )
+                )
+                .dispatch();
+            assert_eq!(post_response.status(), Status::Ok);
+
+            // Ensure we have the same number of setlists in the database
+            assert_eq!(user_setlist_repository.count_all(&conn.0).unwrap(), initial_count);
+
+            // Ensure the setlist is what we expect
+            let setlist = user_setlist_repository.find_by_id(&conn.0, random_id).expect("New setlist not found");
+            assert_eq!(setlist.entries.len(), 0);
+            assert_eq!(&setlist.user_name, "Daniel");
         })
     }
 }

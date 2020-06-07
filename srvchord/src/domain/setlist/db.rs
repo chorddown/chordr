@@ -1,18 +1,9 @@
+use crate::diesel::QueryDsl;
+use crate::domain::setlist_entry::db::SetlistDbEntry;
 use crate::schema::setlist;
 use crate::schema::setlist::dsl::setlist as all_setlists;
 use crate::ConnectionType;
 use diesel::{self, prelude::*};
-use crate::domain::setlist_entry::db::SetlistDbEntry;
-use crate::diesel::QueryDsl;
-// mod schema {
-//     table! {
-//         setlist (id) {
-//             id -> Integer,
-//             user -> Integer,
-//             user_name -> Text,
-//         }
-//     }
-// }
 
 #[table_name = "setlist"]
 #[derive(Serialize, Deserialize, Identifiable, Queryable, Insertable, AsChangeset, Debug, Clone)]
@@ -20,6 +11,7 @@ pub struct SetlistDb {
     pub id: i32,
     pub user: i32,
     pub user_name: String,
+    pub sorting: i32,
 }
 
 impl SetlistDb {

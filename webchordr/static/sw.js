@@ -1,4 +1,25 @@
 const CACHE_NAME = 'chordr';
+
+/* See also webchordr/static/index.html:36 */
+const consoleStyles = {
+    normalStyle: "background: inherit; color: inherit",
+    pathStyle: "font-weight: bold; color: inherit",
+    label: {
+        info: {
+            text: "%cINFO%c webchordr%c ",
+            style: "color: white; padding: 0 3px; background: #029202;"
+        },
+        error: {
+            text: "%cERROR%c webchordr%c ",
+            style: "color: white; padding: 0 3px; background: #ff2863;"
+        },
+        debug: {
+            text: "%cDEBUG%c webchordr%c ",
+            style: "color: white; padding: 0 3px; background: #0066ff;"
+        },
+    }
+}
+
 self.addEventListener('install', function (e) {
     e.waitUntil(
         caches.open(CACHE_NAME).then(function (cache) {
@@ -48,16 +69,35 @@ self.addEventListener('fetch', function (event) {
             .then(function (response) {
                 /* Check if there is a cached entry for the request */
                 if (!response) {
-                    console.info('INFO:webchordr -- Fetch ' + event.request.url + ' from server');
+                    const message = 'Fetch ' + event.request.url + ' from server';
+                    console.info(
+                        consoleStyles.label.info.text + message,
+                        consoleStyles.label.info.style,
+                        consoleStyles.pathStyle,
+                        consoleStyles.normalStyle
+                    )
 
                     return fetchFromServer(event);
                 } else {
                     /* If online try to fetch the latest version in the background */
                     if (navigator.onLine) {
                         fetchFromServer(event).then(function () {
-                            console.info('INFO:webchordr -- Did load ' + event.request.url + ' in background');
+                            const message = 'Did load ' + event.request.url + ' in background';
+                            console.info(
+                                consoleStyles.label.info.text + message,
+                                consoleStyles.label.info.style,
+                                consoleStyles.pathStyle,
+                                consoleStyles.normalStyle
+                            )
                         }).catch(function (e) {
-                            console.error('ERROR:webchordr -- Failed loading ' + event.request.url + ' in background', e);
+                            const message = 'Failed loading ' + event.request.url + ' in background';
+                            console.error(
+                                consoleStyles.label.error.text + message,
+                                consoleStyles.label.error.style,
+                                consoleStyles.pathStyle,
+                                consoleStyles.normalStyle,
+                                e
+                            )
                         });
                     }
                     return response;

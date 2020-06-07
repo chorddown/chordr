@@ -33,6 +33,27 @@
 
 <script>
     const CACHE_NAME = 'chordr';
+    /* See also webchordr/static/sw.js:3 */
+    const consoleStyles = {
+        normalStyle: "background: inherit; color: inherit",
+        pathStyle: "font-weight: bold; color: inherit",
+        label: {
+            info: {
+                text: "%cINFO%c webchordr%c ",
+                style: "color: white; padding: 0 3px; background: #029202;"
+            },
+            error: {
+                text: "%cERROR%c webchordr%c ",
+                style: "color: white; padding: 0 3px; background: #ff2863;"
+            },
+            debug: {
+                text: "%cDEBUG%c webchordr%c ",
+                style: "color: white; padding: 0 3px; background: #0066ff;"
+            },
+        }
+    }
+
+
     const getReloadButtonFallback = function () {
         /** @type {HTMLLinkElement|HTMLElement} */
         return document.getElementById('reload-button-fallback');
@@ -49,13 +70,23 @@
                 /* Button has been removed by the Web App - everything seems ok */
                 return;
             }
-            const message = 'DEBUG:webchordr -- Web App did not start successfully.';
+            const message = consoleStyles.label.debug.text + 'Web App did not start successfully.';
             if (!navigator.onLine) {
-                console.debug(message + ' But device appears to be offline');
+                console.debug(
+                    message + ' But device appears to be offline',
+                    consoleStyles.label.debug.style,
+                    consoleStyles.pathStyle,
+                    consoleStyles.normalStyle
+                );
                 return;
             }
 
-            console.debug(message + ' Clearing caches and reload');
+            console.debug(
+                message + ' Clearing caches and reload',
+                consoleStyles.label.debug.style,
+                consoleStyles.pathStyle,
+                consoleStyles.normalStyle
+            );
             caches.keys().then(function (cacheNames) {
                 Promise.all(
                     cacheNames.filter(function (cacheName) {
@@ -73,19 +104,40 @@
     };
 
     if (window.location.hostname === 'localhost') {
-        console.info('INFO:webchordr -- Service Worker is not used on localhost');
+        console.info(
+            consoleStyles.label.info.text + 'Service Worker is not used on localhost',
+            consoleStyles.label.info.style,
+            consoleStyles.pathStyle,
+            consoleStyles.normalStyle
+        );
     } else if ('serviceWorker' in navigator) {
         navigator.serviceWorker
             .register('/sw.js')
             .then(function () {
-                console.log('INFO:webchordr -- Service Worker registered');
+                console.info(
+                    consoleStyles.label.info.text + 'Service Worker registered',
+                    consoleStyles.label.info.style,
+                    consoleStyles.pathStyle,
+                    consoleStyles.normalStyle
+                );
                 checkWebApp()
             }).catch(function (e) {
-                console.error('ERROR:webchordr -- Service Worker could not be registered', e);
+                console.error(
+                    consoleStyles.label.err.text + 'Service Worker could not be registered',
+                    consoleStyles.label.error.style,
+                    consoleStyles.pathStyle,
+                    consoleStyles.normalStyle,
+                    e
+                );
             }
         );
     } else {
-        console.error('WARN:webchordr -- Service Worker not supported');
+        console.error(
+            consoleStyles.label.err.text + 'Service Worker not supported',
+            consoleStyles.label.error.style,
+            consoleStyles.pathStyle,
+            consoleStyles.normalStyle
+        );
     }
 
     /* Add the current timestamp to the reload-button's URI */

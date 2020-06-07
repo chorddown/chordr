@@ -13,17 +13,17 @@ extern crate serde_derive;
 #[macro_use]
 extern crate rocket_contrib;
 
+mod authentication;
+mod command;
 mod config;
 mod domain;
-mod schema;
-mod routes;
-mod task;
-mod command;
 mod error;
+mod routes;
+mod schema;
+mod task;
 #[cfg(test)]
 mod test_helpers;
-#[cfg(test)]
-mod tests;
+mod traits;
 
 use crate::config::Config;
 use crate::task::{Task, Todo};
@@ -69,7 +69,6 @@ impl<'a, 'b> Context<'a, 'b> {
         }
     }
 }
-
 
 #[post("/", data = "<todo_form>")]
 fn new(todo_form: Form<Todo>, conn: DbConn) -> Flash<Redirect> {
@@ -150,8 +149,6 @@ fn catalog(config: State<Config>) -> Result<Json<Catalog>, libchordr::prelude::E
                 }
             }
 
-            // catalog_result.catalog.revision(),
-
             Ok(Json(catalog_result.catalog))
         }
     }
@@ -187,7 +184,7 @@ fn rocket() -> Rocket {
         // .mount("/", StaticFiles::from("../target/deploy/"))
         .mount("/", routes![index, catalog])
         // .mount("/todo", routes![new, toggle, delete])
-        .mount("/setlist", routes![crate::routes::setlist::setlist_index, crate::routes::setlist::setlist_put])
+        .mount("/setlist", crate::routes::setlist::get_routes())
         .attach(Template::fairing())
 }
 

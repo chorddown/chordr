@@ -32,7 +32,10 @@ impl<'a> Command<'a> {
     }
 }
 
-pub trait CommandExecutor where Self: Sized {
+pub trait CommandExecutor
+where
+    Self: Sized,
+{
     type Error;
 
     fn perform(self, command: Command) -> Result<(), Self::Error> {
