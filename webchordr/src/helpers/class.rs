@@ -1,5 +1,4 @@
-use failure::_core::fmt::{Error, Formatter};
-use std::fmt::Display;
+use std::fmt::{Display, Error, Formatter};
 use yew::Classes;
 
 #[derive(Clone, Debug, PartialEq)]
