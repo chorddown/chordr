@@ -149,8 +149,6 @@ fn catalog(config: State<Config>) -> Result<Json<Catalog>, libchordr::prelude::E
                 }
             }
 
-            // catalog_result.catalog.revision(),
-
             Ok(Json(catalog_result.catalog))
         }
     }
