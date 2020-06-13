@@ -271,9 +271,9 @@ mod test {
                 user_name: "Paul".to_string(),
                 sorting: 918,
                 entries: vec![
-                    SetlistEntry::new("song-1", FileType::Chorddown, "Song 1"),
-                    SetlistEntry::new("song-2", FileType::Chorddown, "Song 2"),
-                    SetlistEntry::new("song-3", FileType::Chorddown, "Song 3"),
+                    SetlistEntry::new("song-1", FileType::Chorddown, "Song 1", None),
+                    SetlistEntry::new("song-2", FileType::Chorddown, "Song 2", None),
+                    SetlistEntry::new("song-3", FileType::Chorddown, "Song 3", None),
                 ],
             };
 
@@ -334,7 +334,7 @@ mod test {
                         user: 8190,                    // New User
                         user_name: "Paul".to_string(), // New name
                         sorting: 918,
-                        entries: vec![SetlistEntry::new("song-4", FileType::Chorddown, "Song 4")],
+                        entries: vec![SetlistEntry::new("song-4", FileType::Chorddown, "Song 4", None)],
                     },
                 )
                 .unwrap();

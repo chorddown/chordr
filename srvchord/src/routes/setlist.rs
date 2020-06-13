@@ -148,7 +148,7 @@ mod test {
             assert_eq!(
                 response_body,
                 json_format::<JsonTemplateValue>(
-                    r#"{"id":$,"user":$,"user_name":"Saul","sorting":$,"entries":[{"song_id":"song-1","file_type":"chorddown","title":"Song 1"},{"song_id":"song-2","file_type":"chorddown","title":"Song 2"},{"song_id":"song-3","file_type":"chorddown","title":"Song 3"}]}"#,
+                    r#"{"id":$,"user":$,"user_name":"Saul","sorting":$,"entries":[{"song_id":"song-1","file_type":"chorddown","title":"Song 1","settings":null},{"song_id":"song-2","file_type":"chorddown","title":"Song 2","settings":null},{"song_id":"song-3","file_type":"chorddown","title":"Song 3","settings":null}]}"#,
                     vec![
                         random_id.into(),
                         user_id.into(),

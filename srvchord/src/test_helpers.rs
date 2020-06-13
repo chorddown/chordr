@@ -120,9 +120,9 @@ pub fn create_setlist(conn: &ConnectionType, id: i32, user: i32) -> UserSetlist 
         user_name: "Saul".to_string(),
         sorting: id,
         entries: vec![
-            SetlistEntry::new("song-1", FileType::Chorddown, "Song 1"),
-            SetlistEntry::new("song-2", FileType::Chorddown, "Song 2"),
-            SetlistEntry::new("song-3", FileType::Chorddown, "Song 3"),
+            SetlistEntry::new("song-1", FileType::Chorddown, "Song 1", None),
+            SetlistEntry::new("song-2", FileType::Chorddown, "Song 2", None),
+            SetlistEntry::new("song-3", FileType::Chorddown, "Song 3", None),
         ],
     };
     CommandExecutor::perform(&setlist, Command::add(conn)).unwrap();
