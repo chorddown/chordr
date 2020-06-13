@@ -79,7 +79,6 @@ impl ConverterTrait for HtmlConverter {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;

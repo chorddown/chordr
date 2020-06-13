@@ -2,7 +2,9 @@ use crate::components::modal::Question;
 use crate::data_exchange::SetlistDeserializeService;
 use crate::events::Event;
 use crate::events::SetlistEvent;
-use libchordr::prelude::{Catalog, Setlist as OriginalSetlist, SetlistEntry, SongData};
+use libchordr::prelude::{
+    Catalog, Setlist as OriginalSetlist, SetlistEntry, SongData,
+};
 use log::{error, info};
 use std::rc::Rc;
 use web_sys::window;

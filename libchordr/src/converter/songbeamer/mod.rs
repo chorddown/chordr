@@ -151,8 +151,10 @@ mod tests {
     use super::*;
     use crate::format::Format;
     use crate::parser::MetaInformation;
-    use crate::test_helpers::{get_test_ast, get_test_ast_with_quote, get_test_ast_w_inline_metadata};
     use crate::test_helpers::get_test_metadata;
+    use crate::test_helpers::{
+        get_test_ast, get_test_ast_w_inline_metadata, get_test_ast_with_quote,
+    };
 
     #[test]
     fn test_convert() {

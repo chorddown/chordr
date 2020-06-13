@@ -1,6 +1,6 @@
 use crate::models::file_type::FileType;
 use crate::models::song_data::SongData;
-use crate::models::song_id::{SongIdTrait, SongId};
+use crate::models::song_id::{SongId, SongIdTrait};
 use crate::models::song_meta::SongMeta;
 use serde::Deserialize;
 use serde::Serialize;

@@ -227,14 +227,18 @@ enum StateError {
 
 impl Display for StateError {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        write!(f, "{}", match self {
-            StateError::UnclosedChord => "UnclosedChord",
-            StateError::NestedChord => "NestedChord",
-            StateError::InvalidChordCharacter => "InvalidChordCharacter",
-            StateError::UnexpectedChordEnd => "UnexpectedChordEnd",
-            StateError::UnexpectedHeaderStart => "UnexpectedHeaderStart",
-            StateError::UnexpectedEndOfFile => "UnexpectedEndOfFile",
-        })
+        write!(
+            f,
+            "{}",
+            match self {
+                StateError::UnclosedChord => "UnclosedChord",
+                StateError::NestedChord => "NestedChord",
+                StateError::InvalidChordCharacter => "InvalidChordCharacter",
+                StateError::UnexpectedChordEnd => "UnexpectedChordEnd",
+                StateError::UnexpectedHeaderStart => "UnexpectedHeaderStart",
+                StateError::UnexpectedEndOfFile => "UnexpectedEndOfFile",
+            }
+        )
     }
 }
 

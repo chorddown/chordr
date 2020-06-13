@@ -100,7 +100,8 @@ pub fn get_test_tokens() -> Vec<Token> {
         Token::literal("home."),
         Token::newline(),
         Token::newline(),
-        Token::quote("Chorus"), Token::newline(),
+        Token::quote("Chorus"),
+        Token::newline(),
     ]
 }
 

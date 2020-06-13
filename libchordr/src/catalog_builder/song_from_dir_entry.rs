@@ -1,13 +1,13 @@
+use super::CatalogBuildError;
 use crate::helper::parse_content;
 use crate::models::file_type::FileType;
 use crate::models::song::Song;
+use crate::models::song_id::SongId;
 use crate::models::song_meta::SongMeta;
 use std::convert::TryFrom;
 use std::fs;
 use std::fs::DirEntry;
 use std::path::Path;
-use super::CatalogBuildError;
-use crate::models::song_id::SongId;
 
 impl TryFrom<&Path> for Song {
     type Error = CatalogBuildError;
@@ -23,18 +23,18 @@ impl TryFrom<&Path> for Song {
 
         let src = match fs::read_to_string(path) {
             Ok(c) => c,
-            Err(e) => return Err(CatalogBuildError::from_error(e, path_buf))
+            Err(e) => return Err(CatalogBuildError::from_error(e, path_buf)),
         };
 
         let song_id = SongId::from(path);
         let parser_result = match parse_content(&src) {
             Ok(p) => p,
-            Err(e) => return Err(CatalogBuildError::from_error(e, path_buf))
+            Err(e) => return Err(CatalogBuildError::from_error(e, path_buf)),
         };
         let title = parser_result.meta().title.unwrap_or(song_id.to_string());
         let file_type = match FileType::try_from(path) {
             Ok(f) => f,
-            Err(e) => return Err(CatalogBuildError::from_error(e, path_buf))
+            Err(e) => return Err(CatalogBuildError::from_error(e, path_buf)),
         };
         //        let meta = SongMeta::new(song_id, title, file_type);
         let meta = SongMeta::new_with_meta_information(

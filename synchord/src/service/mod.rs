@@ -48,9 +48,7 @@ impl ServiceTrait for Services {
                 )?,
             )?)),
             ServiceIdentifier::WebDAV => Ok(Services::WebDAVService(WebDAVService::new(
-                <WebDAVService as ServiceTrait>::Configuration::from_service_config(
-                    configuration,
-                )?,
+                <WebDAVService as ServiceTrait>::Configuration::from_service_config(configuration)?,
             )?)),
         }
     }

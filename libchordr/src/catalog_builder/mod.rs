@@ -1,17 +1,17 @@
-mod song_from_dir_entry;
 mod catalog_build_error;
+mod song_from_dir_entry;
 
+pub use self::catalog_build_error::CatalogBuildError;
 use crate::error::{Error, Result};
 use crate::models::catalog::*;
 use crate::models::file_type::FileType;
 use crate::models::song::Song;
 use crate::models::song_id::SongIdTrait;
+use rand::distributions::Alphanumeric;
+use rand::{thread_rng, Rng};
 use std::convert::TryFrom;
 use std::fs::{self, DirEntry};
 use std::path::Path;
-use rand::distributions::Alphanumeric;
-use rand::{thread_rng, Rng};
-pub use self::catalog_build_error::CatalogBuildError;
 
 /// Catalog Builder provides functions to build a Song Catalog from a given directory
 pub struct CatalogBuilder;
@@ -51,7 +51,10 @@ impl CatalogBuilder {
         })
     }
 
-    fn partition_songs(&self, song_results: Vec<Result<Song, CatalogBuildError>>) -> (Vec<Song>, Vec<CatalogBuildError>) {
+    fn partition_songs(
+        &self,
+        song_results: Vec<Result<Song, CatalogBuildError>>,
+    ) -> (Vec<Song>, Vec<CatalogBuildError>) {
         let (songs, errors): (Vec<_>, Vec<_>) = song_results.into_iter().partition(Result::is_ok);
 
         let mut songs: Vec<Song> = songs.into_iter().map(Result::unwrap).collect();
@@ -59,7 +62,10 @@ impl CatalogBuilder {
 
         (
             songs,
-            errors.into_iter().map(Result::unwrap_err).collect::<Vec<CatalogBuildError>>()
+            errors
+                .into_iter()
+                .map(Result::unwrap_err)
+                .collect::<Vec<CatalogBuildError>>(),
         )
     }
 
@@ -81,8 +87,10 @@ impl CatalogBuilder {
         let mut songs = vec![];
         for entry in entry_iterator {
             match entry {
-                Ok(entry) => songs.append(&mut self.collect_songs_of_entry(entry, file_type, recursive)),
-                Err(error) => songs.push(Err(CatalogBuildError::from_error(error, path)))
+                Ok(entry) => {
+                    songs.append(&mut self.collect_songs_of_entry(entry, file_type, recursive))
+                }
+                Err(error) => songs.push(Err(CatalogBuildError::from_error(error, path))),
             }
         }
         songs
@@ -109,7 +117,10 @@ impl CatalogBuilder {
                 vec![]
             }
         } else {
-            vec![Err(CatalogBuildError::new("Given path is neither a valid file nor a directory", path))]
+            vec![Err(CatalogBuildError::new(
+                "Given path is neither a valid file nor a directory",
+                path,
+            ))]
         }
     }
 }
