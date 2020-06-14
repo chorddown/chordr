@@ -12,7 +12,7 @@ pub enum SetlistEvent {
     Remove(SongId),
 
     /// Replace the complete Setlist with the given one
-    Replace(Setlist<SetlistEntry>),
+    Replace(Setlist),
 
     /// Move one Entry to another position in the Setlist
     SortingChange(SortingChange),

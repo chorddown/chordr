@@ -13,7 +13,7 @@ use yew::prelude::*;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct SongListProps {
-    pub songs: Rc<Setlist<SetlistEntry>>,
+    pub songs: Rc<Setlist>,
     pub sortable: bool,
     #[prop_or_default]
     pub highlighted_song_id: Option<SongId>,
@@ -54,7 +54,7 @@ impl Component for SongList {
                 self.props.on_setlist_change.emit(Event::SetlistEvent(
                     SetlistEvent::SortingChange(sorting_change),
                 ));
-                self.props.songs = Rc::new(Setlist::new());
+                self.props.songs = Rc::new(Setlist::default());
                 true
             }
         }

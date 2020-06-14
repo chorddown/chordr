@@ -8,7 +8,7 @@ pub trait SetlistHandler {
 
     fn setlist_remove(&mut self, song_id: SongId) -> ();
 
-    fn setlist_replace(&mut self, setlist: Setlist<SetlistEntry>) -> ();
+    fn setlist_replace(&mut self, setlist: Setlist) -> ();
 
     fn setlist_sorting_changed(&mut self, sorting_change: SortingChange) -> ();
 

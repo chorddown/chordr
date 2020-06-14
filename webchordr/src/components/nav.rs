@@ -8,7 +8,7 @@ use yew::prelude::*;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct NavProps {
-    pub songs: Rc<Setlist<SetlistEntry>>,
+    pub songs: Rc<Setlist>,
     pub expand: bool,
     pub current_song_id: Option<SongId>,
     pub on_toggle: Callback<()>,

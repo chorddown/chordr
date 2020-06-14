@@ -19,9 +19,7 @@ mod test_helpers;
 
 pub use errors::WebError;
 pub use fetch_helper::*;
-use libchordr::prelude::{Setlist as LibchordrSetlist, SetlistEntry};
-
-pub type Setlist = LibchordrSetlist<SetlistEntry>;
+use libchordr::prelude::Setlist;
 
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsValue;

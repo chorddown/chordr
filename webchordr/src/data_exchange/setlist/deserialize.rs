@@ -1,9 +1,10 @@
 use crate::errors::WebError;
+use chrono::Utc;
 use libchordr::models::setlist::Setlist;
 use libchordr::prelude::{CatalogTrait, SetlistEntry, SongData};
 
 pub struct DeserializeResult {
-    pub setlist: Setlist<SetlistEntry>,
+    pub setlist: Setlist,
     pub errors: Vec<WebError>,
 }
 
@@ -16,9 +17,10 @@ impl DeserializeService {
         catalog: &C,
     ) -> DeserializeResult {
         let (entries, errors) = Self::collect_setlist_entries(serialized_setlist, catalog);
+        let now = Utc::now();
 
         DeserializeResult {
-            setlist: Setlist::with_entries(entries),
+            setlist: Setlist::new("missing-setlist-name", 0, now, now, now, entries),
             errors,
         }
     }
@@ -50,7 +52,7 @@ mod test {
     use super::*;
     use crate::test_helpers::{entry, test_song, TestSong};
     use libchordr::models::song_id::SongId;
-    use libchordr::prelude::SongIdTrait;
+    use libchordr::prelude::{SongIdTrait, SongListTrait};
     use std::slice::Iter;
 
     struct TestCatalog {
@@ -87,7 +89,15 @@ mod test {
         ];
         let result = DeserializeService::deserialize("0,1,2,3,4", &TestCatalog { songs });
         let entries = vec![entry("0"), entry("1"), entry("2"), entry("3"), entry("4")];
-        assert_eq!(result.setlist, Setlist::with_entries(entries));
+        assert_eq!(result.setlist.name(), "missing-setlist-name");
+        assert_eq!(
+            result
+                .setlist
+                .iter()
+                .map(Clone::clone)
+                .collect::<Vec<SetlistEntry>>(),
+            entries
+        );
         assert!(result.errors.is_empty(),);
     }
 
@@ -102,7 +112,15 @@ mod test {
         ];
         let result = DeserializeService::deserialize("0,1,2,not-found,3,4", &TestCatalog { songs });
         let entries = vec![entry("0"), entry("1"), entry("2"), entry("3"), entry("4")];
-        assert_eq!(result.setlist, Setlist::with_entries(entries));
+        assert_eq!(result.setlist.name(), "missing-setlist-name");
+        assert_eq!(
+            result
+                .setlist
+                .iter()
+                .map(Clone::clone)
+                .collect::<Vec<SetlistEntry>>(),
+            entries
+        );
         assert!(!result.errors.is_empty(),);
         assert_eq!(
             result.errors[0].to_string(),

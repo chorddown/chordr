@@ -22,6 +22,7 @@ wasm-logger = "0.2"
 js-sys = "0.3.35"
 wasm-bindgen-futures = "0.4.12"
 async-trait = "0.1.33"
+chrono = { version = "*", features = ["serde", "wasmbind"] }
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3"

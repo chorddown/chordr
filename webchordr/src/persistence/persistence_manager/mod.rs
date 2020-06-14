@@ -26,8 +26,8 @@ pub trait PersistenceManagerTrait {
         namespace: N,
         key: K,
     ) -> Result<Option<T>, WebError>
-    where
-        T: for<'a> Deserialize<'a>;
+        where
+            T: for<'a> Deserialize<'a>;
 }
 
 #[derive(Clone)]
@@ -70,8 +70,8 @@ impl<B: BrowserStorageTrait> PersistenceManagerTrait for PersistenceManager<B> {
         namespace: N,
         key: K,
     ) -> Result<Option<T>, WebError>
-    where
-        T: for<'a> Deserialize<'a>,
+        where
+            T: for<'a> Deserialize<'a>,
     {
         match self
             .browser_storage
@@ -93,6 +93,9 @@ mod test {
     use wasm_bindgen_test::*;
 
     use wasm_bindgen_test::wasm_bindgen_test_configure;
+    use libchordr::models::setlist::Setlist;
+    use crate::test_helpers::entry;
+    use chrono::prelude::*;
     wasm_bindgen_test_configure!(run_in_browser);
 
     #[derive(Serialize, Deserialize, PartialEq, Debug)]
@@ -168,6 +171,40 @@ mod test {
         assert_eq!(
             value,
             pm.load::<TestValue, _, _>("test", "key-1")
+                .await
+                .unwrap()
+                .unwrap()
+        );
+    }
+
+    #[wasm_bindgen_test]
+    async fn store_and_load_setlist_test() {
+        let mut pm = PersistenceManager::new(HashMapBrowserStorage::new());
+
+        let value = Setlist::new(
+            "My setlist",
+            10291,
+            Utc.ymd(2014, 11, 14).and_hms(8, 9, 10),
+            Utc.ymd(2020, 06, 14).and_hms(16, 26, 20),
+            Utc::now(),
+            vec!(
+                entry("song-1"),
+                entry("song-2"),
+                entry("song-3"),
+            ),
+        );
+
+        assert!(pm.store("test", "my-setlist", &value).await.is_ok());
+
+        assert!(pm.load::<Setlist, _, _>("test", "my-setlist").await.is_ok());
+        assert!(pm
+            .load::<Setlist, _, _>("test", "my-setlist")
+            .await
+            .unwrap()
+            .is_some());
+        assert_eq!(
+            value,
+            pm.load::<Setlist, _, _>("test", "my-setlist")
                 .await
                 .unwrap()
                 .unwrap()

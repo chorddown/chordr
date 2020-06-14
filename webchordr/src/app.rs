@@ -14,7 +14,7 @@ use crate::helpers::window;
 use crate::persistence::prelude::*;
 use crate::persistence::web_repository::{CatalogWebRepository, SettingsWebRepository};
 use crate::route::{AppRoute, SetlistRoute};
-use libchordr::models::setlist::{Setlist, SetlistEntry};
+use libchordr::models::setlist::*;
 use libchordr::models::song_id::SongIdTrait;
 use libchordr::models::song_settings::SongSettings;
 use libchordr::prelude::*;
@@ -45,7 +45,7 @@ pub struct App {
     expand: bool,
     fetching: bool,
     catalog: Option<Catalog>,
-    setlist: Setlist<SetlistEntry>,
+    setlist: Setlist,
     settings: SongSettingsMap,
 }
 
@@ -302,7 +302,7 @@ impl SetlistHandler for App {
         <App as SetlistHandler>::commit_changes(self);
     }
 
-    fn setlist_replace(&mut self, setlist: Setlist<SetlistEntry>) {
+    fn setlist_replace(&mut self, setlist: Setlist) {
         info!("Replace setlist {:?} with {:?}", self.setlist, setlist);
         self.setlist = setlist;
         <App as SetlistHandler>::commit_changes(self);
@@ -418,7 +418,7 @@ impl Component for App {
 
         let persistence_manager = PersistenceManager::new(BrowserStorage::new().unwrap());
 
-        let setlist = Setlist::new();
+        let setlist = Setlist::default();
         let settings = SongSettingsMap::new();
 
         Self {
