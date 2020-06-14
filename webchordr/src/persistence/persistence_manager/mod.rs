@@ -1,3 +1,4 @@
+use crate::errors::PersistenceError;
 use crate::errors::WebError;
 use crate::persistence::browser_storage::*;
 use async_trait::async_trait;
@@ -60,7 +61,7 @@ impl<B: BrowserStorageTrait> PersistenceManagerTrait for PersistenceManager<B> {
             Ok(serialized) => self
                 .browser_storage
                 .set_item(self.build_combined_key(&namespace, &key), serialized),
-            Err(e) => Err(WebError::persistence_error(e.to_string())),
+            Err(e) => Err(PersistenceError::serialization_error(e.to_string()).into()),
         }
     }
 
@@ -78,7 +79,7 @@ impl<B: BrowserStorageTrait> PersistenceManagerTrait for PersistenceManager<B> {
         {
             Some(v) => match serde_json::from_str(v.as_str()) {
                 Ok(serialized) => Ok(serialized),
-                Err(e) => Err(WebError::persistence_error(e.to_string())),
+                Err(e) => Err(PersistenceError::deserialization_error(e, Some(v)).into()),
             },
             None => Ok(None),
         }

@@ -1,4 +1,5 @@
 use super::WebRepositoryTrait;
+use crate::errors::PersistenceError;
 use crate::persistence::persistence_manager::PersistenceManagerTrait;
 use crate::{fetch, WebError};
 use async_trait::async_trait;
@@ -37,9 +38,7 @@ where
     }
 
     async fn store(&mut self, _value: &Self::ManagedType) -> Result<(), WebError> {
-        Err(WebError::persistence_error(
-            "Changing the Catalog is not implement",
-        ))
+        Err(PersistenceError::general_error("Changing the Catalog is not implement").into())
     }
 
     async fn load(&mut self) -> Result<Option<Self::ManagedType>, WebError> {
