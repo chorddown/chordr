@@ -26,11 +26,12 @@ pub use crate::models::setlist::{Setlist, SetlistEntry};
 pub use crate::models::song::Song;
 pub use crate::models::song_data::SongData;
 pub use crate::models::song_id::{SongId, SongIdTrait};
+pub use crate::models::song_list::{SongList, SongListTrait};
 pub use crate::models::song_meta::SongMeta;
 pub use crate::models::song_settings::{SongSettings, SongSettingsMap};
 
 /// Catalog management
-pub use crate::catalog_builder::{CatalogBuilder, CatalogBuildResult, CatalogBuildError};
+pub use crate::catalog_builder::{CatalogBuildError, CatalogBuildResult, CatalogBuilder};
 
 /// Helper methods
 pub use crate::helper::*;
