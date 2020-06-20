@@ -1,6 +1,7 @@
 pub mod catalog;
 pub mod chord;
 pub mod file_type;
+pub mod list;
 pub mod meta;
 pub mod prelude;
 pub mod setlist;
