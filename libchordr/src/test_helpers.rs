@@ -1,4 +1,5 @@
 use crate::models::meta::BNotation;
+use crate::models::user::{User, Username};
 use crate::parser::{MetaInformation, Node};
 use crate::tokenizer::{Modifier, Token};
 
@@ -237,4 +238,13 @@ pub fn get_test_metadata() -> MetaInformation {
         capo: Some("1".to_owned()),
         b_notation: BNotation::B,
     }
+}
+
+pub fn get_test_user() -> User {
+    User::new(
+        Username::new("my-username").unwrap(), // username
+        "Daniel".to_string(),                  // first_name
+        "Corn".to_string(),                    // last_name
+        "mypass123".to_string(),               // password
+    )
 }

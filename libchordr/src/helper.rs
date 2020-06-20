@@ -50,3 +50,11 @@ pub fn transpose_and_convert_to_format(
         formatting,
     )
 }
+
+pub(crate) fn is_valid_model_identifier(id: &str) -> bool {
+    fn is_char_allowed(c: char) -> bool {
+        c.is_alphanumeric() || c == '-' || c == '_' || c == '@' || c == '.'
+    }
+
+    !id.is_empty() && id.is_ascii() && id.chars().all(is_char_allowed)
+}
