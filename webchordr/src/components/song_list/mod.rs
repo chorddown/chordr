@@ -4,16 +4,17 @@ pub use self::item::Item;
 use crate::events::setlist_events::SetlistEvent;
 use crate::events::{Event, SortingChange};
 use crate::sortable_service::{SortableHandle, SortableOptions, SortableService};
-use libchordr::models::setlist::Setlist;
+use libchordr::models::song_list::SongList as SongListLibModel;
 use libchordr::prelude::*;
 use log::info;
-use std::rc::Rc;
 use web_sys::HtmlElement;
 use yew::prelude::*;
 
+type SongListModel = SongListLibModel<SetlistEntry>;
+
 #[derive(Properties, PartialEq, Clone)]
 pub struct SongListProps {
-    pub songs: Rc<Setlist>,
+    pub songs: SongListModel,
     pub sortable: bool,
     #[prop_or_default]
     pub highlighted_song_id: Option<SongId>,
@@ -54,7 +55,7 @@ impl Component for SongList {
                 self.props.on_setlist_change.emit(Event::SetlistEvent(
                     SetlistEvent::SortingChange(sorting_change),
                 ));
-                self.props.songs = Rc::new(Setlist::default());
+                self.props.songs = SongListModel::new();
                 true
             }
         }
@@ -91,14 +92,22 @@ impl Component for SongList {
             html! { <Item<SetlistEntry> data_key=key song=song.clone() sortable=sortable highlight=highlight /> }
         };
 
+        let entries = songs
+            .clone()
+            .into_iter()
+            .collect::<Vec<SetlistEntry>>();
+
         info!(
             "Redraw song list {:?}",
-            songs.iter().map(|s| s.id()).collect::<Vec<SongId>>()
+            entries
+                .iter()
+                .map(|s| s.id())
+                .collect::<Vec<SongId>>()
         );
 
         (html! {
             <div class="song-list" ref=self.node_ref.clone()>
-                {for songs.iter().map(render)}
+                {for entries.iter().map(render)}
             </div>
         }) as Html
     }

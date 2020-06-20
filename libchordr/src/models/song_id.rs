@@ -1,3 +1,4 @@
+use crate::models::list::ListEntryTrait;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::fmt::{Display, Formatter};
@@ -5,10 +6,7 @@ use std::hash::{Hash, Hasher};
 use std::path::Path;
 
 /// Trait for objects that have an associated SongId
-pub trait SongIdTrait {
-    /// Return a unique identifier of the Song
-    fn id(&self) -> SongId;
-}
+pub trait SongIdTrait: ListEntryTrait<Id=SongId> {}
 
 /// Song Identifier
 #[derive(Deserialize, Serialize, Clone, Debug)]

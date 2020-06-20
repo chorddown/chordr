@@ -1,9 +1,9 @@
 use crate::models::file_type::FileType;
+use crate::models::list::ListEntryTrait;
 use crate::models::song_data::SongData;
 use crate::models::song_id::{SongId, SongIdTrait};
 use crate::models::song_meta::SongMeta;
-use serde::Deserialize;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
 pub struct Song {
@@ -28,8 +28,12 @@ impl Song {
     }
 }
 
-impl SongIdTrait for Song {
-    fn id(&self) -> SongId {
+impl SongIdTrait for Song {}
+
+impl ListEntryTrait for Song {
+    type Id = SongId;
+
+    fn id(&self) -> Self::Id {
         self.meta.id()
     }
 }

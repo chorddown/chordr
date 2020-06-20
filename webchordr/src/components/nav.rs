@@ -1,14 +1,15 @@
-use crate::components::setlist::SetlistShareButton;
-use crate::components::song_list::SongList;
+// use crate::components::setlist::SetlistShareButton;
+use crate::components::song_list::SongList as SongListView;
 use crate::events::Event;
 use libchordr::models::setlist::*;
+use libchordr::models::song_list::SongList as SongListModel;
 use libchordr::prelude::SongId;
 use std::rc::Rc;
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct NavProps {
-    pub songs: Rc<Setlist>,
+    pub songs: Option<Rc<Setlist>>,
     pub expand: bool,
     pub current_song_id: Option<SongId>,
     pub on_toggle: Callback<()>,
@@ -22,11 +23,14 @@ pub struct Nav {
 
 impl Nav {
     fn view_song_list(&self) -> Html {
-        let songs = &self.props.songs;
+        let songs = match &self.props.songs {
+            Some(setlist) => setlist.as_song_list(),
+            None => SongListModel::new(),
+        };
         let on_setlist_change = self.props.on_setlist_change.reform(|e| e);
 
         html! {
-            <SongList
+            <SongListView
                 songs=songs
                 on_setlist_change=on_setlist_change
                 sortable=self.props.expand
@@ -38,11 +42,18 @@ impl Nav {
     fn view_nav_footer(&self) -> Html {
         let toggle_menu = self.props.on_toggle.reform(|_| ());
 
+        // TODO: Implement sharing support
+        // let setlist_share_button = match &self.props.songs {
+        //     Some(s) => html! { <SetlistShareButton setlist=s.clone()/>},
+        //     None => html! {},
+        // };
+        let setlist_share_button = html! {};
+
         (if self.props.expand {
             html! {
                 <footer>
                     <button class="toggle-menu" onclick=toggle_menu>{ "→" }</button>
-                    <SetlistShareButton setlist=self.props.songs.clone()/>
+                    {setlist_share_button}
                     <a role="button" class="home" href="/#" title="Go to home screen">
                         <i class="im im-home"></i>
                         <span>{ "Home" }</span>

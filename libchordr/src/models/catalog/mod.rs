@@ -1,8 +1,9 @@
 pub mod catalog_trait;
 
 pub use self::catalog_trait::CatalogTrait;
+use crate::models::list::ListEntryTrait;
 use crate::models::song::Song;
-use crate::models::song_id::{SongId, SongIdTrait};
+use crate::models::song_id::SongId;
 use serde::{Deserialize, Serialize};
 use std::slice::Iter;
 

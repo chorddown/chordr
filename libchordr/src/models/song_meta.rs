@@ -1,6 +1,7 @@
 use super::file_type::FileType;
 use super::song_data::SongData;
 use super::song_id::SongId;
+use crate::models::list::ListEntryTrait;
 use crate::models::meta::*;
 use crate::models::song_id::SongIdTrait;
 use serde;
@@ -135,8 +136,12 @@ impl MetaTrait for SongMeta {
     }
 }
 
-impl SongIdTrait for SongMeta {
-    fn id(&self) -> SongId {
+impl SongIdTrait for SongMeta {}
+
+impl ListEntryTrait for SongMeta {
+    type Id = SongId;
+
+    fn id(&self) -> Self::Id {
         self.id.clone()
     }
 }

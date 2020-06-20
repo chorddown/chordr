@@ -14,9 +14,7 @@ use crate::helpers::window;
 use crate::persistence::prelude::*;
 use crate::persistence::web_repository::{CatalogWebRepository, SettingsWebRepository};
 use crate::route::{AppRoute, SetlistRoute};
-use libchordr::models::setlist::*;
-use libchordr::models::song_id::SongIdTrait;
-use libchordr::models::song_settings::SongSettings;
+use chrono::Utc;
 use libchordr::prelude::*;
 use log::{debug, error, info, warn};
 use percent_encoding::percent_decode_str;
@@ -42,10 +40,12 @@ pub struct App {
     route: Route<AppRouteState>,
     link: ComponentLink<App>,
 
+    _user: User,
     expand: bool,
     fetching: bool,
     catalog: Option<Catalog>,
-    setlist: Setlist,
+    current_setlist: Option<Setlist>,
+    _setlist_collection: SetlistCollection,
     settings: SongSettingsMap,
 }
 
@@ -105,7 +105,11 @@ impl App {
             let change = self.link.callback(|s: (SongId, SongSettings)| {
                 Msg::Event(SettingsEvent::Change(s.0, s.1).into())
             });
-            let is_on_setlist = self.setlist.contains(song);
+            let is_on_setlist = if let Some(ref setlist) = self.current_setlist {
+                setlist.contains_id(song.id())
+            } else {
+                false
+            };
 
             let song_settings = match self.settings.get(&song_id) {
                 Some(s) => {
@@ -196,8 +200,10 @@ impl App {
                 Some(catalog) => {
                     let replace = self.link.callback(|e| Msg::Event(e));
                     let catalog = Rc::new(catalog.clone());
-                    let setlist = Rc::new(self.setlist.clone());
-
+                    let setlist = match self.current_setlist {
+                        Some(ref s) => Some(Rc::new(s.clone())),
+                        None => None,
+                    };
                     self.compose(
                         html! {
                             <SetlistLoad
@@ -217,7 +223,10 @@ impl App {
     fn view_nav(&self, current_song_id: Option<SongId>) -> Html {
         let toggle_menu = self.link.callback(|_| Msg::ToggleMenu);
         let on_setlist_change = self.link.callback(|e| Msg::Event(e));
-        let songs = Rc::new(self.setlist.clone());
+        let songs = match self.current_setlist {
+            Some(ref s) => Some(Rc::new(s.clone())),
+            None => None,
+        };
 
         html! {
             <Nav
@@ -287,7 +296,12 @@ impl SetlistHandler for App {
 
     fn setlist_add(&mut self, song: SetlistEntry) {
         let song_id = song.id();
-        match self.setlist.add(song) {
+        match self
+            .current_setlist
+            .as_mut()
+            .expect("No current setlist defined")
+            .add(song)
+        {
             Ok(_) => debug!("Did add song to setlist {}", song_id),
             Err(e) => error!("Could not add song to setlist: {:?}", e),
         }
@@ -295,7 +309,12 @@ impl SetlistHandler for App {
     }
 
     fn setlist_remove(&mut self, song_id: SongId) {
-        match self.setlist.remove_by_id(&song_id) {
+        match self
+            .current_setlist
+            .as_mut()
+            .expect("No current setlist defined")
+            .remove_by_id(song_id.clone())
+        {
             Ok(_) => info!("Removed song {} from setlist", song_id),
             Err(_) => warn!("Could not remove song {} from setlist", song_id),
         }
@@ -303,14 +322,19 @@ impl SetlistHandler for App {
     }
 
     fn setlist_replace(&mut self, setlist: Setlist) {
-        info!("Replace setlist {:?} with {:?}", self.setlist, setlist);
-        self.setlist = setlist;
+        info!(
+            "Replace setlist {:?} with {:?}",
+            self.current_setlist, setlist
+        );
+        self.current_setlist = Some(setlist);
         <App as SetlistHandler>::commit_changes(self);
     }
 
     fn setlist_sorting_changed(&mut self, sorting_change: SortingChange) {
         let move_result = self
-            .setlist
+            .current_setlist
+            .as_mut()
+            .unwrap()
             .move_entry(sorting_change.old_index(), sorting_change.new_index());
 
         match move_result {
@@ -339,15 +363,17 @@ impl SetlistHandler for App {
 
     fn commit_changes(&mut self) {
         let mut pm = self.persistence_manager.clone();
-        let setlist = self.setlist.clone();
-        spawn_local(async move {
-            type Repository<'a> = SetlistWebRepository<'a, PersistenceManager<BrowserStorage>>;
-            let result = Repository::new(&mut pm).store(&setlist).await;
+        match self.current_setlist.clone() {
+            Some(s) => spawn_local(async move {
+                type Repository<'a> = SetlistWebRepository<'a, PersistenceManager<BrowserStorage>>;
+                let result = Repository::new(&mut pm).store(&s).await;
 
-            if let Err(e) = result {
-                error!("Could not commit setlist changes: {}", e.to_string())
-            }
-        });
+                if let Err(e) = result {
+                    error!("Could not commit setlist changes: {}", e.to_string())
+                }
+            }),
+            None => info!("Currently there is no setlist to commit"),
+        }
     }
 }
 
@@ -418,20 +444,23 @@ impl Component for App {
 
         let persistence_manager = PersistenceManager::new(BrowserStorage::new().unwrap());
 
-        let setlist = Setlist::default();
+        let user = User::new(Username::new("me").unwrap(), "First name", "Last name", "");
+        let now = Utc::now();
+        let setlist = Setlist::new("", 0, user.clone(), None, now, now, now, vec![]);
         let settings = SongSettingsMap::new();
 
         Self {
             persistence_manager,
-            // storage_service,
             link,
             fetching: false,
             expand: true,
             catalog: None,
             settings,
-            setlist,
+            current_setlist: Some(setlist),
+            _setlist_collection: SetlistCollection::new(),
             _route_service: route_service,
             route,
+            _user: user,
         }
     }
 

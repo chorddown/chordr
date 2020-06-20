@@ -26,8 +26,8 @@ pub trait PersistenceManagerTrait {
         namespace: N,
         key: K,
     ) -> Result<Option<T>, WebError>
-        where
-            T: for<'a> Deserialize<'a>;
+    where
+        T: for<'a> Deserialize<'a>;
 }
 
 #[derive(Clone)]
@@ -70,8 +70,8 @@ impl<B: BrowserStorageTrait> PersistenceManagerTrait for PersistenceManager<B> {
         namespace: N,
         key: K,
     ) -> Result<Option<T>, WebError>
-        where
-            T: for<'a> Deserialize<'a>,
+    where
+        T: for<'a> Deserialize<'a>,
     {
         match self
             .browser_storage
@@ -92,10 +92,10 @@ mod test {
     use serde::{Deserialize, Serialize};
     use wasm_bindgen_test::*;
 
-    use wasm_bindgen_test::wasm_bindgen_test_configure;
-    use libchordr::models::setlist::Setlist;
-    use crate::test_helpers::entry;
+    use crate::test_helpers::{entry, get_test_user};
     use chrono::prelude::*;
+    use libchordr::models::setlist::Setlist;
+    use wasm_bindgen_test::wasm_bindgen_test_configure;
     wasm_bindgen_test_configure!(run_in_browser);
 
     #[derive(Serialize, Deserialize, PartialEq, Debug)]
@@ -184,14 +184,12 @@ mod test {
         let value = Setlist::new(
             "My setlist",
             10291,
+            get_test_user(),
+            None,
             Utc.ymd(2014, 11, 14).and_hms(8, 9, 10),
             Utc.ymd(2020, 06, 14).and_hms(16, 26, 20),
             Utc::now(),
-            vec!(
-                entry("song-1"),
-                entry("song-2"),
-                entry("song-3"),
-            ),
+            vec![entry("song-1"), entry("song-2"), entry("song-3")],
         );
 
         assert!(pm.store("test", "my-setlist", &value).await.is_ok());

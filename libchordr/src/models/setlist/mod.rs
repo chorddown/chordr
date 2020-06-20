@@ -1,43 +1,38 @@
+mod setlist_collection;
 mod setlist_entry;
 
+pub use self::setlist_collection::SetlistCollection;
 pub use self::setlist_entry::SetlistEntry;
 use crate::error::Result;
-use crate::models::song_id::{SongId, SongIdTrait};
+use crate::models::list::{List, ListEntryTrait, ListError, ListTrait};
+use crate::models::song_id::SongId;
 use crate::models::song_list::{SongList, SongListTrait};
+use crate::models::team::Team;
+use crate::models::user::User;
 use chrono::{DateTime, Utc};
-use serde::Deserialize;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::ops;
-use std::slice::Iter;
+use std::vec::IntoIter;
 
 /// A generic set of Songs identified by their [SongId]
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct Setlist {
     name: String,
     id: i32,
-    songs: SongList<SetlistEntry>,
+    owner: User,
+    team: Option<Team>,
+    songs: List<SetlistEntry>,
     gig_date: DateTime<Utc>,
     creation_date: DateTime<Utc>,
     modification_date: DateTime<Utc>,
 }
 
 impl Setlist {
-    pub fn default() -> Self {
-        let now = Utc::now();
-
-        Self {
-            name: "".to_string(),
-            id: 0,
-            songs: SongList::new(),
-            gig_date: now,
-            creation_date: now,
-            modification_date: now,
-        }
-    }
-
     pub fn new<S: Into<String>>(
         name: S,
         id: i32,
+        owner: User,
+        team: Option<Team>,
         gig_date: DateTime<Utc>,
         creation_date: DateTime<Utc>,
         modification_date: DateTime<Utc>,
@@ -46,7 +41,9 @@ impl Setlist {
         Self {
             name: name.into(),
             id,
-            songs: SongList::with_entries(songs),
+            owner,
+            team,
+            songs: List::from(songs),
             gig_date,
             creation_date,
             modification_date,
@@ -61,6 +58,14 @@ impl Setlist {
         self.id
     }
 
+    pub fn owner(&self) -> &User {
+        &self.owner
+    }
+
+    pub fn team(&self) -> &Option<Team> {
+        &self.team
+    }
+
     pub fn gig_date(&self) -> DateTime<Utc> {
         self.gig_date
     }
@@ -72,12 +77,29 @@ impl Setlist {
     pub fn modification_date(&self) -> DateTime<Utc> {
         self.modification_date
     }
+
+    pub fn as_song_list(&self) -> SongList<SetlistEntry> {
+        SongList::from(
+            self.songs
+                .clone()
+                .into_iter()
+                .collect::<Vec<SetlistEntry>>(),
+        )
+    }
 }
 
 impl SongListTrait for Setlist {
+    // fn iter(&self) -> Iter<'_, SetlistEntry> {
+    //     // TODO: Fix this
+    //     self.as_song_list().iter()
+    //     // self.songs.iter()
+    // }
+}
+
+impl ListTrait for Setlist {
     type Item = SetlistEntry;
 
-    fn contains<D: SongIdTrait>(&self, song: &D) -> bool {
+    fn contains(&self, song: &Self::Item) -> bool {
         self.songs.contains(song)
     }
 
@@ -93,41 +115,39 @@ impl SongListTrait for Setlist {
         self.songs.len()
     }
 
-    fn add(&mut self, song: SetlistEntry) -> Result<()> {
+    fn add(&mut self, song: SetlistEntry) -> Result<(), ListError> {
         self.songs.add(song)
     }
 
-    fn replace(&mut self, song: SetlistEntry) -> Result<()> {
+    fn replace(&mut self, song: SetlistEntry) -> Result<(), ListError> {
         self.songs.replace(song)
     }
 
-    fn remove_by_id<I: AsRef<str>>(&mut self, song_id: I) -> Result<()> {
-        self.songs.remove_by_id(song_id)
+    fn remove_by_id(
+        &mut self,
+        id: <<Self as ListTrait>::Item as ListEntryTrait>::Id,
+    ) -> Result<(), ListError> {
+        self.songs.remove_by_id(id)
     }
 
-    fn move_entry(&mut self, from: usize, to: usize) -> Result<()> {
+    // fn remove(&mut self, item: &Self::Item) -> Result<(), ListError> {
+    //     self.remove_by_id(item.id())
+    // }
+    fn remove(&mut self, item: &<Self as ListTrait>::Item) -> Result<(), ListError> {
+        self.remove_by_id(item.id())
+    }
+
+    fn move_entry(&mut self, from: usize, to: usize) -> Result<(), ListError> {
         self.songs.move_entry(from, to)
     }
 
-    fn position<I: AsRef<str>>(&mut self, song_id: I) -> Option<usize> {
+    fn position(
+        &mut self,
+        song_id: <<Self as ListTrait>::Item as ListEntryTrait>::Id,
+    ) -> Option<usize> {
         self.songs.position(song_id)
     }
-
-    fn iter(&self) -> Iter<'_, SetlistEntry> {
-        self.songs.iter()
-    }
 }
-
-impl Setlist {
-    #[deprecated]
-    pub fn with_entries(songs: Vec<SetlistEntry>) -> Self {
-        let mut new = Self::default();
-        new.songs = SongList::with_entries(songs);
-
-        new
-    }
-}
-
 // impl<S: SetlistEntryTrait + SongIdTrait + PartialEq> PartialEq for Setlist<S> {
 //     fn eq(&self, other: &Self) -> bool {
 //         self.songs == other.songs && self.name == other.name && self.id == other.id
@@ -142,10 +162,27 @@ impl ops::Index<usize> for Setlist {
     }
 }
 
+impl IntoIterator for Setlist {
+    type Item = SetlistEntry;
+    type IntoIter = IntoIter<SetlistEntry>;
+
+    #[inline]
+    fn into_iter(self) -> IntoIter<SetlistEntry> {
+        self.songs.into_iter()
+    }
+}
+
+impl AsRef<Setlist> for Setlist {
+    fn as_ref(&self) -> &Setlist {
+        self
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
     use crate::prelude::FileType;
+    use crate::test_helpers::get_test_user;
 
     fn entry<S: Into<SongId>>(id: S) -> SetlistEntry {
         let song_id = id.into();
@@ -160,6 +197,8 @@ mod test {
         let mut list = Setlist::new(
             "Setlist name",
             1,
+            get_test_user(),
+            None,
             now,
             now,
             now,
@@ -177,6 +216,8 @@ mod test {
         let mut list = Setlist::new(
             "Setlist name",
             1,
+            get_test_user(),
+            None,
             now,
             now,
             now,

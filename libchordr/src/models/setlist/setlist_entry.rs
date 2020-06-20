@@ -1,4 +1,5 @@
 use crate::models::file_type::FileType;
+use crate::models::list::ListEntryTrait;
 use crate::models::song_data::SongData;
 use crate::models::song_id::{SongId, SongIdTrait};
 use crate::models::song_settings::SongSettings;
@@ -28,7 +29,8 @@ impl SetlistEntry {
         }
     }
 
-    pub fn from_song<S: SongData>(song: &S) -> Self {
+    pub fn from_song<S: SongData>(song: &S) -> Self
+    {
         Self {
             song_id: song.id(),
             file_type: song.file_type(),
@@ -37,30 +39,17 @@ impl SetlistEntry {
         }
     }
 
-    pub fn from_song_with_settings<S: SongData>(song: &S, settings: SongSettings) -> Self {
+    pub fn from_song_with_settings<S: SongData + ListEntryTrait<Id=SongId>>(
+        song: &S,
+        settings: SongSettings,
+    ) -> Self {
         let mut entry = Self::from_song(song);
         entry.settings = Some(settings);
         entry
     }
 }
 
-// impl From<Song> for SetlistEntry {
-//     fn from(s: Song) -> Self {
-//         SetlistEntry::from_song(&s)
-//     }
-// }
-
-// impl<S: SongData> From<&S> for SetlistEntry {
-//     fn from(s: &S) -> Self {
-//         SetlistEntry::from_song(s)
-//     }
-// }
-
-impl SongIdTrait for SetlistEntry {
-    fn id(&self) -> SongId {
-        self.song_id.clone()
-    }
-}
+impl SongIdTrait for SetlistEntry {}
 
 impl SongData for SetlistEntry {
     fn title(&self) -> String {
@@ -68,5 +57,13 @@ impl SongData for SetlistEntry {
     }
     fn file_type(&self) -> FileType {
         self.file_type
+    }
+}
+
+impl ListEntryTrait for SetlistEntry {
+    type Id = SongId;
+
+    fn id(&self) -> Self::Id {
+        self.song_id.clone()
     }
 }

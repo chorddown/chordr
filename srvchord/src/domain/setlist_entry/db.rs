@@ -9,6 +9,7 @@ use libchordr::models::song_data::SongData;
 use libchordr::models::song_id::{SongId, SongIdTrait};
 use libchordr::prelude::SetlistEntry;
 use std::convert::TryFrom;
+use libchordr::models::list::ListEntryTrait;
 
 #[derive(
 Serialize, Identifiable, Associations, Queryable, Insertable, AsChangeset, Debug, Clone,
@@ -54,7 +55,10 @@ impl SetlistDbEntry {
     }
 }
 
-impl SongIdTrait for SetlistDbEntry {
+impl SongIdTrait for SetlistDbEntry {}
+
+impl ListEntryTrait for SetlistDbEntry {
+    type Id = SongId;
     fn id(&self) -> SongId {
         SongId::new(&self.song_id)
     }

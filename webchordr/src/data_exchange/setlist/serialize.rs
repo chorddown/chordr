@@ -1,6 +1,6 @@
 use crate::errors::WebError;
+use libchordr::models::list::ListEntryTrait;
 use libchordr::models::setlist::Setlist;
-use libchordr::prelude::{SongIdTrait, SongListTrait};
 
 pub struct SerializeService {}
 
@@ -8,7 +8,8 @@ impl SerializeService {
     /// Serialize `setlist` into a string
     pub fn serialize(setlist: &Setlist) -> Result<String, WebError> {
         Ok(setlist
-            .iter()
+            .clone()
+            .into_iter()
             .map(|song| song.id().to_string())
             .collect::<Vec<String>>()
             .join(","))
@@ -18,7 +19,7 @@ impl SerializeService {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::test_helpers::entry;
+    use crate::test_helpers::{entry, get_test_user};
     use chrono::Utc;
 
     #[test]
@@ -26,6 +27,8 @@ mod test {
         let list = Setlist::new(
             "Setlist name",
             1,
+            get_test_user(),
+            None,
             Utc::now(),
             Utc::now(),
             Utc::now(),
