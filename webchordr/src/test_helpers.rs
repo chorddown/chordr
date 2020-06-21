@@ -1,6 +1,6 @@
 use libchordr::models::file_type::FileType;
 use libchordr::models::song_id::SongId;
-use libchordr::models::user::{User, Username};
+use libchordr::models::user::{User, Username, Password};
 use libchordr::prelude::{ListEntryTrait, SetlistEntry, SongData, SongIdTrait};
 
 pub fn entry<S: Into<String>>(id: S) -> SetlistEntry {
@@ -36,9 +36,9 @@ impl SongData for TestSong {
 
 pub(crate) fn get_test_user() -> User {
     User::new(
-        Username::new("my-username").unwrap(), // username
-        "Daniel".to_string(),                  // first_name
-        "Corn".to_string(),                    // last_name
-        "mypass123".to_string(),               // password
+        Username::new("my-username").unwrap(),  // username
+        "Daniel".to_string(),                   // first_name
+        "Corn".to_string(),                     // last_name
+        Password::new("mypass123").unwrap(),    // password
     )
 }

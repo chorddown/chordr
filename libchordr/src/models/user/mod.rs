@@ -1,6 +1,8 @@
 mod username;
+mod password;
 
 pub use self::username::Username;
+pub use self::password::Password;
 use serde::{Deserialize, Serialize};
 
 /// User of the application which has it's own `Setlist`s and login credentials
@@ -9,11 +11,11 @@ pub struct User {
     username: Username,
     first_name: String,
     last_name: String,
-    password: String,
+    password: Password,
 }
 
 impl User {
-    pub fn new<U: Into<Username>, F: Into<String>, L: Into<String>, P: Into<String>>(
+    pub fn new<U: Into<Username>, F: Into<String>, L: Into<String>, P: Into<Password>>(
         username: U,
         first_name: F,
         last_name: L,
@@ -24,6 +26,15 @@ impl User {
             first_name: first_name.into(),
             last_name: last_name.into(),
             password: password.into(),
+        }
+    }
+
+    pub fn unknown() -> Self {
+        Self {
+            username: Username::new("unknown").unwrap(),
+            first_name: "John".to_owned(),
+            last_name: "Doe".to_owned(),
+            password: Password::new("undefined-password").unwrap(),
         }
     }
 
@@ -39,7 +50,7 @@ impl User {
         &self.last_name
     }
 
-    pub fn password(&self) -> &str {
+    pub fn password(&self) -> &Password {
         &self.password
     }
 }

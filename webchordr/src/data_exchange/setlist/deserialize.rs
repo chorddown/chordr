@@ -1,7 +1,7 @@
 use crate::errors::WebError;
 use chrono::Utc;
 use libchordr::models::setlist::Setlist;
-use libchordr::models::user::{User, Username};
+use libchordr::models::user::User;
 use libchordr::prelude::{CatalogTrait, SetlistEntry, SongData};
 
 pub struct DeserializeResult {
@@ -26,7 +26,7 @@ impl DeserializeService {
             setlist: Setlist::new(
                 "missing-setlist-name",
                 0,
-                User::new(Username::new("unknown").unwrap(), "John", "Doe", ""),
+                User::unknown(),
                 None,
                 now,
                 now,

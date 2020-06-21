@@ -41,6 +41,10 @@ impl Error {
         Error::new(Kind::InvalidUsernameError(invalid_username.into()))
     }
 
+    pub fn invalid_password_error<S: Into<String>>(invalid_password: S) -> Self {
+        Error::new(Kind::InvalidPasswordError(invalid_password.into()))
+    }
+
     pub fn invalid_team_id_error<S: Into<String>>(invalid_team_id: S) -> Self {
         Error::new(Kind::InvalidTeamIdError(invalid_team_id.into()))
     }
@@ -90,6 +94,7 @@ enum Kind {
     SetlistError(String),
     UnknownError(String),
     InvalidUsernameError(String),
+    InvalidPasswordError(String),
     InvalidTeamIdError(String),
 }
 
@@ -110,20 +115,12 @@ impl Display for Kind {
             Kind::InvalidUsernameError(invalid_name) => {
                 write!(f, "Username '{}' is not valid", invalid_name)
             }
+            Kind::InvalidPasswordError(invalid_name) => {
+                write!(f, "Password '{}' is not valid", invalid_name)
+            }
             Kind::InvalidTeamIdError(invalid_id) => {
                 write!(f, "Team ID '{}' is not valid", invalid_id)
             }
         }
-        // match self {
-        //     Kind::ParserError(s) => write!(f, "Parser error: {}", s),
-        //     Kind::TagBuilderError(s) => write!(f, "TagBuilder error: {}", s),
-        //     Kind::CatalogBuilderError(s, p) => {
-        //         write!(f, "Error while building catalog: {} for path {:?}", s, p)
-        //     }
-        //     Kind::FileTypeError(s) => write!(f, "FileTypeError error: {}", s),
-        //     Kind::ChordError(s) => write!(f, "Chord error: {}", s),
-        //     Kind::SetlistError(s) => write!(f, "Setlist error: {}", s),
-        //     Kind::UnknownError(s) => write!(f, "Unknown error: {}", s),
-        // }
     }
 }
