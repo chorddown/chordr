@@ -25,12 +25,12 @@ $dark-mode-modal-header-bg: $gray-ultra-dark !default;
     .modal {
         width: 100%;
         max-width: 500px;
-        background: $modal-bg;
+        background: var(--modal-bg);
         padding: $modal-padding;
         box-shadow: $modal-shadow;
-        @include if-dark-mode {
-            background: $dark-mode-modal-bg;
-        }
+        //@include if-dark-mode {
+        //    background: $dark-mode-modal-bg;
+        //}
     }
 
     .modal-question {
@@ -44,10 +44,10 @@ $dark-mode-modal-header-bg: $gray-ultra-dark !default;
         flex-flow: row nowrap;
         align-items: center;
         justify-content: space-between;
-        background: $modal-header-bg;
-        @include if-dark-mode {
-            background: $dark-mode-modal-header-bg;
-        }
+        background: var(--modal-header-bg);
+        //@include if-dark-mode {
+        //    background: $dark-mode-modal-header-bg;
+        //}
 
         .modal-header-text {
             padding: $button-padding;

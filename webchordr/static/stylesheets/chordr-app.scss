@@ -20,12 +20,13 @@ body {
     font-size: $font-size-web;
     line-height: $line-height;
     margin: 0;
-    color: $text-color;
-
-    @include if-dark-mode {
-        background: $dark-mode-background;
-        color: $text-color-dark-mode;
-    }
+    //color: $text-color;
+    color: var(--text-color);
+background: var(--background);
+    //@include if-dark-mode {
+    //    //background: $dark-mode-background;
+    //    //color: $dark-mode-text-color;
+    //}
 }
 
 label {
@@ -56,13 +57,13 @@ main {
 @import "components";
 
 .content {
-    background: $background;
+    background: var(--background);
     order: 1;
     width: calc(100% - #{$nav-width});
     padding: $std-space;
-    @include if-dark-mode {
-        background: $dark-mode-background;
-    }
+    //@include if-dark-mode {
+    //    background: $dark-mode-background;
+    //}
     @media print {
         width: 100%;
         padding: 0;

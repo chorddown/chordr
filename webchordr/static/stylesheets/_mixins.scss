@@ -68,9 +68,9 @@
 }
 
 @mixin button-default($padding: $button-padding, $border: $button-border, $width: 100%) {
-    background: $button-bg;
+    background: var(--button-bg);
     border: $border;
-    color: $button-color;
+    color: var(--button-color);
     width: $width;
     padding: $padding;
     text-align: center;
@@ -79,18 +79,20 @@
 
     &:focus,
     &:hover {
-        color: $button-hover-color;
-        background: $button-hover-bg;
+        color: var(--button-hover-color);
+        background: var(--button-hover-bg);
+        //color: $button-hover-color;
+        //background: $button-hover-bg;
     }
 
-    @include if-dark-mode {
-        background: $dark-mode-button-bg;
-        color: $dark-mode-button-color;
-
-        &:focus,
-        &:hover {
-            color: $dark-mode-button-hover-color;
-            background: $dark-mode-button-hover-bg;
-        }
-    }
+    //@include if-dark-mode {
+    //    background: $dark-mode-button-bg;
+    //    color: $dark-mode-button-color;
+    //
+    //    &:focus,
+    //    &:hover {
+    //        color: $dark-mode-button-hover-color;
+    //        background: $dark-mode-button-hover-bg;
+    //    }
+    //}
 }

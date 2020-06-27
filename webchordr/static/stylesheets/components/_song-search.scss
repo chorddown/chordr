@@ -1,9 +1,5 @@
 @import "prelude";
 
-$song-search-line-height: $button-line-height !default;
-$song-search-padding: $button-padding !default;
-$song-search-border: $button-border !default;
-$dark-mode-song-search-color: $dark-mode-button-color !default;
 .song-search-home {
     display: inline-block;
     margin-right: $std-half;
@@ -14,12 +10,21 @@ $dark-mode-song-search-color: $dark-mode-button-color !default;
     input[type=search],
     .song-item {
         margin-bottom: 2px;
+
+        a {
+            padding: $button-padding;
+        }
+    }
+
+    div.song-item {
+        padding: 0;
     }
 
     input[type=text],
     input[type=search] {
         line-height: $song-search-line-height;
         padding: $song-search-padding;
+        color: var(--song-search-color);
         display: block;
         -webkit-appearance: none;
         -moz-appearance: none;
@@ -29,8 +34,9 @@ $dark-mode-song-search-color: $dark-mode-button-color !default;
         border-radius: 0;
         background: transparent;
 
-        @include if-dark-mode {
-            color: $dark-mode-song-search-color;
-        }
+        //@include if-dark-mode {
+        //    color: var(--song-search-color);
+        //    //color: $dark-mode-song-search-color;
+        //}
     }
 }

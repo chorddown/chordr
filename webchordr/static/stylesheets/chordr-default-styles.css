@@ -1,3 +1,42 @@
+html {
+  --background: white;
+  --text-color: #221d1c;
+  --link-color: #62625e;
+  --link-hover-color: #221d1c;
+  --button-bg: #b7b7b0;
+  --button-color: #62625e;
+  --button-hover-bg: #8d8d88;
+  --button-hover-color: #62625e;
+  --nav-bg: #d8d8d0;
+  --clipboard-input-bg: clipboard-input-bg;
+  --clipboard-input-color: clipboard-input-color; }
+
+@media screen and (prefers-color-scheme: dark) {
+  --background: #221d1c;
+  --text-color: white;
+  --link-color: white;
+  --link-hover-color: #d8d8d0;
+  --button-bg: #221d1c;
+  --button-color: white;
+  --button-hover-bg: #62625e;
+  --button-hover-color: white;
+  --nav-bg: #8d8d88;
+  --clipboard-input-bg: dark-mode-clipboard-input-bg;
+  --clipboard-input-color: dark-mode-clipboard-input-color; }
+
+html.dark-mode {
+  --background: #221d1c;
+  --text-color: white;
+  --link-color: white;
+  --link-hover-color: #d8d8d0;
+  --button-bg: #221d1c;
+  --button-color: white;
+  --button-hover-bg: #62625e;
+  --button-hover-color: white;
+  --nav-bg: #8d8d88;
+  --clipboard-input-bg: dark-mode-clipboard-input-bg;
+  --clipboard-input-color: dark-mode-clipboard-input-color; }
+
 @page {
   size: auto; }
 
@@ -5,14 +44,9 @@
   font-family: "Merriweather", "Libre Baskerville", "Times", "Times New Roman", -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
   font-size: 16px;
   line-height: 1.3em;
-  letter-spacing: 0.05em; }
-  @media screen and (prefers-color-scheme: dark) {
-    #chordr {
-      background: #221d1c;
-      color: white; } }
-  html.dark-mode #chordr {
-    background: #221d1c;
-    color: white; }
+  letter-spacing: 0.05em;
+  background: var(--background);
+  color: var(--text-color); }
   @media print {
     #chordr {
       font-size: 12px; } }
@@ -100,7 +134,8 @@
   #chordr section {
     margin: 14px 0;
     clear: both;
-    page-break-inside: avoid; }
+    page-break-inside: avoid;
+    border-bottom-color: var(--section-border-color); }
     #chordr section::after {
       display: block;
       content: "";
@@ -108,11 +143,6 @@
       border-bottom: 1px solid #a8a8a2;
       position: absolute;
       margin-top: -1px; }
-    @media screen and (prefers-color-scheme: dark) {
-      #chordr section {
-        border-bottom-color: #a8a8a2; } }
-    html.dark-mode #chordr section {
-      border-bottom-color: #a8a8a2; }
     #chordr section:first-child {
       margin-top: 0; }
     #chordr section.chorus {

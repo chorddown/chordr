@@ -1,0 +1,40 @@
+@import "variables";
+
+@mixin apply-variables-dark-mode {
+    @media screen and (prefers-color-scheme: dark) {
+        @content;
+    }
+    @at-root html.dark-mode {
+        @content;
+    }
+}
+
+html {
+    --background: #{$background};
+    --text-color: #{$text-color};
+    --link-color: #{$link-color};
+    --link-hover-color: #{$link-hover-color};
+    --button-bg: #{$button-bg};
+    --button-color: #{$button-color};
+    --button-hover-bg: #{$button-hover-bg};
+    --button-hover-color: #{$button-hover-color};
+    --nav-bg: #{$nav-bg};
+
+    --clipboard-input-bg: #{clipboard-input-bg};
+    --clipboard-input-color: #{clipboard-input-color};
+}
+
+@include apply-variables-dark-mode {
+    --background: #{$dark-mode-background};
+    --text-color: #{$dark-mode-text-color};
+    --link-color: #{$dark-mode-link-color};
+    --link-hover-color: #{$dark-mode-link-hover-color};
+    --button-bg: #{$dark-mode-button-bg};
+    --button-color: #{$dark-mode-button-color};
+    --button-hover-bg: #{$dark-mode-button-hover-bg};
+    --button-hover-color: #{$dark-mode-button-hover-color};
+    --nav-bg: #{$dark-mode-nav-bg};
+
+    --clipboard-input-bg: #{dark-mode-clipboard-input-bg};
+    --clipboard-input-color: #{dark-mode-clipboard-input-color};
+}
