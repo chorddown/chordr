@@ -9,21 +9,24 @@ html {
   --button-hover-bg: #8d8d88;
   --button-hover-color: #62625e;
   --nav-bg: #d8d8d0;
-  --clipboard-input-bg: clipboard-input-bg;
-  --clipboard-input-color: clipboard-input-color; }
+  --clipboard-input-bg: #b7b7b0;
+  --clipboard-input-color: #62625e;
+  --section-border-color: #a8a8a2; }
 
 @media screen and (prefers-color-scheme: dark) {
-  --background: #221d1c;
-  --text-color: white;
-  --link-color: white;
-  --link-hover-color: #d8d8d0;
-  --button-bg: #221d1c;
-  --button-color: white;
-  --button-hover-bg: #62625e;
-  --button-hover-color: white;
-  --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  html {
+    --background: #221d1c;
+    --text-color: white;
+    --link-color: white;
+    --link-hover-color: #d8d8d0;
+    --button-bg: #221d1c;
+    --button-color: white;
+    --button-hover-bg: #62625e;
+    --button-hover-color: white;
+    --nav-bg: #8d8d88;
+    --clipboard-input-bg: #221d1c;
+    --clipboard-input-color: white;
+    --section-border-color: #a8a8a2; } }
 
 html.dark-mode {
   --background: #221d1c;
@@ -35,8 +38,9 @@ html.dark-mode {
   --button-hover-bg: #62625e;
   --button-hover-color: white;
   --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  --clipboard-input-bg: #221d1c;
+  --clipboard-input-color: white;
+  --section-border-color: #a8a8a2; }
 
 @font-face {
   font-family: 'Libre Baskerville';
@@ -1029,21 +1033,24 @@ html {
   --button-hover-bg: #8d8d88;
   --button-hover-color: #62625e;
   --nav-bg: #d8d8d0;
-  --clipboard-input-bg: clipboard-input-bg;
-  --clipboard-input-color: clipboard-input-color; }
+  --clipboard-input-bg: #b7b7b0;
+  --clipboard-input-color: #62625e;
+  --section-border-color: #a8a8a2; }
 
 @media screen and (prefers-color-scheme: dark) {
-  --background: #221d1c;
-  --text-color: white;
-  --link-color: white;
-  --link-hover-color: #d8d8d0;
-  --button-bg: #221d1c;
-  --button-color: white;
-  --button-hover-bg: #62625e;
-  --button-hover-color: white;
-  --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  html {
+    --background: #221d1c;
+    --text-color: white;
+    --link-color: white;
+    --link-hover-color: #d8d8d0;
+    --button-bg: #221d1c;
+    --button-color: white;
+    --button-hover-bg: #62625e;
+    --button-hover-color: white;
+    --nav-bg: #8d8d88;
+    --clipboard-input-bg: #221d1c;
+    --clipboard-input-color: white;
+    --section-border-color: #a8a8a2; } }
 
 html.dark-mode {
   --background: #221d1c;
@@ -1055,8 +1062,9 @@ html.dark-mode {
   --button-hover-bg: #62625e;
   --button-hover-color: white;
   --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  --clipboard-input-bg: #221d1c;
+  --clipboard-input-color: white;
+  --section-border-color: #a8a8a2; }
 
 .sr-only {
   text-indent: -10000px;
@@ -1075,21 +1083,24 @@ html {
   --button-hover-bg: #8d8d88;
   --button-hover-color: #62625e;
   --nav-bg: #d8d8d0;
-  --clipboard-input-bg: clipboard-input-bg;
-  --clipboard-input-color: clipboard-input-color; }
+  --clipboard-input-bg: #b7b7b0;
+  --clipboard-input-color: #62625e;
+  --section-border-color: #a8a8a2; }
 
 @media screen and (prefers-color-scheme: dark) {
-  --background: #221d1c;
-  --text-color: white;
-  --link-color: white;
-  --link-hover-color: #d8d8d0;
-  --button-bg: #221d1c;
-  --button-color: white;
-  --button-hover-bg: #62625e;
-  --button-hover-color: white;
-  --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  html {
+    --background: #221d1c;
+    --text-color: white;
+    --link-color: white;
+    --link-hover-color: #d8d8d0;
+    --button-bg: #221d1c;
+    --button-color: white;
+    --button-hover-bg: #62625e;
+    --button-hover-color: white;
+    --nav-bg: #8d8d88;
+    --clipboard-input-bg: #221d1c;
+    --clipboard-input-color: white;
+    --section-border-color: #a8a8a2; } }
 
 html.dark-mode {
   --background: #221d1c;
@@ -1101,8 +1112,9 @@ html.dark-mode {
   --button-hover-bg: #62625e;
   --button-hover-color: white;
   --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  --clipboard-input-bg: #221d1c;
+  --clipboard-input-color: white;
+  --section-border-color: #a8a8a2; }
 
 .row {
   margin: 0 -3.5px;
@@ -1179,21 +1191,24 @@ html {
   --button-hover-bg: #8d8d88;
   --button-hover-color: #62625e;
   --nav-bg: #d8d8d0;
-  --clipboard-input-bg: clipboard-input-bg;
-  --clipboard-input-color: clipboard-input-color; }
+  --clipboard-input-bg: #b7b7b0;
+  --clipboard-input-color: #62625e;
+  --section-border-color: #a8a8a2; }
 
 @media screen and (prefers-color-scheme: dark) {
-  --background: #221d1c;
-  --text-color: white;
-  --link-color: white;
-  --link-hover-color: #d8d8d0;
-  --button-bg: #221d1c;
-  --button-color: white;
-  --button-hover-bg: #62625e;
-  --button-hover-color: white;
-  --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  html {
+    --background: #221d1c;
+    --text-color: white;
+    --link-color: white;
+    --link-hover-color: #d8d8d0;
+    --button-bg: #221d1c;
+    --button-color: white;
+    --button-hover-bg: #62625e;
+    --button-hover-color: white;
+    --nav-bg: #8d8d88;
+    --clipboard-input-bg: #221d1c;
+    --clipboard-input-color: white;
+    --section-border-color: #a8a8a2; } }
 
 html.dark-mode {
   --background: #221d1c;
@@ -1205,8 +1220,9 @@ html.dark-mode {
   --button-hover-bg: #62625e;
   --button-hover-color: white;
   --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  --clipboard-input-bg: #221d1c;
+  --clipboard-input-color: white;
+  --section-border-color: #a8a8a2; }
 
 a {
   color: var(--link-color);
@@ -1229,21 +1245,24 @@ html {
   --button-hover-bg: #8d8d88;
   --button-hover-color: #62625e;
   --nav-bg: #d8d8d0;
-  --clipboard-input-bg: clipboard-input-bg;
-  --clipboard-input-color: clipboard-input-color; }
+  --clipboard-input-bg: #b7b7b0;
+  --clipboard-input-color: #62625e;
+  --section-border-color: #a8a8a2; }
 
 @media screen and (prefers-color-scheme: dark) {
-  --background: #221d1c;
-  --text-color: white;
-  --link-color: white;
-  --link-hover-color: #d8d8d0;
-  --button-bg: #221d1c;
-  --button-color: white;
-  --button-hover-bg: #62625e;
-  --button-hover-color: white;
-  --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  html {
+    --background: #221d1c;
+    --text-color: white;
+    --link-color: white;
+    --link-hover-color: #d8d8d0;
+    --button-bg: #221d1c;
+    --button-color: white;
+    --button-hover-bg: #62625e;
+    --button-hover-color: white;
+    --nav-bg: #8d8d88;
+    --clipboard-input-bg: #221d1c;
+    --clipboard-input-color: white;
+    --section-border-color: #a8a8a2; } }
 
 html.dark-mode {
   --background: #221d1c;
@@ -1255,8 +1274,9 @@ html.dark-mode {
   --button-hover-bg: #62625e;
   --button-hover-color: white;
   --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  --clipboard-input-bg: #221d1c;
+  --clipboard-input-color: white;
+  --section-border-color: #a8a8a2; }
 
 a[role=button],
 button,
@@ -1367,21 +1387,24 @@ html {
   --button-hover-bg: #8d8d88;
   --button-hover-color: #62625e;
   --nav-bg: #d8d8d0;
-  --clipboard-input-bg: clipboard-input-bg;
-  --clipboard-input-color: clipboard-input-color; }
+  --clipboard-input-bg: #b7b7b0;
+  --clipboard-input-color: #62625e;
+  --section-border-color: #a8a8a2; }
 
 @media screen and (prefers-color-scheme: dark) {
-  --background: #221d1c;
-  --text-color: white;
-  --link-color: white;
-  --link-hover-color: #d8d8d0;
-  --button-bg: #221d1c;
-  --button-color: white;
-  --button-hover-bg: #62625e;
-  --button-hover-color: white;
-  --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  html {
+    --background: #221d1c;
+    --text-color: white;
+    --link-color: white;
+    --link-hover-color: #d8d8d0;
+    --button-bg: #221d1c;
+    --button-color: white;
+    --button-hover-bg: #62625e;
+    --button-hover-color: white;
+    --nav-bg: #8d8d88;
+    --clipboard-input-bg: #221d1c;
+    --clipboard-input-color: white;
+    --section-border-color: #a8a8a2; } }
 
 html.dark-mode {
   --background: #221d1c;
@@ -1393,8 +1416,9 @@ html.dark-mode {
   --button-hover-bg: #62625e;
   --button-hover-color: white;
   --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  --clipboard-input-bg: #221d1c;
+  --clipboard-input-color: white;
+  --section-border-color: #a8a8a2; }
 
 .center-fullscreen {
   position: fixed;
@@ -1420,21 +1444,24 @@ html {
   --button-hover-bg: #8d8d88;
   --button-hover-color: #62625e;
   --nav-bg: #d8d8d0;
-  --clipboard-input-bg: clipboard-input-bg;
-  --clipboard-input-color: clipboard-input-color; }
+  --clipboard-input-bg: #b7b7b0;
+  --clipboard-input-color: #62625e;
+  --section-border-color: #a8a8a2; }
 
 @media screen and (prefers-color-scheme: dark) {
-  --background: #221d1c;
-  --text-color: white;
-  --link-color: white;
-  --link-hover-color: #d8d8d0;
-  --button-bg: #221d1c;
-  --button-color: white;
-  --button-hover-bg: #62625e;
-  --button-hover-color: white;
-  --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  html {
+    --background: #221d1c;
+    --text-color: white;
+    --link-color: white;
+    --link-hover-color: #d8d8d0;
+    --button-bg: #221d1c;
+    --button-color: white;
+    --button-hover-bg: #62625e;
+    --button-hover-color: white;
+    --nav-bg: #8d8d88;
+    --clipboard-input-bg: #221d1c;
+    --clipboard-input-color: white;
+    --section-border-color: #a8a8a2; } }
 
 html.dark-mode {
   --background: #221d1c;
@@ -1446,8 +1473,9 @@ html.dark-mode {
   --button-hover-bg: #62625e;
   --button-hover-color: white;
   --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  --clipboard-input-bg: #221d1c;
+  --clipboard-input-color: white;
+  --section-border-color: #a8a8a2; }
 
 .reload-button-fallback {
   text-align: center;
@@ -1474,21 +1502,24 @@ html {
   --button-hover-bg: #8d8d88;
   --button-hover-color: #62625e;
   --nav-bg: #d8d8d0;
-  --clipboard-input-bg: clipboard-input-bg;
-  --clipboard-input-color: clipboard-input-color; }
+  --clipboard-input-bg: #b7b7b0;
+  --clipboard-input-color: #62625e;
+  --section-border-color: #a8a8a2; }
 
 @media screen and (prefers-color-scheme: dark) {
-  --background: #221d1c;
-  --text-color: white;
-  --link-color: white;
-  --link-hover-color: #d8d8d0;
-  --button-bg: #221d1c;
-  --button-color: white;
-  --button-hover-bg: #62625e;
-  --button-hover-color: white;
-  --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  html {
+    --background: #221d1c;
+    --text-color: white;
+    --link-color: white;
+    --link-hover-color: #d8d8d0;
+    --button-bg: #221d1c;
+    --button-color: white;
+    --button-hover-bg: #62625e;
+    --button-hover-color: white;
+    --nav-bg: #8d8d88;
+    --clipboard-input-bg: #221d1c;
+    --clipboard-input-color: white;
+    --section-border-color: #a8a8a2; } }
 
 html.dark-mode {
   --background: #221d1c;
@@ -1500,8 +1531,9 @@ html.dark-mode {
   --button-hover-bg: #62625e;
   --button-hover-color: white;
   --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  --clipboard-input-bg: #221d1c;
+  --clipboard-input-color: white;
+  --section-border-color: #a8a8a2; }
 
 @keyframes rotate {
   from {
@@ -1535,21 +1567,24 @@ html {
   --button-hover-bg: #8d8d88;
   --button-hover-color: #62625e;
   --nav-bg: #d8d8d0;
-  --clipboard-input-bg: clipboard-input-bg;
-  --clipboard-input-color: clipboard-input-color; }
+  --clipboard-input-bg: #b7b7b0;
+  --clipboard-input-color: #62625e;
+  --section-border-color: #a8a8a2; }
 
 @media screen and (prefers-color-scheme: dark) {
-  --background: #221d1c;
-  --text-color: white;
-  --link-color: white;
-  --link-hover-color: #d8d8d0;
-  --button-bg: #221d1c;
-  --button-color: white;
-  --button-hover-bg: #62625e;
-  --button-hover-color: white;
-  --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  html {
+    --background: #221d1c;
+    --text-color: white;
+    --link-color: white;
+    --link-hover-color: #d8d8d0;
+    --button-bg: #221d1c;
+    --button-color: white;
+    --button-hover-bg: #62625e;
+    --button-hover-color: white;
+    --nav-bg: #8d8d88;
+    --clipboard-input-bg: #221d1c;
+    --clipboard-input-color: white;
+    --section-border-color: #a8a8a2; } }
 
 html.dark-mode {
   --background: #221d1c;
@@ -1561,8 +1596,9 @@ html.dark-mode {
   --button-hover-bg: #62625e;
   --button-hover-color: white;
   --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  --clipboard-input-bg: #221d1c;
+  --clipboard-input-color: white;
+  --section-border-color: #a8a8a2; }
 
 .modal-outer {
   z-index: 100;
@@ -1632,21 +1668,24 @@ html {
   --button-hover-bg: #8d8d88;
   --button-hover-color: #62625e;
   --nav-bg: #d8d8d0;
-  --clipboard-input-bg: clipboard-input-bg;
-  --clipboard-input-color: clipboard-input-color; }
+  --clipboard-input-bg: #b7b7b0;
+  --clipboard-input-color: #62625e;
+  --section-border-color: #a8a8a2; }
 
 @media screen and (prefers-color-scheme: dark) {
-  --background: #221d1c;
-  --text-color: white;
-  --link-color: white;
-  --link-hover-color: #d8d8d0;
-  --button-bg: #221d1c;
-  --button-color: white;
-  --button-hover-bg: #62625e;
-  --button-hover-color: white;
-  --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  html {
+    --background: #221d1c;
+    --text-color: white;
+    --link-color: white;
+    --link-hover-color: #d8d8d0;
+    --button-bg: #221d1c;
+    --button-color: white;
+    --button-hover-bg: #62625e;
+    --button-hover-color: white;
+    --nav-bg: #8d8d88;
+    --clipboard-input-bg: #221d1c;
+    --clipboard-input-color: white;
+    --section-border-color: #a8a8a2; } }
 
 html.dark-mode {
   --background: #221d1c;
@@ -1658,8 +1697,9 @@ html.dark-mode {
   --button-hover-bg: #62625e;
   --button-hover-color: white;
   --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  --clipboard-input-bg: #221d1c;
+  --clipboard-input-color: white;
+  --section-border-color: #a8a8a2; }
 
 .detail-view {
   width: 100%; }
@@ -1698,21 +1738,24 @@ html {
   --button-hover-bg: #8d8d88;
   --button-hover-color: #62625e;
   --nav-bg: #d8d8d0;
-  --clipboard-input-bg: clipboard-input-bg;
-  --clipboard-input-color: clipboard-input-color; }
+  --clipboard-input-bg: #b7b7b0;
+  --clipboard-input-color: #62625e;
+  --section-border-color: #a8a8a2; }
 
 @media screen and (prefers-color-scheme: dark) {
-  --background: #221d1c;
-  --text-color: white;
-  --link-color: white;
-  --link-hover-color: #d8d8d0;
-  --button-bg: #221d1c;
-  --button-color: white;
-  --button-hover-bg: #62625e;
-  --button-hover-color: white;
-  --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  html {
+    --background: #221d1c;
+    --text-color: white;
+    --link-color: white;
+    --link-hover-color: #d8d8d0;
+    --button-bg: #221d1c;
+    --button-color: white;
+    --button-hover-bg: #62625e;
+    --button-hover-color: white;
+    --nav-bg: #8d8d88;
+    --clipboard-input-bg: #221d1c;
+    --clipboard-input-color: white;
+    --section-border-color: #a8a8a2; } }
 
 html.dark-mode {
   --background: #221d1c;
@@ -1724,8 +1767,9 @@ html.dark-mode {
   --button-hover-bg: #62625e;
   --button-hover-color: white;
   --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  --clipboard-input-bg: #221d1c;
+  --clipboard-input-color: white;
+  --section-border-color: #a8a8a2; }
 
 .clipboard-widget {
   display: flex;
@@ -1761,21 +1805,24 @@ html {
   --button-hover-bg: #8d8d88;
   --button-hover-color: #62625e;
   --nav-bg: #d8d8d0;
-  --clipboard-input-bg: clipboard-input-bg;
-  --clipboard-input-color: clipboard-input-color; }
+  --clipboard-input-bg: #b7b7b0;
+  --clipboard-input-color: #62625e;
+  --section-border-color: #a8a8a2; }
 
 @media screen and (prefers-color-scheme: dark) {
-  --background: #221d1c;
-  --text-color: white;
-  --link-color: white;
-  --link-hover-color: #d8d8d0;
-  --button-bg: #221d1c;
-  --button-color: white;
-  --button-hover-bg: #62625e;
-  --button-hover-color: white;
-  --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  html {
+    --background: #221d1c;
+    --text-color: white;
+    --link-color: white;
+    --link-hover-color: #d8d8d0;
+    --button-bg: #221d1c;
+    --button-color: white;
+    --button-hover-bg: #62625e;
+    --button-hover-color: white;
+    --nav-bg: #8d8d88;
+    --clipboard-input-bg: #221d1c;
+    --clipboard-input-color: white;
+    --section-border-color: #a8a8a2; } }
 
 html.dark-mode {
   --background: #221d1c;
@@ -1787,8 +1834,9 @@ html.dark-mode {
   --button-hover-bg: #62625e;
   --button-hover-color: white;
   --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  --clipboard-input-bg: #221d1c;
+  --clipboard-input-color: white;
+  --section-border-color: #a8a8a2; }
 
 .start-screen {
   display: flex;
@@ -1828,21 +1876,24 @@ html {
   --button-hover-bg: #8d8d88;
   --button-hover-color: #62625e;
   --nav-bg: #d8d8d0;
-  --clipboard-input-bg: clipboard-input-bg;
-  --clipboard-input-color: clipboard-input-color; }
+  --clipboard-input-bg: #b7b7b0;
+  --clipboard-input-color: #62625e;
+  --section-border-color: #a8a8a2; }
 
 @media screen and (prefers-color-scheme: dark) {
-  --background: #221d1c;
-  --text-color: white;
-  --link-color: white;
-  --link-hover-color: #d8d8d0;
-  --button-bg: #221d1c;
-  --button-color: white;
-  --button-hover-bg: #62625e;
-  --button-hover-color: white;
-  --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  html {
+    --background: #221d1c;
+    --text-color: white;
+    --link-color: white;
+    --link-hover-color: #d8d8d0;
+    --button-bg: #221d1c;
+    --button-color: white;
+    --button-hover-bg: #62625e;
+    --button-hover-color: white;
+    --nav-bg: #8d8d88;
+    --clipboard-input-bg: #221d1c;
+    --clipboard-input-color: white;
+    --section-border-color: #a8a8a2; } }
 
 html.dark-mode {
   --background: #221d1c;
@@ -1854,8 +1905,9 @@ html.dark-mode {
   --button-hover-bg: #62625e;
   --button-hover-color: white;
   --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  --clipboard-input-bg: #221d1c;
+  --clipboard-input-color: white;
+  --section-border-color: #a8a8a2; }
 
 .song-browser-home {
   display: inline-block;
@@ -1887,21 +1939,24 @@ html {
   --button-hover-bg: #8d8d88;
   --button-hover-color: #62625e;
   --nav-bg: #d8d8d0;
-  --clipboard-input-bg: clipboard-input-bg;
-  --clipboard-input-color: clipboard-input-color; }
+  --clipboard-input-bg: #b7b7b0;
+  --clipboard-input-color: #62625e;
+  --section-border-color: #a8a8a2; }
 
 @media screen and (prefers-color-scheme: dark) {
-  --background: #221d1c;
-  --text-color: white;
-  --link-color: white;
-  --link-hover-color: #d8d8d0;
-  --button-bg: #221d1c;
-  --button-color: white;
-  --button-hover-bg: #62625e;
-  --button-hover-color: white;
-  --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  html {
+    --background: #221d1c;
+    --text-color: white;
+    --link-color: white;
+    --link-hover-color: #d8d8d0;
+    --button-bg: #221d1c;
+    --button-color: white;
+    --button-hover-bg: #62625e;
+    --button-hover-color: white;
+    --nav-bg: #8d8d88;
+    --clipboard-input-bg: #221d1c;
+    --clipboard-input-color: white;
+    --section-border-color: #a8a8a2; } }
 
 html.dark-mode {
   --background: #221d1c;
@@ -1913,8 +1968,9 @@ html.dark-mode {
   --button-hover-bg: #62625e;
   --button-hover-color: white;
   --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  --clipboard-input-bg: #221d1c;
+  --clipboard-input-color: white;
+  --section-border-color: #a8a8a2; }
 
 .song-search-home {
   display: inline-block;
@@ -1956,21 +2012,24 @@ html {
   --button-hover-bg: #8d8d88;
   --button-hover-color: #62625e;
   --nav-bg: #d8d8d0;
-  --clipboard-input-bg: clipboard-input-bg;
-  --clipboard-input-color: clipboard-input-color; }
+  --clipboard-input-bg: #b7b7b0;
+  --clipboard-input-color: #62625e;
+  --section-border-color: #a8a8a2; }
 
 @media screen and (prefers-color-scheme: dark) {
-  --background: #221d1c;
-  --text-color: white;
-  --link-color: white;
-  --link-hover-color: #d8d8d0;
-  --button-bg: #221d1c;
-  --button-color: white;
-  --button-hover-bg: #62625e;
-  --button-hover-color: white;
-  --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  html {
+    --background: #221d1c;
+    --text-color: white;
+    --link-color: white;
+    --link-hover-color: #d8d8d0;
+    --button-bg: #221d1c;
+    --button-color: white;
+    --button-hover-bg: #62625e;
+    --button-hover-color: white;
+    --nav-bg: #8d8d88;
+    --clipboard-input-bg: #221d1c;
+    --clipboard-input-color: white;
+    --section-border-color: #a8a8a2; } }
 
 html.dark-mode {
   --background: #221d1c;
@@ -1982,8 +2041,9 @@ html.dark-mode {
   --button-hover-bg: #62625e;
   --button-hover-color: white;
   --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  --clipboard-input-bg: #221d1c;
+  --clipboard-input-color: white;
+  --section-border-color: #a8a8a2; }
 
 .song-tools {
   position: fixed;
@@ -2055,21 +2115,24 @@ html {
   --button-hover-bg: #8d8d88;
   --button-hover-color: #62625e;
   --nav-bg: #d8d8d0;
-  --clipboard-input-bg: clipboard-input-bg;
-  --clipboard-input-color: clipboard-input-color; }
+  --clipboard-input-bg: #b7b7b0;
+  --clipboard-input-color: #62625e;
+  --section-border-color: #a8a8a2; }
 
 @media screen and (prefers-color-scheme: dark) {
-  --background: #221d1c;
-  --text-color: white;
-  --link-color: white;
-  --link-hover-color: #d8d8d0;
-  --button-bg: #221d1c;
-  --button-color: white;
-  --button-hover-bg: #62625e;
-  --button-hover-color: white;
-  --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  html {
+    --background: #221d1c;
+    --text-color: white;
+    --link-color: white;
+    --link-hover-color: #d8d8d0;
+    --button-bg: #221d1c;
+    --button-color: white;
+    --button-hover-bg: #62625e;
+    --button-hover-color: white;
+    --nav-bg: #8d8d88;
+    --clipboard-input-bg: #221d1c;
+    --clipboard-input-color: white;
+    --section-border-color: #a8a8a2; } }
 
 html.dark-mode {
   --background: #221d1c;
@@ -2081,8 +2144,9 @@ html.dark-mode {
   --button-hover-bg: #62625e;
   --button-hover-color: white;
   --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  --clipboard-input-bg: #221d1c;
+  --clipboard-input-color: white;
+  --section-border-color: #a8a8a2; }
 
 .transpose-tool {
   margin-bottom: 7px;
@@ -2105,21 +2169,24 @@ html {
   --button-hover-bg: #8d8d88;
   --button-hover-color: #62625e;
   --nav-bg: #d8d8d0;
-  --clipboard-input-bg: clipboard-input-bg;
-  --clipboard-input-color: clipboard-input-color; }
+  --clipboard-input-bg: #b7b7b0;
+  --clipboard-input-color: #62625e;
+  --section-border-color: #a8a8a2; }
 
 @media screen and (prefers-color-scheme: dark) {
-  --background: #221d1c;
-  --text-color: white;
-  --link-color: white;
-  --link-hover-color: #d8d8d0;
-  --button-bg: #221d1c;
-  --button-color: white;
-  --button-hover-bg: #62625e;
-  --button-hover-color: white;
-  --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  html {
+    --background: #221d1c;
+    --text-color: white;
+    --link-color: white;
+    --link-hover-color: #d8d8d0;
+    --button-bg: #221d1c;
+    --button-color: white;
+    --button-hover-bg: #62625e;
+    --button-hover-color: white;
+    --nav-bg: #8d8d88;
+    --clipboard-input-bg: #221d1c;
+    --clipboard-input-color: white;
+    --section-border-color: #a8a8a2; } }
 
 html.dark-mode {
   --background: #221d1c;
@@ -2131,8 +2198,9 @@ html.dark-mode {
   --button-hover-bg: #62625e;
   --button-hover-color: white;
   --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  --clipboard-input-bg: #221d1c;
+  --clipboard-input-color: white;
+  --section-border-color: #a8a8a2; }
 
 .setlist-share.modal .modal-body button {
   width: 42px; }
@@ -2179,21 +2247,24 @@ html {
   --button-hover-bg: #8d8d88;
   --button-hover-color: #62625e;
   --nav-bg: #d8d8d0;
-  --clipboard-input-bg: clipboard-input-bg;
-  --clipboard-input-color: clipboard-input-color; }
+  --clipboard-input-bg: #b7b7b0;
+  --clipboard-input-color: #62625e;
+  --section-border-color: #a8a8a2; }
 
 @media screen and (prefers-color-scheme: dark) {
-  --background: #221d1c;
-  --text-color: white;
-  --link-color: white;
-  --link-hover-color: #d8d8d0;
-  --button-bg: #221d1c;
-  --button-color: white;
-  --button-hover-bg: #62625e;
-  --button-hover-color: white;
-  --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  html {
+    --background: #221d1c;
+    --text-color: white;
+    --link-color: white;
+    --link-hover-color: #d8d8d0;
+    --button-bg: #221d1c;
+    --button-color: white;
+    --button-hover-bg: #62625e;
+    --button-hover-color: white;
+    --nav-bg: #8d8d88;
+    --clipboard-input-bg: #221d1c;
+    --clipboard-input-color: white;
+    --section-border-color: #a8a8a2; } }
 
 html.dark-mode {
   --background: #221d1c;
@@ -2205,8 +2276,9 @@ html.dark-mode {
   --button-hover-bg: #62625e;
   --button-hover-color: white;
   --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  --clipboard-input-bg: #221d1c;
+  --clipboard-input-color: white;
+  --section-border-color: #a8a8a2; }
 
 .setlist-tool {
   margin-bottom: 7px; }
@@ -2227,21 +2299,24 @@ html {
   --button-hover-bg: #8d8d88;
   --button-hover-color: #62625e;
   --nav-bg: #d8d8d0;
-  --clipboard-input-bg: clipboard-input-bg;
-  --clipboard-input-color: clipboard-input-color; }
+  --clipboard-input-bg: #b7b7b0;
+  --clipboard-input-color: #62625e;
+  --section-border-color: #a8a8a2; }
 
 @media screen and (prefers-color-scheme: dark) {
-  --background: #221d1c;
-  --text-color: white;
-  --link-color: white;
-  --link-hover-color: #d8d8d0;
-  --button-bg: #221d1c;
-  --button-color: white;
-  --button-hover-bg: #62625e;
-  --button-hover-color: white;
-  --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  html {
+    --background: #221d1c;
+    --text-color: white;
+    --link-color: white;
+    --link-hover-color: #d8d8d0;
+    --button-bg: #221d1c;
+    --button-color: white;
+    --button-hover-bg: #62625e;
+    --button-hover-color: white;
+    --nav-bg: #8d8d88;
+    --clipboard-input-bg: #221d1c;
+    --clipboard-input-color: white;
+    --section-border-color: #a8a8a2; } }
 
 html.dark-mode {
   --background: #221d1c;
@@ -2253,8 +2328,9 @@ html.dark-mode {
   --button-hover-bg: #62625e;
   --button-hover-color: white;
   --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  --clipboard-input-bg: #221d1c;
+  --clipboard-input-color: white;
+  --section-border-color: #a8a8a2; }
 
 .semitone-notation-tool {
   margin-bottom: 7px; }
@@ -2274,21 +2350,24 @@ html {
   --button-hover-bg: #8d8d88;
   --button-hover-color: #62625e;
   --nav-bg: #d8d8d0;
-  --clipboard-input-bg: clipboard-input-bg;
-  --clipboard-input-color: clipboard-input-color; }
+  --clipboard-input-bg: #b7b7b0;
+  --clipboard-input-color: #62625e;
+  --section-border-color: #a8a8a2; }
 
 @media screen and (prefers-color-scheme: dark) {
-  --background: #221d1c;
-  --text-color: white;
-  --link-color: white;
-  --link-hover-color: #d8d8d0;
-  --button-bg: #221d1c;
-  --button-color: white;
-  --button-hover-bg: #62625e;
-  --button-hover-color: white;
-  --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  html {
+    --background: #221d1c;
+    --text-color: white;
+    --link-color: white;
+    --link-hover-color: #d8d8d0;
+    --button-bg: #221d1c;
+    --button-color: white;
+    --button-hover-bg: #62625e;
+    --button-hover-color: white;
+    --nav-bg: #8d8d88;
+    --clipboard-input-bg: #221d1c;
+    --clipboard-input-color: white;
+    --section-border-color: #a8a8a2; } }
 
 html.dark-mode {
   --background: #221d1c;
@@ -2300,8 +2379,9 @@ html.dark-mode {
   --button-hover-bg: #62625e;
   --button-hover-color: white;
   --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  --clipboard-input-bg: #221d1c;
+  --clipboard-input-color: white;
+  --section-border-color: #a8a8a2; }
 
 nav {
   background: var(--nav-bg);
@@ -2424,21 +2504,24 @@ html {
   --button-hover-bg: #8d8d88;
   --button-hover-color: #62625e;
   --nav-bg: #d8d8d0;
-  --clipboard-input-bg: clipboard-input-bg;
-  --clipboard-input-color: clipboard-input-color; }
+  --clipboard-input-bg: #b7b7b0;
+  --clipboard-input-color: #62625e;
+  --section-border-color: #a8a8a2; }
 
 @media screen and (prefers-color-scheme: dark) {
-  --background: #221d1c;
-  --text-color: white;
-  --link-color: white;
-  --link-hover-color: #d8d8d0;
-  --button-bg: #221d1c;
-  --button-color: white;
-  --button-hover-bg: #62625e;
-  --button-hover-color: white;
-  --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  html {
+    --background: #221d1c;
+    --text-color: white;
+    --link-color: white;
+    --link-hover-color: #d8d8d0;
+    --button-bg: #221d1c;
+    --button-color: white;
+    --button-hover-bg: #62625e;
+    --button-hover-color: white;
+    --nav-bg: #8d8d88;
+    --clipboard-input-bg: #221d1c;
+    --clipboard-input-color: white;
+    --section-border-color: #a8a8a2; } }
 
 html.dark-mode {
   --background: #221d1c;
@@ -2450,8 +2533,9 @@ html.dark-mode {
   --button-hover-bg: #62625e;
   --button-hover-color: white;
   --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  --clipboard-input-bg: #221d1c;
+  --clipboard-input-color: white;
+  --section-border-color: #a8a8a2; }
 
 .sortable-ghost {
   color: #62625e !important;

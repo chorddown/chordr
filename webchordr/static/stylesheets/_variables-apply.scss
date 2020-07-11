@@ -2,7 +2,9 @@
 
 @mixin apply-variables-dark-mode {
     @media screen and (prefers-color-scheme: dark) {
-        @content;
+        html {
+            @content;
+        }
     }
     @at-root html.dark-mode {
         @content;
@@ -20,8 +22,10 @@ html {
     --button-hover-color: #{$button-hover-color};
     --nav-bg: #{$nav-bg};
 
-    --clipboard-input-bg: #{clipboard-input-bg};
-    --clipboard-input-color: #{clipboard-input-color};
+    --clipboard-input-bg: #{$clipboard-input-bg};
+    --clipboard-input-color: #{$clipboard-input-color};
+
+    --section-border-color: #{$section-border-color};
 }
 
 @include apply-variables-dark-mode {
@@ -35,6 +39,8 @@ html {
     --button-hover-color: #{$dark-mode-button-hover-color};
     --nav-bg: #{$dark-mode-nav-bg};
 
-    --clipboard-input-bg: #{dark-mode-clipboard-input-bg};
-    --clipboard-input-color: #{dark-mode-clipboard-input-color};
+    --clipboard-input-bg: #{$dark-mode-clipboard-input-bg};
+    --clipboard-input-color: #{$dark-mode-clipboard-input-color};
+
+    --section-border-color: #{$dark-mode-section-border-color};
 }

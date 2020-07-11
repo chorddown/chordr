@@ -8,21 +8,24 @@ html {
   --button-hover-bg: #8d8d88;
   --button-hover-color: #62625e;
   --nav-bg: #d8d8d0;
-  --clipboard-input-bg: clipboard-input-bg;
-  --clipboard-input-color: clipboard-input-color; }
+  --clipboard-input-bg: #b7b7b0;
+  --clipboard-input-color: #62625e;
+  --section-border-color: #a8a8a2; }
 
 @media screen and (prefers-color-scheme: dark) {
-  --background: #221d1c;
-  --text-color: white;
-  --link-color: white;
-  --link-hover-color: #d8d8d0;
-  --button-bg: #221d1c;
-  --button-color: white;
-  --button-hover-bg: #62625e;
-  --button-hover-color: white;
-  --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  html {
+    --background: #221d1c;
+    --text-color: white;
+    --link-color: white;
+    --link-hover-color: #d8d8d0;
+    --button-bg: #221d1c;
+    --button-color: white;
+    --button-hover-bg: #62625e;
+    --button-hover-color: white;
+    --nav-bg: #8d8d88;
+    --clipboard-input-bg: #221d1c;
+    --clipboard-input-color: white;
+    --section-border-color: #a8a8a2; } }
 
 html.dark-mode {
   --background: #221d1c;
@@ -34,8 +37,9 @@ html.dark-mode {
   --button-hover-bg: #62625e;
   --button-hover-color: white;
   --nav-bg: #8d8d88;
-  --clipboard-input-bg: dark-mode-clipboard-input-bg;
-  --clipboard-input-color: dark-mode-clipboard-input-color; }
+  --clipboard-input-bg: #221d1c;
+  --clipboard-input-color: white;
+  --section-border-color: #a8a8a2; }
 
 @page {
   size: auto; }
@@ -108,6 +112,10 @@ html.dark-mode {
     white-space: pre; }
   #chordr .col {
     float: left; }
+    #chordr .col:last-child::after {
+      content: ' ';
+      display: block;
+      clear: both; }
   #chordr blockquote {
     margin: 7px 0;
     color: #221d1c;

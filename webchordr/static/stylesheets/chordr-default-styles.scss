@@ -91,6 +91,12 @@
 
     .col {
         float: left;
+
+        &:last-child::after {
+            content: ' ';
+            display: block;
+            clear: both
+        }
     }
 
     blockquote {
