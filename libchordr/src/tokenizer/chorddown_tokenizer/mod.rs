@@ -208,4 +208,37 @@ Key: C#m
             );
         }
     }
+
+    #[test]
+    fn test_tokenize_pre_chorus() {
+        use Token::Newline;
+        let content = r"##- Pre-chorus";
+        let token_lines = ChorddownTokenizer::new().tokenize(content);
+        assert_eq!(
+            token_lines,
+            vec![Token::headline(2, "Pre-chorus", Modifier::Bridge)]
+        );
+    }
+
+    #[test]
+    fn test_tokenize_chorus_with_exclamation_marks() {
+        use Token::Newline;
+        let content = r"##! Chorus Loud!!";
+        let token_lines = ChorddownTokenizer::new().tokenize(content);
+        assert_eq!(
+            token_lines,
+            vec![Token::headline(2, "Chorus Loud!!", Modifier::Chorus)]
+        );
+    }
+
+    #[test]
+    fn test_tokenize_bride_with_exclamation_marks() {
+        use Token::Newline;
+        let content = r"##- Bride Loud!!";
+        let token_lines = ChorddownTokenizer::new().tokenize(content);
+        assert_eq!(
+            token_lines,
+            vec![Token::headline(2, "Bride Loud!!", Modifier::Bridge)]
+        );
+    }
 }

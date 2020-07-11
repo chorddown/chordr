@@ -30,20 +30,6 @@ impl Lexeme {
         Lexeme::Literal(s.into())
     }
 
-    // pub fn as_str(&self) -> &str {
-    //     match self {
-    //         Lexeme::Newline => NEWLINE,
-    //         Lexeme::ChordStart => CHORD_START,
-    //         Lexeme::ChordEnd => CHORD_END,
-    //         Lexeme::HeaderStart => HEADER_START,
-    //         Lexeme::QuoteStart => QUOTE_START,
-    //         Lexeme::Colon => COLON,
-    //         Lexeme::ChorusMark => CHORUS_MARK,
-    //         Lexeme::BridgeMark => BRIDGE_MARK,
-    //         Lexeme::Literal(inner) => inner.as_str(),
-    //     }
-    // }
-
     pub fn to_string(&self) -> String {
         match self {
             Lexeme::Newline => NEWLINE.to_string(),
@@ -135,9 +121,13 @@ impl Scanner {
 mod shortcuts {
     use super::Lexeme;
     #[allow(unused_imports)]
+    pub(super) use Lexeme::BridgeMark as B;
+    #[allow(unused_imports)]
     pub(super) use Lexeme::ChordEnd as CE;
     #[allow(unused_imports)]
     pub(super) use Lexeme::ChordStart as CS;
+    #[allow(unused_imports)]
+    pub(super) use Lexeme::ChorusMark as CM;
     #[allow(unused_imports)]
     pub(super) use Lexeme::Eof as EOF;
     #[allow(unused_imports)]
@@ -220,5 +210,40 @@ Swing [D]low, sweet [G]chari[D]ot,
 
         let lexemes = Scanner::new().scan("[B/F#maj7]");
         assert_eq!(lexemes, vec![CS, lit("B/F"), H, lit("maj7"), CE, EOF]);
+    }
+
+    #[test]
+    fn scan_pre_chorus_test() {
+        let content = r"
+##- Pre-chorus
+";
+        let scanner = Scanner::new();
+        let lexemes = scanner.scan(content);
+        assert_eq!(lexemes.len(), 9);
+
+        assert_eq!(
+            lexemes,
+            vec![NL, H, H, B, lit(" Pre"), B, lit("chorus"), NL, EOF,]
+        );
+    }
+
+    #[test]
+    fn scan_bride_with_exclamation_marks_test() {
+        let content = r"##- Bride Loud!!";
+        let scanner = Scanner::new();
+        let lexemes = scanner.scan(content);
+        assert_eq!(lexemes.len(), 7);
+
+        assert_eq!(lexemes, vec![H, H, B, lit(" Bride Loud"), CM, CM, EOF,]);
+    }
+
+    #[test]
+    fn scan_chorus_with_exclamation_marks_test() {
+        let content = r"##! Chorus Loud!!";
+        let scanner = Scanner::new();
+        let lexemes = scanner.scan(content);
+        assert_eq!(lexemes.len(), 7);
+
+        assert_eq!(lexemes, vec![H, H, CM, lit(" Chorus Loud"), CM, CM, EOF,]);
     }
 }
