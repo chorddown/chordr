@@ -92,7 +92,21 @@ impl NodeParser {
         };
 
         // TODO: Add relaxed parsing of chords like `[A ///]`
-        let chords = Chords::try_from(&chords_raw, self.b_notation)?;
+        let chord_result = Chords::try_from(&chords_raw, self.b_notation);
+
+        let chords = match chord_result {
+            Err(error) => {
+                return match tokens.peek() {
+                    Some(next) => Err(Error::chord_error(format!(
+                        "{} (before token {:?})",
+                        error, next
+                    ))),
+                    None => Err(error),
+                }
+            }
+
+            Ok(chords) => chords,
+        };
 
         if let Some(next) = tokens.peek() {
             if let Token::Literal(_) = next {
