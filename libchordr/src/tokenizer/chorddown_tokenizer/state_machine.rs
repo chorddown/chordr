@@ -9,7 +9,7 @@ pub(crate) struct FSM {
     state: Mode,
     literal_buffer: String,
     header_level: u8,
-    header_modifier: Modifier,
+    header_modifier: Option<Modifier>,
     warnings: Vec<StateError>,
 }
 
@@ -19,11 +19,14 @@ impl FSM {
             state: Mode::Bof,
             literal_buffer: String::new(),
             header_level: 0,
-            header_modifier: Modifier::None,
+            header_modifier: None,
             warnings: vec![],
         }
     }
 
+    /// Return the [Mode] that is signaled by `lexeme` if it did change
+    ///
+    /// `None` is returned if there is no change to the current [Mode] (=`self.state`)
     pub fn characterize_lexeme(&mut self, lexeme: &Lexeme) -> Option<Mode> {
         match self.state {
             Mode::Bof | Mode::Newline => match lexeme {
@@ -91,33 +94,36 @@ impl FSM {
                     }
                     Lexeme::Newline => Some(Mode::Newline),
                     Lexeme::ChordStart | Lexeme::ChordEnd => {
+                        self.set_header_modifier_for_lexeme(lexeme);
                         // Chord inside a header
                         self.append_lexeme(lexeme);
                         None
                     }
                     Lexeme::QuoteStart | Lexeme::Colon => {
+                        self.set_header_modifier_for_lexeme(lexeme);
                         self.append_lexeme(lexeme);
                         None
                     }
                     Lexeme::ChorusMark => {
-                        if self.header_modifier != Modifier::None {
+                        if self.header_modifier.is_some() {
                             // A header modifier has already been detected -> append this lexeme
                             self.append_lexeme(lexeme);
                         } else {
-                            self.header_modifier = Modifier::Chorus;
+                            self.set_header_modifier_for_lexeme(lexeme);
                         }
                         None
                     }
                     Lexeme::BridgeMark => {
-                        if self.header_modifier != Modifier::None {
+                        if self.header_modifier.is_some() {
                             // A header modifier has already been detected -> append this lexeme
                             self.append_lexeme(lexeme);
                         } else {
-                            self.header_modifier = Modifier::Bridge;
+                            self.set_header_modifier_for_lexeme(lexeme);
                         }
                         None
                     }
                     Lexeme::Literal(_) => {
+                        self.set_header_modifier_for_lexeme(lexeme);
                         self.append_lexeme(lexeme);
                         None
                     }
@@ -197,11 +203,11 @@ impl FSM {
         let token = Token::headline(
             self.header_level,
             self.consume_buffer().trim_start(),
-            self.header_modifier,
+            self.header_modifier.unwrap_or(Modifier::None),
         );
 
         self.header_level = 0;
-        self.header_modifier = Modifier::None;
+        self.header_modifier = None;
         Some(token)
     }
 
@@ -221,6 +227,15 @@ impl FSM {
         match Meta::try_from(&literal) {
             Ok(meta) => Some(Token::Meta(meta)),
             Err(_) => Some(Token::Literal(literal)),
+        }
+    }
+
+    fn set_header_modifier_for_lexeme(&mut self, lexeme: &Lexeme) {
+        if self.header_modifier.is_none() {
+            match lexeme.detect_modifier() {
+                Some(v) => self.header_modifier = Some(v),
+                None => {}
+            }
         }
     }
 }

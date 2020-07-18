@@ -1,3 +1,4 @@
+use crate::tokenizer::Modifier;
 use std::fmt::{Display, Formatter, Result};
 
 #[derive(Debug, Clone, PartialEq)]
@@ -42,6 +43,34 @@ impl Lexeme {
             Lexeme::BridgeMark => BRIDGE_MARK.to_string(),
             Lexeme::Literal(inner) => inner.clone(),
             Lexeme::Eof => "".to_owned(),
+        }
+    }
+
+    pub fn detect_modifier(&self) -> Option<Modifier> {
+        match self {
+            Lexeme::ChordStart | Lexeme::ChordEnd | Lexeme::QuoteStart | Lexeme::Colon => {
+                Some(Modifier::None)
+            }
+            Lexeme::ChorusMark => Some(Modifier::Chorus),
+            Lexeme::BridgeMark => Some(Modifier::Bridge),
+            Lexeme::Literal(text) => {
+                if text.is_empty() {
+                    None
+                } else if text.trim().is_empty() {
+                    None
+                } else {
+                    Some(Modifier::None)
+                }
+            }
+            Lexeme::HeaderStart => None,
+            Lexeme::Newline => {
+                // unreachable?
+                None
+            }
+            Lexeme::Eof => {
+                // unreachable?
+                None
+            }
         }
     }
 }

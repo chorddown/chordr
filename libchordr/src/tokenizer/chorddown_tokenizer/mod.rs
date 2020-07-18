@@ -2,9 +2,9 @@ mod mode;
 mod scanner;
 mod state_machine;
 
+use self::scanner::Scanner;
 use self::state_machine::FSM;
-use crate::tokenizer::chorddown_tokenizer::scanner::Scanner;
-use crate::tokenizer::{Token, Tokenizer};
+use super::{Token, Tokenizer};
 
 pub(crate) struct ChorddownTokenizer {}
 
@@ -211,7 +211,6 @@ Key: C#m
 
     #[test]
     fn test_tokenize_pre_chorus() {
-        use Token::Newline;
         let content = r"##- Pre-chorus";
         let token_lines = ChorddownTokenizer::new().tokenize(content);
         assert_eq!(
@@ -222,7 +221,6 @@ Key: C#m
 
     #[test]
     fn test_tokenize_chorus_with_exclamation_marks() {
-        use Token::Newline;
         let content = r"##! Chorus Loud!!";
         let token_lines = ChorddownTokenizer::new().tokenize(content);
         assert_eq!(
@@ -233,12 +231,21 @@ Key: C#m
 
     #[test]
     fn test_tokenize_bride_with_exclamation_marks() {
-        use Token::Newline;
         let content = r"##- Bride Loud!!";
         let token_lines = ChorddownTokenizer::new().tokenize(content);
         assert_eq!(
             token_lines,
             vec![Token::headline(2, "Bride Loud!!", Modifier::Bridge)]
+        );
+    }
+
+    #[test]
+    fn test_tokenize_chorus_with_exclamation_marks_at_end() {
+        let content = r"## Play Loud!!";
+        let token_lines = ChorddownTokenizer::new().tokenize(content);
+        assert_eq!(
+            token_lines,
+            vec![Token::headline(2, "Play Loud!!", Modifier::None)]
         );
     }
 }
