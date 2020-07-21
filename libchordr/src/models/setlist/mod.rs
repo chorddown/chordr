@@ -22,7 +22,7 @@ pub struct Setlist {
     owner: User,
     team: Option<Team>,
     songs: List<SetlistEntry>,
-    gig_date: DateTime<Utc>,
+    gig_date: Option<DateTime<Utc>>,
     creation_date: DateTime<Utc>,
     modification_date: DateTime<Utc>,
 }
@@ -33,7 +33,7 @@ impl Setlist {
         id: i32,
         owner: User,
         team: Option<Team>,
-        gig_date: DateTime<Utc>,
+        gig_date: Option<DateTime<Utc>>,
         creation_date: DateTime<Utc>,
         modification_date: DateTime<Utc>,
         songs: Vec<SetlistEntry>,
@@ -66,7 +66,7 @@ impl Setlist {
         &self.team
     }
 
-    pub fn gig_date(&self) -> DateTime<Utc> {
+    pub fn gig_date(&self) -> Option<DateTime<Utc>> {
         self.gig_date
     }
 
@@ -199,7 +199,7 @@ mod test {
             1,
             get_test_user(),
             None,
-            now,
+            Some(now),
             now,
             now,
             vec![entry("0"), entry("1"), entry("2"), entry("3"), entry("4")],
@@ -218,7 +218,7 @@ mod test {
             1,
             get_test_user(),
             None,
-            now,
+            Some(now),
             now,
             now,
             vec![entry("0"), entry("1"), entry("2"), entry("3"), entry("4")],

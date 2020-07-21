@@ -28,7 +28,7 @@ impl DeserializeService {
                 0,
                 User::unknown(),
                 None,
-                now,
+                Some(now),
                 now,
                 now,
                 entries,
@@ -106,10 +106,7 @@ mod test {
         let entries = vec![entry("0"), entry("1"), entry("2"), entry("3"), entry("4")];
         assert_eq!(result.setlist.name(), "missing-setlist-name");
         assert_eq!(
-            result
-                .setlist
-                .into_iter()
-                .collect::<Vec<SetlistEntry>>(),
+            result.setlist.into_iter().collect::<Vec<SetlistEntry>>(),
             entries
         );
         assert!(result.errors.is_empty(),);
@@ -130,10 +127,7 @@ mod test {
         let entries = vec![entry("0"), entry("1"), entry("2"), entry("3"), entry("4")];
         assert_eq!(result.setlist.name(), "missing-setlist-name");
         assert_eq!(
-            result
-                .setlist
-                .into_iter()
-                .collect::<Vec<SetlistEntry>>(),
+            result.setlist.into_iter().collect::<Vec<SetlistEntry>>(),
             entries
         );
         assert!(!result.errors.is_empty(),);

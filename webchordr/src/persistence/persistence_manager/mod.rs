@@ -186,7 +186,7 @@ mod test {
             10291,
             get_test_user(),
             None,
-            Utc.ymd(2014, 11, 14).and_hms(8, 9, 10),
+            Some(Utc.ymd(2014, 11, 14).and_hms(8, 9, 10)),
             Utc.ymd(2020, 06, 14).and_hms(16, 26, 20),
             Utc::now(),
             vec![entry("song-1"), entry("song-2"), entry("song-3")],

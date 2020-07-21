@@ -29,7 +29,7 @@ mod test {
             1,
             get_test_user(),
             None,
-            Utc::now(),
+            Some(Utc::now()),
             Utc::now(),
             Utc::now(),
             vec![entry("0"), entry("1"), entry("2"), entry("3"), entry("4")],
