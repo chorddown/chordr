@@ -31,7 +31,7 @@ fn main() {
                         .help("Chorddown file to parse"),
                 )
                 .arg(output_arg.clone())
-                .arg(Arg::with_name("FORMAT").help("Output format")),
+                .arg(Arg::with_name("FORMAT").help(&get_output_format_help())),
         )
         .subcommand(
             SubCommand::with_name("build-catalog")
@@ -107,10 +107,30 @@ fn convert(args: &ArgMatches) -> Result<()> {
     handle_output(output_file_path, output)
 }
 
+fn get_output_format_help() -> String {
+    format!("Output format (one of {})", get_valid_output_format_help())
+}
+
+fn get_valid_output_format_help() -> String {
+    Format::get_all()
+        .iter()
+        .map(|f| f.to_string())
+        .collect::<Vec<String>>()
+        .join(", ")
+}
+
 fn get_output_format(args: &ArgMatches) -> Format {
     if let Some(raw_format) = args.value_of("FORMAT") {
-        if let Ok(f) = Format::try_from(raw_format) {
-            return f;
+        match Format::try_from(raw_format) {
+            Ok(f) => return f,
+            Err(_) => {
+                eprintln!(
+                    "Unknown format '{}'. Valid formats are: {}",
+                    raw_format,
+                    get_valid_output_format_help()
+                );
+                exit(1);
+            }
         }
     }
 

@@ -3,6 +3,12 @@ name = "srvchord"
 version = "0.1.0"
 authors = ["Daniel Corn <info@cundd.net>"]
 edition = "2018"
+license = "MIT OR Apache-2.0"
+readme = "../README.md"
+repository = "https://github.com/chorddown/chordr"
+description = """
+Chorddown web application - Server side
+"""
 
 [dependencies]
 rocket = "0.4.4"
@@ -15,6 +21,7 @@ log = "0.4"
 base64 = "^0.12.1"
 rust-argon2 = "^0.8.2"
 libchordr = { path = "../libchordr" }
+chrono = { version = "*", features = ["serde"] }
 
 [dev-dependencies]
 parking_lot = { version = "0.10", features = ["nightly"] }
