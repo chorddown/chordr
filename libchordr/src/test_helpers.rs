@@ -1,8 +1,8 @@
 use crate::models::meta::BNotation;
 use crate::models::user::{User, Username};
 use crate::parser::{MetaInformation, Node};
-use crate::tokenizer::{Modifier, Token};
 use crate::prelude::Password;
+use crate::tokenizer::{Modifier, Token};
 
 #[cfg(test)]
 pub fn get_test_parser_input() -> Vec<Token> {

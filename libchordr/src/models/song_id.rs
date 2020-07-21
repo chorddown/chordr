@@ -6,7 +6,7 @@ use std::hash::{Hash, Hasher};
 use std::path::Path;
 
 /// Trait for objects that have an associated SongId
-pub trait SongIdTrait: ListEntryTrait<Id=SongId> {}
+pub trait SongIdTrait: ListEntryTrait<Id = SongId> {}
 
 /// Song Identifier
 #[derive(Deserialize, Serialize, Clone, Debug)]

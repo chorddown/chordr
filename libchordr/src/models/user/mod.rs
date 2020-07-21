@@ -1,8 +1,8 @@
-mod username;
 mod password;
+mod username;
 
-pub use self::username::Username;
 pub use self::password::Password;
+pub use self::username::Username;
 use serde::{Deserialize, Serialize};
 
 /// User of the application which has it's own `Setlist`s and login credentials

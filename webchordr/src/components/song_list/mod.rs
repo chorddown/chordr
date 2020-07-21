@@ -92,17 +92,11 @@ impl Component for SongList {
             html! { <Item<SetlistEntry> data_key=key song=song.clone() sortable=sortable highlight=highlight /> }
         };
 
-        let entries = songs
-            .clone()
-            .into_iter()
-            .collect::<Vec<SetlistEntry>>();
+        let entries = songs.clone().into_iter().collect::<Vec<SetlistEntry>>();
 
         info!(
             "Redraw song list {:?}",
-            entries
-                .iter()
-                .map(|s| s.id())
-                .collect::<Vec<SongId>>()
+            entries.iter().map(|s| s.id()).collect::<Vec<SongId>>()
         );
 
         (html! {

@@ -44,9 +44,7 @@ impl<S: SongData + PartialEq + 'static + Clone> Item<S> {
     }
 }
 
-impl<S: SongData + PartialEq + 'static + Clone> Component
-for Item<S>
-{
+impl<S: SongData + PartialEq + 'static + Clone> Component for Item<S> {
     type Message = ();
     type Properties = SongListItemProps<S>;
 

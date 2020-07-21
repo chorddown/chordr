@@ -29,8 +29,7 @@ impl SetlistEntry {
         }
     }
 
-    pub fn from_song<S: SongData>(song: &S) -> Self
-    {
+    pub fn from_song<S: SongData>(song: &S) -> Self {
         Self {
             song_id: song.id(),
             file_type: song.file_type(),
@@ -39,7 +38,7 @@ impl SetlistEntry {
         }
     }
 
-    pub fn from_song_with_settings<S: SongData + ListEntryTrait<Id=SongId>>(
+    pub fn from_song_with_settings<S: SongData + ListEntryTrait<Id = SongId>>(
         song: &S,
         settings: SongSettings,
     ) -> Self {
