@@ -102,7 +102,7 @@ impl NodeParser {
                         error, next
                     ))),
                     None => Err(error),
-                }
+                };
             }
 
             Ok(chords) => chords,
@@ -113,7 +113,13 @@ impl NodeParser {
                 // Consume the next token
                 let text = tokens.next().unwrap();
 
-                return Ok(Node::ChordTextPair { chords, text });
+                let last_in_line = if let Some(Token::Newline) = tokens.peek() {
+                    true
+                } else {
+                    false
+                };
+
+                return Ok(Node::ChordTextPair { chords, text, last_in_line })
             }
         }
 

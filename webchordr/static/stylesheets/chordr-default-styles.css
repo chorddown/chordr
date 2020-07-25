@@ -110,6 +110,14 @@ html.dark-mode {
       margin: 0 1em 0 0; }
   #chordr .text-row {
     white-space: pre; }
+    #chordr .text-row span {
+      position: relative;
+      background: var(--background); }
+      #chordr .text-row span:not(.-last-in-line)::after {
+        content: "-";
+        position: absolute; }
+    #chordr .text-row.-word-boundary span::after {
+      content: normal; }
   #chordr .col {
     float: left; }
     #chordr .col:last-child::after {

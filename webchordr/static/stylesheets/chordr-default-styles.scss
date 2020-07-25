@@ -87,6 +87,22 @@
 
     .text-row {
         white-space: pre;
+
+        span {
+            position: relative;
+            background: var(--background);
+
+            &:not(.-last-in-line)::after {
+                $combinator: "-" !default;
+                // Em dash: $combinator: "—" !default;
+                content: $combinator;
+                position: absolute;
+            }
+        }
+
+        &.-word-boundary span::after {
+            content: normal;
+        }
     }
 
     .col {

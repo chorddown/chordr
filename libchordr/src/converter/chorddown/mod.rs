@@ -24,7 +24,7 @@ impl ConverterTrait for ChorddownConverter {
 impl ChorddownConverter {
     fn build_node<'a>(&'a self, node: &'a Node, formatting: Formatting) -> Result<String> {
         match node {
-            Node::ChordTextPair { chords, text } => Ok(format!(
+            Node::ChordTextPair { chords, text, last_in_line: _ } => Ok(format!(
                 "{}{}",
                 self.build_tag_for_chords(chords, formatting),
                 self.build_token(text),

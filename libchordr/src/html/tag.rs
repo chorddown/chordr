@@ -97,6 +97,10 @@ impl<'a> Tag /*<'a>*/ {
         Self::new("".to_owned(), Content::Some(content.into()), None)
     }
 
+    pub fn content(&self) -> &Content {
+        &self.content
+    }
+
     pub fn is_self_closing(&self) -> bool {
         self.content.is_empty() && !self.has_attributes()
     }
