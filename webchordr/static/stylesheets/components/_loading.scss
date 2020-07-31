@@ -24,7 +24,7 @@ $loading-size: 40px !default;
         font-size: $loading-size;
         color: $gray-dark;
         @include if-dark-mode {
-            color: $text-color-dark-mode;
+            color: $dark-mode-text-color;
         }
     }
 }

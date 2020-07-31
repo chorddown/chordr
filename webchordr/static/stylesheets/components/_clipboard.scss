@@ -1,12 +1,5 @@
 @import "prelude";
 
-$clipboard-input-bg: $button-bg !default;
-$clipboard-input-color: $button-color !default;
-$clipboard-input-padding: $button-padding !default;
-$clipboard-input-letter-spacing: $button-letter-spacing !default;
-$dark-mode-clipboard-input-bg: $dark-mode-button-bg !default;
-$dark-mode-clipboard-input-color: $dark-mode-button-color !default;
-
 .clipboard-widget {
     display: flex;
     flex-flow: row nowrap;
@@ -14,8 +7,8 @@ $dark-mode-clipboard-input-color: $dark-mode-button-color !default;
     input {
         flex: 1 1 auto;
         @include button();
-        background: $clipboard-input-bg;
-        color: $clipboard-input-color;
+        background: var(--clipboard-input-bg);
+        color: var(--clipboard-input-color);
         border: $button-border;
         border-right: none;
         padding: 0 0 0 nth($clipboard-input-padding, 2) ;
@@ -23,10 +16,10 @@ $dark-mode-clipboard-input-color: $dark-mode-button-color !default;
         letter-spacing: $clipboard-input-letter-spacing;
         border-radius: 0;
 
-        @include if-dark-mode {
-            background: $dark-mode-clipboard-input-bg;
-            color: $dark-mode-clipboard-input-color;
-        }
+        //@include if-dark-mode {
+        //    background: $dark-mode-clipboard-input-bg;
+        //    color: $dark-mode-clipboard-input-color;
+        //}
     }
 
     button {

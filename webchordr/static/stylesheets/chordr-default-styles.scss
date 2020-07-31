@@ -7,14 +7,17 @@
 
 #chordr {
     font-family: $font;
-    font-size: $font-size-web;
+    font-size: var(--font-size-base);
+
     line-height: $line-height;
     letter-spacing: 0.05em;
+    background: var(--background);
+    color: var(--text-color);
 
-    @include if-dark-mode {
-        background: $dark-mode-background;
-        color: $text-color-dark-mode;
-    }
+    //@include if-dark-mode {
+    //    background: $dark-mode-background;
+    //    color: $dark-mode-text-color;
+    //}
 
     @media print {
         font-size: $font-size-print;
@@ -85,10 +88,32 @@
 
     .text-row {
         white-space: pre;
+
+        span {
+            position: relative;
+            background: var(--background);
+
+            &:not(.-last-in-line)::after {
+                $combinator: "-" !default;
+                // Em dash: $combinator: "—" !default;
+                content: $combinator;
+                position: absolute;
+            }
+        }
+
+        &.-word-boundary span::after {
+            content: normal;
+        }
     }
 
     .col {
         float: left;
+
+        &:last-child::after {
+            content: ' ';
+            display: block;
+            clear: both
+        }
     }
 
     blockquote {
@@ -116,9 +141,10 @@
             }
         }
 
-        @include if-dark-mode {
-            border-bottom-color: $dark-mode-section-border-color;
-        }
+        border-bottom-color: var(--section-border-color);
+        //@include if-dark-mode {
+        //    border-bottom-color: $dark-mode-section-border-color;
+        //}
 
         &:first-child {
             margin-top: 0;

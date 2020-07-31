@@ -58,8 +58,8 @@ impl AbstractServiceConfig {
 
 impl ServiceConfigurationTrait for AbstractServiceConfig {
     fn from_service_config(service_config: AbstractServiceConfig) -> Result<Self, Error>
-        where
-            Self: Sized,
+    where
+        Self: Sized,
     {
         Ok(service_config)
     }

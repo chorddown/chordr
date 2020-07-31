@@ -3,15 +3,20 @@ use crate::domain::setlist_entry::db::SetlistDbEntry;
 use crate::schema::setlist;
 use crate::schema::setlist::dsl::setlist as all_setlists;
 use crate::ConnectionType;
+use chrono::prelude::*;
 use diesel::{self, prelude::*};
 
 #[table_name = "setlist"]
 #[derive(Serialize, Deserialize, Identifiable, Queryable, Insertable, AsChangeset, Debug, Clone)]
 pub struct SetlistDb {
     pub id: i32,
-    pub user: i32,
-    pub user_name: String,
+    pub name: String,
     pub sorting: i32,
+    pub owner: String,
+    pub team: Option<String>,
+    pub gig_date: Option<NaiveDateTime>,
+    pub creation_date: NaiveDateTime,
+    pub modification_date: NaiveDateTime,
 }
 
 impl SetlistDb {

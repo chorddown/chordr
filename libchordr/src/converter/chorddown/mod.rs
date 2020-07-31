@@ -24,7 +24,11 @@ impl ConverterTrait for ChorddownConverter {
 impl ChorddownConverter {
     fn build_node<'a>(&'a self, node: &'a Node, formatting: Formatting) -> Result<String> {
         match node {
-            Node::ChordTextPair { chords, text } => Ok(format!(
+            Node::ChordTextPair {
+                chords,
+                text,
+                last_in_line: _,
+            } => Ok(format!(
                 "{}{}",
                 self.build_tag_for_chords(chords, formatting),
                 self.build_token(text),
@@ -171,8 +175,10 @@ mod tests {
     use super::*;
     use crate::format::Format;
     use crate::parser::MetaInformation;
-    use crate::test_helpers::{get_test_ast, get_test_ast_with_quote, get_test_ast_w_inline_metadata};
     use crate::test_helpers::get_test_metadata;
+    use crate::test_helpers::{
+        get_test_ast, get_test_ast_w_inline_metadata, get_test_ast_with_quote,
+    };
 
     #[test]
     fn test_convert() {

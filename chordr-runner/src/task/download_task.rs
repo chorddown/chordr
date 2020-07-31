@@ -2,7 +2,9 @@ use super::{RecurringTaskTrait, TaskTrait};
 use crate::configuration::Configuration;
 use crate::error::Result;
 use libsynchord::error::Error as SynchordError;
-use libsynchord::prelude::{AbstractServiceConfig, Services, ServiceTrait, ServiceConfigurationTrait};
+use libsynchord::prelude::{
+    AbstractServiceConfig, ServiceConfigurationTrait, ServiceTrait, Services,
+};
 use log::info;
 use std::env;
 
@@ -55,9 +57,18 @@ fn build_service_config(configuration: Configuration) -> AbstractServiceConfig {
 
     AbstractServiceConfig::build(
         api_token,
-        configuration.service.url.ok_or(SynchordError::missing_argument_error("URL")),
-        configuration.service.remote_directory.ok_or(SynchordError::missing_argument_error("Remote-directory")),
-        configuration.service.username.ok_or(SynchordError::missing_argument_error("Username")),
+        configuration
+            .service
+            .url
+            .ok_or(SynchordError::missing_argument_error("URL")),
+        configuration
+            .service
+            .remote_directory
+            .ok_or(SynchordError::missing_argument_error("Remote-directory")),
+        configuration
+            .service
+            .username
+            .ok_or(SynchordError::missing_argument_error("Username")),
         password,
         configuration.output_directory.clone(),
         configuration.service.identifier,

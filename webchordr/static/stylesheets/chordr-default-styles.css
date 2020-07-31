@@ -1,18 +1,57 @@
+html {
+  --font-size-base: 16px;
+  --background: white;
+  --text-color: #221d1c;
+  --link-color: #62625e;
+  --link-hover-color: #221d1c;
+  --button-bg: #b7b7b0;
+  --button-color: #62625e;
+  --button-hover-bg: #8d8d88;
+  --button-hover-color: #62625e;
+  --nav-bg: #d8d8d0;
+  --clipboard-input-bg: #b7b7b0;
+  --clipboard-input-color: #62625e;
+  --section-border-color: #a8a8a2; }
+
+@media screen and (prefers-color-scheme: dark) {
+  html {
+    --background: #221d1c;
+    --text-color: white;
+    --link-color: white;
+    --link-hover-color: #d8d8d0;
+    --button-bg: #221d1c;
+    --button-color: white;
+    --button-hover-bg: #62625e;
+    --button-hover-color: white;
+    --nav-bg: #8d8d88;
+    --clipboard-input-bg: #221d1c;
+    --clipboard-input-color: white;
+    --section-border-color: #a8a8a2; } }
+
+html.dark-mode {
+  --background: #221d1c;
+  --text-color: white;
+  --link-color: white;
+  --link-hover-color: #d8d8d0;
+  --button-bg: #221d1c;
+  --button-color: white;
+  --button-hover-bg: #62625e;
+  --button-hover-color: white;
+  --nav-bg: #8d8d88;
+  --clipboard-input-bg: #221d1c;
+  --clipboard-input-color: white;
+  --section-border-color: #a8a8a2; }
+
 @page {
   size: auto; }
 
 #chordr {
   font-family: "Merriweather", "Libre Baskerville", "Times", "Times New Roman", -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
-  font-size: 16px;
+  font-size: var(--font-size-base);
   line-height: 1.3em;
-  letter-spacing: 0.05em; }
-  @media screen and (prefers-color-scheme: dark) {
-    #chordr {
-      background: #221d1c;
-      color: white; } }
-  html.dark-mode #chordr {
-    background: #221d1c;
-    color: white; }
+  letter-spacing: 0.05em;
+  background: var(--background);
+  color: var(--text-color); }
   @media print {
     #chordr {
       font-size: 12px; } }
@@ -72,8 +111,20 @@
       margin: 0 1em 0 0; }
   #chordr .text-row {
     white-space: pre; }
+    #chordr .text-row span {
+      position: relative;
+      background: var(--background); }
+      #chordr .text-row span:not(.-last-in-line)::after {
+        content: "-";
+        position: absolute; }
+    #chordr .text-row.-word-boundary span::after {
+      content: normal; }
   #chordr .col {
     float: left; }
+    #chordr .col:last-child::after {
+      content: ' ';
+      display: block;
+      clear: both; }
   #chordr blockquote {
     margin: 7px 0;
     color: #221d1c;
@@ -100,7 +151,8 @@
   #chordr section {
     margin: 14px 0;
     clear: both;
-    page-break-inside: avoid; }
+    page-break-inside: avoid;
+    border-bottom-color: var(--section-border-color); }
     #chordr section::after {
       display: block;
       content: "";
@@ -108,11 +160,6 @@
       border-bottom: 1px solid #a8a8a2;
       position: absolute;
       margin-top: -1px; }
-    @media screen and (prefers-color-scheme: dark) {
-      #chordr section {
-        border-bottom-color: #a8a8a2; } }
-    html.dark-mode #chordr section {
-      border-bottom-color: #a8a8a2; }
     #chordr section:first-child {
       margin-top: 0; }
     #chordr section.chorus {

@@ -10,6 +10,7 @@ pub enum Node {
     ChordTextPair {
         chords: Chords,
         text: Token,
+        last_in_line: bool,
     },
     ChordStandalone(Chords),
     Text(Token),
@@ -61,7 +62,25 @@ impl Node {
         let chords = Chords::try_from(chords.as_ref(), BNotation::B)?;
         let text = Token::literal(text);
 
-        Ok(Node::ChordTextPair { chords, text })
+        Ok(Node::ChordTextPair {
+            chords,
+            text,
+            last_in_line: false,
+        })
+    }
+
+    pub(crate) fn chord_text_pair_last_in_line<S1: AsRef<str>, S2: Into<String>>(
+        chords: S1,
+        text: S2,
+    ) -> Result<Self, Error> {
+        let chords = Chords::try_from(chords.as_ref(), BNotation::B)?;
+        let text = Token::literal(text);
+
+        Ok(Node::ChordTextPair {
+            chords,
+            text,
+            last_in_line: true,
+        })
     }
 
     pub(crate) fn meta<S: AsRef<str>>(meta: S) -> Result<Self, Error> {
@@ -90,9 +109,14 @@ impl Node {
 impl TransposableTrait for Node {
     fn transpose(&self, semitones: isize) -> Self {
         match self {
-            Node::ChordTextPair { chords, text } => Node::ChordTextPair {
+            Node::ChordTextPair {
+                chords,
+                text,
+                last_in_line: eol,
+            } => Node::ChordTextPair {
                 chords: chords.transpose(semitones),
                 text: text.clone(),
+                last_in_line: *eol,
             },
             Node::ChordStandalone(chords) => Node::ChordStandalone(chords.transpose(semitones)),
 

@@ -17,9 +17,13 @@ impl TagProvider {
         let mut gtb = TagBuilder::new();
 
         match node {
-            Node::ChordTextPair { chords, text } => self.build_column(
+            Node::ChordTextPair {
+                chords,
+                text,
+                last_in_line,
+            } => self.build_column(
                 self.build_tag_for_chords(chords, formatting),
-                self.build_tag_for_token(text, formatting),
+                self.build_tag_for_chord_text_token(text, formatting, *last_in_line),
             ),
             Node::ChordStandalone(chord) => {
                 self.build_column(self.build_tag_for_chords(chord, formatting), Tag::blank())
@@ -65,7 +69,8 @@ impl TagProvider {
                 }
 
                 if let Some(head) = head {
-                    self.build_tag_for_children(children, formatting).to_string();
+                    self.build_tag_for_children(children, formatting)
+                        .to_string();
                     let inner = format!(
                         "{}{}",
                         self.build_tag_for_node(head, formatting),
@@ -99,6 +104,29 @@ impl TagProvider {
             Token::Meta(_) => unreachable!(),
             Token::Newline => unreachable!(),
         }
+    }
+    fn build_tag_for_chord_text_token<'a>(
+        &'a self,
+        token: &'a Token,
+        _formatting: Formatting,
+        last_in_line: bool,
+    ) -> Tag {
+        let mut gtb = TagBuilder::new();
+
+        if let Token::Literal(c) = token {
+            let span = gtb.set_tag_name("span").set_content_str(c);
+            if last_in_line {
+                span.set_class_name("-last-in-line");
+            }
+
+            span.build()
+        } else {
+            unreachable!()
+        }
+        // match token {
+        //     Token::Literal(c) => gtb.set_tag_name("span").set_content_str(c).set_class_name(if eol { "-last-of-line" } else { "" }).build(),
+        //     _ => unreachable!()
+        // }
     }
 
     fn build_tag_for_chords(&self, chords: &Chords, formatting: Formatting) -> Tag {
@@ -141,9 +169,15 @@ impl TagProvider {
             lyric.to_string()
         };
 
+        let lyric_text_class = match lyric.content() {
+            Content::Some(s) if s.ends_with(char::is_alphanumeric) => "text-row -word-split",
+            Content::Some(_) => "text-row -word-boundary",
+            _ => "text-row",
+        };
+
         let string = format!(
-            "<div class='chord-row'>{}</div><div class='text-row'>{}</div>",
-            chord_text, lyric_text
+            "<div class='chord-row'>{}</div><div class='{}'>{}</div>",
+            chord_text, lyric_text_class, lyric_text
         );
 
         TagBuilder::new()

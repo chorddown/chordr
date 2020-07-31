@@ -66,8 +66,8 @@ impl ConverterTrait for PdfConverter {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::test_helpers::get_test_tokens;
     use crate::parser::MetaInformation;
+    use crate::test_helpers::get_test_tokens;
 
     #[test]
     fn test_convert() {

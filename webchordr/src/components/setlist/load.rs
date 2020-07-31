@@ -2,19 +2,17 @@ use crate::components::modal::Question;
 use crate::data_exchange::SetlistDeserializeService;
 use crate::events::Event;
 use crate::events::SetlistEvent;
-use libchordr::prelude::{Catalog, Setlist as OriginalSetlist, SetlistEntry, SongData};
+use libchordr::prelude::{Catalog, Setlist, SetlistEntry, SongData};
 use log::{error, info};
 use std::rc::Rc;
 use web_sys::window;
 use yew::prelude::*;
 
-type Setlist = OriginalSetlist<SetlistEntry>;
-
 #[derive(Properties, PartialEq, Clone)]
 pub struct SetlistProps {
     pub catalog: Rc<Catalog>,
     pub serialized_setlist: String,
-    pub current_setlist: Rc<Setlist>,
+    pub current_setlist: Option<Rc<Setlist>>,
     pub on_load: Callback<Event>,
 }
 
@@ -52,7 +50,7 @@ impl SetlistLoad {
     }
 
     fn render_setlist(&self, setlist: &Setlist) -> Html {
-        let render = |song: &SetlistEntry| {
+        let render = |song: SetlistEntry| {
             let key = song.title();
 
             html! { <li key=key.clone()>{key}</li> }
@@ -61,8 +59,16 @@ impl SetlistLoad {
         (html! {
             <div class="setlist-load-preview-viewport">
                 <ul>
-                    {for setlist.iter().map(render)}
+                    {for setlist.clone().into_iter().map(&render)}
                 </ul>
+            </div>
+        }) as Html
+    }
+
+    fn render_empty_setlist(&self) -> Html {
+        (html! {
+            <div class="setlist-load-preview-viewport">
+                <ul></ul>
             </div>
         }) as Html
     }
@@ -117,7 +123,10 @@ impl Component for SetlistLoad {
         let on_answer_1 = self.link.callback(|_| Msg::ChooseNo);
         let on_answer_2 = self.link.callback(|_| Msg::ChooseYes);
 
-        let current_setlist = self.render_setlist(&self.props.current_setlist);
+        let current_setlist = match &self.props.current_setlist {
+            Some(s) => self.render_setlist(s),
+            None => self.render_empty_setlist(),
+        };
         let new_setlist = self.render_setlist(&self.build_setlist());
 
         html! {

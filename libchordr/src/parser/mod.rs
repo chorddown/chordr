@@ -229,10 +229,7 @@ mod tests {
                 Token::chord("H"),
                 Token::newline(),
             ]),
-            vec![
-                Token::chord("H"),
-                Token::newline(),
-            ]
+            vec![Token::chord("H"), Token::newline(),]
         );
         assert_eq!(
             Parser::cleanup_tokens(&vec![
@@ -242,10 +239,7 @@ mod tests {
                 Token::newline(),
                 Token::newline(),
             ]),
-            vec![
-                Token::chord("H"),
-                Token::newline(),
-            ]
+            vec![Token::chord("H"), Token::newline(),]
         );
     }
 }

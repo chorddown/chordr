@@ -34,7 +34,7 @@ impl Chord {
 
     pub fn try_from(value: &str, b_notation: BNotation) -> Result<Self, Error> {
         if value.is_empty() {
-            return Err(Error::chord_error("Given value is empty"));
+            return Err(Error::chord_error("Given chord brackets are empty"));
         }
 
         if value.len() < 2 {
@@ -44,9 +44,6 @@ impl Chord {
         }
 
         let (node_raw, variant_raw) = Self::split_note_characters(value)?;
-
-        //        println!("ch {:?}", first_non_node_part);
-        //
         let variant_raw_trimmed = variant_raw.trim();
         let variant = if variant_raw_trimmed.is_empty() {
             None

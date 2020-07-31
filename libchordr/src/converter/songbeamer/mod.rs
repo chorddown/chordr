@@ -33,7 +33,11 @@ impl ConverterTrait for SongBeamerConverter {
 impl SongBeamerConverter {
     fn build_node<'a>(&'a self, node: &'a Node) -> Result<String> {
         match node {
-            Node::ChordTextPair { chords: _, text } => Ok(self.build_text(text)),
+            Node::ChordTextPair {
+                chords: _,
+                text,
+                last_in_line: _,
+            } => Ok(self.build_text(text)),
             Node::Text(text) => Ok(self.build_text(text)),
             Node::Document(children) => Ok(self.build_tag_for_children(children)),
             Node::Newline => Ok("\n".to_owned()),
@@ -151,8 +155,10 @@ mod tests {
     use super::*;
     use crate::format::Format;
     use crate::parser::MetaInformation;
-    use crate::test_helpers::{get_test_ast, get_test_ast_with_quote, get_test_ast_w_inline_metadata};
     use crate::test_helpers::get_test_metadata;
+    use crate::test_helpers::{
+        get_test_ast, get_test_ast_w_inline_metadata, get_test_ast_with_quote,
+    };
 
     #[test]
     fn test_convert() {

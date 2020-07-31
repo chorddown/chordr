@@ -1,6 +1,6 @@
 use std::error::Error;
-use std::path::{PathBuf, Path};
 use std::fmt::{Display, Formatter, Result};
+use std::path::{Path, PathBuf};
 
 #[derive(Debug)]
 pub struct CatalogBuildError {
@@ -38,7 +38,7 @@ impl Error for CatalogBuildError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match self.inner {
             None => None,
-            Some(ref b) => Some(b.as_ref())
+            Some(ref b) => Some(b.as_ref()),
         }
     }
 }
@@ -50,6 +50,11 @@ impl Display for CatalogBuildError {
             None => self.message.to_owned(),
         };
 
-        write!(f, "Error during analysis of file {}: {}", self.path.to_string_lossy(), description)
+        write!(
+            f,
+            "Error during analysis of file {}: {}",
+            self.path.to_string_lossy(),
+            description
+        )
     }
 }

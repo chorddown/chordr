@@ -2,7 +2,7 @@
 
 $sort-handle-width: 40px !default;
 nav {
-    background: $nav-bg;
+    background: var(--nav-bg);
     order: 2;
     display: flex;
     flex-flow: column;
@@ -12,9 +12,9 @@ nav {
     bottom: 0;
     padding-left: 2px;
     @include print-hidden;
-    @include if-dark-mode {
-        background: $dark-mode-nav-bg;
-    }
+    //@include if-dark-mode {
+    //    background: $dark-mode-nav-bg;
+    //}
 
     &.-hidden {
         //width: $nav-collapsed-width + 2px; // from padding
@@ -46,16 +46,16 @@ nav {
         margin-bottom: 2px;
 
         &:focus {
-            color: $button-color;
-            background: $button-bg;
+            color: var(--button-color);
+            background: var(--button-bg);
         }
 
-        @include if-dark-mode {
-            &:focus {
-                color: $dark-mode-button-color;
-                background: $dark-mode-button-bg;
-            }
-        }
+        //@include if-dark-mode {
+        //    &:focus {
+        //        color: $dark-mode-button-color;
+        //        background: $dark-mode-button-bg;
+        //    }
+        //}
 
         &.-separator {
             height: $std-half;
@@ -67,25 +67,24 @@ nav {
 
             &:focus,
             &:hover {
-                color: $button-hover-color;
-                @include if-dark-mode {
-                    color: $dark-mode-button-hover-color;
-                }
+                color: var(--button-hover-color);
+                //@include if-dark-mode {
+                //    color: $dark-mode-button-hover-color;
+                //}
             }
         }
 
         &.-highlight {
-            color: $button-hover-color;
-            background: $button-hover-bg;
-            @include if-dark-mode {
-                color: $dark-mode-button-hover-color;
-                background: $dark-mode-button-hover-bg;
-            }
+            color: var(--button-hover-color);
+            background: var(--button-hover-bg);
+            //@include if-dark-mode {
+            //    color: $dark-mode-button-hover-color;
+            //    background: $dark-mode-button-hover-bg;
+            //}
         }
 
         &.-sortable a[role=button] {
             width: $nav-width - $sort-handle-width;
-            border-right: none;
         }
 
         .sortable-handle {

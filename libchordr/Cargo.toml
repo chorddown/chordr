@@ -3,6 +3,13 @@ name = "libchordr"
 version = "0.1.0"
 authors = ["Daniel Corn <info@cundd.net>"]
 edition = "2018"
+license = "MIT OR Apache-2.0"
+readme = "../README.md"
+repository = "https://github.com/chorddown/chordr"
+description = """
+Library with functionality for chorddown file
+handling and basic data structures
+"""
 
 [lib]
 name = "libchordr"
@@ -17,6 +24,7 @@ serde_derive = "^1.0"
 printpdf = { version = "0.2.8", optional = true }
 rand = "0.7.2"
 encoding = "^0.2.33"
+chrono = { version = "0.4", features = ["serde"] }
 
 [dev-dependencies]
 serde_json = "^1.0"

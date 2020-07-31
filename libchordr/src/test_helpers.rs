@@ -1,5 +1,7 @@
 use crate::models::meta::BNotation;
+use crate::models::user::{User, Username};
 use crate::parser::{MetaInformation, Node};
+use crate::prelude::Password;
 use crate::tokenizer::{Modifier, Token};
 
 #[cfg(test)]
@@ -100,7 +102,8 @@ pub fn get_test_tokens() -> Vec<Token> {
         Token::literal("home."),
         Token::newline(),
         Token::newline(),
-        Token::quote("Chorus"), Token::newline(),
+        Token::quote("Chorus"),
+        Token::newline(),
     ]
 }
 
@@ -121,19 +124,19 @@ pub fn get_test_ast() -> Node {
                 Node::text("Swing "),
                 Node::chord_text_pair("D", "low, sweet ").unwrap(),
                 Node::chord_text_pair("G", "chari").unwrap(),
-                Node::chord_text_pair("D", "ot,").unwrap(),
+                Node::chord_text_pair_last_in_line("D", "ot,").unwrap(),
                 Node::newline(),
                 Node::text("Comin’ for to carry me "),
-                Node::chord_text_pair("A7", "home.").unwrap(),
+                Node::chord_text_pair_last_in_line("A7", "home.").unwrap(),
                 Node::newline(),
                 Node::text("Swing "),
                 Node::chord_text_pair("D7", "low, sweet ").unwrap(),
                 Node::chord_text_pair("G", "chari").unwrap(),
-                Node::chord_text_pair("D", "ot,").unwrap(),
+                Node::chord_text_pair_last_in_line("D", "ot,").unwrap(),
                 Node::newline(),
                 Node::text("Comin’ for to "),
                 Node::chord_text_pair("A7", "carry me ").unwrap(),
-                Node::chord_text_pair("D", "home.").unwrap(),
+                Node::chord_text_pair_last_in_line("D", "home.").unwrap(),
                 Node::newline(),
             ],
         ),
@@ -146,19 +149,19 @@ pub fn get_test_ast() -> Node {
                 Node::text("I "),
                 Node::chord_text_pair("D", "looked over Jordan, and ").unwrap(),
                 Node::chord_text_pair("G", "what did I ").unwrap(),
-                Node::chord_text_pair("D", "see,").unwrap(),
+                Node::chord_text_pair_last_in_line("D", "see,").unwrap(),
                 Node::newline(),
                 Node::text("Comin’ for to carry me "),
-                Node::chord_text_pair("A7", "home.").unwrap(),
+                Node::chord_text_pair_last_in_line("A7", "home.").unwrap(),
                 Node::newline(),
                 Node::text("A "),
                 Node::chord_text_pair("D", "band of angels ").unwrap(),
                 Node::chord_text_pair("G", "comin’ after ").unwrap(),
-                Node::chord_text_pair("D", "me,").unwrap(),
+                Node::chord_text_pair_last_in_line("D", "me,").unwrap(),
                 Node::newline(),
                 Node::text("Comin’ for to "),
                 Node::chord_text_pair("A7", "carry me ").unwrap(),
-                Node::chord_text_pair("D", "home.").unwrap(),
+                Node::chord_text_pair_last_in_line("D", "home.").unwrap(),
                 Node::newline(),
             ],
         ),
@@ -236,4 +239,13 @@ pub fn get_test_metadata() -> MetaInformation {
         capo: Some("1".to_owned()),
         b_notation: BNotation::B,
     }
+}
+
+pub fn get_test_user() -> User {
+    User::new(
+        Username::new("my-username").unwrap(), // username
+        "Daniel".to_string(),                  // first_name
+        "Corn".to_string(),                    // last_name
+        Password::new("mypass123").unwrap(),   // password
+    )
 }

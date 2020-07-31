@@ -120,8 +120,14 @@ mod test {
         assert_eq!(configuration.service.identifier, ServiceIdentifier::WebDAV);
         assert_eq!(configuration.service.username.unwrap(), "this-is-me");
         assert_eq!(configuration.service.password.unwrap(), "123-easy");
-        assert_eq!(configuration.service.url.unwrap(), "https://mycloud.example.com");
-        assert_eq!(configuration.service.remote_directory.unwrap(), "remote-dir");
+        assert_eq!(
+            configuration.service.url.unwrap(),
+            "https://mycloud.example.com"
+        );
+        assert_eq!(
+            configuration.service.remote_directory.unwrap(),
+            "remote-dir"
+        );
         assert_eq!(configuration.service.sync_interval, 34);
     }
 

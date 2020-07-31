@@ -1,0 +1,28 @@
+@import "prelude";
+
+.detail-view {
+    width: 100%;
+
+    .detail-view-header {
+        display: flex;
+        flex-flow: row;
+        background: $gray-light;
+
+        button.close-button {
+            margin-left: auto;
+
+            @include button-default($border: none, $width: 42px);
+        }
+    }
+
+    .detail-view-content {
+        display: flex;
+        padding: $std-space;
+
+        > .centered {
+            align-items: center;
+            justify-items: center;
+            margin: auto;
+        }
+    }
+}

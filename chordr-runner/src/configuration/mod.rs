@@ -4,9 +4,9 @@
 //! [`Reader`] to fetch configuration from files
 pub(crate) mod reader;
 
+use libsynchord::prelude::ServiceIdentifier;
 use serde::Deserialize;
 use std::path::PathBuf;
-use libsynchord::prelude::ServiceIdentifier;
 
 #[derive(Deserialize, Debug, Clone)]
 pub struct Configuration {

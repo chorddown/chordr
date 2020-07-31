@@ -3,25 +3,32 @@ name = "srvchord"
 version = "0.1.0"
 authors = ["Daniel Corn <info@cundd.net>"]
 edition = "2018"
+license = "MIT OR Apache-2.0"
+readme = "../README.md"
+repository = "https://github.com/chorddown/chordr"
+description = """
+Chorddown web application - Server side
+"""
 
 [dependencies]
-rocket = "0.4.4"
+rocket = "0.4.5"
 serde = "1.0"
 serde_json = "1.0"
 serde_derive = "1.0"
-diesel = { version = "1.3", features = ["sqlite", "r2d2"] }
+diesel = { version = "1.3", features = ["sqlite", "r2d2", "chrono"] }
 diesel_migrations = "1.3"
 log = "0.4"
 base64 = "^0.12.1"
 rust-argon2 = "^0.8.2"
 libchordr = { path = "../libchordr" }
+chrono = { version = "*", features = ["serde"] }
 
 [dev-dependencies]
 parking_lot = { version = "0.10", features = ["nightly"] }
 rand = "0.7"
 
 [dependencies.rocket_contrib]
-version = "0.4.4"
+version = "0.4.5"
 default-features = false
 #features = ["diesel_sqlite_pool"]
 features = ["tera_templates", "diesel_sqlite_pool", "serve", "json"]

@@ -1,14 +1,12 @@
-use std::path::Path;
+use crate::models::list::ListEntryTrait;
+use serde::{Deserialize, Serialize};
+use std::cmp::Ordering;
 use std::fmt::{Display, Formatter};
 use std::hash::{Hash, Hasher};
-use std::cmp::Ordering;
-use serde::{Deserialize, Serialize};
+use std::path::Path;
 
 /// Trait for objects that have an associated SongId
-pub trait SongIdTrait {
-    /// Return a unique identifier of the Song
-    fn id(&self) -> SongId;
-}
+pub trait SongIdTrait: ListEntryTrait<Id = SongId> {}
 
 /// Song Identifier
 #[derive(Deserialize, Serialize, Clone, Debug)]
@@ -18,7 +16,7 @@ impl SongId {
     /// Build a new identifier from the given input
     pub fn new<S: Into<String>>(input: S) -> Self {
         Self {
-            0: input.into().replace(" ", "-")
+            0: input.into().replace(" ", "-"),
         }
     }
 
@@ -94,10 +92,13 @@ mod tests {
         let ids = vec![
             "identifier-test.chorddown",
             "something_else.chorddown",
-            "abcdefg"
+            "abcdefg",
         ];
         for id in ids {
-            assert_eq!(serde_json::to_string(&SongId::new(id)).unwrap(), format!("\"{}\"", id));
+            assert_eq!(
+                serde_json::to_string(&SongId::new(id)).unwrap(),
+                format!("\"{}\"", id)
+            );
         }
     }
 
@@ -106,10 +107,13 @@ mod tests {
         let ids = vec![
             "identifier-test.chorddown",
             "something_else.chorddown",
-            "abcdefg"
+            "abcdefg",
         ];
         for id in ids {
-            assert_eq!(serde_json::from_str::<SongId>(&format!("\"{}\"", id)).unwrap(), SongId::new(id));
+            assert_eq!(
+                serde_json::from_str::<SongId>(&format!("\"{}\"", id)).unwrap(),
+                SongId::new(id)
+            );
         }
     }
 

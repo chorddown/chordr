@@ -1,5 +1,5 @@
-use crate::models::song_id::SongId;
 use crate::models::song_data::SongData;
+use crate::models::song_id::SongId;
 use std::slice::Iter;
 
 pub trait CatalogTrait<E: SongData> {

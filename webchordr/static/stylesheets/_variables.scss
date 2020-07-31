@@ -18,10 +18,11 @@ $grid-columns: 12 !default;
 $background: white !default;
 $dark-mode-background: $gray-ultra-dark !default;
 $text-color: $gray-ultra-dark !default;
-$text-color-dark-mode: white !default;
+$dark-mode-text-color: white !default;
 
 $font: "Merriweather", "Libre Baskerville", "Times", "Times New Roman", -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji !default;
 $font-size-web: 16px !default;
+$font-size-ui: 16px !default;
 $font-size-small: .8rem !default;
 $font-size-print: 12px !default;
 $font-size-h1: 1.8em !default;
@@ -33,7 +34,7 @@ $ui-font: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-se
 
 $link-color: $gray-darker !default;
 $link-hover-color: $gray-ultra-dark !default;
-$dark-mode-link-color: $text-color-dark-mode !default;
+$dark-mode-link-color: $dark-mode-text-color !default;
 $dark-mode-link-hover-color: $gray-light !default;
 
 $button-line-height: 26px !default;
@@ -46,9 +47,9 @@ $button-border: 1px solid $gray-dark !default;
 $button-hover-bg: $gray-dark !default;
 $button-hover-color: $gray-darker !default;
 $dark-mode-button-bg: $dark-mode-background !default;
-$dark-mode-button-color: $text-color-dark-mode !default;
+$dark-mode-button-color: $dark-mode-text-color !default;
 $dark-mode-button-hover-bg: $gray-darker !default;
-$dark-mode-button-hover-color: $text-color-dark-mode !default;
+$dark-mode-button-hover-color: $dark-mode-text-color !default;
 
 $nav-bg: $gray-light !default;
 $dark-mode-nav-bg: $gray-dark !default;
@@ -103,7 +104,7 @@ $chorus: (
 $chorus-dark: map-merge(
         $chorus,
         (
-            font-color: $text-color-dark-mode,
+            font-color: $dark-mode-text-color,
             // font-weight: value,
             // font-style: value,
             // background: value,
@@ -145,7 +146,7 @@ $bridge: (
 $bridge-dark: map-merge(
         $bridge,
         (
-            font-color: $text-color-dark-mode,
+            font-color: $dark-mode-text-color,
             // font-weight: value,
             // font-style: value,
             // background: value,
@@ -166,7 +167,7 @@ $blockquote: (
 $blockquote-dark: map-merge(
         $blockquote,
         (
-            font-color: $text-color-dark-mode,
+            font-color: $dark-mode-text-color,
             // font-weight: value,
             // font-style: value,
             // background: value,
@@ -180,3 +181,19 @@ $section-border-width: 1px !default;
 $section-border: $section-border-width solid $section-border-color !default;
 $section-border-length: 200px !default;
 $dark-mode-section-border-color: $section-border-color !default;
+
+
+$clipboard-input-bg: $button-bg !default;
+$clipboard-input-color: $button-color !default;
+$clipboard-input-padding: $button-padding !default;
+$clipboard-input-letter-spacing: $button-letter-spacing !default;
+$dark-mode-clipboard-input-bg: $dark-mode-button-bg !default;
+$dark-mode-clipboard-input-color: $dark-mode-button-color !default;
+
+
+
+$song-search-line-height: $button-line-height !default;
+$song-search-padding: $button-padding !default;
+$song-search-border: $button-border !default;
+$song-search-color: $button-color !default;
+$dark-mode-song-search-color: $dark-mode-button-color !default;

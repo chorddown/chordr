@@ -139,10 +139,7 @@ impl ServiceTrait for WebDAVService {
     fn new(configuration: Self::Configuration) -> Result<Self, Error> {
         let url: Url = Url::parse(configuration.url.as_ref())?;
         let client_result = Client::new()
-            .credentials(
-                configuration.username,
-                configuration.password,
-            )
+            .credentials(configuration.username, configuration.password)
             .build(url.as_ref());
         let client = match client_result {
             Ok(c) => c,

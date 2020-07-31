@@ -1,4 +1,5 @@
 use super::BrowserStorageTrait;
+use crate::errors::PersistenceError;
 use crate::helpers::window;
 use crate::WebError;
 use web_sys::Storage;
@@ -13,9 +14,10 @@ impl BrowserStorage {
         let storage_option = window().local_storage()?;
         match storage_option {
             Some(storage) => Ok(Self { storage }),
-            None => Err(WebError::persistence_error(
-                "Could not build retrieve browser storage",
-            )),
+            None => Err(PersistenceError::storage_unavailable(
+                "Could not retrieve browser storage",
+            )
+            .into()),
         }
     }
 }

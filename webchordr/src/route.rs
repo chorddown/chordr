@@ -11,6 +11,8 @@ pub enum AppRoute {
     SongSearch,
     #[to = "/#/setlist{*:rest}"]
     Setlist(SetlistRoute),
+    #[to = "/#/user{*:rest}"]
+    User(UserRoute),
     #[to = "/index"]
     Index,
 }
@@ -19,4 +21,10 @@ pub enum AppRoute {
 pub enum SetlistRoute {
     #[to = "/load/{serialized_setlist}"]
     Load { serialized_setlist: String },
+}
+
+#[derive(Switch, Debug, Clone)]
+pub enum UserRoute {
+    #[to = "/info"]
+    Info,
 }

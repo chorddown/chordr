@@ -75,7 +75,12 @@ impl Component for SongView {
                 let song = &self.props.song;
                 info!("Set Song {} on setlist: {:?}", song.id(), flag);
                 if flag {
-                    self.props.on_setlist_add.emit(SetlistEntry::from(song))
+                    self.props
+                        .on_setlist_add
+                        .emit(SetlistEntry::from_song_with_settings(
+                            song,
+                            self.song_settings.clone(),
+                        ))
                 } else {
                     self.props.on_setlist_remove.emit(song.id())
                 }

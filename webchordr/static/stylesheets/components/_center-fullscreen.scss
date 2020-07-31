@@ -9,13 +9,13 @@
     display: flex;
     align-items: center;
     justify-items: center;
-    background: white;
-    color: $text-color;
+    background: var(--background);
+    color: var(--text-color);
 
-    @include if-dark-mode {
-        background: $dark-mode-background;
-        color: $text-color-dark-mode;
-    }
+    //@include if-dark-mode {
+    //    background: $dark-mode-background;
+    //    color: $dark-mode-text-color;
+    //}
 
     > div {
         margin: auto;

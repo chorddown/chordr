@@ -1,7 +1,7 @@
 use crate::configuration::Configuration;
 use crate::error::Error;
 use crate::task::{RecurringTaskTrait, TaskTrait};
-use libchordr::prelude::{CatalogBuilder, FileType, CatalogBuildResult};
+use libchordr::prelude::{CatalogBuildResult, CatalogBuilder, FileType};
 use log::info;
 use std::fs;
 
@@ -18,7 +18,7 @@ impl TaskTrait for BuildCatalogTask {
         let catalog_builder = CatalogBuilder::new();
         Ok(Self {
             catalog_builder,
-            configuration
+            configuration,
         })
     }
 }

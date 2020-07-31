@@ -14,9 +14,17 @@ pub trait EventTrait {}
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum Event {
+    /// Sorting of entries in the Setlist changed
     SortingChange(SortingChange),
+
+    /// Events related to [`SongSettings`]
     SettingsEvent(SettingsEvent),
+
+    /// Events related to [`Setlist`s]
     SetlistEvent(SetlistEvent),
+
+    /// A pair of events triggered at once
+    Pair(Box<Event>, Box<Event>),
 }
 
 impl From<SortingChange> for Event {

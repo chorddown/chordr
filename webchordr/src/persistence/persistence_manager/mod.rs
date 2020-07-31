@@ -1,3 +1,4 @@
+use crate::errors::PersistenceError;
 use crate::errors::WebError;
 use crate::persistence::browser_storage::*;
 use async_trait::async_trait;
@@ -60,7 +61,7 @@ impl<B: BrowserStorageTrait> PersistenceManagerTrait for PersistenceManager<B> {
             Ok(serialized) => self
                 .browser_storage
                 .set_item(self.build_combined_key(&namespace, &key), serialized),
-            Err(e) => Err(WebError::persistence_error(e.to_string())),
+            Err(e) => Err(PersistenceError::serialization_error(e.to_string()).into()),
         }
     }
 
@@ -78,7 +79,7 @@ impl<B: BrowserStorageTrait> PersistenceManagerTrait for PersistenceManager<B> {
         {
             Some(v) => match serde_json::from_str(v.as_str()) {
                 Ok(serialized) => Ok(serialized),
-                Err(e) => Err(WebError::persistence_error(e.to_string())),
+                Err(e) => Err(PersistenceError::deserialization_error(e, Some(v)).into()),
             },
             None => Ok(None),
         }
@@ -91,6 +92,9 @@ mod test {
     use serde::{Deserialize, Serialize};
     use wasm_bindgen_test::*;
 
+    use crate::test_helpers::{entry, get_test_user};
+    use chrono::prelude::*;
+    use libchordr::models::setlist::Setlist;
     use wasm_bindgen_test::wasm_bindgen_test_configure;
     wasm_bindgen_test_configure!(run_in_browser);
 
@@ -167,6 +171,38 @@ mod test {
         assert_eq!(
             value,
             pm.load::<TestValue, _, _>("test", "key-1")
+                .await
+                .unwrap()
+                .unwrap()
+        );
+    }
+
+    #[wasm_bindgen_test]
+    async fn store_and_load_setlist_test() {
+        let mut pm = PersistenceManager::new(HashMapBrowserStorage::new());
+
+        let value = Setlist::new(
+            "My setlist",
+            10291,
+            get_test_user(),
+            None,
+            Some(Utc.ymd(2014, 11, 14).and_hms(8, 9, 10)),
+            Utc.ymd(2020, 06, 14).and_hms(16, 26, 20),
+            Utc::now(),
+            vec![entry("song-1"), entry("song-2"), entry("song-3")],
+        );
+
+        assert!(pm.store("test", "my-setlist", &value).await.is_ok());
+
+        assert!(pm.load::<Setlist, _, _>("test", "my-setlist").await.is_ok());
+        assert!(pm
+            .load::<Setlist, _, _>("test", "my-setlist")
+            .await
+            .unwrap()
+            .is_some());
+        assert_eq!(
+            value,
+            pm.load::<Setlist, _, _>("test", "my-setlist")
                 .await
                 .unwrap()
                 .unwrap()

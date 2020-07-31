@@ -9,7 +9,7 @@ pub struct Chords(Chord, Option<Chord>);
 impl Chords {
     pub fn try_from(value: &str, b_notation: BNotation) -> Result<Self, Error> {
         if value.is_empty() {
-            return Err(Error::chord_error("Given value is empty"));
+            return Err(Error::chord_error("Chord brackets are empty"));
         }
 
         let mut inner: Vec<Chord> = Vec::with_capacity(2);

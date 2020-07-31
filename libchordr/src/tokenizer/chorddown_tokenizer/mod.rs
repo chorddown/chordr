@@ -2,9 +2,9 @@ mod mode;
 mod scanner;
 mod state_machine;
 
+use self::scanner::Scanner;
 use self::state_machine::FSM;
-use crate::tokenizer::chorddown_tokenizer::scanner::Scanner;
-use crate::tokenizer::{Token, Tokenizer};
+use super::{Token, Tokenizer};
 
 pub(crate) struct ChorddownTokenizer {}
 
@@ -207,5 +207,45 @@ Key: C#m
                 Some(&Token::Meta(Meta::BNotation(BNotation::B)))
             );
         }
+    }
+
+    #[test]
+    fn test_tokenize_pre_chorus() {
+        let content = r"##- Pre-chorus";
+        let token_lines = ChorddownTokenizer::new().tokenize(content);
+        assert_eq!(
+            token_lines,
+            vec![Token::headline(2, "Pre-chorus", Modifier::Bridge)]
+        );
+    }
+
+    #[test]
+    fn test_tokenize_chorus_with_exclamation_marks() {
+        let content = r"##! Chorus Loud!!";
+        let token_lines = ChorddownTokenizer::new().tokenize(content);
+        assert_eq!(
+            token_lines,
+            vec![Token::headline(2, "Chorus Loud!!", Modifier::Chorus)]
+        );
+    }
+
+    #[test]
+    fn test_tokenize_bride_with_exclamation_marks() {
+        let content = r"##- Bride Loud!!";
+        let token_lines = ChorddownTokenizer::new().tokenize(content);
+        assert_eq!(
+            token_lines,
+            vec![Token::headline(2, "Bride Loud!!", Modifier::Bridge)]
+        );
+    }
+
+    #[test]
+    fn test_tokenize_chorus_with_exclamation_marks_at_end() {
+        let content = r"## Play Loud!!";
+        let token_lines = ChorddownTokenizer::new().tokenize(content);
+        assert_eq!(
+            token_lines,
+            vec![Token::headline(2, "Play Loud!!", Modifier::None)]
+        );
     }
 }

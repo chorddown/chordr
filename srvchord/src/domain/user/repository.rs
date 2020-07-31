@@ -1,6 +1,6 @@
 use crate::command::{Command, CommandExecutor};
 use crate::diesel::QueryDsl;
-use crate::domain::user::User;
+use crate::domain::user::UserDb;
 use crate::error::SrvError;
 use crate::schema::user;
 use crate::schema::user::dsl::user as all_users;
@@ -19,7 +19,7 @@ impl UserRepository {
         &self,
         connection: &ConnectionType,
         username: S,
-    ) -> Result<User, SrvError> {
+    ) -> Result<UserDb, SrvError> {
         Ok(all_users
             .filter(crate::schema::user::username.eq(username.as_ref()))
             .first(connection)?)
@@ -27,11 +27,11 @@ impl UserRepository {
 }
 
 impl RepositoryTrait for UserRepository {
-    type ManagedType = User;
+    type ManagedType = UserDb;
     type Error = SrvError;
 
     fn find_all(&self, connection: &ConnectionType) -> Result<Vec<Self::ManagedType>, Self::Error> {
-        Ok(all_users.order(user::id.desc()).load(connection)?)
+        Ok(all_users.order(user::username.desc()).load(connection)?)
     }
 
     fn count_all(&self, connection: &ConnectionType) -> Result<Count, Self::Error> {
@@ -41,9 +41,9 @@ impl RepositoryTrait for UserRepository {
     fn find_by_id(
         &self,
         connection: &ConnectionType,
-        id: <User as RecordIdTrait>::Id,
+        id: <UserDb as RecordIdTrait>::Id,
     ) -> Result<Self::ManagedType, Self::Error> {
-        Ok(all_users.find(id).get_result::<User>(connection)?)
+        Ok(all_users.find(id).get_result::<UserDb>(connection)?)
     }
 
     fn add(

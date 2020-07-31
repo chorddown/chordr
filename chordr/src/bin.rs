@@ -4,13 +4,13 @@ extern crate libchordr;
 use clap::{App, Arg, ArgMatches, SubCommand};
 use std::fs;
 
+use ansi_term::Colour;
+use atty::Stream;
 use libchordr::models::chord::fmt::Formatting;
 use libchordr::prelude::Error;
 use libchordr::prelude::Result;
 use libchordr::prelude::*;
 use std::convert::TryFrom;
-use atty::Stream;
-use ansi_term::Colour;
 use std::error::Error as StdError;
 use std::process::exit;
 
@@ -31,7 +31,7 @@ fn main() {
                         .help("Chorddown file to parse"),
                 )
                 .arg(output_arg.clone())
-                .arg(Arg::with_name("FORMAT").help("Output format")),
+                .arg(Arg::with_name("FORMAT").help(&get_output_format_help())),
         )
         .subcommand(
             SubCommand::with_name("build-catalog")
@@ -107,10 +107,30 @@ fn convert(args: &ArgMatches) -> Result<()> {
     handle_output(output_file_path, output)
 }
 
+fn get_output_format_help() -> String {
+    format!("Output format (one of {})", get_valid_output_format_help())
+}
+
+fn get_valid_output_format_help() -> String {
+    Format::get_all()
+        .iter()
+        .map(|f| f.to_string())
+        .collect::<Vec<String>>()
+        .join(", ")
+}
+
 fn get_output_format(args: &ArgMatches) -> Format {
     if let Some(raw_format) = args.value_of("FORMAT") {
-        if let Ok(f) = Format::try_from(raw_format) {
-            return f;
+        match Format::try_from(raw_format) {
+            Ok(f) => return f,
+            Err(_) => {
+                eprintln!(
+                    "Unknown format '{}'. Valid formats are: {}",
+                    raw_format,
+                    get_valid_output_format_help()
+                );
+                exit(1);
+            }
         }
     }
 
@@ -122,7 +142,8 @@ fn build_catalog(args: &ArgMatches) -> Result<()> {
     let pretty = args.is_present("pretty");
     let output_file_path = args.value_of("OUTPUT").unwrap();
 
-    let catalog_result = CatalogBuilder::new().build_catalog_for_directory(dir_path, FileType::Chorddown, true)?;
+    let catalog_result =
+        CatalogBuilder::new().build_catalog_for_directory(dir_path, FileType::Chorddown, true)?;
 
     let serialization_result = if pretty {
         serde_json::to_string_pretty(&catalog_result.catalog)
@@ -146,7 +167,8 @@ fn build_catalog(args: &ArgMatches) -> Result<()> {
         let msg = format!(
             "Successfully saved the catalog revision '{}' at {}",
             catalog_result.catalog.revision(),
-            output_file_path);
+            output_file_path
+        );
         if atty::is(Stream::Stdout) {
             println!("{}", Colour::Green.paint(msg));
         } else {
@@ -157,7 +179,10 @@ fn build_catalog(args: &ArgMatches) -> Result<()> {
 }
 
 fn handle_error_output(error: CatalogBuildError) -> () {
-    let header = format!("Error during analysis of file {}:", error.path().to_string_lossy());
+    let header = format!(
+        "Error during analysis of file {}:",
+        error.path().to_string_lossy()
+    );
     let description = match error.source() {
         Some(s) => s.to_string(),
         None => error.message().to_owned(),

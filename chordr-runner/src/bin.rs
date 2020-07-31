@@ -31,7 +31,7 @@ fn run() -> Result<()> {
     let app = App::new(env!("CARGO_PKG_NAME"))
         .version(env!("CARGO_PKG_VERSION"))
         .author("Daniel Corn <info@cundd.net>")
-        .about("Synchronize chorddown files with online file services")
+        .about("Service for chorddown file synchronization and catalog building")
         .arg(
             Arg::with_name("configuration")
                 .help("File containing the configuration")

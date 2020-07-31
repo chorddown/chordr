@@ -9,8 +9,8 @@ pub(crate) struct FSM {
     state: Mode,
     literal_buffer: String,
     header_level: u8,
-    header_modifier: Modifier,
-    error: Option<StateError>,
+    header_modifier: Option<Modifier>,
+    warnings: Vec<StateError>,
 }
 
 impl FSM {
@@ -19,11 +19,14 @@ impl FSM {
             state: Mode::Bof,
             literal_buffer: String::new(),
             header_level: 0,
-            header_modifier: Modifier::None,
-            error: None,
+            header_modifier: None,
+            warnings: vec![],
         }
     }
 
+    /// Return the [Mode] that is signaled by `lexeme` if it did change
+    ///
+    /// `None` is returned if there is no change to the current [Mode] (=`self.state`)
     pub fn characterize_lexeme(&mut self, lexeme: &Lexeme) -> Option<Mode> {
         match self.state {
             Mode::Bof | Mode::Newline => match lexeme {
@@ -34,7 +37,7 @@ impl FSM {
                 Lexeme::Newline => Some(Mode::Newline),
                 Lexeme::ChordStart => Some(Mode::Chord),
                 Lexeme::ChordEnd => {
-                    self.error = Some(StateError::UnexpectedChordEnd);
+                    self.warnings.push(StateError::UnexpectedChordEnd);
 
                     Some(Mode::Literal)
                 }
@@ -55,13 +58,13 @@ impl FSM {
                     }
                     Lexeme::Newline => {
                         // Unclosed chord
-                        self.error = Some(StateError::UnclosedChord);
+                        self.warnings.push(StateError::UnclosedChord);
                         Some(Mode::Newline)
                     }
                     Lexeme::ChordStart => {
                         // Nested chord
                         self.append_lexeme(lexeme);
-                        self.error = Some(StateError::NestedChord);
+                        self.warnings.push(StateError::NestedChord);
                         None
                     }
                     Lexeme::ChordEnd => Some(Mode::Literal),
@@ -70,7 +73,7 @@ impl FSM {
                     | Lexeme::ChorusMark
                     | Lexeme::BridgeMark => {
                         self.append_lexeme(lexeme);
-                        self.error = Some(StateError::InvalidChordCharacter);
+                        self.warnings.push(StateError::InvalidChordCharacter);
                         None
                     }
                     Lexeme::Literal(_) => {
@@ -78,7 +81,7 @@ impl FSM {
                         None
                     }
                     Lexeme::Eof => {
-                        self.error = Some(StateError::UnexpectedEndOfFile);
+                        self.warnings.push(StateError::UnexpectedEndOfFile);
                         FSM::build_eof()
                     }
                 }
@@ -91,23 +94,36 @@ impl FSM {
                     }
                     Lexeme::Newline => Some(Mode::Newline),
                     Lexeme::ChordStart | Lexeme::ChordEnd => {
+                        self.set_header_modifier_for_lexeme(lexeme);
                         // Chord inside a header
                         self.append_lexeme(lexeme);
                         None
                     }
                     Lexeme::QuoteStart | Lexeme::Colon => {
+                        self.set_header_modifier_for_lexeme(lexeme);
                         self.append_lexeme(lexeme);
                         None
                     }
                     Lexeme::ChorusMark => {
-                        self.header_modifier = Modifier::Chorus;
+                        if self.header_modifier.is_some() {
+                            // A header modifier has already been detected -> append this lexeme
+                            self.append_lexeme(lexeme);
+                        } else {
+                            self.set_header_modifier_for_lexeme(lexeme);
+                        }
                         None
                     }
                     Lexeme::BridgeMark => {
-                        self.header_modifier = Modifier::Bridge;
+                        if self.header_modifier.is_some() {
+                            // A header modifier has already been detected -> append this lexeme
+                            self.append_lexeme(lexeme);
+                        } else {
+                            self.set_header_modifier_for_lexeme(lexeme);
+                        }
                         None
                     }
                     Lexeme::Literal(_) => {
+                        self.set_header_modifier_for_lexeme(lexeme);
                         self.append_lexeme(lexeme);
                         None
                     }
@@ -133,7 +149,7 @@ impl FSM {
                 match lexeme {
                     Lexeme::Newline => Some(Mode::Newline),
                     Lexeme::HeaderStart => {
-                        self.error = Some(StateError::UnexpectedHeaderStart);
+                        self.warnings.push(StateError::UnexpectedHeaderStart);
                         self.append_lexeme(lexeme);
                         None
                     }
@@ -141,7 +157,7 @@ impl FSM {
                     Lexeme::ChordStart => Some(Mode::Chord),
                     Lexeme::ChordEnd => {
                         // Chord End without an opening bracket
-                        self.error = Some(StateError::UnexpectedChordEnd);
+                        self.warnings.push(StateError::UnexpectedChordEnd);
 
                         None
                     }
@@ -154,7 +170,7 @@ impl FSM {
                         None
                     }
                     Lexeme::Eof => {
-                        self.error = Some(StateError::UnexpectedEndOfFile);
+                        self.warnings.push(StateError::UnexpectedEndOfFile);
                         FSM::build_eof()
                     }
                 }
@@ -187,11 +203,11 @@ impl FSM {
         let token = Token::headline(
             self.header_level,
             self.consume_buffer().trim_start(),
-            self.header_modifier,
+            self.header_modifier.unwrap_or(Modifier::None),
         );
 
         self.header_level = 0;
-        self.header_modifier = Modifier::None;
+        self.header_modifier = None;
         Some(token)
     }
 
@@ -213,6 +229,15 @@ impl FSM {
             Err(_) => Some(Token::Literal(literal)),
         }
     }
+
+    fn set_header_modifier_for_lexeme(&mut self, lexeme: &Lexeme) {
+        if self.header_modifier.is_none() {
+            match lexeme.detect_modifier() {
+                Some(v) => self.header_modifier = Some(v),
+                None => {}
+            }
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -227,14 +252,14 @@ enum StateError {
 
 impl Display for StateError {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        write!(f, "{}", match self {
-            StateError::UnclosedChord => "UnclosedChord",
-            StateError::NestedChord => "NestedChord",
-            StateError::InvalidChordCharacter => "InvalidChordCharacter",
-            StateError::UnexpectedChordEnd => "UnexpectedChordEnd",
-            StateError::UnexpectedHeaderStart => "UnexpectedHeaderStart",
-            StateError::UnexpectedEndOfFile => "UnexpectedEndOfFile",
-        })
+        match self {
+            StateError::UnclosedChord => f.write_str("UnclosedChord"),
+            StateError::NestedChord => f.write_str("NestedChord"),
+            StateError::InvalidChordCharacter => f.write_str("InvalidChordCharacter"),
+            StateError::UnexpectedChordEnd => f.write_str("UnexpectedChordEnd"),
+            StateError::UnexpectedHeaderStart => f.write_str("UnexpectedHeaderStart"),
+            StateError::UnexpectedEndOfFile => f.write_str("UnexpectedEndOfFile"),
+        }
     }
 }
 
