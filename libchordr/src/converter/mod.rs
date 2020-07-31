@@ -14,6 +14,7 @@ mod html;
 mod pdf;
 mod songbeamer;
 
+/// Trait for converting between formats
 pub trait ConverterTrait {
     fn convert(
         &self,
@@ -30,6 +31,10 @@ impl Converter {
         Self {}
     }
 
+    /// Build a Converter for the given format
+    ///
+    /// Factory method to build a `ConverterTrait` implementor instance to convert a [`Node`]
+    /// structure into the output format
     pub fn get_converter(format: Format) -> Box<dyn ConverterTrait> {
         match format {
             Format::HTML => Box::new(HtmlConverter {}),
