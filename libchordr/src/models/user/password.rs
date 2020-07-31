@@ -14,6 +14,14 @@ impl Password {
             Ok(Self(password))
         }
     }
+
+    pub fn hashed<S: Into<String>>(hash: S) -> Result<Self, Error> {
+        let hash = hash.into();
+        // if hash.is_empty() || hash.len() < 8 {
+        //     warn!("Hash is empty or too short");
+        // }
+        Ok(Self(hash))
+    }
 }
 
 impl fmt::Display for Password {
