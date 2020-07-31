@@ -12,6 +12,8 @@
 }
 
 html {
+    --font-size-base: #{$font-size-web};
+
     --background: #{$background};
     --text-color: #{$text-color};
     --link-color: #{$link-color};

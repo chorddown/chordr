@@ -1,4 +1,5 @@
 html {
+  --font-size-base: 16px;
   --background: white;
   --text-color: #221d1c;
   --link-color: #62625e;
@@ -46,7 +47,7 @@ html.dark-mode {
 
 #chordr {
   font-family: "Merriweather", "Libre Baskerville", "Times", "Times New Roman", -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
-  font-size: 16px;
+  font-size: var(--font-size-base);
   line-height: 1.3em;
   letter-spacing: 0.05em;
   background: var(--background);
