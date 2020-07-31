@@ -191,10 +191,10 @@ mod test {
         SetlistEntry::new(song_id, FileType::Chorddown, title, None)
     }
 
-    #[test]
-    fn move_entry_test() {
+    fn build_setlist() -> Setlist {
         let now = Utc::now();
-        let mut list = Setlist::new(
+
+        Setlist::new(
             "Setlist name",
             1,
             get_test_user(),
@@ -203,7 +203,12 @@ mod test {
             now,
             now,
             vec![entry("0"), entry("1"), entry("2"), entry("3"), entry("4")],
-        );
+        )
+    }
+
+    #[test]
+    fn move_entry_test() {
+        let mut list = build_setlist();
         assert!(list.move_entry(1, 3).is_ok());
         assert_eq!(list[0], entry("0"));
         assert_eq!(list[1], entry("2"));
@@ -212,17 +217,7 @@ mod test {
 
     #[test]
     fn move_entry_boundary_test() {
-        let now = Utc::now();
-        let mut list = Setlist::new(
-            "Setlist name",
-            1,
-            get_test_user(),
-            None,
-            Some(now),
-            now,
-            now,
-            vec![entry("0"), entry("1"), entry("2"), entry("3"), entry("4")],
-        );
+        let mut list = build_setlist();
         assert!(list.move_entry(0, 4).is_ok());
         assert_eq!(list[0], entry("1"));
         assert_eq!(list[4], entry("0"));
