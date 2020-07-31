@@ -17,7 +17,11 @@ impl TagProvider {
         let mut gtb = TagBuilder::new();
 
         match node {
-            Node::ChordTextPair { chords, text, last_in_line } => self.build_column(
+            Node::ChordTextPair {
+                chords,
+                text,
+                last_in_line,
+            } => self.build_column(
                 self.build_tag_for_chords(chords, formatting),
                 self.build_tag_for_chord_text_token(text, formatting, *last_in_line),
             ),
@@ -101,7 +105,12 @@ impl TagProvider {
             Token::Newline => unreachable!(),
         }
     }
-    fn build_tag_for_chord_text_token<'a>(&'a self, token: &'a Token, _formatting: Formatting, last_in_line: bool) -> Tag {
+    fn build_tag_for_chord_text_token<'a>(
+        &'a self,
+        token: &'a Token,
+        _formatting: Formatting,
+        last_in_line: bool,
+    ) -> Tag {
         let mut gtb = TagBuilder::new();
 
         if let Token::Literal(c) = token {
@@ -166,12 +175,9 @@ impl TagProvider {
             _ => "text-row",
         };
 
-
         let string = format!(
             "<div class='chord-row'>{}</div><div class='{}'>{}</div>",
-            chord_text,
-            lyric_text_class,
-            lyric_text
+            chord_text, lyric_text_class, lyric_text
         );
 
         TagBuilder::new()

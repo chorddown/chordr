@@ -119,7 +119,11 @@ impl NodeParser {
                     false
                 };
 
-                return Ok(Node::ChordTextPair { chords, text, last_in_line })
+                return Ok(Node::ChordTextPair {
+                    chords,
+                    text,
+                    last_in_line,
+                });
             }
         }
 

@@ -33,7 +33,11 @@ impl ConverterTrait for SongBeamerConverter {
 impl SongBeamerConverter {
     fn build_node<'a>(&'a self, node: &'a Node) -> Result<String> {
         match node {
-            Node::ChordTextPair { chords: _, text, last_in_line: _ } => Ok(self.build_text(text)),
+            Node::ChordTextPair {
+                chords: _,
+                text,
+                last_in_line: _,
+            } => Ok(self.build_text(text)),
             Node::Text(text) => Ok(self.build_text(text)),
             Node::Document(children) => Ok(self.build_tag_for_children(children)),
             Node::Newline => Ok("\n".to_owned()),
