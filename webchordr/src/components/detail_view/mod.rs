@@ -53,7 +53,7 @@ impl Component for DetailView {
                     </button>
                 </header>
                 <div class="detail-view-content">
-                    { self.props.children.render() }
+                    { self.props.children.clone() }
                 </div>
             </div>
         }
