@@ -5,6 +5,7 @@ use crate::components::song_browser::SongBrowser;
 use crate::components::song_search::SongSearch;
 use crate::components::song_view::SongView;
 use crate::components::start_screen::StartScreen;
+use crate::components::user::Info as UserInfo;
 use crate::errors::WebError;
 use crate::events::{Event, SetlistEvent, SettingsEvent, SortingChange};
 use crate::handler_traits::catalog_handler::CatalogHandler;
@@ -13,7 +14,7 @@ use crate::handler_traits::settings_handler::SettingsHandler;
 use crate::helpers::window;
 use crate::persistence::prelude::*;
 use crate::persistence::web_repository::{CatalogWebRepository, SettingsWebRepository};
-use crate::route::{AppRoute, SetlistRoute};
+use crate::route::{AppRoute, SetlistRoute, UserRoute};
 use chrono::Utc;
 use libchordr::prelude::*;
 use log::{debug, error, info, warn};
@@ -39,8 +40,7 @@ pub struct App {
     _route_service: RouteService<AppRouteState>,
     route: Route<AppRouteState>,
     link: ComponentLink<App>,
-
-    _user: User,
+    user: User,
     expand: bool,
     fetching: bool,
     catalog: Option<Catalog>,
@@ -70,6 +70,8 @@ impl App {
             Some(AppRoute::SongBrowser(chars)) => self.view_song_browser(chars),
             Some(AppRoute::SongSearch) => self.view_song_search(true),
             Some(AppRoute::Setlist(route)) => self.view_setlist_route(route),
+
+            Some(AppRoute::User(route)) => self.view_user_route(route),
             Some(AppRoute::Index) => self.view_index(),
             None => self.view_index(),
         }) as Html
@@ -103,26 +105,20 @@ impl App {
                 .link
                 .callback(|s| Msg::Event(SetlistEvent::Remove(s).into()));
             let change = self.link.callback(|s: (SongId, SongSettings)| {
-                Msg::Event(SettingsEvent::Change(s.0, s.1).into())
+                Msg::Event(Event::Pair(
+                    Box::new(SettingsEvent::Change(s.0.clone(), s.1.clone()).into()),
+                    Box::new(SetlistEvent::SettingsChange(s.0, s.1).into()),
+                ))
             });
             let is_on_setlist = if let Some(ref setlist) = self.current_setlist {
-                setlist.contains_id(song.id())
+                setlist.contains_id(song_id.clone())
             } else {
                 false
             };
 
-            let song_settings = match self.settings.get(&song_id) {
-                Some(s) => {
-                    debug!("Found settings for song {}: {:?}", song_id, s);
-                    s.clone()
-                }
-                None => {
-                    debug!("No settings for song {} found in setlist", song_id);
-                    SongSettings::new(0, Formatting::default())
-                }
-            };
+            let song_settings = self.get_settings_for_song(&song_id);
 
-            debug!("Song {} is on list? {}", song.id(), is_on_setlist);
+            debug!("Song {} is on list? {}", song_id, is_on_setlist);
 
             return self.compose(
                 html! {
@@ -155,6 +151,38 @@ impl App {
                 html! {}
             }
         }) as Html
+    }
+
+    fn get_settings_for_song(&self, song_id: &SongId) -> SongSettings {
+        // Look if there are settings for the `SongId` in the `Setlist`
+        if let Some(settings) = self.get_settings_from_setlist(song_id) {
+            debug!(
+                "Found settings for song in Setlist {}: {:?}",
+                song_id, settings
+            );
+
+            return settings;
+        }
+
+        match self.settings.get(song_id) {
+            Some(s) => {
+                debug!("Found settings for song {}: {:?}", song_id, s);
+                s.clone()
+            }
+            None => {
+                debug!("No settings for song {} found in setlist", song_id);
+                SongSettings::default()
+            }
+        }
+    }
+
+    fn get_settings_from_setlist(&self, song_id: &SongId) -> Option<SongSettings> {
+        match &self.current_setlist {
+            None => None,
+            Some(setlist) => setlist
+                .get(song_id.clone())
+                .and_then(|entry| entry.settings()),
+        }
     }
 
     fn view_song_browser<S: Into<String>>(&self, chars: S) -> Html {
@@ -220,6 +248,12 @@ impl App {
         }
     }
 
+    fn view_user_route(&self, route: UserRoute) -> Html {
+        match route {
+            UserRoute::Info => html! { <UserInfo user=self.user.clone() /> },
+        }
+    }
+
     fn view_nav(&self, current_song_id: Option<SongId>) -> Html {
         let toggle_menu = self.link.callback(|_| Msg::ToggleMenu);
         let on_setlist_change = self.link.callback(|e| Msg::Event(e));
@@ -236,6 +270,18 @@ impl App {
                 on_toggle=toggle_menu
                 on_setlist_change=on_setlist_change
             />
+        }
+    }
+
+    fn handle_event(&mut self, e: Event) {
+        match e {
+            Event::SetlistEvent(se) => self.handle_setlist_event(se),
+            Event::SettingsEvent(se) => self.handle_settings_event(se),
+            Event::Pair(a, b) => {
+                self.handle_event(*a);
+                self.handle_event(*b)
+            }
+            _ => debug!("New event {:?}", e),
         }
     }
 
@@ -290,6 +336,9 @@ impl SetlistHandler for App {
             SetlistEvent::SortingChange(v) => self.setlist_sorting_changed(v),
             SetlistEvent::Add(v) => self.setlist_add(v),
             SetlistEvent::Remove(v) => self.setlist_remove(v),
+            SetlistEvent::SettingsChange(id, settings) => {
+                self.setlist_settings_changed(id, settings)
+            }
             SetlistEvent::Replace(v) => self.setlist_replace(v),
         }
     }
@@ -318,6 +367,33 @@ impl SetlistHandler for App {
             Ok(_) => info!("Removed song {} from setlist", song_id),
             Err(_) => warn!("Could not remove song {} from setlist", song_id),
         }
+        <App as SetlistHandler>::commit_changes(self);
+    }
+
+    fn setlist_settings_changed(&mut self, song_id: SongId, song_settings: SongSettings) {
+        info!(
+            "Settings changed song {} {:#?}",
+            song_id,
+            self.current_setlist.as_ref()
+        );
+        let setlist = self
+            .current_setlist
+            .as_mut()
+            .expect("No current setlist defined");
+        let current_entry = match setlist.get(song_id.clone()) {
+            None => {
+                warn!("Could not find song {} in setlist", song_id);
+                return;
+            }
+            Some(c) => c,
+        };
+        let new_entry = current_entry.with_settings(song_settings);
+
+        if setlist.replace(new_entry).is_err() {
+            warn!("Could not replace song {} in setlist", song_id);
+            return;
+        }
+
         <App as SetlistHandler>::commit_changes(self);
     }
 
@@ -444,9 +520,9 @@ impl Component for App {
 
         let persistence_manager = PersistenceManager::new(BrowserStorage::new().unwrap());
 
-        let user = User::new(Username::new("me").unwrap(), "First name", "Last name", "");
+        let user = User::unknown();
         let now = Utc::now();
-        let setlist = Setlist::new("", 0, user.clone(), None, now, now, now, vec![]);
+        let setlist = Setlist::new("", 0, user.clone(), None, Some(now), now, now, vec![]);
         let settings = SongSettingsMap::new();
 
         Self {
@@ -460,7 +536,7 @@ impl Component for App {
             _setlist_collection: SetlistCollection::new(),
             _route_service: route_service,
             route,
-            _user: user,
+            user: user,
         }
     }
 
@@ -484,11 +560,7 @@ impl Component for App {
                     .reload()
                     .expect("Could not reload the top-frame");
             }
-            Msg::Event(e) => match e {
-                Event::SetlistEvent(se) => self.handle_setlist_event(se),
-                Event::SettingsEvent(se) => self.handle_settings_event(se),
-                _ => debug!("New event {:?}", e),
-            },
+            Msg::Event(e) => self.handle_event(e),
         }
         true
     }
