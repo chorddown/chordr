@@ -11,7 +11,7 @@ pub struct DeserializeResult {
 
 pub struct DeserializeService {}
 
-#[allow(unused)]
+#[allow(unused, unreachable_code)]
 impl DeserializeService {
     /// Deserialize the given serialized `Setlist` by querying `catalog` for the `Song`s
     pub fn deserialize<E: SongData, C: CatalogTrait<E>>(
@@ -37,7 +37,7 @@ impl DeserializeService {
         }
     }
 
-    #[allow(unused)]
+    #[allow(unused, deprecated)]
     fn collect_setlist_entries<E: SongData, C: CatalogTrait<E>>(
         serialized_setlist: &str,
         catalog: &C,
@@ -92,6 +92,7 @@ mod test {
     }
 
     #[test]
+    #[allow(unreachable_code)]
     fn deserialize_test() {
         // TODO: Implementation
         return;
@@ -113,6 +114,7 @@ mod test {
     }
 
     #[test]
+    #[allow(unreachable_code)]
     fn deserialize_w_error_test() {
         // TODO: Implementation
         return;
