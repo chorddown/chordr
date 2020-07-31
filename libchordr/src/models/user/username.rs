@@ -1,6 +1,7 @@
 use crate::error::Error;
 use crate::helper::is_valid_model_identifier;
 use serde::{Deserialize, Serialize};
+use std::convert::TryFrom;
 use std::fmt;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -14,6 +15,22 @@ impl Username {
         } else {
             Err(Error::invalid_username_error(id))
         }
+    }
+}
+
+impl TryFrom<&str> for Username {
+    type Error = Error;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        Username::new(value)
+    }
+}
+
+impl TryFrom<String> for Username {
+    type Error = Error;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        Username::new(value)
     }
 }
 
