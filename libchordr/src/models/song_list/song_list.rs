@@ -6,6 +6,7 @@ use serde::Deserialize;
 use serde::Serialize;
 use std::fmt::Debug;
 use std::ops;
+use std::slice::Iter;
 use std::vec::IntoIter;
 
 /// A generic set of Songs identified by their [SongId]
@@ -24,6 +25,10 @@ where
         Self {
             0: List::from(entries),
         }
+    }
+
+    pub fn iter(&self) -> Iter<'_, S> {
+        self.0.iter()
     }
 }
 
