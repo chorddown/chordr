@@ -1,18 +1,20 @@
 mod json_formatting;
 
+pub use self::json_formatting::*;
+use crate::domain::user::repository::UserRepository;
+use crate::domain::user::UserDb;
+use crate::traits::RepositoryTrait;
 use crate::{ConnectionType, DbConn};
 use diesel::Connection;
 use parking_lot::Mutex;
+use rand::{thread_rng, Rng};
 use rocket::config::RocketConfig;
 use rocket::local::Client;
-pub use self::json_formatting::*;
-use rand::{thread_rng, Rng};
-use crate::domain::user::User;
-use crate::domain::user::repository::UserRepository;
-use crate::traits::RepositoryTrait;
-use crate::domain::setlist::UserSetlist;
-use libchordr::prelude::{SetlistEntry, FileType};
-use crate::command::{CommandExecutor, Command};
+// use crate::domain::setlist::UserSetlist;
+use crate::command::{Command, CommandExecutor};
+use chrono::Utc;
+use libchordr::models::user::User;
+use libchordr::prelude::{FileType, Password, Setlist, SetlistEntry, Username};
 
 #[allow(unused)]
 enum UseDatabase {
@@ -42,8 +44,8 @@ macro_rules! run_test {
 }
 
 pub fn run_test_fn<F>(test_body: F) -> ()
-    where
-        F: Fn(Client, DbConn) -> (),
+where
+    F: Fn(Client, DbConn) -> (),
 {
     let _lock = crate::test_helpers::DB_LOCK.lock();
     let rocket = crate::rocket();
@@ -55,8 +57,8 @@ pub fn run_test_fn<F>(test_body: F) -> ()
 }
 
 pub fn run_database_test<F>(test_body: F) -> ()
-    where
-        F: Fn(ConnectionType) -> (),
+where
+    F: Fn(ConnectionType) -> (),
 {
     let _lock = crate::test_helpers::DB_LOCK.lock();
 
@@ -90,7 +92,7 @@ pub fn run_database_test<F>(test_body: F) -> ()
     test_body(conn)
 }
 
-pub fn create_random_user(conn: &ConnectionType) -> User {
+pub fn create_random_user(conn: &ConnectionType) -> UserDb {
     let mut rng = thread_rng();
     let random_user_id = rng.gen_range(10000, i32::MAX);
     let username = format!("daniel-{}", random_user_id);
@@ -100,12 +102,11 @@ pub fn create_random_user(conn: &ConnectionType) -> User {
         .take(30)
         .collect();
 
-    let user = User {
-        id: random_user_id,
+    let user = UserDb {
         username: username.clone(),
         first_name: "Daniel".to_string(),
         last_name: "Corn".to_string(),
-        password: password.clone(),
+        password_hash: password.clone(),
     };
 
     UserRepository::new().add(conn, user.clone()).unwrap();
@@ -113,19 +114,54 @@ pub fn create_random_user(conn: &ConnectionType) -> User {
     user
 }
 
-pub fn create_setlist(conn: &ConnectionType, id: i32, user: i32) -> UserSetlist {
-    let setlist = UserSetlist {
+pub fn insert_test_user<S1: Into<String>, S2: Into<String>, S3: Into<String>>(
+    conn: &ConnectionType,
+    username: S1,
+    first_name: S2,
+    last_name: S3,
+) -> UserDb {
+    let username = username.into();
+    let first_name = first_name.into();
+    let last_name = last_name.into();
+    let new_user = UserDb {
+        username,
+        first_name,
+        last_name,
+        password_hash: create_test_password().to_string(),
+    };
+
+    CommandExecutor::perform(&new_user, Command::add(conn)).unwrap();
+
+    new_user
+}
+
+pub fn create_setlist<S: AsRef<str>>(conn: &ConnectionType, id: i32, username: S) -> Setlist {
+    let now = Utc::now();
+
+    let setlist = Setlist::new(
+        "My setlist",
         id,
-        user,
-        user_name: "Saul".to_string(),
-        sorting: id,
-        entries: vec![
+        User::new(
+            Username::new(username.as_ref()).unwrap(),
+            "Saul",
+            "Doe",
+            create_test_password(),
+        ),
+        None,
+        None,
+        now,
+        now,
+        vec![
             SetlistEntry::new("song-1", FileType::Chorddown, "Song 1", None),
             SetlistEntry::new("song-2", FileType::Chorddown, "Song 2", None),
             SetlistEntry::new("song-3", FileType::Chorddown, "Song 3", None),
         ],
-    };
+    );
     CommandExecutor::perform(&setlist, Command::add(conn)).unwrap();
 
     setlist
+}
+
+pub fn create_test_password() -> Password {
+    Password::new("a-super-nice-password").unwrap()
 }

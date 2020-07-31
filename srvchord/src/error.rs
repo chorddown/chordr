@@ -53,6 +53,18 @@ impl From<::argon2::Error> for SrvError {
     }
 }
 
+impl From<::libchordr::prelude::Error> for SrvError {
+    fn from(error: ::libchordr::prelude::Error) -> Self {
+        SrvError::from_error(error)
+    }
+}
+
+impl From<::serde_json::Error> for SrvError {
+    fn from(error: ::serde_json::Error) -> Self {
+        SrvError::from_error(error)
+    }
+}
+
 #[derive(Debug)]
 pub enum AuthorizationError {
     MissingCredentials,
@@ -64,14 +76,14 @@ impl fmt::Display for AuthorizationError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             AuthorizationError::MissingCredentials => write!(f, "No credentials given"),
-            AuthorizationError::IncorrectPassword
-            | AuthorizationError::IncorrectUsername => write!(f, "Incorrect username or password"),
+            AuthorizationError::IncorrectPassword | AuthorizationError::IncorrectUsername => {
+                write!(f, "Incorrect username or password")
+            }
         }
     }
 }
 
 impl Error for AuthorizationError {}
-
 
 #[derive(Debug)]
 pub enum SrvErrorKind {

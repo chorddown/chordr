@@ -12,12 +12,16 @@ impl JsonTemplateValue {}
 
 impl fmt::Display for JsonTemplateValue {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", match self {
-            JsonTemplateValue::Text(s) => s.clone(),
-            JsonTemplateValue::PosInt(i) => i.to_string(),
-            JsonTemplateValue::NegInt(i) => i.to_string(),
-            JsonTemplateValue::Float(i) => i.to_string(),
-        })
+        write!(
+            f,
+            "{}",
+            match self {
+                JsonTemplateValue::Text(s) => s.clone(),
+                JsonTemplateValue::PosInt(i) => i.to_string(),
+                JsonTemplateValue::NegInt(i) => i.to_string(),
+                JsonTemplateValue::Float(i) => i.to_string(),
+            }
+        )
     }
 }
 

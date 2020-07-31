@@ -1,9 +1,9 @@
 use crate::domain::credentials::Credentials;
-use crate::domain::user::User;
+use crate::domain::user::UserDb;
 use crate::error::SrvError;
 
-pub fn verify_password(credentials: &Credentials, user: &User) -> bool {
-    let password_data = &user.password;
+pub fn verify_password(credentials: &Credentials, user: &UserDb) -> bool {
+    let password_data = &user.password_hash;
     let parts: Vec<&str> = password_data.splitn(3, ':').collect();
     if parts.len() < 3 {
         warn!("Check un-hashed password");
@@ -32,7 +32,7 @@ fn verify_password_argon2(password: &str, hash: &str, salt: &str) -> Result<bool
     use argon2::Config;
 
     #[cfg(debug_assertions)]
-        let real_password_hash = {
+    let real_password_hash = {
         let config = Config::default();
         match argon2::hash_encoded(password.as_bytes(), salt.as_bytes(), &config) {
             Ok(r) => Some(r),
