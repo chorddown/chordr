@@ -29,6 +29,7 @@ impl SetlistEntry {
         }
     }
 
+    #[deprecated]
     pub fn from_song<S: SongData>(song: &S) -> Self {
         Self {
             song_id: song.id(),
@@ -42,9 +43,36 @@ impl SetlistEntry {
         song: &S,
         settings: SongSettings,
     ) -> Self {
-        let mut entry = Self::from_song(song);
-        entry.settings = Some(settings);
-        entry
+        Self {
+            song_id: song.id(),
+            file_type: song.file_type(),
+            title: song.title(),
+            settings: Some(settings),
+        }
+    }
+
+    pub fn settings(&self) -> Option<SongSettings> {
+        self.settings.clone()
+    }
+
+    /// Build a clone of the entry with the given [`SongSettings`] assigned
+    pub fn with_settings(&self, settings: SongSettings) -> Self {
+        Self {
+            song_id: self.id(),
+            file_type: self.file_type(),
+            title: self.title(),
+            settings: Some(settings),
+        }
+    }
+
+    /// Build a clone of the entry without any [`SongSettings`] assigned
+    pub fn without_settings(&self) -> Self {
+        Self {
+            song_id: self.id(),
+            file_type: self.file_type(),
+            title: self.title(),
+            settings: None,
+        }
     }
 }
 

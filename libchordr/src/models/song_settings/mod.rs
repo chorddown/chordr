@@ -36,3 +36,9 @@ impl SongSettings {
         self.formatting
     }
 }
+
+impl Default for SongSettings {
+    fn default() -> Self {
+        SongSettings::new(0, Formatting::default())
+    }
+}

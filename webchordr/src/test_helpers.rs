@@ -1,10 +1,7 @@
-use libchordr::models::file_type::FileType;
-use libchordr::models::song_id::SongId;
-use libchordr::models::user::{Password, User, Username};
-use libchordr::prelude::{ListEntryTrait, SetlistEntry, SongData, SongIdTrait};
+use libchordr::prelude::*;
 
 pub fn entry<S: Into<String>>(id: S) -> SetlistEntry {
-    SetlistEntry::from_song(&test_song(id))
+    SetlistEntry::from_song_with_settings(&test_song(id), SongSettings::default())
 }
 
 pub fn test_song<S: Into<String>>(id: S) -> TestSong {
