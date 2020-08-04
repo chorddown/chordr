@@ -20,6 +20,18 @@ where
             _phantom: PhantomData,
         }
     }
+
+    async fn load_catalog(no_cache: bool) -> Result<Option<Catalog>, WebError> {
+        let uri_base = "/catalog.json".to_owned();
+        let uri = if no_cache {
+            format!("{}?{}", uri_base, Date::now())
+        } else {
+            uri_base
+        };
+
+        let catalog = fetch::<Catalog>(&uri).await?;
+        Ok(Some(catalog))
+    }
 }
 
 #[async_trait(? Send)]
@@ -42,16 +54,9 @@ where
     }
 
     async fn load(&mut self) -> Result<Option<Self::ManagedType>, WebError> {
-        let no_cache = true;
-
-        let uri_base = "/catalog.json".to_owned();
-        let uri = if no_cache {
-            format!("{}?{}", uri_base, Date::now())
-        } else {
-            uri_base
-        };
-
-        let catalog = fetch::<Catalog>(&uri).await?;
-        Ok(Some(catalog))
+        match <CatalogWebRepository<'a, P>>::load_catalog(true).await {
+            Ok(r) => Ok(r),
+            Err(_) => <CatalogWebRepository<'a, P>>::load_catalog(false).await,
+        }
     }
 }
