@@ -1,35 +1,47 @@
-use super::persistence_manager_trait::PersistenceManagerTrait;
+use crate::errors::PersistenceError;
 use crate::errors::WebError;
 use crate::persistence::backend::BackendTrait;
+use crate::persistence::browser_storage::*;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use std::sync::{Arc, RwLock};
 
-pub struct PersistenceManager<B> {
-    backend: Arc<RwLock<B>>,
+pub struct BrowserStorageBackend<B> {
+    browser_storage: Arc<RwLock<B>>,
 }
 
-impl<B: BackendTrait> PersistenceManager<B> {
-    pub fn new(backend: B) -> Self {
+impl<B: BrowserStorageTrait> BrowserStorageBackend<B> {
+    pub fn new(browser_storage: B) -> Self {
         Self {
-            backend: Arc::new(RwLock::new(backend)),
+            browser_storage: Arc::new(RwLock::new(browser_storage)),
+        }
+    }
+
+    fn build_combined_key<N: AsRef<str>, K: AsRef<str>>(&self, namespace: &N, key: &K) -> String {
+        if namespace.as_ref().is_empty() {
+            key.as_ref().to_string()
+        } else {
+            format!("{}.{}", namespace.as_ref(), key.as_ref())
         }
     }
 }
 
 #[async_trait(? Send)]
-impl<B: BackendTrait> BackendTrait for PersistenceManager<B> {
+impl<B: BrowserStorageTrait> BackendTrait for BrowserStorageBackend<B> {
     async fn store<T: Serialize, N: AsRef<str>, K: AsRef<str>>(
         &self,
         namespace: N,
         key: K,
         value: &T,
     ) -> Result<(), WebError> {
-        self.backend
-            .write()
-            .expect("Could not acquire lock for writing")
-            .store(namespace, key, value)
-            .await
+        match serde_json::to_string(&value) {
+            Ok(serialized) => self
+                .browser_storage
+                .write()
+                .expect("Could not acquire lock for writing")
+                .set_item(self.build_combined_key(&namespace, &key), serialized),
+            Err(e) => Err(PersistenceError::serialization_error(e.to_string()).into()),
+        }
     }
 
     async fn load<T, N: AsRef<str>, K: AsRef<str>>(
@@ -40,16 +52,20 @@ impl<B: BackendTrait> BackendTrait for PersistenceManager<B> {
     where
         T: for<'a> Deserialize<'a>,
     {
-        self.backend
+        match self
+            .browser_storage
             .read()
             .expect("Could not acquire lock for reading")
-            .load(namespace, key)
-            .await
+            .get_item(self.build_combined_key(&namespace, &key))
+        {
+            Some(v) => match serde_json::from_str(v.as_str()) {
+                Ok(serialized) => Ok(serialized),
+                Err(e) => Err(PersistenceError::deserialization_error(e, Some(v)).into()),
+            },
+            None => Ok(None),
+        }
     }
 }
-
-#[async_trait(? Send)]
-impl<B: BackendTrait> PersistenceManagerTrait for PersistenceManager<B> {}
 
 #[cfg(test)]
 mod test {
@@ -57,9 +73,6 @@ mod test {
     use serde::{Deserialize, Serialize};
     use wasm_bindgen_test::*;
 
-    use crate::persistence::backend::BrowserStorageBackend;
-    use crate::persistence::browser_storage::HashMapBrowserStorage;
-    use crate::persistence::prelude::BrowserStorage;
     use crate::test_helpers::{entry, get_test_user};
     use chrono::prelude::*;
     use libchordr::models::setlist::Setlist;
@@ -74,7 +87,7 @@ mod test {
 
     #[wasm_bindgen_test]
     async fn store_and_load_i32_test() {
-        let pm = PersistenceManager::new(BrowserStorageBackend::new(HashMapBrowserStorage::new()));
+        let pm = BrowserStorageBackend::new(HashMapBrowserStorage::new());
         let value: i32 = 12;
         assert!(pm.store("test", "key-1", &value).await.is_ok());
 
@@ -95,7 +108,7 @@ mod test {
 
     #[wasm_bindgen_test]
     async fn store_and_load_person_test() {
-        let pm = PersistenceManager::new(BrowserStorageBackend::new(HashMapBrowserStorage::new()));
+        let pm = BrowserStorageBackend::new(HashMapBrowserStorage::new());
         let value = TestValue {
             age: 3,
             name: "Daniel".to_string(),
@@ -120,10 +133,9 @@ mod test {
 
     #[wasm_bindgen_test]
     async fn store_and_load_person_localstorage_test() {
-        let backend = BrowserStorageBackend::new(
+        let pm = BrowserStorageBackend::new(
             BrowserStorage::new().expect("Could not create Browser Storage"),
         );
-        let pm = PersistenceManager::new(backend);
         let value = TestValue {
             age: 3,
             name: "Daniel".to_string(),
@@ -148,7 +160,7 @@ mod test {
 
     #[wasm_bindgen_test]
     async fn store_and_load_setlist_test() {
-        let pm = PersistenceManager::new(BrowserStorageBackend::new(HashMapBrowserStorage::new()));
+        let pm = BrowserStorageBackend::new(HashMapBrowserStorage::new());
 
         let value = Setlist::new(
             "My setlist",

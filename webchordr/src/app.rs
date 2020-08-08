@@ -12,6 +12,7 @@ use crate::handler_traits::catalog_handler::CatalogHandler;
 use crate::handler_traits::setlist_handler::SetlistHandler;
 use crate::handler_traits::settings_handler::SettingsHandler;
 use crate::helpers::window;
+use crate::persistence::backend::BrowserStorageBackend;
 use crate::persistence::prelude::*;
 use crate::persistence::web_repository::{CatalogWebRepository, SettingsWebRepository};
 use crate::route::{AppRoute, SetlistRoute, UserRoute};
@@ -26,6 +27,7 @@ use wasm_bindgen_futures::spawn_local;
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
 use yew_router::prelude::*;
 
+type PMType = PersistenceManager<BrowserStorageBackend<BrowserStorage>>;
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct AppRouteState {}
 
@@ -36,7 +38,7 @@ impl Default for AppRouteState {
 }
 
 pub struct App {
-    persistence_manager: Arc<PersistenceManager<BrowserStorage>>,
+    persistence_manager: Arc<PMType>,
     /// Keep a reference to the RouteService so that it doesn't get dropped
     _route_service: RouteService<AppRouteState>,
     route: Route<AppRouteState>,
@@ -293,6 +295,13 @@ impl App {
             </>
         };
     }
+
+    fn build_persistence_manager() -> Arc<PMType> {
+        let browser_storage = BrowserStorage::new().unwrap();
+        let browser_storage_backend = BrowserStorageBackend::new(browser_storage);
+
+        Arc::new(PersistenceManager::new(browser_storage_backend))
+    }
 }
 
 impl CatalogHandler for App {
@@ -304,7 +313,7 @@ impl CatalogHandler for App {
         });
 
         spawn_local(async move {
-            type Repository<'a> = CatalogWebRepository<'a, PersistenceManager<BrowserStorage>>;
+            type Repository<'a> = CatalogWebRepository<'a, PMType>;
             let result = Repository::new(&pm).load().await;
 
             match result {
@@ -319,7 +328,7 @@ impl CatalogHandler for App {
         let pm = self.persistence_manager.clone();
         let catalog = self.catalog.clone();
         spawn_local(async move {
-            type Repository<'a> = CatalogWebRepository<'a, PersistenceManager<BrowserStorage>>;
+            type Repository<'a> = CatalogWebRepository<'a, PMType>;
             let result = Repository::new(&pm).store(&catalog.unwrap()).await;
 
             if let Err(e) = result {
@@ -425,7 +434,7 @@ impl SetlistHandler for App {
             .callback(move |setlist| Msg::Event(SetlistEvent::Replace(setlist).into()));
 
         spawn_local(async move {
-            type Repository<'a> = SetlistWebRepository<'a, PersistenceManager<BrowserStorage>>;
+            type Repository<'a> = SetlistWebRepository<'a, PMType>;
             let result = Repository::new(&pm).load().await;
 
             match result {
@@ -440,7 +449,7 @@ impl SetlistHandler for App {
         let pm = self.persistence_manager.clone();
         match self.current_setlist.clone() {
             Some(s) => spawn_local(async move {
-                type Repository<'a> = SetlistWebRepository<'a, PersistenceManager<BrowserStorage>>;
+                type Repository<'a> = SetlistWebRepository<'a, PMType>;
                 let result = Repository::new(&pm).store(&s).await;
 
                 if let Err(e) = result {
@@ -483,7 +492,7 @@ impl SettingsHandler for App {
             .callback(move |settings_map| Msg::Event(SettingsEvent::Replace(settings_map).into()));
 
         spawn_local(async move {
-            type Repository<'a> = SettingsWebRepository<'a, PersistenceManager<BrowserStorage>>;
+            type Repository<'a> = SettingsWebRepository<'a, PMType>;
             let result = Repository::new(&pm).load().await;
 
             match result {
@@ -498,7 +507,7 @@ impl SettingsHandler for App {
         let pm = self.persistence_manager.clone();
         let settings = self.settings.clone();
         spawn_local(async move {
-            type Repository<'a> = SettingsWebRepository<'a, PersistenceManager<BrowserStorage>>;
+            type Repository<'a> = SettingsWebRepository<'a, PMType>;
             let result = Repository::new(&pm).store(&settings).await;
 
             if let Err(e) = result {
@@ -517,8 +526,7 @@ impl Component for App {
         let route = Route::from(route_service.get_route());
         route_service.register_callback(link.callback(Msg::RouteChanged));
 
-        let persistence_manager = PersistenceManager::new(BrowserStorage::new().unwrap());
-        let persistence_manager = Arc::new(persistence_manager);
+        let persistence_manager = App::build_persistence_manager();
 
         let user = User::unknown();
         let now = Utc::now();
