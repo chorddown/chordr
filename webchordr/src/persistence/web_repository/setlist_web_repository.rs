@@ -4,14 +4,14 @@ use crate::{Setlist, WebError};
 use async_trait::async_trait;
 
 pub struct SetlistWebRepository<'a, P: PersistenceManagerTrait> {
-    persistence_manager: &'a mut P,
+    persistence_manager: &'a P,
 }
 
 impl<'a, P> SetlistWebRepository<'a, P>
 where
     P: PersistenceManagerTrait,
 {
-    pub fn new(persistence_manager: &'a mut P) -> Self {
+    pub fn new(persistence_manager: &'a P) -> Self {
         Self {
             persistence_manager,
         }

@@ -21,6 +21,7 @@ use log::{debug, error, info, warn};
 use percent_encoding::percent_decode_str;
 use serde::{Deserialize, Serialize};
 use std::rc::Rc;
+use std::sync::Arc;
 use wasm_bindgen_futures::spawn_local;
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
 use yew_router::prelude::*;
@@ -35,7 +36,7 @@ impl Default for AppRouteState {
 }
 
 pub struct App {
-    persistence_manager: PersistenceManager<BrowserStorage>,
+    persistence_manager: Arc<PersistenceManager<BrowserStorage>>,
     /// Keep a reference to the RouteService so that it doesn't get dropped
     _route_service: RouteService<AppRouteState>,
     route: Route<AppRouteState>,
@@ -48,8 +49,6 @@ pub struct App {
     _setlist_collection: SetlistCollection,
     settings: SongSettingsMap,
 }
-
-//#[allow(dead_code)]
 
 #[derive(Debug)]
 pub enum Msg {
@@ -298,7 +297,7 @@ impl App {
 
 impl CatalogHandler for App {
     fn fetch_catalog(&mut self) {
-        let mut pm = self.persistence_manager.clone();
+        let pm = self.persistence_manager.clone();
         let callback = self.link.callback(move |result| {
             debug!("Catalog response {:?}", result);
             Msg::FetchCatalogReady(result)
@@ -306,7 +305,7 @@ impl CatalogHandler for App {
 
         spawn_local(async move {
             type Repository<'a> = CatalogWebRepository<'a, PersistenceManager<BrowserStorage>>;
-            let result = Repository::new(&mut pm).load().await;
+            let result = Repository::new(&pm).load().await;
 
             match result {
                 Ok(Some(catalog)) => callback.emit(Ok(catalog)),
@@ -317,11 +316,11 @@ impl CatalogHandler for App {
     }
 
     fn commit_changes(&mut self) {
-        let mut pm = self.persistence_manager.clone();
+        let pm = self.persistence_manager.clone();
         let catalog = self.catalog.clone();
         spawn_local(async move {
             type Repository<'a> = CatalogWebRepository<'a, PersistenceManager<BrowserStorage>>;
-            let result = Repository::new(&mut pm).store(&catalog.unwrap()).await;
+            let result = Repository::new(&pm).store(&catalog.unwrap()).await;
 
             if let Err(e) = result {
                 error!("Could not commit Catalog changes: {}", e.to_string())
@@ -420,14 +419,14 @@ impl SetlistHandler for App {
     }
 
     fn fetch_setlist(&mut self) {
-        let mut pm = self.persistence_manager.clone();
+        let pm = self.persistence_manager.clone();
         let callback = self
             .link
             .callback(move |setlist| Msg::Event(SetlistEvent::Replace(setlist).into()));
 
         spawn_local(async move {
             type Repository<'a> = SetlistWebRepository<'a, PersistenceManager<BrowserStorage>>;
-            let result = Repository::new(&mut pm).load().await;
+            let result = Repository::new(&pm).load().await;
 
             match result {
                 Ok(Some(setlist)) => callback.emit(setlist),
@@ -438,11 +437,11 @@ impl SetlistHandler for App {
     }
 
     fn commit_changes(&mut self) {
-        let mut pm = self.persistence_manager.clone();
+        let pm = self.persistence_manager.clone();
         match self.current_setlist.clone() {
             Some(s) => spawn_local(async move {
                 type Repository<'a> = SetlistWebRepository<'a, PersistenceManager<BrowserStorage>>;
-                let result = Repository::new(&mut pm).store(&s).await;
+                let result = Repository::new(&pm).store(&s).await;
 
                 if let Err(e) = result {
                     error!("Could not commit setlist changes: {}", e.to_string())
@@ -478,14 +477,14 @@ impl SettingsHandler for App {
     }
 
     fn fetch_song_settings(&mut self) {
-        let mut pm = self.persistence_manager.clone();
+        let pm = self.persistence_manager.clone();
         let callback = self
             .link
             .callback(move |settings_map| Msg::Event(SettingsEvent::Replace(settings_map).into()));
 
         spawn_local(async move {
             type Repository<'a> = SettingsWebRepository<'a, PersistenceManager<BrowserStorage>>;
-            let result = Repository::new(&mut pm).load().await;
+            let result = Repository::new(&pm).load().await;
 
             match result {
                 Ok(Some(settings)) => callback.emit(settings),
@@ -496,11 +495,11 @@ impl SettingsHandler for App {
     }
 
     fn commit_changes(&mut self) {
-        let mut pm = self.persistence_manager.clone();
+        let pm = self.persistence_manager.clone();
         let settings = self.settings.clone();
         spawn_local(async move {
             type Repository<'a> = SettingsWebRepository<'a, PersistenceManager<BrowserStorage>>;
-            let result = Repository::new(&mut pm).store(&settings).await;
+            let result = Repository::new(&pm).store(&settings).await;
 
             if let Err(e) = result {
                 error!("Could not commit setting changes: {}", e.to_string())
@@ -519,6 +518,7 @@ impl Component for App {
         route_service.register_callback(link.callback(Msg::RouteChanged));
 
         let persistence_manager = PersistenceManager::new(BrowserStorage::new().unwrap());
+        let persistence_manager = Arc::new(persistence_manager);
 
         let user = User::unknown();
         let now = Utc::now();

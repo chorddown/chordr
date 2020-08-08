@@ -3,6 +3,7 @@ use crate::errors::WebError;
 use crate::persistence::browser_storage::*;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
+use std::sync::{Arc, RwLock};
 
 /// The Persistence Manager will take care of storing and loading data.
 ///
@@ -14,7 +15,7 @@ pub trait PersistenceManagerTrait {
     ///
     /// `value` will be serialized before it is stored
     async fn store<T: Serialize, N: AsRef<str>, K: AsRef<str>>(
-        &mut self,
+        &self,
         namespace: N,
         key: K,
         value: &T,
@@ -22,7 +23,7 @@ pub trait PersistenceManagerTrait {
 
     /// Load the stored value with the given `key` in the `namespace`
     async fn load<T, N: AsRef<str>, K: AsRef<str>>(
-        &mut self,
+        &self,
         namespace: N,
         key: K,
     ) -> Result<Option<T>, WebError>
@@ -30,14 +31,15 @@ pub trait PersistenceManagerTrait {
         T: for<'a> Deserialize<'a>;
 }
 
-#[derive(Clone)]
 pub struct PersistenceManager<B> {
-    browser_storage: B,
+    browser_storage: Arc<RwLock<B>>,
 }
 
 impl<B: BrowserStorageTrait> PersistenceManager<B> {
     pub fn new(browser_storage: B) -> Self {
-        Self { browser_storage }
+        Self {
+            browser_storage: Arc::new(RwLock::new(browser_storage)),
+        }
     }
 
     fn build_combined_key<N: AsRef<str>, K: AsRef<str>>(&self, namespace: &N, key: &K) -> String {
@@ -52,7 +54,7 @@ impl<B: BrowserStorageTrait> PersistenceManager<B> {
 #[async_trait(? Send)]
 impl<B: BrowserStorageTrait> PersistenceManagerTrait for PersistenceManager<B> {
     async fn store<T: Serialize, N: AsRef<str>, K: AsRef<str>>(
-        &mut self,
+        &self,
         namespace: N,
         key: K,
         value: &T,
@@ -60,13 +62,15 @@ impl<B: BrowserStorageTrait> PersistenceManagerTrait for PersistenceManager<B> {
         match serde_json::to_string(&value) {
             Ok(serialized) => self
                 .browser_storage
+                .write()
+                .expect("Could not acquire lock for writing")
                 .set_item(self.build_combined_key(&namespace, &key), serialized),
             Err(e) => Err(PersistenceError::serialization_error(e.to_string()).into()),
         }
     }
 
     async fn load<T, N: AsRef<str>, K: AsRef<str>>(
-        &mut self,
+        &self,
         namespace: N,
         key: K,
     ) -> Result<Option<T>, WebError>
@@ -75,6 +79,8 @@ impl<B: BrowserStorageTrait> PersistenceManagerTrait for PersistenceManager<B> {
     {
         match self
             .browser_storage
+            .read()
+            .expect("Could not acquire lock for reading")
             .get_item(self.build_combined_key(&namespace, &key))
         {
             Some(v) => match serde_json::from_str(v.as_str()) {
@@ -106,7 +112,7 @@ mod test {
 
     #[wasm_bindgen_test]
     async fn store_and_load_i32_test() {
-        let mut pm = PersistenceManager::new(HashMapBrowserStorage::new());
+        let pm = PersistenceManager::new(HashMapBrowserStorage::new());
         let value: i32 = 12;
         assert!(pm.store("test", "key-1", &value).await.is_ok());
 
@@ -127,7 +133,7 @@ mod test {
 
     #[wasm_bindgen_test]
     async fn store_and_load_person_test() {
-        let mut pm = PersistenceManager::new(HashMapBrowserStorage::new());
+        let pm = PersistenceManager::new(HashMapBrowserStorage::new());
         let value = TestValue {
             age: 3,
             name: "Daniel".to_string(),
@@ -152,7 +158,7 @@ mod test {
 
     #[wasm_bindgen_test]
     async fn store_and_load_person_localstorage_test() {
-        let mut pm = PersistenceManager::new(
+        let pm = PersistenceManager::new(
             BrowserStorage::new().expect("Could not create Browser Storage"),
         );
         let value = TestValue {
@@ -179,7 +185,7 @@ mod test {
 
     #[wasm_bindgen_test]
     async fn store_and_load_setlist_test() {
-        let mut pm = PersistenceManager::new(HashMapBrowserStorage::new());
+        let pm = PersistenceManager::new(HashMapBrowserStorage::new());
 
         let value = Setlist::new(
             "My setlist",

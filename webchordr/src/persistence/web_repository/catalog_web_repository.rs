@@ -15,7 +15,7 @@ impl<'a, P> CatalogWebRepository<'a, P>
 where
     P: PersistenceManagerTrait,
 {
-    pub fn new(_persistence_manager: &'a mut P) -> Self {
+    pub fn new(_persistence_manager: &'a P) -> Self {
         Self {
             _phantom: PhantomData,
         }

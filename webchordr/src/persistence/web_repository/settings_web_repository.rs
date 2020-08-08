@@ -5,14 +5,14 @@ use async_trait::async_trait;
 use libchordr::prelude::SongSettingsMap;
 
 pub struct SettingsWebRepository<'a, P: PersistenceManagerTrait> {
-    persistence_manager: &'a mut P,
+    persistence_manager: &'a P,
 }
 
 impl<'a, P> SettingsWebRepository<'a, P>
 where
     P: PersistenceManagerTrait,
 {
-    pub fn new(persistence_manager: &'a mut P) -> Self {
+    pub fn new(persistence_manager: &'a P) -> Self {
         Self {
             persistence_manager,
         }
