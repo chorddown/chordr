@@ -1,4 +1,5 @@
 use crate::errors::WebError;
+use crate::helpers::window;
 use libchordr::prelude::*;
 use serde::Deserialize;
 use wasm_bindgen::JsCast;
@@ -73,8 +74,7 @@ where
     OUT: for<'a> Deserialize<'a>,
 {
     let request = WebRequest::new_with_str_and_init(uri, options).unwrap();
-    let window = web_sys::window().unwrap();
-    let request_promise = window.fetch_with_request(&request);
+    let request_promise = window().fetch_with_request(&request);
     let future = JsFuture::from(request_promise);
 
     let resp = future.await?;
