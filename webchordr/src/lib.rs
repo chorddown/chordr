@@ -11,6 +11,7 @@ mod events;
 mod fetch_helper;
 mod handler_traits;
 mod helpers;
+mod lock;
 mod persistence;
 mod route;
 mod sortable_service;
