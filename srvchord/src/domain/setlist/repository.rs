@@ -10,7 +10,7 @@ use crate::schema::setlist::dsl::setlist as all_setlists;
 use crate::traits::*;
 use crate::ConnectionType;
 use diesel::{self, prelude::*};
-use libchordr::prelude::{Setlist, Team, User, Username};
+use libchordr::prelude::{Setlist, Team, User, Username, RecordIdTrait};
 
 pub struct SetlistRepository {}
 
@@ -127,14 +127,6 @@ impl SetlistRepository {
             .filter_map(|u| u.try_to_user().ok())
             .collect();
         Ok(users)
-    }
-}
-
-impl RecordIdTrait for Setlist {
-    type Id = i32;
-
-    fn id(self) -> Self::Id {
-        Setlist::id(&self)
     }
 }
 

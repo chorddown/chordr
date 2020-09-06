@@ -1,5 +1,5 @@
-use crate::traits::RecordIdTrait;
 use crate::ConnectionType;
+use libchordr::prelude::RecordIdTrait;
 
 pub type Count = i64;
 

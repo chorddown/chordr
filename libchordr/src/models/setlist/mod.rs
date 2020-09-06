@@ -13,6 +13,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::ops;
 use std::vec::IntoIter;
+use crate::prelude::RecordIdTrait;
 
 /// A generic set of Songs identified by their [SongId]
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
@@ -175,6 +176,14 @@ impl IntoIterator for Setlist {
 impl AsRef<Setlist> for Setlist {
     fn as_ref(&self) -> &Setlist {
         self
+    }
+}
+
+impl RecordIdTrait for Setlist {
+    type Id = i32;
+
+    fn id(self) -> Self::Id {
+        Setlist::id(&self)
     }
 }
 

@@ -4,6 +4,7 @@ pub mod file_type;
 pub mod list;
 pub mod meta;
 pub mod prelude;
+pub mod record_id_trait;
 pub mod setlist;
 pub mod song;
 pub mod song_data;
