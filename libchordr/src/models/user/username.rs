@@ -39,3 +39,9 @@ impl fmt::Display for Username {
         f.write_str(self.0.as_str())
     }
 }
+
+impl AsRef<str> for Username {
+    fn as_ref(&self) -> &str {
+        &self.0
+    }
+}
