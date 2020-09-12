@@ -2,11 +2,10 @@ pub mod command;
 pub mod repository;
 
 use crate::authentication::verify_password;
-use crate::domain::credentials::Credentials;
 use crate::domain::user::repository::UserRepository;
 use crate::error::{AuthorizationError, SrvError};
 use crate::schema::user;
-use crate::traits::RecordIdTrait;
+use crate::traits::{FromHeader, FromHeaderResult};
 use crate::DbConn;
 use diesel::Identifiable;
 use libchordr::prelude::{Credentials, Password, RecordIdTrait, User, Username};
@@ -74,17 +73,27 @@ impl<'a, 'r> FromRequest<'a, 'r> for UserDb {
                     request.headers().get("Authorization").collect();
 
                 let credentials = match Credentials::from_headers(authorization_headers.clone()) {
-                    None => {
+                    FromHeaderResult::Ok(c) => c,
+                    FromHeaderResult::None => {
                         warn!("No credentials: {:?}", authorization_headers);
                         return Outcome::Failure((
                             Status::Unauthorized,
                             AuthorizationError::MissingCredentials,
                         ));
                     }
-                    Some(c) => c,
+                    FromHeaderResult::Err(e) => {
+                        warn!(
+                            "Could not decode credentials '{:?}': {}",
+                            authorization_headers, e
+                        );
+                        return Outcome::Failure((
+                            Status::Unauthorized,
+                            AuthorizationError::MissingCredentials,
+                        ));
+                    }
                 };
 
-                match UserRepository::new().find_by_name(&conn.0, &credentials.username) {
+                match UserRepository::new().find_by_name(&conn.0, &credentials.username()) {
                     Ok(user) if verify_password(&credentials, &user) => Outcome::Success(user),
                     Ok(_) => {
                         warn!("Wrong password");
@@ -100,5 +109,41 @@ impl<'a, 'r> FromRequest<'a, 'r> for UserDb {
                 }
             }
         }
+    }
+}
+
+impl FromHeader for Credentials {
+    type Err = AuthorizationError;
+
+    /// Try to read the `Credentials` from the Basic Auth header
+    fn from_header(header: &str) -> FromHeaderResult<Self, Self::Err> {
+        if !header.starts_with("Basic ") {
+            return FromHeaderResult::None;
+        }
+
+        println!("{}", header);
+
+        let header_chars = header.chars();
+        let base64code = header_chars.into_iter().skip(6).collect::<String>();
+        let decoded: String = match base64::decode(&base64code) {
+            Ok(vec) => String::from_utf8_lossy(&vec).to_string(),
+            Err(_) => return FromHeaderResult::None,
+        };
+
+        let parts: Vec<&str> = decoded.splitn(2, ':').collect();
+        if parts.len() < 2 {
+            return FromHeaderResult::None;
+        }
+
+        let username: Username = match parts[0].try_into() {
+            Ok(u) => u,
+            Err(_) => return FromHeaderResult::Err(AuthorizationError::MissingCredentials),
+        };
+        let password: Password = match parts[1].try_into() {
+            Ok(p) => p,
+            Err(_) => return FromHeaderResult::Err(AuthorizationError::MissingCredentials),
+        };
+
+        FromHeaderResult::Ok(Credentials::new(username, password))
     }
 }
