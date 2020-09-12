@@ -9,7 +9,7 @@ use crate::schema::user;
 use crate::traits::RecordIdTrait;
 use crate::DbConn;
 use diesel::Identifiable;
-use libchordr::prelude::{Password, Username, RecordIdTrait};
+use libchordr::prelude::{Credentials, Password, RecordIdTrait, User, Username};
 use rocket::http::Status;
 use rocket::request::FromRequest;
 use rocket::request::Outcome;

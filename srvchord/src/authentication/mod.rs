@@ -1,6 +1,6 @@
-use crate::domain::credentials::Credentials;
 use crate::domain::user::UserDb;
 use crate::error::SrvError;
+use libchordr::prelude::Credentials;
 
 pub fn verify_password(credentials: &Credentials, user: &UserDb) -> bool {
     let password_data = &user.password_hash;
@@ -8,14 +8,14 @@ pub fn verify_password(credentials: &Credentials, user: &UserDb) -> bool {
     if parts.len() < 3 {
         warn!("Check un-hashed password");
 
-        return password_data == &credentials.password;
+        return password_data == &credentials.password().to_string();
     }
 
     let algorithm = parts[0];
     let salt = parts[1];
     let hash = parts[2];
     if algorithm == "argon2" {
-        match verify_password_argon2(&credentials.password, hash, salt) {
+        match verify_password_argon2(&credentials.password().to_string(), hash, salt) {
             Ok(r) => r,
             Err(e) => {
                 error!("{}", e);

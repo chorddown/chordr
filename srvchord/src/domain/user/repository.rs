@@ -7,6 +7,7 @@ use crate::schema::user::dsl::user as all_users;
 use crate::traits::*;
 use crate::ConnectionType;
 use diesel::{self, prelude::*};
+use libchordr::prelude::RecordIdTrait;
 
 pub struct UserRepository {}
 

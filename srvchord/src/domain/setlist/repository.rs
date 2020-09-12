@@ -10,7 +10,7 @@ use crate::schema::setlist::dsl::setlist as all_setlists;
 use crate::traits::*;
 use crate::ConnectionType;
 use diesel::{self, prelude::*};
-use libchordr::prelude::{Setlist, Team, User, Username, RecordIdTrait};
+use libchordr::prelude::{RecordIdTrait, Setlist, Team, User, Username};
 
 pub struct SetlistRepository {}
 
