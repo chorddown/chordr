@@ -2,6 +2,7 @@ use crate::errors::WebError;
 use crate::helpers::window;
 use libchordr::prelude::*;
 use serde::Deserialize;
+use std::collections::HashMap;
 use wasm_bindgen::JsCast;
 use wasm_bindgen_futures::JsFuture;
 use web_sys;
@@ -27,11 +28,7 @@ pub async fn fetch<OUT>(uri: &str) -> FetchResult<OUT>
 where
     OUT: for<'a> Deserialize<'a>,
 {
-    let mut options = RequestInit::new();
-    options.method("GET");
-    options.mode(RequestMode::Cors);
-
-    fetch_with_options(uri, &options).await
+    fetch_with_options(uri, &get_default_options()).await
 }
 
 /// Fetch a URI and invoke the given callback when finished
@@ -59,11 +56,7 @@ pub async fn fetch_with_callback<OUT>(
 where
     OUT: for<'a> Deserialize<'a> + Clone,
 {
-    let mut options = RequestInit::new();
-    options.method("GET");
-    options.mode(RequestMode::Cors);
-
-    let result: Result<OUT, _> = fetch_with_options(uri, &options).await;
+    let result: Result<OUT, _> = fetch_with_options(uri, &get_default_options()).await;
     callback.emit(result.clone());
 
     result
@@ -73,14 +66,80 @@ pub async fn fetch_with_options<OUT>(uri: &str, options: &RequestInit) -> FetchR
 where
     OUT: for<'a> Deserialize<'a>,
 {
+    fetch_with_options_and_additional_headers::<OUT, String>(uri, options, None).await
+}
+
+pub async fn fetch_with_additional_headers<OUT, AHKEY>(
+    uri: &str,
+    additional_headers: HashMap<AHKEY, String>,
+) -> FetchResult<OUT>
+where
+    OUT: for<'a> Deserialize<'a>,
+    AHKEY: AsRef<str>,
+{
+    fetch_with_options_and_additional_headers(uri, &get_default_options(), Some(additional_headers))
+        .await
+}
+
+/// Fetch a URI with additional settings
+///
+/// # Example: POST request
+/// ```rust,no_run
+/// # use webchordr::fetch_with_options_and_additional_headers;
+/// # let uri = "some_uri";
+///
+/// use wasm_bindgen_futures::spawn_local;
+/// use web_sys::{RequestInit, RequestMode};
+/// use std::collections::HashMap;
+/// use wasm_bindgen::JsValue;
+/// type TargetType = HashMap<String, serde_json::Value>;
+/// spawn_local(async move {
+///     let mut options = RequestInit::new();
+///     options.method("POST");
+///     options.mode(RequestMode::Cors);
+///
+///     // Configure the request body/post data
+///     let serialized_json_string = serde_json::to_string("some value").expect("Could not serialize value");
+///     let js_value = JsValue::from_str(&serialized_json_string);
+///     options.body(Some(&js_value));
+///
+///     let result = fetch_with_options_and_additional_headers::<TargetType, &str>(&uri, &options, None).await;
+/// });
+/// ```
+pub async fn fetch_with_options_and_additional_headers<OUT, AHKEY>(
+    uri: &str,
+    options: &RequestInit,
+    additional_headers: Option<HashMap<AHKEY, String>>,
+) -> FetchResult<OUT>
+where
+    OUT: for<'a> Deserialize<'a>,
+    AHKEY: AsRef<str>,
+{
     let request = WebRequest::new_with_str_and_init(uri, options).unwrap();
+    if let Some(headers) = additional_headers {
+        for (key, value) in headers {
+            request.headers().set(&key.as_ref(), &value)?;
+        }
+    }
     let request_promise = window().fetch_with_request(&request);
     let future = JsFuture::from(request_promise);
 
     let resp = future.await?;
     let resp: WebResponse = resp.dyn_into().expect("response not working...");
-    let json = resp.json()?;
-    let json = JsFuture::from(json).await?;
+    if resp.ok() {
+        let json = resp.json()?;
+        let json = JsFuture::from(json).await?;
 
-    Ok(json.into_serde::<OUT>()?)
+        Ok(json.into_serde::<OUT>()?)
+    } else {
+        // TODO: If `resp.headers().get("Content-Type")` contains JSON parse the error message
+        Err(WebError::response_error(uri, resp))
+    }
+}
+
+fn get_default_options() -> RequestInit {
+    let mut options = RequestInit::new();
+    options.method("GET");
+    options.mode(RequestMode::Cors);
+    options
 }
