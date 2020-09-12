@@ -219,7 +219,7 @@ mod test {
                 ),
                 Command::update(&conn),
             )
-                .unwrap();
+            .unwrap();
 
             assert_eq!(SetlistDb::count_all(&conn), 2);
             assert_eq!(SetlistDbEntry::count_all(&conn), 3);
@@ -261,7 +261,7 @@ mod test {
                 ),
                 Command::update(&conn),
             )
-                .unwrap();
+            .unwrap();
 
             assert_eq!(SetlistDb::count_all(&conn), 2);
             assert_eq!(SetlistDbEntry::count_all(&conn), 4);
@@ -320,7 +320,7 @@ mod test {
                 ),
                 Command::delete(&conn),
             )
-                .unwrap();
+            .unwrap();
 
             assert_eq!(SetlistDb::count_all(&conn), 1);
         })
