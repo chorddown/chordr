@@ -11,6 +11,7 @@ pub fn get_routes() -> Vec<rocket::Route> {
         crate::routes::setlist::setlist_index,
         crate::routes::setlist::setlist_list,
         crate::routes::setlist::setlist_get,
+        crate::routes::setlist::setlist_get_latest,
         crate::routes::setlist::setlist_put,
         crate::routes::setlist::setlist_delete
     ]
@@ -27,10 +28,9 @@ pub fn setlist_list(username: String, conn: DbConn, user: UserDb) -> Option<Json
         Ok(u) => u,
         Err(_) => return None,
     };
-    println!("{:?}", user);
 
     match SetlistRepository::new().find_by_username(&conn.0, &username_instance) {
-        Ok(setlist) => Some(Json(setlist)),
+        Ok(setlists) => Some(Json(setlists)),
         Err(e) => {
             warn!("No setlists for user {} found: {}", username, e);
             None
@@ -49,7 +49,6 @@ pub fn setlist_get(
         Ok(u) => u,
         Err(_) => return None,
     };
-    println!("{:?}", user);
 
     match SetlistRepository::new().find_by_username_and_setlist_id(
         &conn.0,
@@ -59,6 +58,34 @@ pub fn setlist_get(
         Ok(setlist) => Some(Json(setlist)),
         Err(_) => {
             warn!("Setlist {} for user {} not found", setlist, username);
+            None
+        }
+    }
+}
+
+#[get("/<username>/latest", rank = 2)]
+pub fn setlist_get_latest(username: String, conn: DbConn, user: UserDb) -> Option<Json<Setlist>> {
+    let username_instance = match check_username(&username, &user) {
+        Ok(u) => u,
+        Err(_) => return None,
+    };
+
+    match SetlistRepository::new().find_by_username(&conn.0, &username_instance) {
+        Ok(setlists) if setlists.is_empty() => {
+            warn!("No setlists for user {} found", username);
+            None
+        }
+        Ok(mut setlists) => {
+            setlists.sort_by(|a, b| {
+                a.modification_date()
+                    .partial_cmp(&b.modification_date())
+                    .unwrap()
+            });
+
+            Some(Json(setlists.pop().unwrap()))
+        }
+        Err(e) => {
+            warn!("No setlists for user {} found: {}", username, e);
             None
         }
     }
@@ -92,7 +119,7 @@ pub fn setlist_put(
         Ok(u) => u,
         Err(_) => return None,
     };
-    println!("Add/update setlist {} {:?}", username, setlist);
+    debug!("Add/update setlist {} {:?}", username, setlist);
 
     // Todo: Check if user did not change
     let setlist = setlist.into_inner();
@@ -100,7 +127,7 @@ pub fn setlist_put(
     let repo = SetlistRepository::new();
     match repo.find_by_username_and_setlist_id(&conn.0, &username_instance, setlist.id()) {
         Ok(_) => {
-            println!("Perform update setlist {} #{}", username, setlist.id());
+            info!("Perform update setlist {} #{}", username, setlist.id());
             match repo.update(&conn.0, setlist.clone()) {
                 Ok(_) => Some(Json(setlist)),
                 Err(e) => {
@@ -110,7 +137,7 @@ pub fn setlist_put(
             }
         }
         Err(_) => {
-            println!("Perform add setlist {} #{}", username, setlist.id());
+            info!("Perform add setlist {} #{}", username, setlist.id());
             match repo.add(&conn.0, setlist.clone()) {
                 Ok(_) => Some(Json(setlist)),
                 Err(e) => {
@@ -179,11 +206,10 @@ mod test {
             assert_eq!(
                 response_body,
                 json_format::<JsonTemplateValue>(
-                    r#"{"name":"My setlist","id":$,"owner":{"username":"$","first_name":"Daniel","last_name":"Corn","password":"$"},"team":null,"songs":$,"gig_date":null,"creation_date":"$","modification_date":"$"}"#,
+                    r#"{"name":"My setlist","id":$,"owner":{"username":"$","first_name":"Daniel","last_name":"Corn"},"team":null,"songs":$,"gig_date":null,"creation_date":"$","modification_date":"$"}"#,
                     vec![
                         random_id.into(),
                         username.into(),
-                        password.into(),
                         r#"[{"song_id":"song-1","file_type":"chorddown","title":"Song 1","settings":null},{"song_id":"song-2","file_type":"chorddown","title":"Song 2","settings":null},{"song_id":"song-3","file_type":"chorddown","title":"Song 3","settings":null}]"#.into(),
                         format!("{:?}", setlist.creation_date()).into(),
                         format!("{:?}", setlist.modification_date()).into(),
