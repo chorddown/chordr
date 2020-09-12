@@ -31,10 +31,12 @@ use diesel::SqliteConnection;
 use libchordr::models::catalog::Catalog;
 use libchordr::prelude::{CatalogBuilder, FileType};
 use rocket::fairing::AdHoc;
+use rocket::http::Method;
 use rocket::request::{FlashMessage, Form};
 use rocket::response::{Flash, NamedFile, Redirect};
 use rocket::{Rocket, State};
 use rocket_contrib::{json::Json, serve::StaticFiles, templates::Template};
+use rocket_cors::{AllowedHeaders, AllowedOrigins, Cors};
 use std::io;
 use std::path::Path;
 
@@ -167,6 +169,7 @@ fn run_db_migrations(rocket: Rocket) -> Result<Rocket, Rocket> {
 
 fn rocket() -> Rocket {
     rocket::ignite()
+        .attach(build_cors_fairing())
         .attach(DbConn::fairing())
         .attach(AdHoc::on_attach("Database Migrations", run_db_migrations))
         .attach(AdHoc::on_attach(
@@ -203,6 +206,23 @@ fn build_application_config(rocket: &Rocket) -> Config {
         song_dir,
         static_files_dir,
     }
+}
+
+fn build_cors_fairing() -> Cors {
+    let allowed_origins = AllowedOrigins::some_exact(&["http://localhost:8000", "http://localhost:9000"]);
+
+    rocket_cors::CorsOptions {
+        allowed_origins,
+        allowed_methods: vec![Method::Get, Method::Post]
+            .into_iter()
+            .map(From::from)
+            .collect(),
+        allowed_headers: AllowedHeaders::some(&["Authorization", "Accept", "Content-Type"]),
+        allow_credentials: true,
+        ..Default::default()
+    }
+        .to_cors()
+        .expect("Invalid CORS configuration")
 }
 
 fn main() {

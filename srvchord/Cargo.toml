@@ -22,6 +22,7 @@ base64 = "^0.12.1"
 rust-argon2 = "^0.8.2"
 libchordr = { path = "../libchordr" }
 chrono = { version = "*", features = ["serde"] }
+rocket_cors = "0.5.2"
 
 [dev-dependencies]
 parking_lot = { version = "0.10", features = ["nightly"] }
