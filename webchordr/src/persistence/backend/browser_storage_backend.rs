@@ -70,20 +70,13 @@ impl<B: BrowserStorageTrait> BackendTrait for BrowserStorageBackend<B> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use serde::{Deserialize, Serialize};
-    use wasm_bindgen_test::*;
-
-    use crate::test_helpers::{entry, get_test_user};
-    use chrono::prelude::*;
+    use crate::test_helpers::{
+        get_test_setlist, get_test_user, get_test_user_password_hidden, TestValue,
+    };
     use libchordr::models::setlist::Setlist;
     use wasm_bindgen_test::wasm_bindgen_test_configure;
+    use wasm_bindgen_test::*;
     wasm_bindgen_test_configure!(run_in_browser);
-
-    #[derive(Serialize, Deserialize, PartialEq, Debug)]
-    struct TestValue {
-        pub age: i32,
-        pub name: String,
-    }
 
     #[wasm_bindgen_test]
     async fn store_and_load_i32_test() {
@@ -162,18 +155,13 @@ mod test {
     async fn store_and_load_setlist_test() {
         let pm = BrowserStorageBackend::new(HashMapBrowserStorage::new());
 
-        let value = Setlist::new(
-            "My setlist",
-            10291,
-            get_test_user(),
-            None,
-            Some(Utc.ymd(2014, 11, 14).and_hms(8, 9, 10)),
-            Utc.ymd(2020, 06, 14).and_hms(16, 26, 20),
-            Utc::now(),
-            vec![entry("song-1"), entry("song-2"), entry("song-3")],
-        );
+        let original_value = get_test_setlist(get_test_user());
+        let expected_value = get_test_setlist(get_test_user_password_hidden());
 
-        assert!(pm.store("test", "my-setlist", &value).await.is_ok());
+        assert!(pm
+            .store("test", "my-setlist", &original_value)
+            .await
+            .is_ok());
 
         assert!(pm.load::<Setlist, _, _>("test", "my-setlist").await.is_ok());
         assert!(pm
@@ -182,7 +170,7 @@ mod test {
             .unwrap()
             .is_some());
         assert_eq!(
-            value,
+            expected_value,
             pm.load::<Setlist, _, _>("test", "my-setlist")
                 .await
                 .unwrap()
