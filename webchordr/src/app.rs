@@ -12,7 +12,8 @@ use crate::handler_traits::catalog_handler::CatalogHandler;
 use crate::handler_traits::setlist_handler::SetlistHandler;
 use crate::handler_traits::settings_handler::SettingsHandler;
 use crate::helpers::window;
-use crate::persistence::backend::BrowserStorageBackend;
+use crate::persistence::persistence_manager::PMType;
+use crate::persistence::persistence_manager::PersistenceManagerFactory;
 use crate::persistence::prelude::*;
 use crate::persistence::web_repository::{CatalogWebRepository, SettingsWebRepository};
 use crate::route::{AppRoute, SetlistRoute, UserRoute};
@@ -27,7 +28,6 @@ use wasm_bindgen_futures::spawn_local;
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
 use yew_router::prelude::*;
 
-type PMType = PersistenceManager<BrowserStorageBackend<BrowserStorage>>;
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct AppRouteState {}
 
@@ -297,10 +297,9 @@ impl App {
     }
 
     fn build_persistence_manager() -> Arc<PMType> {
-        let browser_storage = BrowserStorage::new().unwrap();
-        let browser_storage_backend = BrowserStorageBackend::new(browser_storage);
+        let persistence_manager_factory = PersistenceManagerFactory::new();
 
-        Arc::new(PersistenceManager::new(browser_storage_backend))
+        Arc::new(persistence_manager_factory.build())
     }
 }
 
