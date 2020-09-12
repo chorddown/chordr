@@ -9,11 +9,11 @@ use crate::models::song_id::SongId;
 use crate::models::song_list::{SongList, SongListTrait};
 use crate::models::team::Team;
 use crate::models::user::User;
+use crate::prelude::RecordIdTrait;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::ops;
 use std::vec::IntoIter;
-use crate::prelude::RecordIdTrait;
 
 /// A generic set of Songs identified by their [SongId]
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]

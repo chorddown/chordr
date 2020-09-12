@@ -23,3 +23,11 @@ pub trait RecordIdTrait {
     /// so that we have a lifetime to use for `Id`.
     fn id(self) -> Self::Id;
 }
+
+impl RecordIdTrait for i32 {
+    type Id = i32;
+
+    fn id(self) -> Self::Id {
+        self
+    }
+}

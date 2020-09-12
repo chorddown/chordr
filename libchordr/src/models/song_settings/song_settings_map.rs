@@ -1,3 +1,4 @@
+use crate::models::record_id_trait::RecordIdTrait;
 use crate::models::song_id::SongId;
 use crate::models::song_settings::SongSettings;
 use serde::{Deserialize, Serialize};
@@ -18,5 +19,13 @@ impl SongSettingsMap {
 
     pub fn get(&self, song_id: &SongId) -> Option<&SongSettings> {
         self.0.get(song_id)
+    }
+}
+
+impl RecordIdTrait for SongSettingsMap {
+    type Id = &'static str;
+
+    fn id(self) -> Self::Id {
+        "song-settings"
     }
 }
