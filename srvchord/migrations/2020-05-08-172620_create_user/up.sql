@@ -11,5 +11,5 @@ CREATE TABLE user
 --     ON user (username);
 
 INSERT INTO user (username, first_name, last_name, password_hash)
-VALUES ('yvi', 'Yvi', 'Best', 'pwhash'),
-       ('daniel', 'Daniel', 'Corn', 'pwhash');
+VALUES ('yvi', 'Yvi', 'Best', 'passwordhash'),
+       ('daniel', 'Daniel', 'Corn', 'passwordhash');
