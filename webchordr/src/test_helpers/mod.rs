@@ -63,7 +63,7 @@ pub(crate) fn get_test_setlist(user: User) -> Setlist {
         None,
         Some(Utc.ymd(2014, 11, 14).and_hms(8, 9, 10)),
         Utc.ymd(2020, 06, 14).and_hms(16, 26, 20),
-        Utc::now(),
+        Utc.ymd(2020, 11, 01).and_hms(19, 17, 14),
         vec![entry("song-1"), entry("song-2"), entry("song-3")],
     )
 }
