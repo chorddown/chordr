@@ -15,7 +15,7 @@ use serde::{Deserialize, Serialize};
 use std::ops;
 use std::vec::IntoIter;
 
-/// A generic set of Songs identified by their [SongId]
+/// A set of Songs organized by a User
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct Setlist {
     name: String,
