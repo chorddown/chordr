@@ -4,6 +4,7 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 mod app;
 mod components;
+mod config;
 pub mod constants;
 mod data_exchange;
 mod errors;
