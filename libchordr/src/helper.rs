@@ -51,10 +51,24 @@ pub fn transpose_and_convert_to_format(
     )
 }
 
+#[allow(unused)]
 pub(crate) fn is_valid_model_identifier(id: &str) -> bool {
+    validate_model_identifier(id).is_ok()
+}
+
+pub(crate) fn validate_model_identifier(id: &str) -> Result<(), &'static str> {
+    if id.is_empty() {
+        return Err("Identifier must not be empty");
+    }
+    if !id.is_ascii() {
+        return Err("Identifier must not be an ASCII text");
+    }
     fn is_char_allowed(c: char) -> bool {
         c.is_alphanumeric() || c == '-' || c == '_' || c == '@' || c == '.'
     }
-
-    !id.is_empty() && id.is_ascii() && id.chars().all(is_char_allowed)
+    if id.chars().all(is_char_allowed) {
+        Ok(())
+    } else {
+        Err("Identifier can only contain alphanumerics, dash ('-'), underscore ('_'), @ or a dot ('.')")
+    }
 }
