@@ -1,11 +1,11 @@
 use crate::components::detail_view::DetailView;
-use libchordr::prelude::*;
 use std::fmt::Display;
 use yew::prelude::*;
+use crate::session::SessionUser;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct InfoProps {
-    pub user: User,
+    pub user: SessionUser,
 }
 
 pub enum Msg {}
@@ -44,22 +44,37 @@ impl Component for Info {
             html! { <tr><th>{caption}</th><td>{value.to_string()}</td></tr> }
         }
 
-        let username = row("Username", user.username());
-        let first_name = row("First name", user.first_name());
-        let last_name = row("Last name", user.last_name());
-        let password = row("Password", user.password());
+        match user {
+            SessionUser::LoggedIn(user) => {
+                let username = row("Username", user.username());
+                let first_name = row("First name", user.first_name());
+                let last_name = row("Last name", user.last_name());
 
-        html! {
-            <DetailView>
-                <table class="centered">
-                    <tbody>
-                        {username}
-                        {first_name}
-                        {last_name}
-                        {password}
-                    </tbody>
-                </table>
-            </DetailView>
+                (html! {
+                    <DetailView>
+                        <table class="centered">
+                            <tbody>
+                                {username}
+                                {first_name}
+                                {last_name}
+                            </tbody>
+                        </table>
+                    </DetailView>
+                }) as Html
+            }
+            SessionUser::Unauthenticated => {
+                let not_logged_in = row("Not logged in", "");
+
+                (html! {
+                    <DetailView>
+                        <table class="centered">
+                            <tbody>
+                                {not_logged_in}
+                            </tbody>
+                        </table>
+                    </DetailView>
+                }) as Html
+            }
         }
     }
 }

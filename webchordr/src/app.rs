@@ -6,6 +6,8 @@ use crate::components::song_search::SongSearch;
 use crate::components::song_view::SongView;
 use crate::components::start_screen::StartScreen;
 use crate::components::user::Info as UserInfo;
+use crate::components::user::Login as UserLogin;
+use crate::config::Config;
 use crate::errors::WebError;
 use crate::events::{Event, SetlistEvent, SettingsEvent, SortingChange};
 use crate::handler_traits::catalog_handler::CatalogHandler;
@@ -17,6 +19,7 @@ use crate::persistence::persistence_manager::PersistenceManagerFactory;
 use crate::persistence::prelude::*;
 use crate::persistence::web_repository::{CatalogWebRepository, SettingsWebRepository};
 use crate::route::{AppRoute, SetlistRoute, UserRoute};
+use crate::session::{Session, SessionService};
 use chrono::Utc;
 use libchordr::prelude::*;
 use log::{debug, error, info, warn};
@@ -43,13 +46,14 @@ pub struct App {
     _route_service: RouteService<AppRouteState>,
     route: Route<AppRouteState>,
     link: ComponentLink<App>,
-    user: User,
     expand: bool,
     fetching: bool,
     catalog: Option<Catalog>,
     current_setlist: Option<Setlist>,
     _setlist_collection: SetlistCollection,
     settings: SongSettingsMap,
+    config: Config,
+    session: Rc<Session>,
 }
 
 #[derive(Debug)]
@@ -62,6 +66,7 @@ pub enum Msg {
     #[allow(dead_code)]
     Ignore,
     RouteChanged(Route<AppRouteState>),
+    SessionChanged(Session),
 }
 
 impl App {
@@ -250,8 +255,21 @@ impl App {
     }
 
     fn view_user_route(&self, route: UserRoute) -> Html {
+        let on_login_success = self.link.callback(|s| Msg::SessionChanged(s));
+        let on_login_error = self.link.callback(|e| {
+            error!("{}", e);
+            Msg::Ignore
+        });
         match route {
-            UserRoute::Info => html! { <UserInfo user=self.user.clone() /> },
+            UserRoute::Info => html! { <UserInfo user=self.session.user().clone() /> },
+            UserRoute::Login => html! {
+                <UserLogin
+                    user=self.session.user().clone()
+                    config=self.config.clone()
+                    on_success=on_login_success
+                    on_error=on_login_error
+                />
+            },
         }
     }
 
@@ -262,6 +280,7 @@ impl App {
             Some(ref s) => Some(Rc::new(s.clone())),
             None => None,
         };
+        let session = self.session.clone();
 
         html! {
             <Nav
@@ -270,6 +289,7 @@ impl App {
                 current_song_id=current_song_id
                 on_toggle=toggle_menu
                 on_setlist_change=on_setlist_change
+                session=session
             />
         }
     }
@@ -296,10 +316,34 @@ impl App {
         };
     }
 
-    fn build_persistence_manager() -> Arc<PMType> {
+    fn build_persistence_manager(config: &Config, session: &Session) -> Arc<PMType> {
         let persistence_manager_factory = PersistenceManagerFactory::new();
 
-        Arc::new(persistence_manager_factory.build())
+        Arc::new(persistence_manager_factory.build(config, session))
+    }
+
+    fn try_login_and_update_session(&mut self) {
+        let session_service = SessionService::new(self.config.clone());
+        if session_service.has_credentials_in_session_storage() {
+            let on_success = self.link.callback(|s| Msg::SessionChanged(s));
+            let on_failure = self.link.callback(|_| Msg::SessionChanged(Session::default()));
+
+            debug!("Try to login with credentials from Session Storage");
+            spawn_local(async move {
+                match session_service.try_session().await {
+                    Ok(u) => {
+                        debug!("Successful login with credentials from Session Storage");
+                        on_success.emit(u)
+                    }
+                    Err(_) => {
+                        debug!("Failed login with credentials from Session Storage");
+                        on_failure.emit(())
+                    }
+                }
+            });
+        } else {
+            self.link.send_message(Msg::SessionChanged(Session::default()))
+        }
     }
 }
 
@@ -525,11 +569,13 @@ impl Component for App {
         let route = Route::from(route_service.get_route());
         route_service.register_callback(link.callback(Msg::RouteChanged));
 
-        let persistence_manager = App::build_persistence_manager();
-
         let user = User::unknown();
+        let config = Config::default();
+        let session = Rc::new(Session::default());
+        let persistence_manager = App::build_persistence_manager(&config, &session);
+
         let now = Utc::now();
-        let setlist = Setlist::new("", 0, user.clone(), None, Some(now), now, now, vec![]);
+        let setlist = Setlist::new("", 0, user, None, Some(now), now, now, vec![]);
         let settings = SongSettingsMap::new();
 
         Self {
@@ -543,7 +589,8 @@ impl Component for App {
             _setlist_collection: SetlistCollection::new(),
             _route_service: route_service,
             route,
-            user: user,
+            config,
+            session,
         }
     }
 
@@ -557,6 +604,14 @@ impl Component for App {
             Msg::Ignore => return false,
             Msg::ToggleMenu => {
                 self.expand = !self.expand;
+            }
+            Msg::SessionChanged(session) => {
+                self.session = Rc::new(session);
+                self.persistence_manager = Self::build_persistence_manager(&self.config, &self.session);
+
+                // Fetch/reload the Setlist and Song Settings
+                self.fetch_setlist();
+                self.fetch_song_settings();
             }
             Msg::Reload => {
                 window()
@@ -591,8 +646,7 @@ impl Component for App {
     fn rendered(&mut self, first_render: bool) -> () {
         if first_render {
             self.fetch_catalog();
-            self.fetch_setlist();
-            self.fetch_song_settings();
+            self.try_login_and_update_session();
         }
     }
 }

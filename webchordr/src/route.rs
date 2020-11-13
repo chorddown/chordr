@@ -27,4 +27,6 @@ pub enum SetlistRoute {
 pub enum UserRoute {
     #[to = "/info"]
     Info,
+    #[to = "/login"]
+    Login,
 }

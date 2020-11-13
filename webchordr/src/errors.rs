@@ -11,6 +11,7 @@ pub enum WebError {
     SetlistDeserializeError(String),
     PersistenceError(PersistenceError),
     ResponseError(String, Response),
+    CredentialsError(String),
 }
 
 #[allow(unused)]
@@ -38,6 +39,10 @@ impl WebError {
     pub fn response_error<S: Into<String>>(url: S, response: Response) -> Self {
         WebError::ResponseError(url.into(), response)
     }
+
+    pub fn credentials_error<S: Display>(s: S) -> Self {
+        WebError::CredentialsError(s.to_string())
+    }
 }
 
 impl Display for WebError {
@@ -55,6 +60,7 @@ impl Display for WebError {
                 r.status(),
                 r.status_text()
             ),
+            WebError::CredentialsError(s) => f.write_str(s.to_string().as_str()),
         }
     }
 }

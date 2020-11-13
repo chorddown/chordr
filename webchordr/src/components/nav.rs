@@ -6,6 +6,8 @@ use libchordr::models::song_list::SongList as SongListModel;
 use libchordr::prelude::SongId;
 use std::rc::Rc;
 use yew::prelude::*;
+use crate::session::Session;
+use crate::components::user::NavItem;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct NavProps {
@@ -14,6 +16,7 @@ pub struct NavProps {
     pub current_song_id: Option<SongId>,
     pub on_toggle: Callback<()>,
     pub on_setlist_change: Callback<Event>,
+    pub session: Rc<Session>,
 }
 
 #[allow(dead_code)]
@@ -48,22 +51,28 @@ impl Nav {
         //     None => html! {},
         // };
         let setlist_share_button = html! {};
+        let session = self.props.session.clone();
 
         (if self.props.expand {
             html! {
                 <footer>
-                    <button class="toggle-menu" onclick=toggle_menu>{ "→" }</button>
+                    <button class="toggle-menu" onclick=toggle_menu>
+                        <i class="im im-angle-right"></i>
+                    </button>
                     {setlist_share_button}
                     <a role="button" class="home" href="/#" title="Go to home screen">
                         <i class="im im-home"></i>
                         <span>{ "Home" }</span>
                     </a>
+                    <NavItem session=session />
                 </footer>
             }
         } else {
             html! {
                 <footer>
-                    <button class="toggle-menu" onclick=toggle_menu>{ "︎←" }</button>
+                    <button class="toggle-menu" onclick=toggle_menu>
+                        <i class="im im-angle-left"></i>
+                    </button>
                 </footer>
             }
         }) as Html
