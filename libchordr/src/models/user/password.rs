@@ -45,6 +45,14 @@ impl TryFrom<String> for Password {
     }
 }
 
+impl TryFrom<&String> for Password {
+    type Error = Error;
+
+    fn try_from(value: &String) -> Result<Self, Self::Error> {
+        Password::new(value)
+    }
+}
+
 impl fmt::Display for Password {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(self.0.as_str())

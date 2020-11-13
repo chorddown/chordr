@@ -1,5 +1,6 @@
 use crate::models::user::{Password, Username};
 use serde::{Deserialize, Serialize};
+use super::user::User;
 
 /// Login credentials
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -22,5 +23,20 @@ impl Credentials {
 
     pub fn password(&self) -> &Password {
         &self.password
+    }
+}
+
+impl From<&User> for Credentials {
+    fn from(user: &User) -> Self {
+        Self {
+            username: user.username().clone(),
+            password: user.password().clone(),
+        }
+    }
+}
+
+impl From<User> for Credentials {
+    fn from(user: User) -> Self {
+        From::from(&user)
     }
 }
