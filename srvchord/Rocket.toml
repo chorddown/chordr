@@ -16,6 +16,8 @@ url = "db/stage-db.sqlite"
 
 [development]
 #log = "debug"
+address = "localhost"
+port = 9000
 
 [development.databases.main_database]
 url = "db/dev-db.sqlite"

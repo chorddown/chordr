@@ -188,6 +188,7 @@ fn rocket() -> Rocket {
         .mount("/", routes![index, catalog])
         // .mount("/todo", routes![new, toggle, delete])
         .mount("/setlist", crate::routes::setlist::get_routes())
+        .mount("/user", crate::routes::user::get_routes())
         .attach(Template::fairing())
 }
 
@@ -209,11 +210,12 @@ fn build_application_config(rocket: &Rocket) -> Config {
 }
 
 fn build_cors_fairing() -> Cors {
-    let allowed_origins = AllowedOrigins::some_exact(&["http://localhost:8000", "http://localhost:9000"]);
+    let allowed_origins =
+        AllowedOrigins::some_exact(&["http://localhost:8000", "http://localhost:9000"]);
 
     rocket_cors::CorsOptions {
         allowed_origins,
-        allowed_methods: vec![Method::Get, Method::Post]
+        allowed_methods: vec![Method::Get, Method::Post, Method::Options]
             .into_iter()
             .map(From::from)
             .collect(),
@@ -221,8 +223,8 @@ fn build_cors_fairing() -> Cors {
         allow_credentials: true,
         ..Default::default()
     }
-        .to_cors()
-        .expect("Invalid CORS configuration")
+    .to_cors()
+    .expect("Invalid CORS configuration")
 }
 
 fn main() {
