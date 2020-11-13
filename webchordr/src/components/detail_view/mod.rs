@@ -5,6 +5,8 @@ use yew::prelude::*;
 #[derive(Properties, PartialEq, Clone)]
 pub struct DetailViewProps {
     pub children: Children,
+    #[prop_or_default]
+    pub close_uri: Option<&'static str>,
 }
 
 pub struct DetailView {
@@ -35,6 +37,29 @@ impl Component for DetailView {
     }
 
     fn view(&self) -> Html {
+        html! {
+            <div class="detail-view">
+                <header class="detail-view-header">
+                    { self.render_close_button() }
+                </header>
+                <div class="detail-view-content">
+                    { self.props.children.clone() }
+                </div>
+            </div>
+        }
+    }
+}
+
+impl DetailView {
+    fn render_close_button(&self) -> Html {
+        if let Some(href) = self.props.close_uri {
+            return html! {
+                <a role="button" class="close-button discreet" href=href>
+                    <i class="im im-x-mark"></i>
+                </a>
+            };
+        }
+
         let close = self.link.callback(|_| {
             if let Err(_) = window()
                 .history()
@@ -46,16 +71,9 @@ impl Component for DetailView {
         });
 
         html! {
-            <div class="detail-view">
-                <header class="detail-view-header">
-                    <button class="close-button discreet" onclick=close>
-                        <i class="im im-x-mark"></i>
-                    </button>
-                </header>
-                <div class="detail-view-content">
-                    { self.props.children.clone() }
-                </div>
-            </div>
+            <button class="close-button discreet" onclick=close>
+                <i class="im im-x-mark"></i>
+            </button>
         }
     }
 }
