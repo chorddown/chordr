@@ -27,4 +27,19 @@ pub trait BackendTrait {
     ) -> Result<Option<T>, WebError>
     where
         T: for<'a> Deserialize<'a>;
+
+    // /// Load the stored value with the given `key` in the `namespace`
+    // async fn find_by_identifier<T, I, ID, N: AsRef<str>, K: AsRef<str>>(
+    //     &self,
+    //     namespace: N,
+    //     key: K,
+    //     identifier: I,
+    // ) -> Result<Option<T>, WebError>
+    // where
+    //     I: Into<<T as RecordIdTrait>::Id>,
+    //     T: for<'a> Deserialize<'a> + RecordIdTrait,
+    // {
+    //     self.load(namespace, key).await
+    //     // Err(WebError::custom_error("f"))
+    // }
 }

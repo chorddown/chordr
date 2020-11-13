@@ -3,8 +3,8 @@ use crate::persistence::backend::BackendTrait;
 use async_trait::async_trait;
 use libchordr::models::record_id_trait::RecordIdTrait;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 use std::cell::RefCell;
+use std::collections::HashMap;
 
 pub struct TransientBackend {
     map: RefCell<HashMap<String, String>>,
@@ -41,7 +41,10 @@ impl BackendTrait for TransientBackend {
     where
         T: for<'a> Deserialize<'a>,
     {
-        match self.map.borrow().get(&format!("{}/{}", namespace.as_ref(), key.as_ref()))
+        match self
+            .map
+            .borrow()
+            .get(&format!("{}/{}", namespace.as_ref(), key.as_ref()))
         {
             Some(v) => match serde_json::from_str(v.as_str()) {
                 Ok(serialized) => Ok(serialized),

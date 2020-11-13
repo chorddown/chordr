@@ -4,20 +4,36 @@ use crate::helpers::window;
 use crate::WebError;
 use web_sys::Storage;
 
+pub enum BrowserStorageType {
+    LocalStorage,
+    SessionStorage,
+}
+
 #[derive(Clone)]
 pub struct BrowserStorage {
     storage: Storage,
 }
 
 impl BrowserStorage {
-    pub fn new() -> Result<Self, WebError> {
-        let storage_option = window().local_storage()?;
+    pub fn local_storage() -> Result<Self, WebError> {
+        Self::new(BrowserStorageType::LocalStorage)
+    }
+
+    pub fn session_storage() -> Result<Self, WebError> {
+        Self::new(BrowserStorageType::SessionStorage)
+    }
+
+    pub fn new(browser_storage_type: BrowserStorageType) -> Result<Self, WebError> {
+        let storage_option = match browser_storage_type {
+            BrowserStorageType::LocalStorage => window().local_storage()?,
+            BrowserStorageType::SessionStorage => window().session_storage()?,
+        };
         match storage_option {
             Some(storage) => Ok(Self { storage }),
             None => Err(PersistenceError::storage_unavailable(
                 "Could not retrieve browser storage",
             )
-            .into()),
+                .into()),
         }
     }
 }

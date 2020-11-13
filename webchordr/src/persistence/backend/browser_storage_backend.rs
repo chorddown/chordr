@@ -127,7 +127,7 @@ mod test {
     #[wasm_bindgen_test]
     async fn store_and_load_person_localstorage_test() {
         let pm = BrowserStorageBackend::new(
-            BrowserStorage::new().expect("Could not create Browser Storage"),
+            BrowserStorage::local_storage().expect("Could not create Browser Storage"),
         );
         let value = TestValue {
             age: 3,

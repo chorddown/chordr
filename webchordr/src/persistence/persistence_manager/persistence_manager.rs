@@ -260,7 +260,7 @@ mod test {
     #[wasm_bindgen_test]
     async fn store_and_load_person_localstorage_test() {
         let backend = BrowserStorageBackend::new(
-            BrowserStorage::new().expect("Could not create Browser Storage"),
+            BrowserStorage::local_storage().expect("Could not create Browser Storage"),
         );
         let pm =
             PersistenceManager::new(backend, DummyServerBackend::new(), TransientBackend::new());
