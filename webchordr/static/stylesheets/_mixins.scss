@@ -96,3 +96,9 @@
     //    }
     //}
 }
+
+@mixin assign-variables($prefix, $styles) {
+    @each $key, $value in $styles {
+        --#{$prefix}-#{$key}: #{$value};
+    }
+}

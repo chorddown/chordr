@@ -1,4 +1,5 @@
 @import "variables";
+@import "mixins";
 
 @mixin apply-variables-dark-mode {
     @media screen and (prefers-color-scheme: dark) {
@@ -20,6 +21,7 @@ html {
     --link-hover-color: #{$link-hover-color};
     --button-bg: #{$button-bg};
     --button-color: #{$button-color};
+    --button-border: #{$button-color};
     --button-hover-bg: #{$button-hover-bg};
     --button-hover-color: #{$button-hover-color};
     --nav-bg: #{$nav-bg};
@@ -28,6 +30,8 @@ html {
     --clipboard-input-color: #{$clipboard-input-color};
 
     --section-border-color: #{$section-border-color};
+
+    @include assign-variables(control, $control);
 }
 
 @include apply-variables-dark-mode {
@@ -37,6 +41,7 @@ html {
     --link-hover-color: #{$dark-mode-link-hover-color};
     --button-bg: #{$dark-mode-button-bg};
     --button-color: #{$dark-mode-button-color};
+    --button-border: #{$dark-mode-button-color};
     --button-hover-bg: #{$dark-mode-button-hover-bg};
     --button-hover-color: #{$dark-mode-button-hover-color};
     --nav-bg: #{$dark-mode-nav-bg};
@@ -45,4 +50,6 @@ html {
     --clipboard-input-color: #{$dark-mode-clipboard-input-color};
 
     --section-border-color: #{$dark-mode-section-border-color};
+
+    @include assign-variables(control, $dark-mode-control);
 }

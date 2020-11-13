@@ -41,15 +41,33 @@ $button-line-height: 26px !default;
 $button-font-size: $font-size-h3 !default;
 $button-padding: $std-half $std-space !default;
 $button-letter-spacing: -.01em !default;
-$button-bg: $gray !default;
-$button-color: $gray-darker !default;
-$button-border: 1px solid $gray-dark !default;
-$button-hover-bg: $gray-dark !default;
-$button-hover-color: $gray-darker !default;
-$dark-mode-button-bg: $dark-mode-background !default;
-$dark-mode-button-color: $dark-mode-text-color !default;
-$dark-mode-button-hover-bg: $gray-darker !default;
-$dark-mode-button-hover-color: $dark-mode-text-color !default;
+
+$control: (
+        bg: $gray,
+        color: $gray-darker,
+        border: 1px solid $gray-dark,
+        hover-bg: $gray-dark,
+        hover-color: $gray-darker
+) !default;
+
+$dark-mode-control: (
+        bg: $dark-mode-background,
+        color: $dark-mode-text-color,
+        border: map-get($control, border),
+        hover-bg: $gray-darker,
+        hover-color: $dark-mode-text-color,
+) !default;
+
+$button-bg: map-get($control, bg);
+$button-color: map-get($control, color);
+$button-border: map-get($control, border);
+$button-hover-bg: map-get($control, hover-bg);
+$button-hover-color: map-get($control, hover-color);
+$dark-mode-button-bg: map-get($dark-mode-control, bg) !default;
+$dark-mode-button-color: map-get($dark-mode-control, color) !default;
+$dark-mode-button-border: map-get($dark-mode-control, border) !default;
+$dark-mode-button-hover-bg: map-get($dark-mode-control, hover-bg) !default;
+$dark-mode-button-hover-color: map-get($dark-mode-control, hover-color) !default;
 
 $nav-bg: $gray-light !default;
 $dark-mode-nav-bg: $gray-dark !default;
@@ -62,55 +80,55 @@ $nav-collapsed-width: $nav-button-height !default;
 $tool-top-space: $nav-button-height + 5px;
 
 $_block-style: (
-    font-color: $text-color,
-    font-weight: normal,
-    font-style: normal,
-    background: transparent,
-    block-width: 10px,
-    block-color: #777,
+        font-color: $text-color,
+        font-weight: normal,
+        font-style: normal,
+        background: transparent,
+        block-width: 10px,
+        block-color: #777,
 ) !default;
 
 $chord: (
-    font-color: $green,
-    font-weight: bold,
-    font-style: normal,
-    background: transparent,
-    block-width: 0,
-    block-color: none,
-    margin: 0 1em 0 0,
+        font-color: $green,
+        font-weight: bold,
+        font-style: normal,
+        background: transparent,
+        block-width: 0,
+        block-color: none,
+        margin: 0 1em 0 0,
 ) !default;
 
 $chord-dark: map-merge(
-        $chord,
-            (
-                // font-color: value,
-                // font-weight: value,
-                // font-style: value,
-                // background: value,
-                // block-width: value,
-                // block-color: value,
-            )
+                $chord,
+                        (
+                          // font-color: value,
+                          // font-weight: value,
+                          // font-style: value,
+                          // background: value,
+                          // block-width: value,
+                          // block-color: value,
+                        )
 ) !default;
 
 $chorus: (
-    font-color: $text-color,
-    font-weight: normal,
-    font-style: normal,
-    background: transparent,
-    block-width: .3em,
-    block-color: $green,
+        font-color: $text-color,
+        font-weight: normal,
+        font-style: normal,
+        background: transparent,
+        block-width: .3em,
+        block-color: $green,
 ) !default;
 
 $chorus-dark: map-merge(
-        $chorus,
-        (
-            font-color: $dark-mode-text-color,
-            // font-weight: value,
-            // font-style: value,
-            // background: value,
-            // block-width: value,
-            // block-color: value,
-        )
+                $chorus,
+                (
+                        font-color: $dark-mode-text-color,
+                  // font-weight: value,
+                  // font-style: value,
+                  // background: value,
+                  // block-width: value,
+                  // block-color: value,
+                )
 ) !default;
 
 //$verse: (
@@ -135,45 +153,45 @@ $chorus-dark: map-merge(
 //) !default;
 
 $bridge: (
-    font-color: $text-color,
-    font-weight: normal,
-    font-style: normal,
-    background: transparent,
-    block-width: .3em,
-    block-color: $green-darker,
+        font-color: $text-color,
+        font-weight: normal,
+        font-style: normal,
+        background: transparent,
+        block-width: .3em,
+        block-color: $green-darker,
 ) !default;
 
 $bridge-dark: map-merge(
-        $bridge,
-        (
-            font-color: $dark-mode-text-color,
-            // font-weight: value,
-            // font-style: value,
-            // background: value,
-            // block-width: value,
-            // block-color: value,
-        )
+                $bridge,
+                (
+                        font-color: $dark-mode-text-color,
+                  // font-weight: value,
+                  // font-style: value,
+                  // background: value,
+                  // block-width: value,
+                  // block-color: value,
+                )
 ) !default;
 
 $blockquote: (
-    font-color: $text-color,
-    font-weight: bold,
-    font-style: normal,
-    background: transparent,
-    block-width: .3em,
-    block-color: $gray-dark,
+        font-color: $text-color,
+        font-weight: bold,
+        font-style: normal,
+        background: transparent,
+        block-width: .3em,
+        block-color: $gray-dark,
 ) !default;
 
 $blockquote-dark: map-merge(
-        $blockquote,
-        (
-            font-color: $dark-mode-text-color,
-            // font-weight: value,
-            // font-style: value,
-            // background: value,
-            // block-width: value,
-            // block-color: value,
-        )
+                $blockquote,
+                (
+                        font-color: $dark-mode-text-color,
+                  // font-weight: value,
+                  // font-style: value,
+                  // background: value,
+                  // block-width: value,
+                  // block-color: value,
+                )
 ) !default;
 
 $section-border-color: $gray-medium !default;
@@ -189,7 +207,6 @@ $clipboard-input-padding: $button-padding !default;
 $clipboard-input-letter-spacing: $button-letter-spacing !default;
 $dark-mode-clipboard-input-bg: $dark-mode-button-bg !default;
 $dark-mode-clipboard-input-color: $dark-mode-button-color !default;
-
 
 
 $song-search-line-height: $button-line-height !default;

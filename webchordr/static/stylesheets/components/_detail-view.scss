@@ -6,9 +6,9 @@
     .detail-view-header {
         display: flex;
         flex-flow: row;
-        background: $gray-light;
+        background: var(--control-bg);
 
-        button.close-button {
+        .close-button {
             margin-left: auto;
 
             @include button-default($border: none, $width: 42px);

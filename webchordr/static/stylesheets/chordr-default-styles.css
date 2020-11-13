@@ -6,12 +6,18 @@ html {
   --link-hover-color: #221d1c;
   --button-bg: #b7b7b0;
   --button-color: #62625e;
+  --button-border: #62625e;
   --button-hover-bg: #8d8d88;
   --button-hover-color: #62625e;
   --nav-bg: #d8d8d0;
   --clipboard-input-bg: #b7b7b0;
   --clipboard-input-color: #62625e;
-  --section-border-color: #a8a8a2; }
+  --section-border-color: #a8a8a2;
+  --control-bg: #b7b7b0;
+  --control-color: #62625e;
+  --control-border: 1px solid #8d8d88;
+  --control-hover-bg: #8d8d88;
+  --control-hover-color: #62625e; }
 
 @media screen and (prefers-color-scheme: dark) {
   html {
@@ -21,12 +27,18 @@ html {
     --link-hover-color: #d8d8d0;
     --button-bg: #221d1c;
     --button-color: white;
+    --button-border: white;
     --button-hover-bg: #62625e;
     --button-hover-color: white;
     --nav-bg: #8d8d88;
     --clipboard-input-bg: #221d1c;
     --clipboard-input-color: white;
-    --section-border-color: #a8a8a2; } }
+    --section-border-color: #a8a8a2;
+    --control-bg: #221d1c;
+    --control-color: white;
+    --control-border: 1px solid #8d8d88;
+    --control-hover-bg: #62625e;
+    --control-hover-color: white; } }
 
 html.dark-mode {
   --background: #221d1c;
@@ -35,12 +47,18 @@ html.dark-mode {
   --link-hover-color: #d8d8d0;
   --button-bg: #221d1c;
   --button-color: white;
+  --button-border: white;
   --button-hover-bg: #62625e;
   --button-hover-color: white;
   --nav-bg: #8d8d88;
   --clipboard-input-bg: #221d1c;
   --clipboard-input-color: white;
-  --section-border-color: #a8a8a2; }
+  --section-border-color: #a8a8a2;
+  --control-bg: #221d1c;
+  --control-color: white;
+  --control-border: 1px solid #8d8d88;
+  --control-hover-bg: #62625e;
+  --control-hover-color: white; }
 
 @page {
   size: auto; }
