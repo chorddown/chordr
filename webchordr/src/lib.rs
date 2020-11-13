@@ -15,6 +15,7 @@ mod helpers;
 mod lock;
 mod persistence;
 mod route;
+mod session;
 mod sortable_service;
 #[cfg(test)]
 mod test_helpers;
