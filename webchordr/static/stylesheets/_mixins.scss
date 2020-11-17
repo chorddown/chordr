@@ -97,6 +97,23 @@
     //}
 }
 
+@mixin button-disabled($padding: $button-padding, $border: $button-border, $width: 100%) {
+    background: var(--control-disabled-bg);
+    border: $border;
+    color: var(--control-disabled-color);
+    width: $width;
+    padding: $padding;
+    text-align: center;
+    letter-spacing: $button-letter-spacing;
+    cursor: pointer;
+
+    &:focus,
+    &:hover {
+        color: var(--control-disabled-hover-color);
+        background: var(--control-disabled-hover-bg);
+    }
+}
+
 @mixin assign-variables($prefix, $styles) {
     @each $key, $value in $styles {
         --#{$prefix}-#{$key}: #{$value};

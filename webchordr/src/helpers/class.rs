@@ -5,6 +5,10 @@ use yew::Classes;
 pub struct Class(String);
 
 impl Class {
+    pub fn new<S: Into<String>>(class: S) -> Self {
+        Self(class.into())
+    }
+
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
     }
@@ -20,6 +24,12 @@ impl Class {
     /// Return a new class with the given string appended
     pub fn add(&self, class: &str) -> Self {
         Self(format!("{} {}", self.0, class))
+    }
+
+    /// Return a new class with the given string appended
+    pub fn append(&mut self, class: &str) {
+        self.0.push(' ');
+        self.0.push_str(class);
     }
 }
 

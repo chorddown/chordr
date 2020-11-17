@@ -47,7 +47,7 @@ $control: (
         color: $gray-darker,
         border: 1px solid $gray-dark,
         hover-bg: $gray-dark,
-        hover-color: $gray-darker
+        hover-color: $gray-darker,
 ) !default;
 
 $dark-mode-control: (
@@ -56,6 +56,22 @@ $dark-mode-control: (
         border: map-get($control, border),
         hover-bg: $gray-darker,
         hover-color: $dark-mode-text-color,
+) !default;
+
+$control-disabled: (
+        bg: $gray,
+        color: $gray-dark,
+        border: 1px solid $gray-dark,
+        hover-bg: $gray,
+        hover-color: $gray-dark,
+) !default;
+
+$dark-mode-control-disabled: (
+        bg: $dark-mode-background,
+        color: $gray-darker,
+        border: map-get($control, border),
+        hover-bg: $dark-mode-background,
+        hover-color: $gray-darker,
 ) !default;
 
 $button-bg: map-get($control, bg);

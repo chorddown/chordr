@@ -18,7 +18,12 @@ html {
   --control-color: #62625e;
   --control-border: 1px solid #8d8d88;
   --control-hover-bg: #8d8d88;
-  --control-hover-color: #62625e; }
+  --control-hover-color: #62625e;
+  --control-disabled-bg: #b7b7b0;
+  --control-disabled-color: #8d8d88;
+  --control-disabled-border: 1px solid #8d8d88;
+  --control-disabled-hover-bg: #b7b7b0;
+  --control-disabled-hover-color: #8d8d88; }
 
 @media screen and (prefers-color-scheme: dark) {
   html {
@@ -39,7 +44,12 @@ html {
     --control-color: white;
     --control-border: 1px solid #8d8d88;
     --control-hover-bg: #62625e;
-    --control-hover-color: white; } }
+    --control-hover-color: white;
+    --control-disabled-bg: #221d1c;
+    --control-disabled-color: #62625e;
+    --control-disabled-border: 1px solid #8d8d88;
+    --control-disabled-hover-bg: #221d1c;
+    --control-disabled-hover-color: #62625e; } }
 
 html.dark-mode {
   --background: #221d1c;
@@ -59,7 +69,12 @@ html.dark-mode {
   --control-color: white;
   --control-border: 1px solid #8d8d88;
   --control-hover-bg: #62625e;
-  --control-hover-color: white; }
+  --control-hover-color: white;
+  --control-disabled-bg: #221d1c;
+  --control-disabled-color: #62625e;
+  --control-disabled-border: 1px solid #8d8d88;
+  --control-disabled-hover-bg: #221d1c;
+  --control-disabled-hover-color: #62625e; }
 
 @font-face {
   font-family: 'Libre Baskerville';
@@ -1169,6 +1184,25 @@ button,
     background: transparent;
     border: none; }
 
+a.disabled[role=button]:not(.discreet),
+button:disabled:not(.discreet),
+.button.disabled:not(.discreet) {
+  background: var(--control-disabled-bg);
+  border: 1px solid #8d8d88;
+  color: var(--control-disabled-color);
+  width: 100%;
+  padding: 7px 14px;
+  text-align: center;
+  letter-spacing: -0.01em;
+  cursor: pointer; }
+  a.disabled[role=button]:not(.discreet):focus, a.disabled[role=button]:not(.discreet):hover,
+  button:disabled:not(.discreet):focus,
+  button:disabled:not(.discreet):hover,
+  .button.disabled:not(.discreet):focus,
+  .button.disabled:not(.discreet):hover {
+    color: var(--control-disabled-hover-color);
+    background: var(--control-disabled-hover-bg); }
+
 .grid-button {
   height: 100%;
   display: flex;
@@ -1710,11 +1744,15 @@ nav {
 .sortable-drag {
   opacity: 0 !important; }
 
-.user-state.logged-in .im-check-mark {
+.user-state .logged-in .im-check-mark {
   position: absolute;
   font-size: .6em;
   margin-top: 3px;
-  margin-left: -2px; }
+  margin-left: -2px;
+  transform: rotate(-6deg); }
+
+.user-state .offline {
+  color: var(--button-color-disabled); }
 
 .content {
   background: var(--background);

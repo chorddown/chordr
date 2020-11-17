@@ -32,6 +32,7 @@ html {
     --section-border-color: #{$section-border-color};
 
     @include assign-variables(control, $control);
+    @include assign-variables(control-disabled, $control-disabled);
 }
 
 @include apply-variables-dark-mode {
@@ -52,4 +53,5 @@ html {
     --section-border-color: #{$dark-mode-section-border-color};
 
     @include assign-variables(control, $dark-mode-control);
+    @include assign-variables(control-disabled, $dark-mode-control-disabled);
 }

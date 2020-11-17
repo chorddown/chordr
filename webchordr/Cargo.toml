@@ -57,6 +57,7 @@ features = [
     'Response',
     'Storage',
     'History',
+    'Navigator',
 ]
 
 [package.metadata.wasm-pack.profile.dev.wasm-bindgen]

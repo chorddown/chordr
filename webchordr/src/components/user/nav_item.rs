@@ -1,6 +1,7 @@
 use yew::prelude::*;
 use crate::session::{SessionUser, Session};
 use std::rc::Rc;
+use crate::helpers::{window, Class};
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct NavItemProps {
@@ -39,20 +40,27 @@ impl Component for NavItem {
     fn view(&self) -> Html {
         let user = &self.props.session.user();
 
+        let on_line = window().navigator().on_line();
+        let class = Class::new("user-state").add(if on_line { "on-line" } else { "offline disabled" });
+
         match user {
             SessionUser::LoggedIn(user) => {
                 let user_description = format!("{} {} aka {}", user.first_name(), user.last_name(), user.username());
+                let class = class.add("logged-in");
 
                 (html! {
-                    <a role="button" class="user-state logged-in" href="/#/user/info" title=user_description>
+                    <a role="button" class=class href="/#/user/info" title=user_description>
                         <i class="im im-user-male"></i>
                         <i class="im im-check-mark"></i>
                     </a>
                 }) as Html
             }
             SessionUser::Unauthenticated => {
+                let title = if on_line { "Click to log in" } else { "Device offline" };
+                let class = class.add("not-logged-in");
+
                 (html! {
-                    <a role="button" class="user-state not-logged-in" href="/#/user/login" title="Click to log in">
+                    <a role="button" class=class href="/#/user/login" title=title>
                         <i class="im im-user-male"></i>
                     </a>
                 }) as Html

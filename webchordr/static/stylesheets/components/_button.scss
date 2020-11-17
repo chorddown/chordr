@@ -20,6 +20,14 @@ button,
     }
 }
 
+a[role=button].disabled,
+button:disabled,
+.button.disabled {
+    &:not(.discreet) {
+        @include button-disabled();
+    }
+}
+
 .grid-button {
     height: 100%;
     display: flex;
