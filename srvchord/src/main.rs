@@ -186,6 +186,7 @@ fn rocket() -> Rocket {
         // .mount("/", StaticFiles::from("static/"))
         // .mount("/", StaticFiles::from("../target/deploy/"))
         .mount("/", routes![index, catalog])
+        .mount("/status", crate::routes::status::get_routes())
         // .mount("/todo", routes![new, toggle, delete])
         .mount("/setlist", crate::routes::setlist::get_routes())
         .mount("/user", crate::routes::user::get_routes())
