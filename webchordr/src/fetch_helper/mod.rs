@@ -9,7 +9,7 @@ use web_sys;
 use web_sys::{Request as WebRequest, RequestInit, RequestMode, Response as WebResponse};
 use yew::Callback;
 
-type FetchResult<OUT> = Result<OUT, WebError>;
+pub type FetchResult<OUT> = Result<OUT, WebError>;
 
 /// Fetch a URI
 ///
