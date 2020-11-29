@@ -12,9 +12,18 @@ impl Password {
     pub fn new<S: Into<String>>(password: S) -> Result<Self, Error> {
         let password = password.into();
         if password.is_empty() {
-            Err(Error::invalid_password_error(password, "Password must not be empty"))
+            Err(Error::invalid_password_error(
+                password,
+                "Password must not be empty",
+            ))
         } else if password.len() < PASSWORD_MIN_LENGTH {
-            Err(Error::invalid_password_error(password, format!("Password must be at least {} characters long", PASSWORD_MIN_LENGTH)))
+            Err(Error::invalid_password_error(
+                password,
+                format!(
+                    "Password must be at least {} characters long",
+                    PASSWORD_MIN_LENGTH
+                ),
+            ))
         } else {
             Ok(Self(password))
         }

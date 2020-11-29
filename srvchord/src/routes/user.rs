@@ -4,9 +4,7 @@ use rocket::get;
 use rocket_contrib::json::Json;
 
 pub fn get_routes() -> Vec<rocket::Route> {
-    routes![
-        crate::routes::user::index,
-    ]
+    routes![crate::routes::user::index,]
 }
 
 #[get("/")]
@@ -19,9 +17,7 @@ pub fn index(user: UserDb) -> Option<Json<User>> {
 
 #[cfg(test)]
 mod test {
-    use crate::test_helpers::{
-        create_random_user, json_format, run_test_fn, JsonTemplateValue,
-    };
+    use crate::test_helpers::{create_random_user, json_format, run_test_fn, JsonTemplateValue};
     use rocket::http::Header;
     use rocket::http::Status;
 
@@ -49,9 +45,7 @@ mod test {
                 response_body,
                 json_format::<JsonTemplateValue>(
                     r#"{"username":"$","first_name":"Daniel","last_name":"Corn"}"#,
-                    vec![
-                        username.into(),
-                    ],
+                    vec![username.into(),],
                 )
             );
         })

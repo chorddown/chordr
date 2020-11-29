@@ -39,10 +39,7 @@ impl User {
 
     /// Return a clone of `self` with the given password
     pub fn with_password(self, password: Password) -> Self {
-        Self {
-            password,
-            ..self
-        }
+        Self { password, ..self }
     }
 
     pub fn username(&self) -> &Username {

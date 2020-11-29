@@ -37,16 +37,34 @@ impl Error {
         Error::new(Kind::SetlistError(description.into()))
     }
 
-    pub fn invalid_username_error<S1: Into<String>, S2: Into<String>>(invalid_username: S1, message: S2) -> Self {
-        Error::new(Kind::InvalidUsernameError(invalid_username.into(), message.into()))
+    pub fn invalid_username_error<S1: Into<String>, S2: Into<String>>(
+        invalid_username: S1,
+        message: S2,
+    ) -> Self {
+        Error::new(Kind::InvalidUsernameError(
+            invalid_username.into(),
+            message.into(),
+        ))
     }
 
-    pub fn invalid_password_error<S1: Into<String>, S2: Into<String>>(invalid_password: S1, message: S2) -> Self {
-        Error::new(Kind::InvalidPasswordError(invalid_password.into(), message.into()))
+    pub fn invalid_password_error<S1: Into<String>, S2: Into<String>>(
+        invalid_password: S1,
+        message: S2,
+    ) -> Self {
+        Error::new(Kind::InvalidPasswordError(
+            invalid_password.into(),
+            message.into(),
+        ))
     }
 
-    pub fn invalid_team_id_error<S1: Into<String>, S2: Into<String>>(invalid_team_id: S1, message: S2) -> Self {
-        Error::new(Kind::InvalidTeamIdError(invalid_team_id.into(), message.into()))
+    pub fn invalid_team_id_error<S1: Into<String>, S2: Into<String>>(
+        invalid_team_id: S1,
+        message: S2,
+    ) -> Self {
+        Error::new(Kind::InvalidTeamIdError(
+            invalid_team_id.into(),
+            message.into(),
+        ))
     }
 
     pub fn unknown_error<S: Into<String>>(description: S) -> Self {
@@ -112,12 +130,8 @@ impl Display for Kind {
             Kind::ChordError(s) => write!(f, "{}", s),
             Kind::SetlistError(s) => write!(f, "{}", s),
             Kind::UnknownError(s) => write!(f, "{}", s),
-            Kind::InvalidUsernameError(_name, message) => {
-                write!(f, "{}", message)
-            }
-            Kind::InvalidPasswordError(_password, message) => {
-                write!(f, "{}", message)
-            }
+            Kind::InvalidUsernameError(_name, message) => write!(f, "{}", message),
+            Kind::InvalidPasswordError(_password, message) => write!(f, "{}", message),
             Kind::InvalidTeamIdError(invalid_id, _message) => {
                 write!(f, "Team ID '{}' is not valid", invalid_id)
             }

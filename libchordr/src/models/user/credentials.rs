@@ -1,6 +1,6 @@
+use super::user::User;
 use crate::models::user::{Password, Username};
 use serde::{Deserialize, Serialize};
-use super::user::User;
 
 /// Login credentials
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]

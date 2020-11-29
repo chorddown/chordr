@@ -12,7 +12,7 @@ impl Username {
         let id = id.into();
         match validate_model_identifier(&id) {
             Ok(_) => Ok(Self(id)),
-            Err(msg) => Err(Error::invalid_username_error(id, msg))
+            Err(msg) => Err(Error::invalid_username_error(id, msg)),
         }
     }
 }
