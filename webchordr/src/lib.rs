@@ -1,4 +1,4 @@
-#![recursion_limit="256"]
+#![recursion_limit = "256"]
 
 // Use `wee_alloc` as the global allocator.
 #[global_allocator]

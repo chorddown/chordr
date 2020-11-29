@@ -94,7 +94,7 @@ impl BackendTrait for ServerBackend {
             HashMap<String, serde_json::Value>,
             &str,
         >(&uri, &options, Some(headers))
-            .await;
+        .await;
         result.map(|_| ())
     }
 

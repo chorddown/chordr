@@ -33,7 +33,7 @@ impl BrowserStorage {
             None => Err(PersistenceError::storage_unavailable(
                 "Could not retrieve browser storage",
             )
-                .into()),
+            .into()),
         }
     }
 }

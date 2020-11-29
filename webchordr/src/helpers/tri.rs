@@ -12,7 +12,7 @@ impl<T, E: Error> Tri<T, E> {
         match self {
             Tri::Some(_) => true,
             Tri::None => false,
-            Tri::Err(_) => false
+            Tri::Err(_) => false,
         }
     }
 
@@ -20,7 +20,7 @@ impl<T, E: Error> Tri<T, E> {
         match self {
             Tri::Some(_) => false,
             Tri::None => true,
-            Tri::Err(_) => false
+            Tri::Err(_) => false,
         }
     }
 
@@ -28,7 +28,7 @@ impl<T, E: Error> Tri<T, E> {
         match self {
             Tri::Some(_) => false,
             Tri::None => false,
-            Tri::Err(_) => true
+            Tri::Err(_) => true,
         }
     }
 
@@ -41,7 +41,7 @@ impl<T, E: Error> Tri<T, E> {
         match self {
             Tri::Some(v) => v,
             Tri::None => panic!("called `Tri::unwrap()` on a `None` value"),
-            Tri::Err(_) => panic!("called `Tri::unwrap()` on a `Err` value")
+            Tri::Err(_) => panic!("called `Tri::unwrap()` on a `Err` value"),
         }
     }
 }
