@@ -6,6 +6,7 @@ use libchordr::models::catalog::*;
 use libchordr::models::song_data::SongData;
 use libchordr::prelude::Song;
 use log::info;
+use std::rc::Rc;
 use yew::prelude::*;
 use yew::{Component, ComponentLink, ShouldRender};
 
@@ -18,7 +19,7 @@ pub struct SongSearch {
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct SongSearchProps {
-    pub catalog: Catalog,
+    pub catalog: Rc<Catalog>,
     pub show_back_button: bool,
 }
 

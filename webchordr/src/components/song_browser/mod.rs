@@ -11,6 +11,7 @@ use libchordr::models::song_data::SongData;
 use libchordr::prelude::Song;
 use yew::prelude::*;
 use yew::{Component, ComponentLink, ShouldRender};
+use std::rc::Rc;
 
 pub struct SongBrowser {
     props: SongBrowserProps,
@@ -21,7 +22,7 @@ const SONG_BROWSER_PLACEHOLDER: &'static str = "_";
 #[derive(Properties, PartialEq, Clone)]
 pub struct SongBrowserProps {
     pub chars: String,
-    pub catalog: Catalog,
+    pub catalog: Rc<Catalog>,
 }
 
 impl SongBrowser {

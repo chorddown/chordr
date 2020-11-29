@@ -1,4 +1,4 @@
-#[derive(PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum ConnectionStatus {
     OnLine,
     ServerNotReachable,
