@@ -8,6 +8,7 @@ use crate::components::start_screen::StartScreen;
 use crate::components::user::Info as UserInfo;
 use crate::components::user::Login as UserLogin;
 use crate::config::Config;
+use crate::connection::{ConnectionService, ConnectionStatus};
 use crate::errors::WebError;
 use crate::events::{Event, SetlistEvent, SettingsEvent, SortingChange};
 use crate::handler_traits::catalog_handler::CatalogHandler;
@@ -20,6 +21,7 @@ use crate::persistence::prelude::*;
 use crate::persistence::web_repository::{CatalogWebRepository, SettingsWebRepository};
 use crate::route::{AppRoute, SetlistRoute, UserRoute};
 use crate::session::{Session, SessionService};
+use crate::state::State;
 use chrono::Utc;
 use libchordr::prelude::*;
 use log::{debug, error, info, warn};
@@ -27,7 +29,10 @@ use percent_encoding::percent_decode_str;
 use serde::{Deserialize, Serialize};
 use std::rc::Rc;
 use std::sync::Arc;
+use std::time::Duration;
 use wasm_bindgen_futures::spawn_local;
+use yew::services::interval::IntervalTask;
+use yew::services::IntervalService;
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
 use yew_router::prelude::*;
 
@@ -44,20 +49,31 @@ pub struct App {
     persistence_manager: Arc<PMType>,
     /// Keep a reference to the RouteService so that it doesn't get dropped
     _route_service: RouteService<AppRouteState>,
+    _clock_handle: IntervalTask,
     route: Route<AppRouteState>,
     link: ComponentLink<App>,
     expand: bool,
     fetching: bool,
+    //#[deprecated]
     catalog: Option<Catalog>,
+    //#[deprecated]
     current_setlist: Option<Setlist>,
     _setlist_collection: SetlistCollection,
+    //#[deprecated]
     settings: SongSettingsMap,
     config: Config,
+    //#[deprecated]
     session: Rc<Session>,
+    session_service: Rc<SessionService>,
+    #[allow(unused)]
+    connection_service: ConnectionService,
+    #[allow(unused)]
+    state: Rc<State>,
 }
 
 #[derive(Debug)]
 pub enum Msg {
+    Tick,
     Event(Event),
     FetchCatalogReady(Result<Catalog, WebError>),
     ToggleMenu,
@@ -281,6 +297,7 @@ impl App {
             None => None,
         };
         let session = self.session.clone();
+        let session_service = self.session_service.clone();
 
         html! {
             <Nav
@@ -290,6 +307,7 @@ impl App {
                 on_toggle=toggle_menu
                 on_setlist_change=on_setlist_change
                 session=session
+                session_service=session_service
             />
         }
     }
@@ -323,14 +341,16 @@ impl App {
     }
 
     fn try_login_and_update_session(&mut self) {
-        let session_service = SessionService::new(self.config.clone());
+        let session_service = self.session_service.clone();
         if session_service.has_credentials_in_session_storage() {
             let on_success = self.link.callback(|s| Msg::SessionChanged(s));
-            let on_failure = self.link.callback(|_| Msg::SessionChanged(Session::default()));
+            let on_failure = self
+                .link
+                .callback(|_| Msg::SessionChanged(Session::default()));
 
             debug!("Try to login with credentials from Session Storage");
             spawn_local(async move {
-                match session_service.try_session().await {
+                match session_service.try_from_browser_storage().await {
                     Ok(u) => {
                         debug!("Successful login with credentials from Session Storage");
                         on_success.emit(u)
@@ -342,8 +362,13 @@ impl App {
                 }
             });
         } else {
-            self.link.send_message(Msg::SessionChanged(Session::default()))
+            self.link
+                .send_message(Msg::SessionChanged(Session::default()))
         }
+    }
+
+    fn run_scheduled_tasks(&mut self) {
+        // self.
     }
 }
 
@@ -565,18 +590,31 @@ impl Component for App {
     type Properties = ();
 
     fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
+        let clock_handle =
+            IntervalService::spawn(Duration::from_secs(60), link.callback(|_| Msg::Tick));
+
         let mut route_service: RouteService<AppRouteState> = RouteService::new();
         let route = Route::from(route_service.get_route());
         route_service.register_callback(link.callback(Msg::RouteChanged));
 
         let user = User::unknown();
         let config = Config::default();
+        let session_service = Rc::new(SessionService::new(config.clone()));
         let session = Rc::new(Session::default());
         let persistence_manager = App::build_persistence_manager(&config, &session);
 
         let now = Utc::now();
         let setlist = Setlist::new("", 0, user, None, Some(now), now, now, vec![]);
         let settings = SongSettingsMap::new();
+
+        let connection_service = ConnectionService::new(config.clone());
+        let state = Rc::new(State::new(
+            None,
+            setlist.clone(),
+            settings.clone(),
+            ConnectionStatus::OnLine,
+            Session::default(),
+        ));
 
         Self {
             persistence_manager,
@@ -588,9 +626,13 @@ impl Component for App {
             current_setlist: Some(setlist),
             _setlist_collection: SetlistCollection::new(),
             _route_service: route_service,
+            _clock_handle: clock_handle,
             route,
             config,
+            session_service,
             session,
+            connection_service,
+            state,
         }
     }
 
@@ -607,7 +649,8 @@ impl Component for App {
             }
             Msg::SessionChanged(session) => {
                 self.session = Rc::new(session);
-                self.persistence_manager = Self::build_persistence_manager(&self.config, &self.session);
+                self.persistence_manager =
+                    Self::build_persistence_manager(&self.config, &self.session);
 
                 // Fetch/reload the Setlist and Song Settings
                 self.fetch_setlist();
@@ -623,6 +666,10 @@ impl Component for App {
                     .expect("Could not reload the top-frame");
             }
             Msg::Event(e) => self.handle_event(e),
+            Msg::Tick => {
+                self.run_scheduled_tasks();
+                return false;
+            }
         }
         true
     }

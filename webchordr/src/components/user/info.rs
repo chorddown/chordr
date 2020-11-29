@@ -1,7 +1,7 @@
 use crate::components::detail_view::DetailView;
+use crate::session::SessionUser;
 use std::fmt::Display;
 use yew::prelude::*;
-use crate::session::SessionUser;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct InfoProps {

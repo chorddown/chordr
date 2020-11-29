@@ -9,7 +9,6 @@ use crate::components::song_list::Item as SongItem;
 use libchordr::models::catalog::*;
 use libchordr::models::song_data::SongData;
 use libchordr::prelude::Song;
-use log::info;
 use yew::prelude::*;
 use yew::{Component, ComponentLink, ShouldRender};
 
@@ -106,17 +105,15 @@ impl Component for SongBrowser {
     }
 
     fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        info!("change: props.chars: {}", props.chars);
-
-        self.props = props;
-        true
+        if self.props != props {
+            self.props = props;
+            true
+        } else {
+            false
+        }
     }
 
     fn view(&self) -> Html {
-        let chars = &self.props.chars;
-
-        info!("props.chars: {}", chars);
-
         let render_index_item = |index| {
             html! {
                 <div class="col-3">

@@ -1,12 +1,8 @@
 use super::ConnectionStatus;
 use crate::config::Config;
 use crate::helpers::window;
-use crate::session::SessionService;
-use crate::{fetch, fetch_with_additional_headers, FetchResult};
+use crate::{fetch, FetchResult};
 use serde::Deserialize;
-use std::rc::Rc;
-use wasm_bindgen_futures::spawn_local;
-use yew::services::FetchService;
 
 pub struct ConnectionService {
     config: Config,

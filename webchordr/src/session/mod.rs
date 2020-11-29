@@ -1,9 +1,9 @@
-mod session_user;
 mod session_service;
+mod session_user;
 
-use libchordr::prelude::User;
-pub use self::session_user::SessionUser;
 pub use self::session_service::SessionService;
+pub use self::session_user::SessionUser;
+use libchordr::prelude::User;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Session {
@@ -12,7 +12,9 @@ pub struct Session {
 
 impl Session {
     pub fn with_user(user: User) -> Self {
-        Self { user: SessionUser::LoggedIn(user) }
+        Self {
+            user: SessionUser::LoggedIn(user),
+        }
     }
 
     pub fn user(&self) -> &SessionUser {
@@ -22,6 +24,8 @@ impl Session {
 
 impl Default for Session {
     fn default() -> Self {
-        Self { user: SessionUser::Unauthenticated }
+        Self {
+            user: SessionUser::Unauthenticated,
+        }
     }
 }

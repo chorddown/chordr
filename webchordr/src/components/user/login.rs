@@ -1,15 +1,16 @@
 use crate::components::detail_view::DetailView;
-use yew::prelude::*;
-use crate::session::{SessionUser, SessionService, Session};
-use libchordr::prelude::{Username, Password, Error, Credentials};
-use std::convert::TryFrom;
-use crate::helpers::Tri;
-use log::info;
 use crate::config::Config;
-use wasm_bindgen_futures::spawn_local;
+use crate::connection::{ConnectionService, ConnectionStatus};
+use crate::helpers::Tri;
+use crate::session::{Session, SessionService, SessionUser};
 use crate::WebError;
+use libchordr::prelude::{Credentials, Error, Password, Username};
+use log::info;
+use std::convert::TryFrom;
+use wasm_bindgen_futures::spawn_local;
+use yew::prelude::*;
 
-type LoginState = Tri<Session, WebError>;
+type LoginStatus = Tri<Session, WebError>;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct LoginProps {
@@ -22,9 +23,10 @@ pub struct LoginProps {
 pub enum Msg {
     UsernameChange(String),
     PasswordChange(String),
-    ChangeLoginState(LoginState),
+    ChangeLoginStatus(LoginStatus),
     Clicked,
     Submit,
+    ChangeConnectionStatus(ConnectionStatus),
 }
 
 pub struct Login {
@@ -34,7 +36,8 @@ pub struct Login {
     password_raw: String,
     username: Tri<Username, Error>,
     password: Tri<Password, Error>,
-    login_state: LoginState,
+    login_status: LoginStatus,
+    connection_status: ConnectionStatus,
 }
 
 impl Component for Login {
@@ -49,10 +52,10 @@ impl Component for Login {
             password_raw: "".to_string(),
             username: Tri::None,
             password: Tri::None,
-            login_state: Tri::None,
+            login_status: Tri::None,
+            connection_status: ConnectionStatus::OnLine,
         }
     }
-
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
@@ -64,49 +67,49 @@ impl Component for Login {
                 self.password = Password::try_from(&value).into();
                 self.password_raw = value
             }
-            Msg::Clicked => {
-                info!("Clicked")
-            }
+            Msg::Clicked => info!("Clicked"),
             Msg::Submit => {
                 let mut session_service = SessionService::new(self.props.config.clone());
                 if self.username.is_some() && self.password.is_some() {
                     let username = match self.username {
                         Tri::Some(ref u) => u.clone(),
-                        _ => unreachable!()
+                        _ => unreachable!(),
                     };
                     let password = match self.password {
                         Tri::Some(ref u) => u.clone(),
-                        _ => unreachable!()
+                        _ => unreachable!(),
                     };
-                    let change_login_state = self.link.callback(|i| Msg::ChangeLoginState(i));
+                    let change_login_status = self.link.callback(|i| Msg::ChangeLoginStatus(i));
 
                     spawn_local(async move {
                         let credentials = Credentials::new(username, password);
                         match session_service.try_login(&credentials).await {
                             Ok(u) => {
                                 info!("Login successful");
-                                change_login_state.emit(LoginState::Some(u))
+                                let _ = session_service
+                                    .set_credentials_in_session_storage(&credentials);
+                                change_login_status.emit(LoginStatus::Some(u))
                             }
                             Err(e) => {
                                 info!("Login failed: {}", e);
-                                change_login_state.emit(LoginState::Err(e))
+                                change_login_status.emit(LoginStatus::Err(e))
                             }
                         }
                     });
                 }
             }
 
-            Msg::ChangeLoginState(state) => {
-                self.login_state = state.clone();
-                match state {
-                    Tri::Some(u) => {
-                        self.props.on_success.emit(u)
-                    }
+            Msg::ChangeLoginStatus(status) => {
+                self.login_status = status.clone();
+                match status {
+                    Tri::Some(u) => self.props.on_success.emit(u),
                     Tri::None => {}
-                    Tri::Err(e) => {
-                        self.props.on_error.emit(e)
-                    }
+                    Tri::Err(e) => self.props.on_error.emit(e),
                 }
+            }
+
+            Msg::ChangeConnectionStatus(status) => {
+                self.connection_status = status.clone();
             }
         }
         true
@@ -124,7 +127,7 @@ impl Component for Login {
 
     fn view(&self) -> Html {
         // If the user has just logged in
-        if let Tri::Some(session) = &self.login_state {
+        if let Tri::Some(session) = &self.login_status {
             let session: &Session = session;
             if let SessionUser::LoggedIn(user) = session.user() {
                 return (html! {
@@ -145,25 +148,41 @@ impl Component for Login {
         }
 
         let username_error = match &self.username {
-            Tri::Err(e) => html! { <div class="error">{format!("{}",e)}</div>},
-            _ => html! {}
+            Tri::Err(e) => html! { <div class="message error">{format!("{}",e)}</div> },
+            _ => html! {},
         };
 
         let password_error = match &self.password {
-            Tri::Err(e) => html! { <div class="error">{format!("{}",e)}</div>},
-            _ => html! {}
+            Tri::Err(e) => html! { <div class="message error">{format!("{}",e)}</div> },
+            _ => html! {},
         };
 
-        let login_error = match &self.login_state {
-            // Tri::Err(e) => html! { <div class="error">{format!("{}",e)}</div>},
-            Tri::Err(_e) => html! { <div class="error">{"Login incorrect"}</div>},
-            _ => html! {}
+        let login_error = match &self.login_status {
+            // Tri::Err(e) => html! { <div class="message error">{format!("{}",e)}</div> },
+            Tri::Err(_e) => html! { <div class="message error">{"Login incorrect"}</div> },
+            _ => html! {},
         };
 
         let submit = self.link.callback(|e: FocusEvent| {
             e.prevent_default();
             Msg::Submit
         });
+
+        let connection_warning = match self.connection_status {
+            ConnectionStatus::OnLine => {
+                html! {}
+            }
+            ConnectionStatus::ServerNotReachable => {
+                html! {
+                    <div class="message warn">{"The server is not reachable"}</div>
+                }
+            }
+            ConnectionStatus::Offline => {
+                html! {
+                    <div class="message warn">{"The browser appears to be offline"}</div>
+                }
+            }
+        };
 
         (html! {
             <DetailView close_uri="#">
@@ -187,6 +206,7 @@ impl Component for Login {
                             {password_error}
                         </div>
                         {login_error}
+                        {connection_warning}
                         <button onclick=self.link.callback(|e|Msg::Clicked)>{"Submit"}</button>
                     </div>
                 </form>
@@ -197,13 +217,19 @@ impl Component for Login {
     fn rendered(&mut self, first_render: bool) {
         if first_render {
             let session_service = SessionService::new(self.props.config.clone());
-            let change_login_state = self.link.callback(|i| Msg::ChangeLoginState(i));
+            let change_login_status = self.link.callback(|i| Msg::ChangeLoginStatus(i));
+            let change_connection_status = self.link.callback(|i| Msg::ChangeConnectionStatus(i));
+            let connection_service = ConnectionService::new(self.props.config.clone());
 
             spawn_local(async move {
-                if let Ok(u) = session_service.try_session().await {
+                if let Ok(u) = session_service.try_from_browser_storage().await {
                     info!("Login successful");
-                    change_login_state.emit(LoginState::Some(u))
+                    change_login_status.emit(LoginStatus::Some(u))
                 }
+            });
+            spawn_local(async move {
+                let connection_status = connection_service.get_connection_status().await;
+                change_connection_status.emit(connection_status)
             });
         }
     }
