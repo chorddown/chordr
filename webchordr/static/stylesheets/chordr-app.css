@@ -23,7 +23,13 @@ html {
   --control-disabled-color: #8d8d88;
   --control-disabled-border: 1px solid #8d8d88;
   --control-disabled-hover-bg: #b7b7b0;
-  --control-disabled-hover-color: #8d8d88; }
+  --control-disabled-hover-color: #8d8d88;
+  --message-warn-bg: #ffe795;
+  --message-warn-color: #bf8f00;
+  --message-warn-border: 1px solid #bf8f00;
+  --message-error-bg: #f09a9e;
+  --message-error-color: #a1050d;
+  --message-error-border: 1px solid #a1050d; }
 
 @media screen and (prefers-color-scheme: dark) {
   html {
@@ -49,7 +55,13 @@ html {
     --control-disabled-color: #62625e;
     --control-disabled-border: 1px solid #8d8d88;
     --control-disabled-hover-bg: #221d1c;
-    --control-disabled-hover-color: #62625e; } }
+    --control-disabled-hover-color: #62625e;
+    --message-warn-bg: #bf8f00;
+    --message-warn-color: #ffe795;
+    --message-warn-border: 1px solid #ffe795;
+    --message-error-bg: #a1050d;
+    --message-error-color: #f09a9e;
+    --message-error-border: 1px solid #f09a9e; } }
 
 html.dark-mode {
   --background: #221d1c;
@@ -74,7 +86,13 @@ html.dark-mode {
   --control-disabled-color: #62625e;
   --control-disabled-border: 1px solid #8d8d88;
   --control-disabled-hover-bg: #221d1c;
-  --control-disabled-hover-color: #62625e; }
+  --control-disabled-hover-color: #62625e;
+  --message-warn-bg: #bf8f00;
+  --message-warn-color: #ffe795;
+  --message-warn-border: 1px solid #ffe795;
+  --message-error-bg: #a1050d;
+  --message-error-color: #f09a9e;
+  --message-error-border: 1px solid #f09a9e; }
 
 @font-face {
   font-family: 'Libre Baskerville';
@@ -1257,6 +1275,32 @@ table th {
 
 table tbody th {
   text-align: left; }
+
+.message {
+  padding: 14px; }
+  .message::before {
+    margin-right: 4px; }
+  .message.warn::before, .message.error::before {
+    content: "";
+    display: inline-block;
+    font-weight: normal;
+    font-variant: normal;
+    font-style: normal;
+    font-family: 'iconmonstr-iconic-font';
+    font-size: 1em;
+    line-height: 1;
+    vertical-align: bottom;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale; }
+  .message.warn {
+    background: var(--message-warn-bg);
+    color: var(--message-warn-color);
+    border: var(--message-warn-border); }
+  .message.error {
+    background: var(--message-error-bg);
+    color: var(--message-error-color);
+    border: var(--message-error-border); }
 
 .center-fullscreen {
   position: fixed;

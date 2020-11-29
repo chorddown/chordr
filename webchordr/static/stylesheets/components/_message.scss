@@ -1,0 +1,28 @@
+@import "prelude";
+
+$message-padding: $std-space !default;
+
+.message {
+    padding: $message-padding;
+
+    &::before {
+        margin-right: 4px;
+    }
+
+    &.warn,
+    &.error {
+        @include icon("\e049");
+    }
+
+    &.warn {
+        background: var(--message-warn-bg);
+        color: var(--message-warn-color);
+        border: var(--message-warn-border);
+    }
+
+    &.error {
+        background: var(--message-error-bg);
+        color: var(--message-error-color);
+        border: var(--message-error-border);
+    }
+}

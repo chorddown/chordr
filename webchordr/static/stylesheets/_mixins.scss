@@ -119,3 +119,20 @@
         --#{$prefix}-#{$key}: #{$value};
     }
 }
+
+@mixin icon($content: normal) {
+    &::before {
+        content: $content;
+        display: inline-block;
+        font-weight: normal;
+        font-variant: normal;
+        font-style: normal;
+        font-family: 'iconmonstr-iconic-font';
+        font-size: 1em;
+        line-height: 1;
+        vertical-align: bottom;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+}

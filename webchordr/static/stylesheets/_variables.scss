@@ -74,6 +74,33 @@ $dark-mode-control-disabled: (
         hover-color: $gray-darker,
 ) !default;
 
+$message-warn-light: rgb(255, 231, 149);
+$message-warn-dark: rgb(191, 143, 0);
+
+$message-warn: (
+        bg: $message-warn-light,
+        color: $message-warn-dark,
+        border: 1px solid $message-warn-dark
+) !default;
+$dark-mode-message-warn: (
+        bg: $message-warn-dark,
+        color: $message-warn-light,
+        border: 1px solid $message-warn-light
+) !default;
+
+$message-error-light: rgb(240, 154, 158);
+$message-error-dark: rgb(161, 5, 13);
+$message-error: (
+        bg: $message-error-light,
+        color: $message-error-dark,
+        border: 1px solid $message-error-dark
+) !default;
+$dark-mode-message-error: (
+        bg: $message-error-dark,
+        color: $message-error-light,
+        border: 1px solid $message-error-light
+) !default;
+
 $button-bg: map-get($control, bg);
 $button-color: map-get($control, color);
 $button-border: map-get($control, border);
