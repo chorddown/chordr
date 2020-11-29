@@ -26,14 +26,12 @@ mod test_helpers;
 mod traits;
 
 use crate::config::Config;
-use crate::task::{Task, Todo};
 use diesel::SqliteConnection;
 use libchordr::models::catalog::Catalog;
 use libchordr::prelude::{CatalogBuilder, FileType};
 use rocket::fairing::AdHoc;
 use rocket::http::Method;
-use rocket::request::{FlashMessage, Form};
-use rocket::response::{Flash, NamedFile, Redirect};
+use rocket::response::NamedFile;
 use rocket::{Rocket, State};
 use rocket_contrib::{json::Json, serve::StaticFiles, templates::Template};
 use rocket_cors::{AllowedHeaders, AllowedOrigins, Cors};
@@ -50,90 +48,9 @@ pub type ConnectionType = SqliteConnection;
 #[database("main_database")]
 pub struct DbConn(ConnectionType);
 
-#[derive(Debug, Serialize)]
-struct Context<'a, 'b> {
-    msg: Option<(&'a str, &'b str)>,
-    tasks: Vec<Task>,
-}
-
-impl<'a, 'b> Context<'a, 'b> {
-    pub fn err(conn: &DbConn, msg: &'a str) -> Context<'static, 'a> {
-        Context {
-            msg: Some(("error", msg)),
-            tasks: Task::all(&conn.0),
-        }
-    }
-
-    pub fn raw(conn: &DbConn, msg: Option<(&'a str, &'b str)>) -> Context<'a, 'b> {
-        Context {
-            msg: msg,
-            tasks: Task::all(&conn.0),
-        }
-    }
-}
-
-#[post("/", data = "<todo_form>")]
-fn new(todo_form: Form<Todo>, conn: DbConn) -> Flash<Redirect> {
-    let todo = todo_form.into_inner();
-    if todo.description.is_empty() {
-        Flash::error(Redirect::to("/"), "Description cannot be empty.")
-    } else if Task::insert(todo, &conn.0) {
-        Flash::success(Redirect::to("/"), "Todo successfully added.")
-    } else {
-        Flash::error(Redirect::to("/"), "Whoops! The server failed.")
-    }
-}
-
-#[post("/", data = "<todo_form>")]
-fn ne2w(todo_form: Form<Todo>, conn: DbConn) -> Flash<Redirect> {
-    let todo = todo_form.into_inner();
-    if todo.description.is_empty() {
-        Flash::error(Redirect::to("/"), "Description cannot be empty.")
-    } else if Task::insert(todo, &conn.0) {
-        Flash::success(Redirect::to("/"), "Todo successfully added.")
-    } else {
-        Flash::error(Redirect::to("/"), "Whoops! The server failed.")
-    }
-}
-
-#[put("/<id>")]
-fn toggle(id: i32, conn: DbConn) -> Result<Redirect, Template> {
-    if Task::toggle_with_id(id, &conn.0) {
-        Ok(Redirect::to("/"))
-    } else {
-        Err(Template::render(
-            "index",
-            &Context::err(&conn, "Couldn't toggle task."),
-        ))
-    }
-}
-
-#[delete("/<id>")]
-fn delete(id: i32, conn: DbConn) -> Result<Flash<Redirect>, Template> {
-    if Task::delete_with_id(id, &conn.0) {
-        Ok(Flash::success(Redirect::to("/"), "Todo was deleted."))
-    } else {
-        Err(Template::render(
-            "index",
-            &Context::err(&conn, "Couldn't delete task."),
-        ))
-    }
-}
-
 #[get("/")]
 fn index(config: State<Config>) -> io::Result<NamedFile> {
     NamedFile::open(Path::new(&config.static_files_dir).join("index.html"))
-}
-
-#[get("/template")]
-fn index_template(msg: Option<FlashMessage<'_, '_>>, conn: DbConn) -> Template {
-    Template::render(
-        "index",
-        &match msg {
-            Some(ref msg) => Context::raw(&conn, Some((msg.name(), msg.msg()))),
-            None => Context::raw(&conn, None),
-        },
-    )
 }
 
 #[get("/catalog.json")]
