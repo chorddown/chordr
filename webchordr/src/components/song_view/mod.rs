@@ -159,7 +159,7 @@ impl SongView {
     }
 
     fn convert_song_to_html_string(&self) -> String {
-        use chrono::{DateTime, Duration, Utc};
+        use chrono::Utc;
 
         let props = &self.props;
         let transpose_semitone = props.song_settings.transpose_semitone();
