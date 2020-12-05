@@ -91,11 +91,8 @@ impl Component for SongView {
     }
 
     fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        let song_changed = self.props.song.id() != props.song.id();
-        if song_changed || self.props != props {
-            if song_changed {
-                self.song_settings = props.song_settings.clone();
-            }
+        if self.props != props {
+            self.song_settings = props.song_settings.clone();
             self.props = props;
             true
         } else {
