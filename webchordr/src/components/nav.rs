@@ -8,6 +8,7 @@ use libchordr::models::song_list::SongList as SongListModel;
 use libchordr::prelude::SongId;
 use std::rc::Rc;
 use yew::prelude::*;
+use crate::state::State;
 
 #[derive(Properties, Clone)]
 pub struct NavProps {
@@ -16,6 +17,7 @@ pub struct NavProps {
     pub current_song_id: Option<SongId>,
     pub on_toggle: Callback<()>,
     pub on_setlist_change: Callback<Event>,
+    pub state: Rc<State>,
     pub session: Rc<Session>,
     pub session_service: Rc<SessionService>,
 }
@@ -23,6 +25,7 @@ pub struct NavProps {
 impl PartialEq for NavProps {
     fn eq(&self, other: &Self) -> bool {
         self.songs == other.songs
+            && self.state == other.state
             && self.expand == other.expand
             && self.current_song_id == other.current_song_id
             && self.on_toggle == other.on_toggle
@@ -38,7 +41,7 @@ pub struct Nav {
 
 impl Nav {
     fn view_song_list(&self) -> Html {
-        let songs = match &self.props.songs {
+        let songs = match &self.props.state.current_setlist() {
             Some(setlist) => setlist.as_song_list(),
             None => SongListModel::new(),
         };
@@ -64,7 +67,7 @@ impl Nav {
         // };
         let setlist_share_button = html! {};
         let session = self.props.session.clone();
-        let session_service = self.props.session_service.clone();
+        let state  = self.props.state.clone();
 
         (if self.props.expand {
             html! {
@@ -77,7 +80,7 @@ impl Nav {
                         <i class="im im-home"></i>
                         <span>{ "Home" }</span>
                     </a>
-                    <UserNavButton session=session session_service=session_service />
+                    <UserNavButton state=state session=session />
                 </footer>
             }
         } else {
