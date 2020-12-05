@@ -6,7 +6,7 @@ use libchordr::prelude::SongSettingsMap;
 use std::rc::Rc;
 
 #[allow(unused)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct State {
     catalog: Option<Rc<Catalog>>,
     connection_status: ConnectionStatus,

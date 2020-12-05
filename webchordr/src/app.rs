@@ -289,6 +289,7 @@ impl App {
         let songs = self.state.current_setlist();
         let session = self.state.session();
         let session_service = self.session_service.clone();
+        let state = self.state.clone();
 
         html! {
             <Nav
@@ -297,6 +298,7 @@ impl App {
                 current_song_id=current_song_id
                 on_toggle=toggle_menu
                 on_setlist_change=on_setlist_change
+                state=state
                 session=session
                 session_service=session_service
             />
@@ -359,11 +361,25 @@ impl App {
     }
 
     fn run_scheduled_tasks(&mut self) {
-        // self.
+        debug!("Run scheduled tasks");
+
+        let state = self.state.clone();
+        let connection_service = self.connection_service.clone();
+        let state_changed = self.link.callback(|s| Msg::StateChanged(s));
+        spawn_local(async move {
+            let connection_status = connection_service.get_connection_status().await;
+            if state.connection_status() != connection_status {
+                state_changed.emit(state.with_connection_status(connection_status))
+            }
+        });
     }
 
-    fn set_state(&mut self, state: State, _sync: bool) {
-        self.link.send_message(Msg::StateChanged(state))
+    fn set_state(&mut self, state: State, sync: bool) {
+        if sync {
+            self.state = Rc::new(state)
+        } else {
+            self.link.send_message(Msg::StateChanged(state))
+        }
     }
 }
 
@@ -695,6 +711,7 @@ impl Component for App {
     fn rendered(&mut self, first_render: bool) -> () {
         if first_render {
             self.fetch_catalog();
+            self.run_scheduled_tasks();
             self.try_login_and_update_session();
         }
     }

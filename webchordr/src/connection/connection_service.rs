@@ -4,6 +4,7 @@ use crate::helpers::window;
 use crate::{fetch, FetchResult};
 use serde::Deserialize;
 
+#[derive(Clone, Debug)]
 pub struct ConnectionService {
     config: Config,
 }
