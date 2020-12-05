@@ -8,32 +8,17 @@ use crate::components::start_screen::StartScreen;
 use crate::components::user::Info as UserInfo;
 use crate::components::user::Login as UserLogin;
 use crate::config::Config;
-use crate::connection::{ConnectionService, ConnectionStatus};
-use crate::errors::WebError;
-use crate::events::{Event, SetlistEvent, SettingsEvent, SortingChange};
-use crate::handler_traits::catalog_handler::CatalogHandler;
-use crate::handler_traits::setlist_handler::SetlistHandler;
-use crate::handler_traits::settings_handler::SettingsHandler;
-use crate::helpers::window;
-use crate::persistence::persistence_manager::PMType;
-use crate::persistence::persistence_manager::PersistenceManagerFactory;
-use crate::persistence::prelude::*;
-use crate::persistence::web_repository::{CatalogWebRepository, SettingsWebRepository};
+use crate::events::{Event, SetlistEvent, SettingsEvent};
 use crate::route::{AppRoute, SetlistRoute, UserRoute};
-use crate::session::{Session, SessionService};
+use crate::session::Session;
 use crate::state::State;
-use chrono::Utc;
+use crate::WebError;
 use libchordr::prelude::*;
-use log::{debug, error, info, warn};
+use log::{debug, error, info};
 use percent_encoding::percent_decode_str;
 use serde::{Deserialize, Serialize};
 use std::rc::Rc;
-use std::sync::Arc;
-use std::time::Duration;
-use wasm_bindgen_futures::spawn_local;
-use yew::services::interval::IntervalTask;
-use yew::services::IntervalService;
-use yew::{html, Component, ComponentLink, Html, ShouldRender};
+use yew::{html, Callback, Component, ComponentLink, Html, Properties, ShouldRender};
 use yew_router::prelude::*;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -45,38 +30,29 @@ impl Default for AppRouteState {
     }
 }
 
+#[derive(Properties, PartialEq, Clone)]
+pub struct AppProperties {
+    pub on_event: Callback<Event>,
+    pub on_setlist_change: Callback<Event>,
+    pub on_user_login_success: Callback<Session>,
+    pub on_user_login_error: Callback<WebError>,
+    pub state: Rc<State>,
+}
+
 pub struct App {
-    persistence_manager: Arc<PMType>,
     /// Keep a reference to the RouteService so that it doesn't get dropped
     _route_service: RouteService<AppRouteState>,
-    /// Keep a reference to the IntervalTask so that it doesn't get dropped
-    _clock_handle: IntervalTask,
     route: Route<AppRouteState>,
-    link: ComponentLink<App>,
     expand: bool,
-    fetching: bool,
-    _setlist_collection: SetlistCollection,
     config: Config,
-    session_service: Rc<SessionService>,
-    #[allow(unused)]
-    connection_service: ConnectionService,
-    #[allow(unused)]
-    state: Rc<State>,
+    props: AppProperties,
+    link: ComponentLink<App>,
 }
 
 #[derive(Debug)]
 pub enum Msg {
-    Tick,
-    Event(Event),
-    FetchCatalogReady(Result<Catalog, WebError>),
     ToggleMenu,
-    #[allow(dead_code)]
-    Reload,
-    #[allow(dead_code)]
-    Ignore,
     RouteChanged(Route<AppRouteState>),
-    SessionChanged(Session),
-    StateChanged(State),
 }
 
 impl App {
@@ -108,25 +84,25 @@ impl App {
     }
 
     fn view_song(&self, song_id: SongId) -> Html {
-        if self.state.catalog().is_none() {
+        let state = self.props.state.clone();
+        if state.catalog().is_none() {
             return html! {};
         }
 
-        let catalog = self.state.catalog().unwrap();
+        let catalog = state.catalog().unwrap();
         if let Some(song) = catalog.get(song_id.clone()) {
-            let add = self
-                .link
-                .callback(|s| Msg::Event(SetlistEvent::Add(s).into()));
+            let add = self.props.on_event.reform(|s| SetlistEvent::Add(s).into());
             let remove = self
-                .link
-                .callback(|s| Msg::Event(SetlistEvent::Remove(s).into()));
-            let change = self.link.callback(|s: (SongId, SongSettings)| {
-                Msg::Event(Event::Pair(
+                .props
+                .on_event
+                .reform(|s| SetlistEvent::Remove(s).into());
+            let change = self.props.on_event.reform(|s: (SongId, SongSettings)| {
+                Event::Pair(
                     Box::new(SettingsEvent::Change(s.0.clone(), s.1.clone()).into()),
                     Box::new(SetlistEvent::SettingsChange(s.0, s.1).into()),
-                ))
+                )
             });
-            let is_on_setlist = if let Some(ref setlist) = self.state.current_setlist() {
+            let is_on_setlist = if let Some(ref setlist) = state.current_setlist() {
                 setlist.contains_id(song_id.clone())
             } else {
                 false
@@ -180,7 +156,7 @@ impl App {
             return settings;
         }
 
-        match self.state.song_settings().get(song_id) {
+        match self.props.state.song_settings().get(song_id) {
             Some(s) => {
                 debug!("Found settings for song {}: {:?}", song_id, s);
                 s.clone()
@@ -193,7 +169,7 @@ impl App {
     }
 
     fn get_settings_from_setlist(&self, song_id: &SongId) -> Option<SongSettings> {
-        match &self.state.current_setlist() {
+        match &self.props.state.current_setlist() {
             None => None,
             Some(setlist) => setlist
                 .get(song_id.clone())
@@ -212,7 +188,7 @@ impl App {
             Err(_) => chars_as_string,
         };
 
-        (match &self.state.catalog() {
+        (match &self.props.state.catalog() {
             Some(catalog) => {
                 info!("New chars from router: {}", chars);
                 html! {<SongBrowser chars=chars catalog=catalog/>}
@@ -229,7 +205,7 @@ impl App {
     }
 
     fn render_song_search(&self, show_back_button: bool) -> Html {
-        (match &self.state.catalog() {
+        (match &self.props.state.catalog() {
             Some(catalog) => {
                 html! {<SongSearch catalog=catalog show_back_button=show_back_button />}
             }
@@ -238,13 +214,14 @@ impl App {
     }
 
     fn view_setlist_route(&self, route: SetlistRoute) -> Html {
+        let state = self.props.state.clone();
         match route {
-            SetlistRoute::Load { serialized_setlist } => match &self.state.catalog() {
+            SetlistRoute::Load { serialized_setlist } => match &state.catalog() {
                 None => html! {},
                 Some(catalog) => {
-                    let replace = self.link.callback(|e| Msg::Event(e));
+                    let replace = self.props.on_event.reform(|e| e);
                     let catalog = catalog.clone();
-                    let setlist = self.state.current_setlist();
+                    let setlist = state.current_setlist();
 
                     self.compose(
                         html! {
@@ -263,12 +240,9 @@ impl App {
     }
 
     fn view_user_route(&self, route: UserRoute) -> Html {
-        let user = self.state.session().user().clone();
-        let on_login_success = self.link.callback(|s| Msg::SessionChanged(s));
-        let on_login_error = self.link.callback(|e| {
-            error!("{}", e);
-            Msg::Ignore
-        });
+        let user = self.props.state.session().user().clone();
+        let on_login_success = self.props.on_user_login_success.reform(|i| i);
+        let on_login_error = self.props.on_user_login_error.reform(|i| i);
 
         match route {
             UserRoute::Info => html! { <UserInfo user=user /> },
@@ -284,36 +258,18 @@ impl App {
     }
 
     fn view_nav(&self, current_song_id: Option<SongId>) -> Html {
-        let toggle_menu = self.link.callback(|_| Msg::ToggleMenu);
-        let on_setlist_change = self.link.callback(|e| Msg::Event(e));
-        let songs = self.state.current_setlist();
-        let session = self.state.session();
-        let session_service = self.session_service.clone();
-        let state = self.state.clone();
+        let on_toggle = self.link.callback(|_| Msg::ToggleMenu);
+        let on_setlist_change = self.props.on_setlist_change.reform(|i| i);
+        let state = self.props.state.clone();
 
         html! {
             <Nav
                 expand=self.expand
-                songs=songs
                 current_song_id=current_song_id
-                on_toggle=toggle_menu
+                on_toggle=on_toggle
                 on_setlist_change=on_setlist_change
                 state=state
-                session=session
-                session_service=session_service
             />
-        }
-    }
-
-    fn handle_event(&mut self, e: Event) {
-        match e {
-            Event::SetlistEvent(se) => self.handle_setlist_event(se),
-            Event::SettingsEvent(se) => self.handle_settings_event(se),
-            Event::Pair(a, b) => {
-                self.handle_event(*a);
-                self.handle_event(*b)
-            }
-            _ => debug!("New event {:?}", e),
         }
     }
 
@@ -326,374 +282,44 @@ impl App {
             </>
         };
     }
-
-    fn build_persistence_manager(config: &Config, session: &Session) -> Arc<PMType> {
-        let persistence_manager_factory = PersistenceManagerFactory::new();
-
-        Arc::new(persistence_manager_factory.build(config, session))
-    }
-
-    fn try_login_and_update_session(&mut self) {
-        let session_service = self.session_service.clone();
-        if session_service.has_credentials_in_session_storage() {
-            let on_success = self.link.callback(|s| Msg::SessionChanged(s));
-            let on_failure = self
-                .link
-                .callback(|_| Msg::SessionChanged(Session::default()));
-
-            debug!("Try to login with credentials from Session Storage");
-            spawn_local(async move {
-                match session_service.try_from_browser_storage().await {
-                    Ok(u) => {
-                        debug!("Successful login with credentials from Session Storage");
-                        on_success.emit(u)
-                    }
-                    Err(_) => {
-                        debug!("Failed login with credentials from Session Storage");
-                        on_failure.emit(())
-                    }
-                }
-            });
-        } else {
-            self.link
-                .send_message(Msg::SessionChanged(Session::default()))
-        }
-    }
-
-    fn run_scheduled_tasks(&mut self) {
-        debug!("Run scheduled tasks");
-
-        let state = self.state.clone();
-        let connection_service = self.connection_service.clone();
-        let state_changed = self.link.callback(|s| Msg::StateChanged(s));
-        spawn_local(async move {
-            let connection_status = connection_service.get_connection_status().await;
-            if state.connection_status() != connection_status {
-                state_changed.emit(state.with_connection_status(connection_status))
-            }
-        });
-    }
-
-    fn set_state(&mut self, state: State, sync: bool) {
-        if sync {
-            self.state = Rc::new(state)
-        } else {
-            self.link.send_message(Msg::StateChanged(state))
-        }
-    }
-}
-
-impl CatalogHandler for App {
-    fn fetch_catalog(&mut self) {
-        let pm = self.persistence_manager.clone();
-        let callback = self.link.callback(move |result| {
-            debug!("Catalog response {:?}", result);
-            Msg::FetchCatalogReady(result)
-        });
-
-        spawn_local(async move {
-            type Repository<'a> = CatalogWebRepository<'a, PMType>;
-            let result = Repository::new(&pm).load().await;
-
-            match result {
-                Ok(Some(catalog)) => callback.emit(Ok(catalog)),
-                Ok(None) => { /* noop */ }
-                Err(e) => callback.emit(Err(e)),
-            }
-        });
-    }
-
-    fn commit_changes(&mut self) {
-        let pm = self.persistence_manager.clone();
-        let catalog = self.state.catalog().clone();
-        spawn_local(async move {
-            type Repository<'a> = CatalogWebRepository<'a, PMType>;
-            let result = Repository::new(&pm).store(&catalog.unwrap()).await;
-
-            if let Err(e) = result {
-                error!("Could not commit Catalog changes: {}", e.to_string())
-            }
-        });
-    }
-}
-
-impl SetlistHandler for App {
-    fn handle_setlist_event(&mut self, event: SetlistEvent) {
-        match event {
-            SetlistEvent::SortingChange(v) => self.setlist_sorting_changed(v),
-            SetlistEvent::Add(v) => self.setlist_add(v),
-            SetlistEvent::Remove(v) => self.setlist_remove(v),
-            SetlistEvent::SettingsChange(id, settings) => {
-                self.setlist_settings_changed(id, settings)
-            }
-            SetlistEvent::Replace(v) => self.setlist_replace(v),
-        }
-    }
-
-    fn setlist_add(&mut self, song: SetlistEntry) {
-        let song_id = song.id();
-        let current_setlist = self
-            .state
-            .current_setlist()
-            .expect("No current setlist defined");
-        let mut new_setlist = (*current_setlist).clone();
-        match new_setlist.add(song) {
-            Ok(_) => debug!("Did add song to setlist {}", song_id),
-            Err(e) => error!("Could not add song to setlist: {:?}", e),
-        }
-        self.set_state(self.state.with_current_setlist(new_setlist), true);
-        <App as SetlistHandler>::commit_changes(self);
-    }
-
-    fn setlist_remove(&mut self, song_id: SongId) {
-        let current_setlist = self
-            .state
-            .current_setlist()
-            .expect("No current setlist defined");
-        let mut new_setlist = (*current_setlist).clone();
-        match new_setlist.remove_by_id(song_id.clone()) {
-            Ok(_) => info!("Removed song {} from setlist", song_id),
-            Err(_) => warn!("Could not remove song {} from setlist", song_id),
-        }
-        self.set_state(self.state.with_current_setlist(new_setlist), true);
-        <App as SetlistHandler>::commit_changes(self);
-    }
-
-    fn setlist_settings_changed(&mut self, song_id: SongId, song_settings: SongSettings) {
-        info!(
-            "Settings changed song {} {:#?}",
-            song_id,
-            self.state.current_setlist().as_ref()
-        );
-        let setlist = self
-            .state
-            .current_setlist()
-            .expect("No current setlist defined");
-        let current_entry = match setlist.get(song_id.clone()) {
-            None => {
-                warn!("Could not find song {} in setlist", song_id);
-                return;
-            }
-            Some(c) => c,
-        };
-        let new_entry = current_entry.with_settings(song_settings);
-
-        let mut new_setlist = (*setlist).clone();
-        if new_setlist.replace(new_entry).is_err() {
-            warn!("Could not replace song {} in setlist", song_id);
-            return;
-        }
-
-        self.set_state(self.state.with_current_setlist(new_setlist), true);
-        <App as SetlistHandler>::commit_changes(self);
-    }
-
-    fn setlist_replace(&mut self, setlist: Setlist) {
-        info!(
-            "Replace setlist {:?} with {:?}",
-            self.state.current_setlist(),
-            setlist
-        );
-        self.set_state(self.state.with_current_setlist(setlist), true);
-        <App as SetlistHandler>::commit_changes(self);
-    }
-
-    fn setlist_sorting_changed(&mut self, sorting_change: SortingChange) {
-        let setlist = self.state.current_setlist().unwrap();
-        let mut new_setlist = (*setlist).clone();
-        let move_result =
-            new_setlist.move_entry(sorting_change.old_index(), sorting_change.new_index());
-
-        match move_result {
-            Ok(_) => {
-                self.set_state(self.state.with_current_setlist(new_setlist), true);
-                <App as SetlistHandler>::commit_changes(self)
-            }
-            Err(e) => error!("{}", e),
-        }
-    }
-
-    fn fetch_setlist(&mut self) {
-        let pm = self.persistence_manager.clone();
-        let callback = self
-            .link
-            .callback(move |setlist| Msg::Event(SetlistEvent::Replace(setlist).into()));
-
-        spawn_local(async move {
-            type Repository<'a> = SetlistWebRepository<'a, PMType>;
-            let result = Repository::new(&pm).load().await;
-
-            match result {
-                Ok(Some(setlist)) => callback.emit(setlist),
-                Ok(None) => { /* noop */ }
-                Err(e) => error!("{}", e),
-            }
-        });
-    }
-
-    fn commit_changes(&mut self) {
-        let pm = self.persistence_manager.clone();
-        match self.state.current_setlist().clone() {
-            Some(s) => spawn_local(async move {
-                type Repository<'a> = SetlistWebRepository<'a, PMType>;
-                let result = Repository::new(&pm).store(&s).await;
-
-                if let Err(e) = result {
-                    error!("Could not commit setlist changes: {}", e.to_string())
-                }
-            }),
-            None => info!("Currently there is no setlist to commit"),
-        }
-    }
-}
-
-impl SettingsHandler for App {
-    fn handle_settings_event(&mut self, event: SettingsEvent) {
-        match event {
-            SettingsEvent::Change(song_id, settings) => {
-                self.song_settings_change(song_id, settings)
-            }
-            SettingsEvent::Replace(v) => self.song_settings_replace(v),
-        }
-    }
-
-    fn song_settings_change(&mut self, song_id: SongId, settings: SongSettings) {
-        let mut song_settings = (*self.state.song_settings()).clone();
-        song_settings.store(song_id, settings);
-        self.set_state(self.state.with_song_settings(song_settings), true);
-        <App as SettingsHandler>::commit_changes(self);
-    }
-
-    fn song_settings_replace(&mut self, settings: SongSettingsMap) {
-        info!(
-            "Replace Map of Song Settings {:?} with {:?}",
-            self.state.song_settings(),
-            settings
-        );
-        self.set_state(self.state.with_song_settings(settings), true);
-        <App as SettingsHandler>::commit_changes(self);
-    }
-
-    fn fetch_song_settings(&mut self) {
-        let pm = self.persistence_manager.clone();
-        let callback = self
-            .link
-            .callback(move |settings_map| Msg::Event(SettingsEvent::Replace(settings_map).into()));
-
-        spawn_local(async move {
-            type Repository<'a> = SettingsWebRepository<'a, PMType>;
-            let result = Repository::new(&pm).load().await;
-
-            match result {
-                Ok(Some(settings)) => callback.emit(settings),
-                Ok(None) => { /* noop */ }
-                Err(e) => error!("{}", e),
-            }
-        });
-    }
-
-    fn commit_changes(&mut self) {
-        let pm = self.persistence_manager.clone();
-        let settings = self.state.song_settings();
-        spawn_local(async move {
-            type Repository<'a> = SettingsWebRepository<'a, PMType>;
-            let result = Repository::new(&pm).store(&settings).await;
-
-            if let Err(e) = result {
-                error!("Could not commit setting changes: {}", e.to_string())
-            }
-        });
-    }
 }
 
 impl Component for App {
     type Message = Msg;
-    type Properties = ();
+    type Properties = AppProperties;
 
-    fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
-        let clock_handle =
-            IntervalService::spawn(Duration::from_secs(60), link.callback(|_| Msg::Tick));
-
+    fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
         let mut route_service: RouteService<AppRouteState> = RouteService::new();
         let route = Route::from(route_service.get_route());
         route_service.register_callback(link.callback(Msg::RouteChanged));
 
-        let user = User::unknown();
         let config = Config::default();
-        let session_service = Rc::new(SessionService::new(config.clone()));
-        let session = Rc::new(Session::default());
-        let persistence_manager = App::build_persistence_manager(&config, &session);
-
-        let now = Utc::now();
-        let setlist = Setlist::new("", 0, user, None, Some(now), now, now, vec![]);
-        let settings = SongSettingsMap::new();
-
-        let connection_service = ConnectionService::new(config.clone());
-        let state = Rc::new(State::new(
-            None,
-            Some(setlist.clone()),
-            settings.clone(),
-            ConnectionStatus::OnLine,
-            Session::default(),
-        ));
 
         Self {
-            persistence_manager,
-            link,
-            fetching: false,
-            expand: true,
-            _setlist_collection: SetlistCollection::new(),
             _route_service: route_service,
-            _clock_handle: clock_handle,
+            expand: true,
+            link,
             route,
             config,
-            session_service,
-            connection_service,
-            state,
+            props,
         }
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
             Msg::RouteChanged(route) => self.route = route,
-            Msg::FetchCatalogReady(response) => {
-                self.fetching = false;
-                let catalog_option = response.ok();
-                // self.catalog = catalog_option.clone();
-                self.set_state(self.state.with_catalog(catalog_option), true);
-            }
-            Msg::Ignore => return false,
             Msg::ToggleMenu => self.expand = !self.expand,
-            Msg::SessionChanged(session) => {
-                self.set_state(self.state.with_session(session), true);
-                self.persistence_manager =
-                    Self::build_persistence_manager(&self.config, &self.state.session());
-
-                // Fetch/reload the Setlist and Song Settings
-                self.fetch_setlist();
-                self.fetch_song_settings();
-            }
-            Msg::Reload => {
-                window()
-                    .top()
-                    .unwrap()
-                    .unwrap()
-                    .location()
-                    .reload()
-                    .expect("Could not reload the top-frame");
-            }
-            Msg::Event(e) => self.handle_event(e),
-            Msg::StateChanged(state) => self.state = Rc::new(state),
-            Msg::Tick => {
-                self.run_scheduled_tasks();
-                return false;
-            }
         }
         true
     }
 
-    fn change(&mut self, _: Self::Properties) -> ShouldRender {
-        false
+    fn change(&mut self, props: Self::Properties) -> ShouldRender {
+        if props != self.props {
+            self.props = props;
+            true
+        } else {
+            false
+        }
     }
 
     fn view(&self) -> Html {
@@ -710,9 +336,8 @@ impl Component for App {
 
     fn rendered(&mut self, first_render: bool) -> () {
         if first_render {
-            self.fetch_catalog();
-            self.run_scheduled_tasks();
-            self.try_login_and_update_session();
+            // self.fetch_catalog();
+            // self.try_login_and_update_session();
         }
     }
 }

@@ -13,14 +13,15 @@ mod data_exchange;
 mod errors;
 mod events;
 mod fetch_helper;
+mod handler;
 mod handler_traits;
 mod helpers;
 mod lock;
 mod persistence;
 mod route;
-mod state;
 mod session;
 mod sortable_service;
+mod state;
 #[cfg(test)]
 mod test_helpers;
 
@@ -35,6 +36,6 @@ use wasm_bindgen::JsValue;
 #[wasm_bindgen]
 pub async fn run_app() -> Result<(), JsValue> {
     wasm_logger::init(wasm_logger::Config::default());
-    yew::start_app::<app::App>();
+    yew::start_app::<handler::Handler>();
     Ok(())
 }
