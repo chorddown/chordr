@@ -7,15 +7,15 @@ use self::transpose_tool::TransposeTool;
 use crate::components::song_view::semitone_notation_tool::SemitoneNotationTool;
 use libchordr::models::song_settings::SongSettings;
 use libchordr::prelude::*;
-use log::error;
 use log::info;
+use log::{debug, error};
 use web_sys::window;
 use web_sys::Document;
 use yew::prelude::*;
 use yew::virtual_dom::VNode;
 use yew::{Component, ComponentLink};
 
-#[derive(Properties, PartialEq, Clone)]
+#[derive(Properties, Clone, Debug)]
 pub struct SongViewProps {
     pub song: Song,
     pub song_settings: SongSettings,
@@ -29,6 +29,16 @@ pub struct SongViewProps {
     /// Display the Transpose tool with an input field
     #[prop_or_default]
     pub show_input_field: Option<()>,
+}
+
+impl PartialEq for SongViewProps {
+    fn eq(&self, other: &Self) -> bool {
+        self.song == other.song
+            && self.song_settings == other.song_settings
+            && self.enable_setlists == other.enable_setlists
+            && self.is_on_setlist == other.is_on_setlist
+            && self.show_input_field == other.show_input_field
+    }
 }
 
 pub enum Msg {
@@ -45,8 +55,6 @@ pub struct SongView {
     props: SongViewProps,
     /// Utility object
     link: ComponentLink<Self>,
-
-    song_settings: SongSettings,
 }
 
 impl Component for SongView {
@@ -54,21 +62,15 @@ impl Component for SongView {
     type Properties = SongViewProps;
 
     fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        let song_settings = props.song_settings.clone();
-
-        Self {
-            link,
-            props,
-            song_settings,
-        }
+        Self { link, props }
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
+        let song_settings = &self.props.song_settings;
+
         match msg {
-            Msg::TransposeUp => self.change_transpose(self.song_settings.transpose_semitone() + 1),
-            Msg::TransposeDown => {
-                self.change_transpose(self.song_settings.transpose_semitone() - 1)
-            }
+            Msg::TransposeUp => self.change_transpose(song_settings.transpose_semitone() + 1),
+            Msg::TransposeDown => self.change_transpose(song_settings.transpose_semitone() - 1),
             Msg::TransposeSet(v) => self.change_transpose(v),
             Msg::SemitoneNotationChange(s) => self.change_semitone_notation(s),
             Msg::SetlistChange(flag) => {
@@ -79,7 +81,7 @@ impl Component for SongView {
                         .on_setlist_add
                         .emit(SetlistEntry::from_song_with_settings(
                             song,
-                            self.song_settings.clone(),
+                            song_settings.clone(),
                         ))
                 } else {
                     self.props.on_setlist_remove.emit(song.id())
@@ -87,12 +89,11 @@ impl Component for SongView {
             }
         };
 
-        true
+        false
     }
 
     fn change(&mut self, props: Self::Properties) -> ShouldRender {
         if self.props != props {
-            self.song_settings = props.song_settings.clone();
             self.props = props;
             true
         } else {
@@ -104,12 +105,12 @@ impl Component for SongView {
         info!(
             "View song {} (transpose {}, in setlist: {})",
             self.props.song.id(),
-            self.song_settings.transpose_semitone(),
+            self.props.song_settings.transpose_semitone(),
             self.props.is_on_setlist
         );
 
-        let semitone_notation = self.song_settings.semitone_notation();
-        let transpose_semitone = self.song_settings.transpose_semitone();
+        let semitone_notation = self.props.song_settings.semitone_notation();
+        let transpose_semitone = self.props.song_settings.transpose_semitone();
 
         let detail = self.convert_song_to_html_node();
         let transpose_up = self.link.callback(|_| Msg::TransposeUp);
@@ -151,17 +152,20 @@ impl Component for SongView {
 }
 
 impl SongView {
-    fn send_change(&self) {
+    fn send_change(&self, song_settings: SongSettings) {
         self.props
             .on_settings_change
-            .emit((self.props.song.id(), self.song_settings.clone()))
+            .emit((self.props.song.id(), song_settings))
     }
 
     fn convert_song_to_html_string(&self) -> String {
-        let props = &self.props;
-        let transpose_semitone = self.song_settings.transpose_semitone();
-        let formatting = self.song_settings.formatting();
+        use chrono::{DateTime, Duration, Utc};
 
+        let props = &self.props;
+        let transpose_semitone = props.song_settings.transpose_semitone();
+        let formatting = props.song_settings.formatting();
+
+        let start = Utc::now().time();
         let converter_result = if transpose_semitone != 0 {
             transpose_and_convert_to_format(
                 &props.song.src(),
@@ -172,6 +176,11 @@ impl SongView {
         } else {
             convert_to_format(&props.song.src(), props.song.meta(), formatting)
         };
+        let end = Utc::now().time();
+        debug!(
+            "Converted the song in {:?}ms",
+            (end - start).num_milliseconds()
+        );
 
         match converter_result {
             Ok(s) => s,
@@ -202,21 +211,21 @@ impl SongView {
     }
 
     fn change_transpose(&mut self, transpose_semitone: isize) {
-        self.song_settings = SongSettings::new(transpose_semitone, self.song_settings.formatting());
-
         info!("Change transpose semitone to {}", transpose_semitone);
-        self.send_change();
+        self.send_change(
+            self.props
+                .song_settings
+                .with_transpose_semitone(transpose_semitone),
+        );
     }
 
     fn change_semitone_notation(&mut self, s: SemitoneNotation) -> () {
         let formatting = Formatting {
             semitone_notation: s,
-            ..self.song_settings.formatting()
+            ..self.props.song_settings.formatting()
         };
-        let transpose_semitone = self.song_settings.transpose_semitone();
 
         info!("Change formatting to {:?}", formatting);
-        self.song_settings = SongSettings::new(transpose_semitone, formatting);
-        self.send_change();
+        self.send_change(self.props.song_settings.with_formatting(formatting));
     }
 }
