@@ -32,8 +32,21 @@ impl SongSettings {
     pub fn transpose_semitone(&self) -> isize {
         self.transpose_semitone
     }
+    pub fn with_transpose_semitone(&self, transpose_semitone: isize) -> Self {
+        let mut clone = self.clone();
+        clone.transpose_semitone = transpose_semitone;
+
+        clone
+    }
+
     pub fn formatting(&self) -> Formatting {
         self.formatting
+    }
+    pub fn with_formatting(&self, formatting: Formatting) -> Self {
+        let mut clone = self.clone();
+        clone.formatting = formatting;
+
+        clone
     }
 }
 
