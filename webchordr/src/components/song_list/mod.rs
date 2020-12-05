@@ -12,7 +12,7 @@ use yew::prelude::*;
 
 type SongListModel = SongListLibModel<SetlistEntry>;
 
-#[derive(Properties, PartialEq, Clone)]
+#[derive(Properties, Clone)]
 pub struct SongListProps {
     pub songs: SongListModel,
     pub sortable: bool,
@@ -20,6 +20,14 @@ pub struct SongListProps {
     pub highlighted_song_id: Option<SongId>,
 
     pub on_setlist_change: Callback<Event>,
+}
+
+impl PartialEq for SongListProps {
+    fn eq(&self, other: &Self) -> bool {
+        self.songs == other.songs
+            && self.sortable == other.sortable
+            && self.highlighted_song_id == other.highlighted_song_id
+    }
 }
 
 pub enum Msg {
