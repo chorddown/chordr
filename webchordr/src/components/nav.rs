@@ -22,8 +22,6 @@ impl PartialEq for NavProps {
         self.state == other.state
             && self.expand == other.expand
             && self.current_song_id == other.current_song_id
-            && self.on_toggle == other.on_toggle
-            && self.on_setlist_change == other.on_setlist_change
     }
 }
 
