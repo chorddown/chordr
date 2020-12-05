@@ -66,7 +66,7 @@ impl Component for SongView {
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
-        let song_settings = &self.props.song_settings;
+        let song_settings = self.props.song_settings.clone();
 
         match msg {
             Msg::TransposeUp => self.change_transpose(song_settings.transpose_semitone() + 1),
