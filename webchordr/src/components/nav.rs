@@ -2,35 +2,28 @@
 use crate::components::song_list::SongList as SongListView;
 use crate::components::user::NavItem as UserNavButton;
 use crate::events::Event;
-use crate::session::{Session, SessionService};
-use libchordr::models::setlist::*;
+use crate::state::State;
 use libchordr::models::song_list::SongList as SongListModel;
 use libchordr::prelude::SongId;
 use std::rc::Rc;
 use yew::prelude::*;
-use crate::state::State;
 
 #[derive(Properties, Clone)]
 pub struct NavProps {
-    pub songs: Option<Rc<Setlist>>,
     pub expand: bool,
     pub current_song_id: Option<SongId>,
     pub on_toggle: Callback<()>,
     pub on_setlist_change: Callback<Event>,
     pub state: Rc<State>,
-    pub session: Rc<Session>,
-    pub session_service: Rc<SessionService>,
 }
 
 impl PartialEq for NavProps {
     fn eq(&self, other: &Self) -> bool {
-        self.songs == other.songs
-            && self.state == other.state
+        self.state == other.state
             && self.expand == other.expand
             && self.current_song_id == other.current_song_id
             && self.on_toggle == other.on_toggle
             && self.on_setlist_change == other.on_setlist_change
-            && self.session == other.session
     }
 }
 
@@ -66,8 +59,8 @@ impl Nav {
         //     None => html! {},
         // };
         let setlist_share_button = html! {};
-        let session = self.props.session.clone();
-        let state  = self.props.state.clone();
+        let session = self.props.state.session().clone();
+        let state = self.props.state.clone();
 
         (if self.props.expand {
             html! {
