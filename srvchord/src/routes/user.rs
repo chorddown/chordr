@@ -1,10 +1,14 @@
+use crate::domain::setlist::repository::SetlistRepository;
 use crate::domain::user::UserDb;
+use crate::DbConn;
+use libchordr::models::setlist::Setlist;
+use libchordr::models::user::MainData;
 use libchordr::prelude::User;
 use rocket::get;
 use rocket_contrib::json::Json;
 
 pub fn get_routes() -> Vec<rocket::Route> {
-    routes![crate::routes::user::index,]
+    routes![crate::routes::user::index, crate::routes::user::data,]
 }
 
 #[get("/")]
@@ -13,6 +17,43 @@ pub fn index(user: UserDb) -> Option<Json<User>> {
         Ok(u) => Some(Json(u)),
         Err(_) => None,
     }
+}
+
+#[get("/data")]
+pub fn data(user_db: UserDb, conn: DbConn) -> Option<Json<MainData>> {
+    match user_db.try_to_user() {
+        Ok(user) => {
+            let username = user.username();
+            let latest_setlist = match SetlistRepository::new().find_by_username(&conn.0, &username)
+            {
+                Ok(setlists) if setlists.is_empty() => None,
+                Ok(mut setlists) => {
+                    sort_setlist_by_date(&mut setlists);
+
+                    Some(setlists.pop().unwrap())
+                }
+                Err(e) => {
+                    warn!("No setlists for user {} found: {}", username, e);
+                    None
+                }
+            };
+
+            Some(Json(MainData {
+                user,
+                latest_setlist,
+                song_settings: None,
+            }))
+        }
+        Err(_) => None,
+    }
+}
+
+fn sort_setlist_by_date(setlists: &mut Vec<Setlist>) {
+    setlists.sort_by(|a, b| {
+        a.modification_date()
+            .partial_cmp(&b.modification_date())
+            .unwrap()
+    });
 }
 
 #[cfg(test)]
