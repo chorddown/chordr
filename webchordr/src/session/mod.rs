@@ -1,6 +1,8 @@
+mod session_main_data;
 mod session_service;
 mod session_user;
 
+pub use self::session_main_data::SessionMainData;
 pub use self::session_service::SessionService;
 pub use self::session_user::SessionUser;
 use libchordr::prelude::User;

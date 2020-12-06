@@ -2,8 +2,10 @@ use crate::config::Config;
 use crate::fetch_helper::*;
 use crate::persistence::browser_storage::BrowserStorageTrait;
 use crate::persistence::prelude::BrowserStorage;
+use crate::session::session_main_data::SessionMainData;
 use crate::session::Session;
 use crate::WebError;
+use libchordr::models::user::MainData;
 use libchordr::prelude::{Credentials, Password, User, Username};
 use std::collections::HashMap;
 
@@ -33,8 +35,16 @@ impl SessionService {
         self.perform_login(&credentials).await
     }
 
+    #[allow(unused)]
     pub fn has_credentials_in_session_storage(&self) -> bool {
         self.get_credentials_from_session_storage().is_ok()
+    }
+
+    pub fn get_credentials_from_session_storage(&self) -> Result<Credentials, WebError> {
+        let username = self.get_username_from_session_storage()?;
+        let password = self.get_password_from_session_storage()?;
+
+        Ok(Credentials::new(username, password))
     }
 
     pub fn set_credentials_in_session_storage(
@@ -49,6 +59,23 @@ impl SessionService {
         Ok(())
     }
 
+    pub async fn get_main_data(
+        &self,
+        credentials: &Credentials,
+    ) -> Result<SessionMainData, WebError> {
+        let headers = self.build_basic_auth_headers(credentials);
+        let uri = format!("{}/user/", self.config.api_url());
+
+        let main_data: MainData = fetch_with_additional_headers(&uri, headers).await?;
+        let password = credentials.password().clone();
+        let user = main_data.user.clone().with_password(password);
+        log::info!("{:?}", user);
+        Ok(SessionMainData {
+            session: Session::with_user(user.clone()),
+            main_data: main_data.with_user(user),
+        })
+    }
+
     async fn perform_login(&self, credentials: &Credentials) -> Result<Session, WebError> {
         let headers = self.build_basic_auth_headers(credentials);
         let uri = format!("{}/user/", self.config.api_url());
@@ -58,13 +85,6 @@ impl SessionService {
         let user = user.with_password(credentials.password().clone());
         log::info!("{:?}", user);
         Ok(Session::with_user(user))
-    }
-
-    fn get_credentials_from_session_storage(&self) -> Result<Credentials, WebError> {
-        let username = self.get_username_from_session_storage()?;
-        let password = self.get_password_from_session_storage()?;
-
-        Ok(Credentials::new(username, password))
     }
 
     fn get_password_from_session_storage(&self) -> Result<Password, WebError> {

@@ -1,3 +1,4 @@
+use crate::app::App;
 use crate::config::Config;
 use crate::connection::{ConnectionService, ConnectionStatus};
 use crate::errors::WebError;
@@ -10,10 +11,10 @@ use crate::persistence::persistence_manager::PMType;
 use crate::persistence::persistence_manager::PersistenceManagerFactory;
 use crate::persistence::prelude::*;
 use crate::persistence::web_repository::{CatalogWebRepository, SettingsWebRepository};
-use crate::session::{Session, SessionService};
-use crate::app::App;
+use crate::session::{Session, SessionMainData, SessionService};
 use crate::state::State;
 use chrono::Utc;
+use libchordr::models::user::MainData;
 use libchordr::prelude::*;
 use log::{debug, error, info, warn};
 use std::rc::Rc;
@@ -23,6 +24,8 @@ use wasm_bindgen_futures::spawn_local;
 use yew::services::interval::IntervalTask;
 use yew::services::IntervalService;
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
+
+type InitialDataResult = Result<Box<SessionMainData>, Option<WebError>>;
 
 pub struct Handler {
     persistence_manager: Arc<PMType>,
@@ -43,10 +46,11 @@ pub enum Msg {
     FetchCatalogReady(Result<Catalog, WebError>),
     #[allow(dead_code)]
     Reload,
-    #[allow(dead_code)]
     Ignore,
     SessionChanged(Session),
+    ConnectionStatusChanged(ConnectionStatus),
     StateChanged(State),
+    InitialDataLoaded(InitialDataResult),
 }
 
 impl Handler {
@@ -68,48 +72,97 @@ impl Handler {
         Arc::new(persistence_manager_factory.build(config, session))
     }
 
-    fn try_login_and_update_session(&mut self) {
+    fn load_initial_data(&mut self) {
         let session_service = self.session_service.clone();
-        if session_service.has_credentials_in_session_storage() {
-            let on_success = self.link.callback(|s| Msg::SessionChanged(s));
-            let on_failure = self
-                .link
-                .callback(|_| Msg::SessionChanged(Session::default()));
-
-            debug!("Try to login with credentials from Session Storage");
-            spawn_local(async move {
-                match session_service.try_from_browser_storage().await {
-                    Ok(u) => {
-                        debug!("Successful login with credentials from Session Storage");
-                        on_success.emit(u)
+        match session_service.get_credentials_from_session_storage() {
+            Ok(credentials) => {
+                let on_load = self.link.callback(Msg::InitialDataLoaded);
+                debug!("Try to login with credentials from Session Storage");
+                spawn_local(async move {
+                    match session_service.get_main_data(&credentials).await {
+                        Ok(r) => {
+                            debug!("Successful login with credentials from Session Storage");
+                            on_load.emit(Ok(Box::new(r)))
+                        }
+                        Err(e) => {
+                            debug!("Failed login with credentials from Session Storage");
+                            on_load.emit(Err(Some(e)))
+                        }
                     }
-                    Err(_) => {
-                        debug!("Failed login with credentials from Session Storage");
-                        on_failure.emit(())
-                    }
-                }
-            });
-        } else {
-            self.link
-                .send_message(Msg::SessionChanged(Session::default()))
+                });
+            }
+            Err(e) => self.link.send_message(Msg::InitialDataLoaded(Err(Some(e)))),
         }
+    }
+
+    fn handle_initial_data(&mut self, r: InitialDataResult) {
+        match r {
+            Ok(initial_data) => {
+                self.update_session(initial_data.session.clone(), false);
+                let MainData {
+                    song_settings,
+                    latest_setlist,
+                    user: _,
+                } = initial_data.main_data;
+
+                let did_fetch_setlist = latest_setlist.is_some();
+                let did_fetch_song_settings = song_settings.is_some();
+
+                self.set_state(
+                    State::new(
+                        self.state.catalog().map(|c| (*c).clone()),
+                        latest_setlist,
+                        song_settings.unwrap_or_else(SongSettingsMap::new),
+                        ConnectionStatus::OnLine,
+                        initial_data.session,
+                    ),
+                    true,
+                );
+                if !did_fetch_setlist {
+                    self.fetch_setlist();
+                }
+                if !did_fetch_song_settings {
+                    self.fetch_song_settings();
+                }
+            }
+            Err(_) => {
+                self.update_session(Session::default(), false);
+                self.check_connection_status();
+                self.fetch_setlist();
+                self.fetch_song_settings();
+            }
+        }
+    }
+
+    fn check_connection_status(&mut self) {
+        let connection_service = self.connection_service.clone();
+        let state_changed = self.link.callback(|s| Msg::ConnectionStatusChanged(s));
+        spawn_local(async move {
+            let connection_status = connection_service.get_connection_status().await;
+            state_changed.emit(connection_status)
+        });
     }
 
     fn run_scheduled_tasks(&mut self) {
         debug!("Run scheduled tasks");
 
-        let state = self.state.clone();
-        let connection_service = self.connection_service.clone();
-        let state_changed = self.link.callback(|s| Msg::StateChanged(s));
-        spawn_local(async move {
-            let connection_status = connection_service.get_connection_status().await;
-            if state.connection_status() != connection_status {
-                state_changed.emit(state.with_connection_status(connection_status))
-            }
-        });
+        self.check_connection_status();
+    }
+
+    fn update_session(&mut self, session: Session, reload_data: bool) {
+        self.set_state(self.state.with_session(session), true);
+        self.persistence_manager =
+            Self::build_persistence_manager(&self.config, (*self.state.session()).clone());
+
+        if reload_data {
+            // Fetch/reload the Setlist and Song Settings
+            self.fetch_setlist();
+            self.fetch_song_settings();
+        }
     }
 
     fn set_state(&mut self, state: State, sync: bool) {
+        debug!("Change state ({})", if sync { "sync" } else { "async" });
         if sync {
             self.state = Rc::new(state)
         } else {
@@ -361,8 +414,8 @@ impl Component for Handler {
         let connection_service = ConnectionService::new(config.clone());
         let state = Rc::new(State::new(
             None,
-            Some(setlist.clone()),
-            settings.clone(),
+            Some(setlist),
+            settings,
             ConnectionStatus::OnLine,
             Session::default(),
         ));
@@ -387,14 +440,13 @@ impl Component for Handler {
                 self.set_state(self.state.with_catalog(response.ok()), true);
             }
             Msg::Ignore => return false,
-            Msg::SessionChanged(session) => {
-                self.set_state(self.state.with_session(session), true);
-                self.persistence_manager =
-                    Self::build_persistence_manager(&self.config, &self.state.session());
-
-                // Fetch/reload the Setlist and Song Settings
-                self.fetch_setlist();
-                self.fetch_song_settings();
+            Msg::SessionChanged(session) => self.update_session(session, true),
+            Msg::ConnectionStatusChanged(connection_state) => {
+                if self.state.connection_status() != connection_state {
+                    self.set_state(self.state.with_connection_status(connection_state), true)
+                } else {
+                    return false;
+                }
             }
             Msg::Reload => {
                 window()
@@ -406,7 +458,8 @@ impl Component for Handler {
                     .expect("Could not reload the top-frame");
             }
             Msg::Event(e) => self.handle_event(e),
-            Msg::StateChanged(state) => self.state = Rc::new(state),
+            Msg::StateChanged(_state) => unreachable!(), //self.state = Rc::new(state),
+            Msg::InitialDataLoaded(r) => self.handle_initial_data(r),
             Msg::Tick => {
                 self.run_scheduled_tasks();
                 return false;
@@ -428,22 +481,30 @@ impl Component for Handler {
             error!("{}", e);
             Msg::Ignore
         });
-
-        html! {
-            <App state=state
-                on_event=on_event
-                on_setlist_change=on_setlist_change
-                on_user_login_success=on_user_login_success
-                on_user_login_error=on_user_login_error
-            />
+        if state.catalog().is_some() {
+            (html! {
+                <App state=state
+                    on_event=on_event
+                    on_setlist_change=on_setlist_change
+                    on_user_login_success=on_user_login_success
+                    on_user_login_error=on_user_login_error
+                />
+            }) as Html
+        } else {
+            (html! {
+                <div class="center-fullscreen loading">
+                    <div class="loading-inner">
+                        <i class="im im-spinner"></i>
+                    </div>
+                </div>
+            }) as Html
         }
     }
 
     fn rendered(&mut self, first_render: bool) -> () {
         if first_render {
             self.fetch_catalog();
-            self.run_scheduled_tasks();
-            self.try_login_and_update_session();
+            self.load_initial_data();
         }
     }
 }

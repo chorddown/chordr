@@ -64,6 +64,6 @@ features = [
 # Should we enable wasm-bindgen's debug assertions in its generated JS glue?
 #debug-js-glue = true
 # Should wasm-bindgen demangle the symbols in the "name" custom section?
-#demangle-name-section = true
+demangle-name-section = true
 # Should we emit the DWARF debug info custom sections?
 dwarf-debug-info = true
