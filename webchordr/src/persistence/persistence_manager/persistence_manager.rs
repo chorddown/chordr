@@ -5,6 +5,7 @@ use crate::constants::{
 use crate::errors::WebError;
 use crate::lock::Stupex;
 use crate::persistence::backend::BackendTrait;
+use crate::session::Session;
 use async_trait::async_trait;
 use libchordr::prelude::RecordIdTrait;
 use log::{error, warn};
@@ -14,14 +15,21 @@ use std::sync::Arc;
 type Lock<I> = Stupex<I>;
 
 pub struct PersistenceManager<CB, SB, TB> {
+    session: Session,
     client_backend: Arc<Lock<CB>>,
     server_backend: Arc<Lock<SB>>,
     transient_backend: Arc<Lock<TB>>,
 }
 
 impl<CB: BackendTrait, SB: BackendTrait, TB: BackendTrait> PersistenceManager<CB, SB, TB> {
-    pub fn new(client_backend: CB, server_backend: SB, transient_backend: TB) -> Self {
+    pub fn new(
+        session: Session,
+        client_backend: CB,
+        server_backend: SB,
+        transient_backend: TB,
+    ) -> Self {
         Self {
+            session,
             client_backend: Arc::new(Lock::new(client_backend)),
             server_backend: Arc::new(Lock::new(server_backend)),
             transient_backend: Arc::new(Lock::new(transient_backend)),
@@ -50,6 +58,9 @@ impl<CB: BackendTrait, SB: BackendTrait, TB: BackendTrait> PersistenceManager<CB
     ) -> Result<(), WebError> {
         if namespace != STORAGE_NAMESPACE && namespace != TEST_STORAGE_NAMESPACE {
             panic!("No server backend found for namespace: '{}'", namespace)
+        }
+        if self.session.is_unauthenticated() {
+            return Ok(());
         }
 
         match key {
@@ -149,22 +160,21 @@ impl<CB: BackendTrait, SB: BackendTrait, TB: BackendTrait> BackendTrait
     where
         T: for<'a> Deserialize<'a>,
     {
-        match self
-            .load_from_server(namespace.as_ref(), key.as_ref())
-            .await
-        {
-            Ok(v) => Ok(v),
-            Err(e) => {
-                warn!("{}", e);
-
-                self.client_backend
-                    .lock()
-                    .await
-                    .expect("Could not acquire lock for reading (client backend)")
-                    .load(namespace.as_ref(), key.as_ref())
-                    .await
+        if self.session.is_authenticated() {
+            let server_result = self
+                .load_from_server(namespace.as_ref(), key.as_ref())
+                .await;
+            match server_result {
+                Ok(v) => return Ok(v),
+                Err(e) => warn!("{}", e),
             }
         }
+        self.client_backend
+            .lock()
+            .await
+            .expect("Could not acquire lock for reading (client backend)")
+            .load(namespace.as_ref(), key.as_ref())
+            .await
     }
 }
 
@@ -196,7 +206,12 @@ mod test {
         let server_backend = DummyServerBackend::new();
         let transient_backend = TransientBackend::new();
 
-        PersistenceManager::new(client_backend, server_backend, transient_backend)
+        PersistenceManager::new(
+            Session::default(),
+            client_backend,
+            server_backend,
+            transient_backend,
+        )
     }
 
     #[wasm_bindgen_test]
@@ -262,8 +277,12 @@ mod test {
         let backend = BrowserStorageBackend::new(
             BrowserStorage::local_storage().expect("Could not create Browser Storage"),
         );
-        let pm =
-            PersistenceManager::new(backend, DummyServerBackend::new(), TransientBackend::new());
+        let pm = PersistenceManager::new(
+            Session::default(),
+            backend,
+            DummyServerBackend::new(),
+            TransientBackend::new(),
+        );
         let value = TestValue {
             age: 3,
             name: "Daniel".to_string(),

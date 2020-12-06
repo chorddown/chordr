@@ -17,15 +17,20 @@ impl PersistenceManagerFactory {
         Self {}
     }
 
-    pub fn build(&self, config: &Config, session: &Session) -> PMType {
+    pub fn build(&self, config: &Config, session: Session) -> PMType {
         let browser_storage_backend_factory = BrowserStorageBackendFactory::new();
         let server_backend_factory = ServerBackendFactory::new();
         let transient_backend_factory = TransientBackendFactory::new();
 
+        let browser_storage_backend = browser_storage_backend_factory.build(config, &session);
+        let server_backend = server_backend_factory.build(config, &session);
+        let transient_backend = transient_backend_factory.build(config, &session);
+
         PersistenceManager::new(
-            browser_storage_backend_factory.build(config, session),
-            server_backend_factory.build(config, session),
-            transient_backend_factory.build(config, session),
+            session,
+            browser_storage_backend,
+            server_backend,
+            transient_backend,
         )
     }
 }

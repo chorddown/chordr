@@ -20,6 +20,17 @@ impl Session {
     pub fn user(&self) -> &SessionUser {
         &self.user
     }
+
+    pub fn is_authenticated(&self) -> bool {
+        match self.user {
+            SessionUser::LoggedIn(_) => true,
+            SessionUser::Unauthenticated => false,
+        }
+    }
+
+    pub fn is_unauthenticated(&self) -> bool {
+        !self.is_authenticated()
+    }
 }
 
 impl Default for Session {

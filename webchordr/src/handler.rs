@@ -62,7 +62,7 @@ impl Handler {
         }
     }
 
-    fn build_persistence_manager(config: &Config, session: &Session) -> Arc<PMType> {
+    fn build_persistence_manager(config: &Config, session: Session) -> Arc<PMType> {
         let persistence_manager_factory = PersistenceManagerFactory::new();
 
         Arc::new(persistence_manager_factory.build(config, session))
@@ -352,8 +352,7 @@ impl Component for Handler {
         let user = User::unknown();
         let config = Config::default();
         let session_service = Rc::new(SessionService::new(config.clone()));
-        let session = Rc::new(Session::default());
-        let persistence_manager = Handler::build_persistence_manager(&config, &session);
+        let persistence_manager = Handler::build_persistence_manager(&config, Session::default());
 
         let now = Utc::now();
         let setlist = Setlist::new("", 0, user, None, Some(now), now, now, vec![]);
