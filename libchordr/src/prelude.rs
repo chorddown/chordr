@@ -32,7 +32,7 @@ pub use crate::models::song_list::{SongList, SongListTrait};
 pub use crate::models::song_meta::SongMeta;
 pub use crate::models::song_settings::{SongSettings, SongSettingsMap};
 pub use crate::models::team::{Team, TeamId};
-pub use crate::models::user::{Credentials, Password, User, Username};
+pub use crate::models::user::{Credentials, MainData, Password, User, Username};
 
 /// Catalog management
 pub use crate::catalog_builder::{CatalogBuildError, CatalogBuildResult, CatalogBuilder};
