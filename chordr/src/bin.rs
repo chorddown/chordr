@@ -7,6 +7,7 @@ use std::fs;
 use ansi_term::Colour;
 use atty::Stream;
 use libchordr::models::chord::fmt::Formatting;
+use libchordr::models::chord::TransposableTrait;
 use libchordr::prelude::Error;
 use libchordr::prelude::Result;
 use libchordr::prelude::*;
@@ -15,40 +16,60 @@ use std::error::Error as StdError;
 use std::process::exit;
 
 fn main() {
-    let output_arg = Arg::with_name("OUTPUT")
+    let output_arg = Arg::with_name("output")
         .required(true)
         .help("Output file name");
+
+    let format_help = get_output_format_help();
+    let subcommand_convert = SubCommand::with_name("convert")
+        .about("Convert chorddown files")
+        .arg(
+            Arg::with_name("input")
+                .required(true)
+                .help("Chorddown file to parse"),
+        )
+        .arg(output_arg.clone())
+        .arg(Arg::with_name("format").help(&format_help))
+        .arg(
+            Arg::with_name("transpose")
+                .long("transpose")
+                .takes_value(true)
+                .help("Number of semitones to transpose the song"),
+        )
+        .arg(
+            Arg::with_name("b-notation")
+                .long("b-notation")
+                .takes_value(true)
+                .help("Define how the `B` chord will be displayed"),
+        )
+        .arg(
+            Arg::with_name("semitone-notation")
+                .long("semitone-notation")
+                .takes_value(true)
+                .help("Define if `#` or `b` should be used"),
+        );
+
+    let subcommand_build_catalog = SubCommand::with_name("build-catalog")
+        .about("Build a catalog from chorddown files")
+        .arg(
+            Arg::with_name("dir")
+                .required(true)
+                .help("Path to the directory of chorddown files"),
+        )
+        .arg(output_arg.clone())
+        .arg(
+            Arg::with_name("pretty")
+                .long("pretty")
+                .short("p")
+                .help("Output indented JSON"),
+        );
+
     let args = App::new("chordr")
         .version(env!("CARGO_PKG_VERSION"))
         .author("Daniel Corn <info@cundd.net>")
         .about("Manage chorddown files and catalogs")
-        .subcommand(
-            SubCommand::with_name("convert")
-                .about("Convert chorddown files")
-                .arg(
-                    Arg::with_name("INPUT")
-                        .required(true)
-                        .help("Chorddown file to parse"),
-                )
-                .arg(output_arg.clone())
-                .arg(Arg::with_name("FORMAT").help(&get_output_format_help())),
-        )
-        .subcommand(
-            SubCommand::with_name("build-catalog")
-                .about("Build a catalog from chorddown files")
-                .arg(
-                    Arg::with_name("DIR")
-                        .required(true)
-                        .help("Path to the directory of chorddown files"),
-                )
-                .arg(output_arg.clone())
-                .arg(
-                    Arg::with_name("pretty")
-                        .long("pretty")
-                        .short("p")
-                        .help("Output indented JSON"),
-                ),
-        )
+        .subcommand(subcommand_convert)
+        .subcommand(subcommand_build_catalog)
         .get_matches();
 
     let error = if let Some(matches) = args.subcommand_matches("convert") {
@@ -67,17 +88,44 @@ fn main() {
 }
 
 fn convert(args: &ArgMatches) -> Result<()> {
-    let input_file_path = args.value_of("INPUT").unwrap();
+    let input_file_path = args.value_of("input").unwrap();
+    let output_file_path = args.value_of("output").unwrap();
+
+    let b_notation = match args.value_of("b-notation") {
+        None => BNotation::default(),
+        Some(b) => BNotation::try_from(b)?,
+    };
+    let semitone_notation = match args.value_of("semitone-notation") {
+        None => SemitoneNotation::default(),
+        Some(b) => SemitoneNotation::try_from(b)?,
+    };
+
+    let transpose: Option<isize> = match args.value_of("transpose") {
+        None => None,
+        Some(raw) => Some(str::parse::<isize>(raw)?),
+    };
+
     let format = get_output_format(args);
-    let contents = fs::read_to_string(input_file_path)?;
+
+    let formatting = Formatting {
+        b_notation,
+        semitone_notation,
+        format,
+    };
+
+    let contents = match fs::read_to_string(input_file_path) {
+        Ok(c) => c,
+        Err(e) => return Err(Error::unknown_error(format!("Could not read file: {}", e))),
+    };
     let tokens = build_tokenizer().tokenize(&contents);
     let parser_result = Parser::new().parse(tokens)?;
-    let converted = Converter::new().convert(
-        parser_result.node_as_ref(),
-        parser_result.meta_as_ref(),
-        Formatting::with_format(format),
-    )?;
-    let output_file_path = args.value_of("OUTPUT").unwrap();
+    let meta = parser_result.meta_as_ref().clone();
+    let parser_result_node = match transpose {
+        None => parser_result.node(),
+        Some(t) => parser_result.node().transpose(t),
+    };
+
+    let converted = Converter::new().convert(&parser_result_node, &meta, formatting)?;
 
     let output = if format == Format::HTML {
         format!(
@@ -96,7 +144,7 @@ fn convert(args: &ArgMatches) -> Result<()> {
 </body>
 </html>
     "#,
-            title = parser_result.meta().title.unwrap_or("".to_owned()),
+            title = meta.title.unwrap_or("".to_owned()),
             styles = include_str!("../../webchordr/static/stylesheets/chordr-default-styles.css"),
             content = converted
         )
@@ -120,7 +168,7 @@ fn get_valid_output_format_help() -> String {
 }
 
 fn get_output_format(args: &ArgMatches) -> Format {
-    if let Some(raw_format) = args.value_of("FORMAT") {
+    if let Some(raw_format) = args.value_of("format") {
         match Format::try_from(raw_format) {
             Ok(f) => return f,
             Err(_) => {
@@ -138,9 +186,9 @@ fn get_output_format(args: &ArgMatches) -> Format {
 }
 
 fn build_catalog(args: &ArgMatches) -> Result<()> {
-    let dir_path = args.value_of("DIR").unwrap();
+    let dir_path = args.value_of("dir").unwrap();
     let pretty = args.is_present("pretty");
-    let output_file_path = args.value_of("OUTPUT").unwrap();
+    let output_file_path = args.value_of("output").unwrap();
 
     let catalog_result =
         CatalogBuilder::new().build_catalog_for_directory(dir_path, FileType::Chorddown, true)?;
@@ -202,7 +250,10 @@ fn handle_output(output_file_path: &str, output: String) -> Result<(), Error> {
         println!("{}", output);
         Ok(())
     } else {
-        Ok(fs::write(output_file_path, output)?)
+        match fs::write(output_file_path, output) {
+            Ok(_) => Ok(()),
+            Err(e) => Err(Error::unknown_error(format!("Could not write file: {}", e))),
+        }
     }
 }
 
