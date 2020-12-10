@@ -232,9 +232,8 @@ impl FSM {
 
     fn set_header_modifier_for_lexeme(&mut self, lexeme: &Lexeme) {
         if self.header_modifier.is_none() {
-            match lexeme.detect_modifier() {
-                Some(v) => self.header_modifier = Some(v),
-                None => {}
+            if let Some(v) = lexeme.detect_modifier() {
+                self.header_modifier = Some(v)
             }
         }
     }

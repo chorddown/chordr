@@ -51,10 +51,10 @@ impl Chord {
             Some(variant_raw_trimmed.to_owned())
         };
 
-        return Ok(Self {
+        Ok(Self {
             root: Note::try_from(&node_raw, b_notation)?,
             variant,
-        });
+        })
     }
 
     fn split_note_characters(value: &str) -> Result<(String, String), Error> {
@@ -120,7 +120,7 @@ impl NoteDisplay for Chord {
     fn note_format(&self, formatting: Formatting) -> String {
         match self.variant {
             Some(ref v) => format!("{}{}", NoteDisplay::note_format(&self.root, formatting), v),
-            None => format!("{}", NoteDisplay::note_format(&self.root, formatting)),
+            None => NoteDisplay::note_format(&self.root, formatting),
         }
     }
 }

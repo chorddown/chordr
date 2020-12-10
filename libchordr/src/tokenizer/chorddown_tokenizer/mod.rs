@@ -17,11 +17,11 @@ impl ChorddownTokenizer {
 impl Tokenizer for ChorddownTokenizer {
     fn tokenize(&self, line: &str) -> Vec<Token> {
         let lexemes_vec = Scanner::new().scan(line);
-        let mut lexemes = lexemes_vec.iter().peekable();
+        let lexemes = lexemes_vec.iter().peekable();
         let mut tokens: Vec<Token> = vec![];
         let mut fsm = FSM::new();
 
-        while let Some(lexeme) = lexemes.next() {
+        for lexeme in lexemes {
             if let Some(changed_state) = fsm.characterize_lexeme(lexeme) {
                 let token = fsm.build_token();
 

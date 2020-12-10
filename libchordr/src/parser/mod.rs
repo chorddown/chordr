@@ -30,6 +30,12 @@ impl Parser {
     }
 }
 
+impl Default for Parser {
+    fn default() -> Self {
+        Self {}
+    }
+}
+
 impl ParserTrait for Parser {
     type OkType = ParserResult;
 
@@ -45,9 +51,9 @@ impl Parser {
     pub fn cleanup_tokens(tokens: &[Token]) -> Vec<Token> {
         let mut tokens_clean: Vec<Token> = vec![];
 
-        let mut token_iterator = tokens.iter();
+        let token_iterator = tokens.iter();
         let mut previous_token = None;
-        while let Some(token) = token_iterator.next() {
+        for token in token_iterator {
             match previous_token {
                 Some(&Token::Newline) if token == &Token::Newline => continue,
                 Some(_) => {

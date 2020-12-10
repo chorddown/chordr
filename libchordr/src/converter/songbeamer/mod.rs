@@ -118,7 +118,7 @@ impl SongBeamerConverter {
         buffer.join("\n")
     }
 
-    fn build_tag_for_children<'a, 'b>(&'a self, children: &'a Vec<Node>) -> String {
+    fn build_tag_for_children<'a>(&'a self, children: &'a [Node]) -> String {
         children
             .iter()
             .filter_map(|n| self.build_node(n).ok())

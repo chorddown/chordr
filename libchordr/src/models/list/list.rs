@@ -50,6 +50,10 @@ where
         self.0.len()
     }
 
+    fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+
     fn add(&mut self, item: Self::Item) -> Result<(), ListError> {
         if !self.contains(&item) {
             self.0.push(item);

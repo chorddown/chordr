@@ -109,11 +109,11 @@ impl Mode {
     }
 
     pub fn from_lexeme(lexeme: &Lexeme) -> Self {
-        match lexeme {
-            &Lexeme::QuoteStart => Mode::Quote,
-            &Lexeme::HeaderStart => Mode::Header,
-            &Lexeme::ChordStart => Mode::Chord,
-            &Lexeme::Newline => Mode::Newline,
+        match *lexeme {
+            Lexeme::QuoteStart => Mode::Quote,
+            Lexeme::HeaderStart => Mode::Header,
+            Lexeme::ChordStart => Mode::Chord,
+            Lexeme::Newline => Mode::Newline,
             _ => Mode::Literal,
         }
     }

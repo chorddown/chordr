@@ -57,6 +57,12 @@ impl ConverterTrait for Converter {
     }
 }
 
+impl Default for Converter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

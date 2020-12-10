@@ -22,6 +22,12 @@ impl SongSettingsMap {
     }
 }
 
+impl Default for SongSettingsMap {
+    fn default() -> Self {
+        SongSettingsMap::new()
+    }
+}
+
 impl RecordIdTrait for SongSettingsMap {
     type Id = &'static str;
 

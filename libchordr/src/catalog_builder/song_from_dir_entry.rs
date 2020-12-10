@@ -31,7 +31,7 @@ impl TryFrom<&Path> for Song {
             Ok(p) => p,
             Err(e) => return Err(CatalogBuildError::from_error(e, path_buf)),
         };
-        let title = parser_result.meta().title.unwrap_or(song_id.to_string());
+        let title = parser_result.meta().title.unwrap_or_else(|| song_id.to_string());
         let file_type = match FileType::try_from(path) {
             Ok(f) => f,
             Err(e) => return Err(CatalogBuildError::from_error(e, path_buf)),

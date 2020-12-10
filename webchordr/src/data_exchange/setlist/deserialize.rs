@@ -82,6 +82,10 @@ mod test {
             unreachable!()
         }
 
+        fn is_empty(&self) -> bool {
+            self.songs.is_empty()
+        }
+
         fn iter(&self) -> Iter<TestSong> {
             unreachable!()
         }

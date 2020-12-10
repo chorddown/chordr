@@ -9,6 +9,9 @@ pub trait CatalogTrait<E: SongData> {
     /// Return the number of songs in the `Catalog`
     fn len(&self) -> usize;
 
+    /// Return if the `Catalog` is empty
+    fn is_empty(&self) -> bool;
+
     /// Return an iterator over the songs of the `Catalog`
     fn iter(&self) -> Iter<E>;
 

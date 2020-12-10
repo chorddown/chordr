@@ -129,7 +129,7 @@ impl TransposableTrait for Node {
                 children,
             } => Node::Section {
                 head: head.clone(),
-                section_type: section_type.clone(),
+                section_type: *section_type,
                 children: (children.iter().map(|n| n.transpose(semitones)).collect()),
             },
             _ => self.clone(),

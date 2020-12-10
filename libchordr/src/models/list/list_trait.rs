@@ -25,6 +25,9 @@ pub trait ListTrait {
     /// Return the number of entries in the list
     fn len(&self) -> usize;
 
+    // Return if the list is empty
+    fn is_empty(&self) -> bool;
+
     /// Add the given instance to the [List] if it's [Item::Id] is not already registered
     fn add(&mut self, item: <Self as ListTrait>::Item) -> Result<(), ListError>;
 

@@ -50,9 +50,8 @@ impl<'a> Tag /*<'a>*/ {
         attributes: Option<HashSet<Attribute /*<'a>*/>>,
     ) -> Self {
         let tag_name_string = tag_name.into();
-        match validate_xml_identifier(&tag_name_string) {
-            Err(e) => panic!(e.to_string()),
-            Ok(_) => {}
+        if let Err(e) = validate_xml_identifier(&tag_name_string) {
+            panic!(e.to_string())
         }
         Self {
             tag_name: Some(tag_name_string),
@@ -122,9 +121,9 @@ impl<'a> Tag /*<'a>*/ {
 
     pub fn is_raw_wrapper(&self) -> bool {
         if self.tag_name.is_none() || self.tag_name().unwrap().is_empty() {
-            return !self.content.is_empty();
+            !self.content.is_empty()
         } else {
-            return false;
+            false
         }
     }
 }

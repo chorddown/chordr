@@ -116,6 +116,10 @@ impl ListTrait for Setlist {
         self.songs.len()
     }
 
+    fn is_empty(&self) -> bool {
+        self.songs.is_empty()
+    }
+
     fn add(&mut self, song: SetlistEntry) -> Result<(), ListError> {
         self.songs.add(song)
     }

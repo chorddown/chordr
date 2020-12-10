@@ -33,6 +33,10 @@ impl CatalogTrait<Song> for Catalog {
         self.songs.len()
     }
 
+    fn is_empty(&self) -> bool {
+        self.songs.is_empty()
+    }
+
     fn iter(&self) -> Iter<Song> {
         self.songs.iter()
     }

@@ -24,6 +24,12 @@ impl SetlistCollection {
     }
 }
 
+impl Default for SetlistCollection {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl IntoIterator for SetlistCollection {
     type Item = Setlist;
     type IntoIter = IntoIter<Setlist>;

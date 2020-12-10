@@ -104,7 +104,7 @@ impl Note {
             // C
             "c" => Ok(Self::C),
 
-            _ => return Err(Error::chord_error(format!("Unknown note {}", value)))
+            _ => Err(Error::chord_error(format!("Unknown note {}", value)))
         }
     }
 }

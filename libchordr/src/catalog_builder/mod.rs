@@ -58,7 +58,7 @@ impl CatalogBuilder {
         let (songs, errors): (Vec<_>, Vec<_>) = song_results.into_iter().partition(Result::is_ok);
 
         let mut songs: Vec<Song> = songs.into_iter().map(Result::unwrap).collect();
-        songs.sort_by(|a, b| a.id().cmp(&b.id()));
+        songs.sort_by_key(|a| a.id());
 
         (
             songs,
@@ -122,6 +122,12 @@ impl CatalogBuilder {
                 path,
             ))]
         }
+    }
+}
+
+impl Default for CatalogBuilder {
+    fn default() -> Self {
+        Self {}
     }
 }
 

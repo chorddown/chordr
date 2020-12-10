@@ -138,11 +138,7 @@ impl TagProvider {
             .build()
     }
 
-    fn build_tag_for_children<'a, 'b>(
-        &'a self,
-        children: &'a Vec<Node>,
-        formatting: Formatting,
-    ) -> Tag {
+    fn build_tag_for_children<'a>(&'a self, children: &'a [Node], formatting: Formatting) -> Tag {
         let mut gtb = TagBuilder::new();
         if children.is_empty() {
             return Tag::blank();

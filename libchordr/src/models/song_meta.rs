@@ -4,7 +4,6 @@ use super::song_id::SongId;
 use crate::models::list::ListEntryTrait;
 use crate::models::meta::*;
 use crate::models::song_id::SongIdTrait;
-use serde;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]

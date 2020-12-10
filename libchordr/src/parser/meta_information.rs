@@ -36,7 +36,7 @@ impl MetaInformation {
             Meta::Tempo(content) => self.tempo = Some(content.clone()),
             Meta::Duration(content) => self.duration = Some(content.clone()),
             Meta::Capo(content) => self.capo = Some(content.clone()),
-            Meta::BNotation(notation) => self.b_notation = notation.clone(),
+            Meta::BNotation(notation) => self.b_notation = *notation,
         }
     }
 }

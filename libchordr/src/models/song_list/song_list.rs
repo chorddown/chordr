@@ -64,6 +64,10 @@ where
         self.0.len()
     }
 
+    fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+
     /// Add the given [SongData] instance to the [SongList] if it's [SongId] is not already registered
     fn add(&mut self, song: S) -> Result<(), ListError> {
         self.0.add(song)

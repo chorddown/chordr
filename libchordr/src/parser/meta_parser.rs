@@ -43,7 +43,7 @@ impl MetaParser {
                 }
             }
             Token::Meta(token_meta) => {
-                let mut new_meta = meta.clone();
+                let mut new_meta = meta;
                 new_meta.assign_from_token(&token_meta);
                 new_meta
             }

@@ -29,7 +29,7 @@ impl HtmlConverter {
     }
 
     fn format_meta(&self, meta: &dyn SongMetaTrait) -> String {
-        let none_text = "None".to_owned();
+        let none_text = "None";
 
         format!(
             r"<!--
@@ -49,19 +49,19 @@ Tempo:      {}
 Duration:   {}
 Capo:       {}
 -->",
-            meta.title().unwrap_or(none_text.clone()),
-            meta.subtitle().unwrap_or(none_text.clone()),
-            meta.artist().unwrap_or(none_text.clone()),
-            meta.composer().unwrap_or(none_text.clone()),
-            meta.lyricist().unwrap_or(none_text.clone()),
-            meta.copyright().unwrap_or(none_text.clone()),
-            meta.album().unwrap_or(none_text.clone()),
-            meta.year().unwrap_or(none_text.clone()),
-            meta.key().unwrap_or(none_text.clone()),
-            meta.time().unwrap_or(none_text.clone()),
-            meta.tempo().unwrap_or(none_text.clone()),
-            meta.duration().unwrap_or(none_text.clone()),
-            meta.capo().unwrap_or(none_text.clone()),
+            meta.title().unwrap_or_else(|| none_text.to_owned()),
+            meta.subtitle().unwrap_or_else(|| none_text.to_owned()),
+            meta.artist().unwrap_or_else(|| none_text.to_owned()),
+            meta.composer().unwrap_or_else(|| none_text.to_owned()),
+            meta.lyricist().unwrap_or_else(|| none_text.to_owned()),
+            meta.copyright().unwrap_or_else(|| none_text.to_owned()),
+            meta.album().unwrap_or_else(|| none_text.to_owned()),
+            meta.year().unwrap_or_else(|| none_text.to_owned()),
+            meta.key().unwrap_or_else(|| none_text.to_owned()),
+            meta.time().unwrap_or_else(|| none_text.to_owned()),
+            meta.tempo().unwrap_or_else(|| none_text.to_owned()),
+            meta.duration().unwrap_or_else(|| none_text.to_owned()),
+            meta.capo().unwrap_or_else(|| none_text.to_owned()),
         )
     }
 }

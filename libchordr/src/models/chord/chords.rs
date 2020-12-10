@@ -21,7 +21,7 @@ impl Chords {
         }
 
         let chord1 = inner.remove(0);
-        let chord2 = if inner.len() > 0 {
+        let chord2 = if !inner.is_empty() {
             Some(inner.remove(0))
         } else {
             None

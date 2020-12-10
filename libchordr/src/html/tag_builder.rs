@@ -74,10 +74,10 @@ impl<'a> TagBuilder<'a> {
             panic!("Can not build a Fragment tag with attributes and content")
         }
         if self.attributes.is_empty() {
-            Tag::new(self.tag_name.to_owned().clone(), self.content.clone(), None)
+            Tag::new(self.tag_name.to_owned(), self.content.clone(), None)
         } else {
             Tag::new(
-                self.tag_name.to_owned().clone(),
+                self.tag_name.to_owned(),
                 self.content.clone(),
                 Some(self.attributes.clone()),
             )

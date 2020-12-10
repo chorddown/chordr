@@ -113,8 +113,8 @@ impl Scanner {
     pub fn scan(mut self, input: &str) -> Vec<Lexeme> {
         // let mut lexemes: Vec<Lexeme> = vec![];
         let mut literal_buffer = String::new();
-        let mut chars = input.chars();
-        while let Some(current_character) = chars.next() {
+        let chars = input.chars();
+        for current_character in chars {
             match current_character {
                 NEWLINE => self.push_n_drain(&mut literal_buffer, Lexeme::Newline),
                 CHORD_START => self.push_n_drain(&mut literal_buffer, Lexeme::ChordStart),
