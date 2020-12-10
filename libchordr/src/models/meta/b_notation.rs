@@ -45,8 +45,6 @@ impl Display for BNotation {
     }
 }
 
-pub struct NotationError {}
-
 impl TryFrom<char> for BNotation {
     type Error = NotationError;
 
@@ -55,7 +53,7 @@ impl TryFrom<char> for BNotation {
         match value {
             'B' | 'b' => Ok(Self::B),
             'H' | 'h' => Ok(Self::H),
-            _ => Err(NotationError {}),
+            _ => Err(NotationError(value.to_string())),
         }
     }
 }
@@ -68,7 +66,18 @@ impl TryFrom<&str> for BNotation {
         match value {
             "B" | "b" => Ok(Self::B),
             "H" | "h" => Ok(Self::H),
-            _ => Err(NotationError {}),
+            _ => Err(NotationError(value.to_string())),
         }
+    }
+}
+
+#[derive(Debug)]
+pub struct NotationError(String);
+
+impl std::error::Error for NotationError {}
+
+impl Display for NotationError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
+        write!(f, "Invalid b-notation '{}'", self.0)
     }
 }

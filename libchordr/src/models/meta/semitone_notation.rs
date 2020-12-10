@@ -17,8 +17,6 @@ impl Default for SemitoneNotation {
     }
 }
 
-pub struct SemitoneNotationError {}
-
 impl TryFrom<char> for SemitoneNotation {
     type Error = SemitoneNotationError;
 
@@ -26,7 +24,7 @@ impl TryFrom<char> for SemitoneNotation {
         match value {
             '#' | '♯' => Ok(Self::Sharp),
             'b' | '♭' => Ok(Self::Flat),
-            _ => Err(SemitoneNotationError {}),
+            _ => Err(SemitoneNotationError(value.to_string())),
         }
     }
 }
@@ -39,7 +37,7 @@ impl TryFrom<&str> for SemitoneNotation {
         match value {
             "#" | "♯" => Ok(Self::Sharp),
             "b" | "♭" => Ok(Self::Flat),
-            _ => Err(SemitoneNotationError {}),
+            _ => Err(SemitoneNotationError(value.to_string())),
         }
     }
 }
@@ -54,5 +52,16 @@ impl Display for SemitoneNotation {
                 Self::Flat => "♭",
             }
         )
+    }
+}
+
+#[derive(Debug)]
+pub struct SemitoneNotationError(String);
+
+impl std::error::Error for SemitoneNotationError {}
+
+impl Display for SemitoneNotationError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
+        write!(f, "Invalid semitone-notation '{}'", self.0)
     }
 }

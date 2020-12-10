@@ -1,3 +1,5 @@
+use crate::models::meta::b_notation::NotationError;
+use crate::models::meta::semitone_notation::SemitoneNotationError;
 use std::error::Error as StdError;
 use std::fmt::{Display, Error as FmtError, Formatter};
 use std::path::PathBuf;
@@ -98,6 +100,24 @@ impl StdError for Error {
 
 impl From<::std::io::Error> for Error {
     fn from(error: ::std::io::Error) -> Self {
+        Error::from_error(error)
+    }
+}
+
+impl From<NotationError> for Error {
+    fn from(error: NotationError) -> Self {
+        Error::from_error(error)
+    }
+}
+
+impl From<SemitoneNotationError> for Error {
+    fn from(error: SemitoneNotationError) -> Self {
+        Error::from_error(error)
+    }
+}
+
+impl From<std::num::ParseIntError> for Error {
+    fn from(error: std::num::ParseIntError) -> Self {
         Error::from_error(error)
     }
 }
