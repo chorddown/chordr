@@ -51,7 +51,7 @@ impl<'a> Tag /*<'a>*/ {
     ) -> Self {
         let tag_name_string = tag_name.into();
         if let Err(e) = validate_xml_identifier(&tag_name_string) {
-            panic!(e.to_string())
+            panic!("{}", e.to_string())
         }
         Self {
             tag_name: Some(tag_name_string),

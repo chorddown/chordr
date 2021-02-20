@@ -6,8 +6,10 @@ use crate::ConnectionType;
 use chrono::prelude::*;
 use diesel::{self, prelude::*};
 
+#[derive(
+Serialize, Deserialize, Identifiable, Queryable, Insertable, AsChangeset, Debug, Clone,
+)]
 #[table_name = "setlist"]
-#[derive(Serialize, Deserialize, Identifiable, Queryable, Insertable, AsChangeset, Debug, Clone)]
 pub struct SetlistDb {
     pub id: i32,
     pub name: String,

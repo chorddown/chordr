@@ -93,7 +93,7 @@ mod test {
     }
 
     fn assert_valid_configuration(result: Result<Configuration, Error>) {
-        assert!(result.is_ok(), result.unwrap_err().to_string());
+        assert!(result.is_ok(), "{}", result.unwrap_err().to_string());
 
         let configuration = assert_valid_mandatory_configuration(result);
         assert_valid_webdav_configuration_values(configuration.clone());
@@ -102,7 +102,7 @@ mod test {
     }
 
     fn assert_valid_dropbox_configuration(result: Result<Configuration, Error>) {
-        assert!(result.is_ok(), result.unwrap_err().to_string());
+        assert!(result.is_ok(), "{}", result.unwrap_err().to_string());
 
         let configuration = assert_valid_mandatory_configuration(result);
         assert_eq!(configuration.service.identifier, ServiceIdentifier::Dropbox);
@@ -110,7 +110,7 @@ mod test {
     }
 
     fn assert_valid_webdav_configuration(result: Result<Configuration, Error>) {
-        assert!(result.is_ok(), result.unwrap_err().to_string());
+        assert!(result.is_ok(), "{}", result.unwrap_err().to_string());
 
         let configuration = assert_valid_mandatory_configuration(result);
         assert_valid_webdav_configuration_values(configuration);

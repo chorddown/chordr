@@ -15,9 +15,11 @@ use rocket::request::Outcome;
 use rocket::Request;
 use std::convert::TryInto;
 
-#[table_name = "user"]
+#[derive(
+Serialize, Deserialize, Queryable, Identifiable, Insertable, AsChangeset, Debug, Clone,
+)]
 #[primary_key(username)]
-#[derive(Serialize, Deserialize, Queryable, Identifiable, Insertable, AsChangeset, Debug, Clone)]
+#[table_name = "user"]
 pub struct UserDb {
     pub username: String,
     pub first_name: String,
