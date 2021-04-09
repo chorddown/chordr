@@ -60,6 +60,7 @@
     font-size: $button-font-size;
     font-family: $ui-font;
     text-decoration: none;
+    touch-action: manipulation;
 
     &:focus,
     &:hover {
