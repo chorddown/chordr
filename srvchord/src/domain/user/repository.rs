@@ -1,5 +1,5 @@
-use crate::command::{Command, CommandExecutor};
 use crate::diesel::QueryDsl;
+use crate::domain::user::command::UserCommandExecutor;
 use crate::domain::user::UserDb;
 use crate::error::SrvError;
 use crate::schema::user;
@@ -8,6 +8,7 @@ use crate::traits::*;
 use crate::ConnectionType;
 use diesel::{self, prelude::*};
 use libchordr::prelude::RecordTrait;
+use cqrs::prelude::CommandExecutor;
 
 pub struct UserRepository {}
 
@@ -24,6 +25,10 @@ impl UserRepository {
         Ok(all_users
             .filter(crate::schema::user::username.eq(username.as_ref()))
             .first(connection)?)
+    }
+
+    fn get_command_executor<'a>(&self, connection: &'a ConnectionType) -> UserCommandExecutor<'a> {
+        UserCommandExecutor::with_connection(connection)
     }
 }
 
@@ -52,7 +57,8 @@ impl RepositoryTrait for UserRepository {
         connection: &ConnectionType,
         instance: Self::ManagedType,
     ) -> Result<(), Self::Error> {
-        CommandExecutor::perform(instance, Command::add(connection))
+        self.get_command_executor(connection)
+            .perform(cqrs::prelude::Command::add(instance))
     }
 
     fn update(
@@ -60,7 +66,8 @@ impl RepositoryTrait for UserRepository {
         connection: &ConnectionType,
         instance: Self::ManagedType,
     ) -> Result<(), Self::Error> {
-        CommandExecutor::perform(instance, Command::update(connection))
+        self.get_command_executor(connection)
+            .perform(cqrs::prelude::Command::update(instance))
     }
 
     fn delete(
@@ -68,6 +75,7 @@ impl RepositoryTrait for UserRepository {
         connection: &ConnectionType,
         instance: Self::ManagedType,
     ) -> Result<(), Self::Error> {
-        CommandExecutor::perform(instance, Command::delete(connection))
+        self.get_command_executor(connection)
+            .perform(cqrs::prelude::Command::delete(instance.id()))
     }
 }

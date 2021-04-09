@@ -1,9 +1,10 @@
-use crate::command::{Command, CommandExecutor};
 use crate::diesel::QueryDsl;
 use crate::domain::setlist::db::SetlistDb;
 use crate::domain::setlist_entry::db::SetlistDbEntry;
 use crate::error::SrvError;
 use crate::schema::setlist::dsl::setlist as all_setlists;
+use crate::ConnectionType;
+use cqrs::prelude::{Command, CommandExecutor};
 use diesel::{self, prelude::*};
 use libchordr::prelude::Setlist;
 
@@ -20,87 +21,88 @@ fn as_setlist_db(setlist: &Setlist) -> SetlistDb {
     }
 }
 
-fn get_setlist_db_entries(setlist: &Setlist) -> Vec<SetlistDbEntry> {
-    let setlist_db = as_setlist_db(setlist);
-    setlist
-        .as_song_list()
-        .iter()
-        .map(|e| SetlistDbEntry::from(&e, &setlist_db))
-        .collect()
+pub(crate) struct SetlistCommandExecutor<'a> {
+    connection: &'a ConnectionType,
 }
 
-fn insert_setlist_db_entries(setlist: &Setlist, command: &Command) -> Result<(), SrvError> {
-    diesel::insert_into(crate::schema::setlist_entry::table)
-        .values(get_setlist_db_entries(setlist))
-        .execute(command.connection)?;
+impl<'a> SetlistCommandExecutor<'a> {
+    pub(crate) fn with_connection(connection: &'a ConnectionType) -> Self {
+        Self { connection }
+    }
 
-    Ok(())
+    fn insert_setlist_db_entries(
+        &self,
+        setlist: &Setlist,
+        _command: &Command<Setlist>,
+    ) -> Result<(), SrvError> {
+        fn get_setlist_db_entries(setlist: &Setlist) -> Vec<SetlistDbEntry> {
+            let setlist_db = as_setlist_db(setlist);
+            setlist
+                .as_song_list()
+                .iter()
+                .map(|e| SetlistDbEntry::from(&e, &setlist_db))
+                .collect()
+        }
+
+        diesel::insert_into(crate::schema::setlist_entry::table)
+            .values(get_setlist_db_entries(setlist))
+            .execute(self.connection)?;
+
+        Ok(())
+    }
 }
 
-impl CommandExecutor for &Setlist {
+impl<'a> CommandExecutor for SetlistCommandExecutor<'_> {
+    type RecordType = Setlist;
+
     type Error = SrvError;
 
-    fn add(self, command: Command) -> Result<(), Self::Error> {
-        let setlist_db = as_setlist_db(self);
+    fn add(&self, command: Command<Self::RecordType>) -> Result<(), Self::Error> {
+        let setlist = command.record().unwrap();
+        let setlist_db = as_setlist_db(setlist);
 
-        command.connection.transaction::<(), Self::Error, _>(|| {
+        self.connection.transaction::<(), Self::Error, _>(|| {
             diesel::insert_into(crate::schema::setlist::table)
                 .values(&setlist_db)
-                .execute(command.connection)?;
+                .execute(self.connection)?;
 
-            insert_setlist_db_entries(self, &command)
+            self.insert_setlist_db_entries(setlist, &command)
         })?;
 
         Ok(())
     }
 
-    fn update(self, command: Command) -> Result<(), Self::Error> {
-        let setlist_db_query = all_setlists.find(self.id());
-        let setlist_db_instance = match setlist_db_query.get_result::<SetlistDb>(command.connection)
-        {
+    fn update(&self, command: Command<Self::RecordType>) -> Result<(), Self::Error> {
+        let setlist = command.record().unwrap();
+        let setlist_db_query = all_setlists.find(setlist.id());
+        let setlist_db_instance = match setlist_db_query.get_result::<SetlistDb>(self.connection) {
             Ok(setlist_db_instance) => setlist_db_instance,
             Err(_) => {
                 return Err(SrvError::persistence_error(format!(
                     "Original object with ID '{}' could not be found",
-                    self.id()
+                    setlist.id()
                 )));
             }
         };
-        command.connection.transaction::<(), Self::Error, _>(|| {
+        self.connection.transaction::<(), Self::Error, _>(|| {
             diesel::update(setlist_db_query)
-                .set(as_setlist_db(self))
-                .execute(command.connection)?;
+                .set(as_setlist_db(setlist))
+                .execute(self.connection)?;
 
             // Delete the current associated Setlist Entries
             diesel::delete(SetlistDbEntry::belonging_to(&setlist_db_instance))
-                .execute(command.connection)?;
+                .execute(self.connection)?;
 
             // Insert the updated Setlist Entries
-            insert_setlist_db_entries(&self, &command)
+            self.insert_setlist_db_entries(&setlist, &command)
         })?;
 
         Ok(())
     }
 
-    fn delete(self, command: Command) -> Result<(), Self::Error> {
-        diesel::delete(all_setlists.find(self.id())).execute(command.connection)?;
+    fn delete(&self, command: Command<Self::RecordType>) -> Result<(), Self::Error> {
+        diesel::delete(all_setlists.find(command.id().unwrap())).execute(self.connection)?;
         Ok(())
-    }
-}
-
-impl CommandExecutor for Setlist {
-    type Error = SrvError;
-
-    fn add(self, command: Command) -> Result<(), Self::Error> {
-        CommandExecutor::add(&self, command)
-    }
-
-    fn update(self, command: Command) -> Result<(), Self::Error> {
-        CommandExecutor::update(&self, command)
-    }
-
-    fn delete(self, command: Command) -> Result<(), Self::Error> {
-        CommandExecutor::delete(&self, command)
     }
 }
 
@@ -138,7 +140,11 @@ mod test {
                 vec![],
             );
 
-            CommandExecutor::perform(new_setlist, Command::add(&conn)).unwrap();
+            CommandExecutor::perform(
+                &SetlistCommandExecutor::with_connection(&conn),
+                Command::add(new_setlist),
+            )
+                .unwrap();
 
             let new_setlists = SetlistDb::all(&conn);
             assert_eq!(new_setlists.len(), init_setlists.len() + 1);
@@ -178,7 +184,11 @@ mod test {
                 ],
             );
 
-            CommandExecutor::perform(new_setlist, Command::add(&conn)).unwrap();
+            CommandExecutor::perform(
+                &SetlistCommandExecutor::with_connection(&conn),
+                Command::add(new_setlist),
+            )
+                .unwrap();
 
             let new_setlists = SetlistDb::all(&conn);
             assert_eq!(new_setlists.len(), init_setlists.len() + 1);
@@ -201,7 +211,8 @@ mod test {
             assert_eq!(SetlistDbEntry::count_all(&conn), 6);
 
             CommandExecutor::perform(
-                Setlist::new(
+                &SetlistCommandExecutor::with_connection(&conn),
+                Command::update(Setlist::new(
                     "My setlist #918",
                     918, // Same ID
                     // New User:
@@ -216,10 +227,9 @@ mod test {
                     Utc::now(),
                     Utc::now(),
                     vec![],
-                ),
-                Command::update(&conn),
+                )),
             )
-            .unwrap();
+                .unwrap();
 
             assert_eq!(SetlistDb::count_all(&conn), 2);
             assert_eq!(SetlistDbEntry::count_all(&conn), 3);
@@ -238,7 +248,8 @@ mod test {
             assert_eq!(SetlistDbEntry::count_all(&conn), 6);
 
             CommandExecutor::perform(
-                Setlist::new(
+                &SetlistCommandExecutor::with_connection(&conn),
+                Command::update(Setlist::new(
                     "My setlist #918",
                     918, // Same ID
                     // New User:
@@ -258,10 +269,9 @@ mod test {
                         "Song 4",
                         None,
                     )],
-                ),
-                Command::update(&conn),
+                )),
             )
-            .unwrap();
+                .unwrap();
 
             assert_eq!(SetlistDb::count_all(&conn), 2);
             assert_eq!(SetlistDbEntry::count_all(&conn), 4);
@@ -273,7 +283,8 @@ mod test {
         run_database_test(|conn| {
             clear_database(&conn);
             let result = CommandExecutor::perform(
-                Setlist::new(
+                &SetlistCommandExecutor::with_connection(&conn),
+                Command::update(Setlist::new(
                     "My setlist #918",
                     10001,
                     User::unknown(),
@@ -287,8 +298,7 @@ mod test {
                         "Song 4",
                         None,
                     )],
-                ),
-                Command::update(&conn),
+                )),
             );
             assert_eq!(
                 result.unwrap_err().to_string(),
@@ -308,41 +318,14 @@ mod test {
             create_setlist(&conn, 1918, "1819");
 
             CommandExecutor::perform(
-                Setlist::new(
-                    "My setlist #918",
-                    918, // This is important
-                    User::unknown(),
-                    None,
-                    None,
-                    Utc::now(),
-                    Utc::now(),
-                    vec![],
-                ),
-                Command::delete(&conn),
+                &SetlistCommandExecutor::with_connection(&conn),
+                Command::delete(918),
             )
-            .unwrap();
+                .unwrap();
 
             assert_eq!(SetlistDb::count_all(&conn), 1);
         })
     }
-
-    // fn insert_test_setlist(conn: &ConnectionType, id: i32, user: i32) {
-    //     CommandExecutor::perform(
-    //         UserSetlist {
-    //             id,
-    //             user,
-    //             user_name: "Saul".to_string(),
-    //             sorting: id,
-    //             entries: vec![
-    //                 SetlistEntry::new("song-1", FileType::Chorddown, "Song 1", None),
-    //                 SetlistEntry::new("song-2", FileType::Chorddown, "Song 2", None),
-    //                 SetlistEntry::new("song-3", FileType::Chorddown, "Song 3", None),
-    //             ],
-    //         },
-    //         Command::add(conn),
-    //     )
-    //         .unwrap();
-    // }
 
     fn clear_database(conn: &ConnectionType) {
         assert!(

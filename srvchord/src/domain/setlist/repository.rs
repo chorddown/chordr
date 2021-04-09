@@ -1,5 +1,5 @@
-use crate::command::{Command, CommandExecutor};
 use crate::diesel::QueryDsl;
+use crate::domain::setlist::command::SetlistCommandExecutor;
 use crate::domain::setlist::db::SetlistDb;
 use crate::domain::setlist::setlist_from_data;
 use crate::domain::setlist_entry::db::SetlistDbEntry;
@@ -9,6 +9,7 @@ use crate::schema::setlist;
 use crate::schema::setlist::dsl::setlist as all_setlists;
 use crate::traits::*;
 use crate::ConnectionType;
+use cqrs::prelude::CommandExecutor;
 use diesel::{self, prelude::*};
 use libchordr::prelude::{RecordTrait, Setlist, Team, User, Username};
 
@@ -110,23 +111,23 @@ impl SetlistRepository {
         Ok(setlists.into_iter().zip(grouped_entries).collect())
     }
 
-    fn get_user(
-        &self,
-        connection: &SqliteConnection,
-        username: &Username,
-    ) -> Result<User, SrvError> {
+    fn get_user(&self, connection: &ConnectionType, username: &Username) -> Result<User, SrvError> {
         UserRepository::new()
             .find_by_name(connection, username.to_string())?
             .try_to_user()
     }
 
-    fn get_users(&self, connection: &SqliteConnection) -> Result<Vec<User>, SrvError> {
+    fn get_users(&self, connection: &ConnectionType) -> Result<Vec<User>, SrvError> {
         let raw_users = UserRepository::new().find_all(connection)?;
         let users = raw_users
             .into_iter()
             .filter_map(|u| u.try_to_user().ok())
             .collect();
         Ok(users)
+    }
+
+    fn get_command_executor<'a>(&self, connection: &'a ConnectionType) -> SetlistCommandExecutor<'a> {
+        SetlistCommandExecutor::with_connection(connection)
     }
 }
 
@@ -176,7 +177,8 @@ impl RepositoryTrait for SetlistRepository {
         connection: &ConnectionType,
         instance: Self::ManagedType,
     ) -> Result<(), Self::Error> {
-        CommandExecutor::perform(instance, Command::add(connection))
+        self.get_command_executor(connection)
+            .perform(cqrs::prelude::Command::add(instance))
     }
 
     fn update(
@@ -184,7 +186,8 @@ impl RepositoryTrait for SetlistRepository {
         connection: &ConnectionType,
         instance: Self::ManagedType,
     ) -> Result<(), Self::Error> {
-        CommandExecutor::perform(instance, Command::update(connection))
+        self.get_command_executor(connection)
+            .perform(cqrs::prelude::Command::update(instance))
     }
 
     fn delete(
@@ -192,7 +195,8 @@ impl RepositoryTrait for SetlistRepository {
         connection: &ConnectionType,
         instance: Self::ManagedType,
     ) -> Result<(), Self::Error> {
-        CommandExecutor::perform(instance, Command::delete(connection))
+        self.get_command_executor(connection)
+            .perform(cqrs::prelude::Command::delete(instance.id()))
     }
 }
 

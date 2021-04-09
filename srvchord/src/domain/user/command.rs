@@ -55,6 +55,50 @@ impl crate::command::CommandExecutor for UserDb {
     }
 }
 
+pub(crate) struct UserCommandExecutor<'a> {
+    connection: &'a ConnectionType,
+}
+
+impl<'a> UserCommandExecutor<'a> {
+    pub(crate) fn with_connection(connection: &'a ConnectionType) -> Self {
+        Self { connection }
+    }
+}
+
+impl<'a> cqrs::prelude::CommandExecutor for UserCommandExecutor<'_> {
+    type RecordType = UserDb;
+    type Error = SrvError;
+
+    fn add(&self, command: cqrs::prelude::Command<Self::RecordType>) -> Result<(), Self::Error> {
+        diesel::insert_into(crate::schema::user::table)
+            .values(command.record().unwrap())
+            .execute(self.connection)?;
+        Ok(())
+    }
+
+    fn update(&self, command: cqrs::prelude::Command<Self::RecordType>) -> Result<(), Self::Error> {
+        let user = command.record().unwrap();
+        let user_query = all_users.find(user.id());
+        if let Err(_) = user_query.get_result::<UserDb>(self.connection) {
+            return Err(SrvError::persistence_error(format!(
+                "Original object with ID '{}' could not be found",
+                user.id()
+            )));
+        }
+
+        diesel::update(user_query)
+            .set(user)
+            .execute(self.connection)?;
+
+        Ok(())
+    }
+
+    fn delete(&self, command: cqrs::prelude::Command<Self::RecordType>) -> Result<(), Self::Error> {
+        diesel::delete(all_users.find(&command.id().unwrap())).execute(self.connection)?;
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -62,6 +106,7 @@ mod test {
     use crate::test_helpers::*;
     use crate::traits::Count;
     use crate::ConnectionType;
+    use cqrs::prelude::{Command, CommandExecutor};
 
     #[test]
     fn test_add() {
@@ -75,7 +120,11 @@ mod test {
                 password_hash: "123456".to_string(),
             };
 
-            CommandExecutor::perform(new_user, Command::add(&conn)).unwrap();
+            CommandExecutor::perform(
+                &UserCommandExecutor::with_connection(&conn),
+                Command::add(new_user),
+            )
+                .unwrap();
 
             assert_eq!(count_all_users(&conn), 1);
         })
@@ -90,15 +139,15 @@ mod test {
             assert_eq!(count_all_users(&conn), 2);
 
             CommandExecutor::perform(
-                UserDb {
+                &UserCommandExecutor::with_connection(&conn),
+                Command::update(UserDb {
                     username: "saul-panther-918".to_string(), // Same username
                     first_name: "Paul".to_string(),           // New name
                     last_name: "Panther".to_string(),
                     password_hash: "123456".to_string(),
-                },
-                Command::update(&conn),
+                }),
             )
-            .unwrap();
+                .unwrap();
 
             assert_eq!(count_all_users(&conn), 2);
         })
@@ -114,15 +163,10 @@ mod test {
             assert_eq!(count_all_users(&conn), 2);
 
             CommandExecutor::perform(
-                UserDb {
-                    username: "saul-panther-918".to_string(),
-                    first_name: "".to_string(),
-                    last_name: "".to_string(),
-                    password_hash: "".to_string(),
-                },
-                Command::delete(&conn),
+                &UserCommandExecutor::with_connection(&conn),
+                Command::delete("saul-panther-918".to_string()),
             )
-            .unwrap();
+                .unwrap();
 
             assert_eq!(count_all_users(&conn), 1);
         })

@@ -1,20 +1,21 @@
 mod json_formatting;
 
 pub use self::json_formatting::*;
+use crate::domain::setlist::command::SetlistCommandExecutor;
+use crate::domain::user::command::UserCommandExecutor;
 use crate::domain::user::repository::UserRepository;
 use crate::domain::user::UserDb;
 use crate::traits::RepositoryTrait;
 use crate::{ConnectionType, DbConn};
+use chrono::Utc;
+use cqrs::prelude::{Command, CommandExecutor};
 use diesel::Connection;
+use libchordr::models::user::User;
+use libchordr::prelude::{FileType, Password, Setlist, SetlistEntry, Username};
 use parking_lot::Mutex;
 use rand::{thread_rng, Rng};
 use rocket::config::RocketConfig;
 use rocket::local::Client;
-// use crate::domain::setlist::UserSetlist;
-use crate::command::{Command, CommandExecutor};
-use chrono::Utc;
-use libchordr::models::user::User;
-use libchordr::prelude::{FileType, Password, Setlist, SetlistEntry, Username};
 
 #[allow(unused)]
 enum UseDatabase {
@@ -130,7 +131,11 @@ pub fn insert_test_user<S1: Into<String>, S2: Into<String>, S3: Into<String>>(
         password_hash: create_test_password().to_string(),
     };
 
-    CommandExecutor::perform(&new_user, Command::add(conn)).unwrap();
+    CommandExecutor::perform(
+        &UserCommandExecutor::with_connection(conn),
+        Command::add(new_user.clone()),
+    )
+        .unwrap();
 
     new_user
 }
@@ -157,7 +162,12 @@ pub fn create_setlist<S: AsRef<str>>(conn: &ConnectionType, id: i32, username: S
             SetlistEntry::new("song-3", FileType::Chorddown, "Song 3", None),
         ],
     );
-    CommandExecutor::perform(&setlist, Command::add(conn)).unwrap();
+
+    CommandExecutor::perform(
+        &SetlistCommandExecutor::with_connection(&conn),
+        Command::add(setlist.clone()),
+    )
+        .unwrap();
 
     setlist
 }
