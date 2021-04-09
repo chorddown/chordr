@@ -1,4 +1,4 @@
-use libchordr::prelude::{RecordIdTrait, RecordTrait};
+use libchordr::prelude::RecordTrait;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
