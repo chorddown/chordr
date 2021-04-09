@@ -33,7 +33,6 @@
 
 <script>
     const CACHE_NAME = 'chordr';
-    /* See also webchordr/static/sw.js:3 */
     const consoleStyles = {
         normalStyle: "background: inherit; color: inherit",
         pathStyle: "font-weight: bold; color: inherit",
@@ -112,7 +111,7 @@
         );
     } else if ('serviceWorker' in navigator) {
         navigator.serviceWorker
-            .register('/sw.js')
+            .register('/service-worker.js')
             .then(function () {
                 console.info(
                     consoleStyles.label.info.text + 'Service Worker registered',
