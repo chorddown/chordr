@@ -137,3 +137,15 @@
         -moz-osx-font-smoothing: grayscale;
     }
 }
+
+@mixin max-screen-xs {
+    @media screen and (max-width: 768px - .001) {
+        @content;
+    }
+}
+
+@mixin min-screen-tablet {
+    @media screen and (min-width: 768px) {
+        @content;
+    }
+}

@@ -21,14 +21,20 @@ nav {
     }
 
     &.-visible {
-        width: $nav-width;
+        width: $nav-width-xs;
+        @include min-screen-tablet {
+            width: $nav-width;
+        }
     }
 
     .song-list {
         display: flex;
         flex-flow: column;
         overflow: scroll;
-        height: calc(100vh - #{$nav-button-height + $nav-footer-border-width});
+        height: calc(100vh - #{3 * $nav-button-height + $nav-footer-border-width});
+        @include min-screen-tablet {
+            height: calc(100vh - #{$nav-button-height + $nav-footer-border-width});
+        }
 
         &:focus,
         & > div:focus {
@@ -84,7 +90,10 @@ nav {
         }
 
         &.-sortable a[role=button] {
-            width: $nav-width - $sort-handle-width;
+            width: $nav-width-xs - $sort-handle-width;
+            @include min-screen-tablet {
+                width: $nav-width - $sort-handle-width;
+            }
         }
 
         .sortable-handle {
@@ -118,6 +127,17 @@ nav {
         display: flex;
         order: 200;
         border-top: $nav-footer-border-width solid $nav-footer-border-color;
+        flex-flow: column;
+        @include max-screen-xs {
+            .toggle-menu {
+                order: 10;
+            }
+        }
+
+        @include min-screen-tablet {
+            flex-flow: row;
+        }
+
         @include if-dark-mode {
             border-top-color: $gray-darker;
         }

@@ -18,7 +18,7 @@ img {
 
 body {
     font-family: $ui-font;
-    font-size: $font-size-ui;
+    font-size: var(--font-size-base); // $font-size-ui;
     line-height: $line-height;
     margin: 0;
     //color: $text-color;
@@ -60,8 +60,11 @@ main {
 .content {
     background: var(--background);
     order: 1;
-    width: calc(100% - #{$nav-width});
     padding: $std-space;
+    width: calc(100% - #{$nav-width-xs});
+    @include min-screen-tablet {
+        width: calc(100% - #{$nav-width});
+    }
     //@include if-dark-mode {
     //    background: $dark-mode-background;
     //}

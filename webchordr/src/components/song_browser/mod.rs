@@ -9,9 +9,9 @@ use crate::components::song_list::Item as SongItem;
 use libchordr::models::catalog::*;
 use libchordr::models::song_data::SongData;
 use libchordr::prelude::Song;
+use std::rc::Rc;
 use yew::prelude::*;
 use yew::{Component, ComponentLink, ShouldRender};
-use std::rc::Rc;
 
 pub struct SongBrowser {
     props: SongBrowserProps,
@@ -117,7 +117,7 @@ impl Component for SongBrowser {
     fn view(&self) -> Html {
         let render_index_item = |index| {
             html! {
-                <div class="col-3">
+                <div class="col-xs-6 col-3">
                     <IndexItem class="song-browser-index-item grid-button"
                         index=index/>
                 </div>
@@ -126,7 +126,7 @@ impl Component for SongBrowser {
         let render_song_item = |song: &Song| {
             let key = song.title();
             html! {
-                <div class="col-3">
+                <div class="col-xs-6 col-3">
                     <SongItem<Song> class="song-item grid-button"
                         data_key=key
                         song=song/>

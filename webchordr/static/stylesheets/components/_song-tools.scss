@@ -2,13 +2,18 @@
 
 .song-tools {
     position: fixed;
-    top: 0;
-    right: $nav-width;
+    bottom: 0;
     background: $gray-light;
     color: $button-color;
     padding: (1+$std-half) $std-half;
     line-height: $button-line-height;
     font-size: $button-font-size;
+    right: $nav-width-xs;
+    @include min-screen-tablet {
+        right: $nav-width;
+        top: 0;
+        bottom: auto;
+    }
 
     @media print {
         display: none;

@@ -16,14 +16,19 @@
 
 .reload-section {
     display: flex;
-    flex-flow: row;
+    flex-flow: column;
+    @include min-screen-tablet {
+        flex-flow: row;
+    }
 }
 
 .reload-button,
 .reload-section-version {
     display: inline-block;
-    line-height: 40px;
     letter-spacing: $button-letter-spacing;
+    @include min-screen-tablet {
+        line-height: 40px;
+    }
 }
 
 .reload-button-container {

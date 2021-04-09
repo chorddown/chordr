@@ -7,16 +7,16 @@
     flex-flow: row wrap;
 }
 
-@mixin build-columns($grid-columns) {
-    @include _build-columns-default($grid-columns);
-    @include _build-columns-width($grid-columns);
-    @include _build-grid($grid-columns);
+@mixin build-columns($grid-columns, $screen: '') {
+    @include _build-columns-default($grid-columns, $screen);
+    @include _build-columns-width($grid-columns, $screen);
+    @include _build-grid($grid-columns, $screen);
 }
 
-@mixin _build-columns-default($grid-columns) {
+@mixin _build-columns-default($grid-columns, $screen) {
     $list: "";
     @for $i from 1 through $grid-columns {
-        $list: "#{$list}.col-#{$i}";
+        $list: "#{$list}.col-#{$screen}#{$i}";
         @if $i < $grid-columns {
             $list: "#{$list},"
         }
@@ -29,10 +29,10 @@
     }
 }
 
-@mixin _build-grid($grid-columns) {
+@mixin _build-grid($grid-columns, $screen) {
     $list: "";
     @for $i from 1 through $grid-columns {
-        $list: "#{$list}.col-#{$i}";
+        $list: "#{$list}.col-#{$screen}#{$i}";
         @if $i < $grid-columns {
             $list: "#{$list},"
         }
@@ -45,9 +45,9 @@
     }
 }
 
-@mixin _build-columns-width($grid-columns) {
+@mixin _build-columns-width($grid-columns, $screen) {
     @for $i from 1 through $grid-columns {
-        .col-#{$i} {
+        .col-#{$screen}#{$i} {
             $width: 100%/$grid-columns * $i;
             max-width: $width;
             flex: 0 0 $width;
@@ -56,9 +56,12 @@
 }
 
 .row {
-    @include build-row;
+    @include build-row();
 }
 
 @include build-columns($grid-columns);
 
+@include max-screen-xs {
+    @include build-columns($grid-columns, 'xs-');
+}
 
