@@ -14,6 +14,7 @@ extern crate serde_derive;
 extern crate rocket_contrib;
 
 mod authentication;
+#[deprecated(note = "Use cqrs::prelude::* instead")]
 mod command;
 mod config;
 mod domain;

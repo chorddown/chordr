@@ -1,21 +1,22 @@
-use crate::command::{Command, CommandExecutor};
 use crate::diesel::QueryDsl;
 use crate::domain::user::UserDb;
 use crate::error::SrvError;
 use crate::schema::user::dsl::user as all_users;
+use crate::ConnectionType;
 use diesel::{self, prelude::*};
 
-impl CommandExecutor for &UserDb {
+#[allow(deprecated)]
+impl crate::command::CommandExecutor for &UserDb {
     type Error = SrvError;
 
-    fn add(self, command: Command) -> Result<(), Self::Error> {
+    fn add(self, command: crate::command::Command) -> Result<(), Self::Error> {
         diesel::insert_into(crate::schema::user::table)
             .values(self)
             .execute(command.connection)?;
         Ok(())
     }
 
-    fn update(self, command: Command) -> Result<(), Self::Error> {
+    fn update(self, command: crate::command::Command) -> Result<(), Self::Error> {
         let user_query = all_users.find(&self.username);
         if let Err(_) = user_query.get_result::<UserDb>(command.connection) {
             return Err(SrvError::persistence_error(format!(
@@ -31,25 +32,26 @@ impl CommandExecutor for &UserDb {
         Ok(())
     }
 
-    fn delete(self, command: Command) -> Result<(), Self::Error> {
+    fn delete(self, command: crate::command::Command) -> Result<(), Self::Error> {
         diesel::delete(all_users.find(&self.username)).execute(command.connection)?;
         Ok(())
     }
 }
 
-impl CommandExecutor for UserDb {
+#[allow(deprecated)]
+impl crate::command::CommandExecutor for UserDb {
     type Error = SrvError;
 
-    fn add(self, command: Command) -> Result<(), Self::Error> {
-        CommandExecutor::add(&self, command)
+    fn add(self, command: crate::command::Command) -> Result<(), Self::Error> {
+        crate::command::CommandExecutor::add(&self, command)
     }
 
-    fn update(self, command: Command) -> Result<(), Self::Error> {
-        CommandExecutor::update(&self, command)
+    fn update(self, command: crate::command::Command) -> Result<(), Self::Error> {
+        crate::command::CommandExecutor::update(&self, command)
     }
 
-    fn delete(self, command: Command) -> Result<(), Self::Error> {
-        CommandExecutor::delete(&self, command)
+    fn delete(self, command: crate::command::Command) -> Result<(), Self::Error> {
+        crate::command::CommandExecutor::delete(&self, command)
     }
 }
 
