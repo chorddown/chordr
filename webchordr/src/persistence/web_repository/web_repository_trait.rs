@@ -1,6 +1,6 @@
 use crate::WebError;
 use async_trait::async_trait;
-use libchordr::prelude::RecordIdTrait;
+use libchordr::prelude::RecordTrait;
 
 /// Web Repository provides the functions to manage the persistence of a specific type
 ///
@@ -8,7 +8,7 @@ use libchordr::prelude::RecordIdTrait;
 /// must be implemented
 #[async_trait(? Send)]
 pub trait WebRepositoryTrait {
-    type ManagedType: RecordIdTrait;
+    type ManagedType: RecordTrait;
 
     /// Return the `namespace` part of the storage key
     fn namespace() -> &'static str;

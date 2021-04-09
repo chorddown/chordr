@@ -1,4 +1,4 @@
-use libchordr::prelude::RecordIdTrait;
+use libchordr::prelude::{RecordIdTrait, RecordTrait};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
@@ -7,7 +7,7 @@ pub struct TestValue {
     pub name: String,
 }
 
-impl RecordIdTrait for TestValue {
+impl RecordTrait for TestValue {
     type Id = String;
 
     fn id(self) -> Self::Id {

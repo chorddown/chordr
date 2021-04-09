@@ -2,8 +2,7 @@ use crate::errors::WebError;
 use crate::persistence::backend::BackendTrait;
 use crate::{fetch_with_additional_headers, fetch_with_options_and_additional_headers};
 use async_trait::async_trait;
-use libchordr::models::record_id_trait::RecordIdTrait;
-use libchordr::prelude::Credentials;
+use libchordr::prelude::{Credentials, RecordTrait};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use wasm_bindgen::JsValue;
@@ -69,7 +68,7 @@ impl ServerBackend {
 
 #[async_trait(? Send)]
 impl BackendTrait for ServerBackend {
-    async fn store<T: Serialize + RecordIdTrait, N: AsRef<str>, K: AsRef<str>>(
+    async fn store<T: Serialize + RecordTrait, N: AsRef<str>, K: AsRef<str>>(
         &self,
         namespace: N,
         key: K,

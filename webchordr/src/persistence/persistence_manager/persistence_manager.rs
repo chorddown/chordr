@@ -7,7 +7,7 @@ use crate::lock::Stupex;
 use crate::persistence::backend::BackendTrait;
 use crate::session::Session;
 use async_trait::async_trait;
-use libchordr::prelude::RecordIdTrait;
+use libchordr::prelude::RecordTrait;
 use log::{error, warn};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
@@ -36,7 +36,7 @@ impl<CB: BackendTrait, SB: BackendTrait, TB: BackendTrait> PersistenceManager<CB
         }
     }
 
-    async fn store_on_client<T: Serialize + RecordIdTrait>(
+    async fn store_on_client<T: Serialize + RecordTrait>(
         &self,
         namespace: &str,
         key: &str,
@@ -50,7 +50,7 @@ impl<CB: BackendTrait, SB: BackendTrait, TB: BackendTrait> PersistenceManager<CB
             .await
     }
 
-    async fn store_on_server<T: Serialize + RecordIdTrait>(
+    async fn store_on_server<T: Serialize + RecordTrait>(
         &self,
         namespace: &str,
         key: &str,
@@ -134,7 +134,7 @@ impl<CB: BackendTrait, SB: BackendTrait, TB: BackendTrait> PersistenceManager<CB
 impl<CB: BackendTrait, SB: BackendTrait, TB: BackendTrait> BackendTrait
     for PersistenceManager<CB, SB, TB>
 {
-    async fn store<T: Serialize + RecordIdTrait, N: AsRef<str>, K: AsRef<str>>(
+    async fn store<T: Serialize + RecordTrait, N: AsRef<str>, K: AsRef<str>>(
         &self,
         namespace: N,
         key: K,

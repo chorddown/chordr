@@ -8,7 +8,7 @@ use crate::schema::user;
 use crate::traits::{FromHeader, FromHeaderResult};
 use crate::DbConn;
 use diesel::Identifiable;
-use libchordr::prelude::{Credentials, Password, RecordIdTrait, User, Username};
+use libchordr::prelude::{Credentials, Password, RecordTrait, User, Username};
 use rocket::http::Status;
 use rocket::request::FromRequest;
 use rocket::request::Outcome;
@@ -51,7 +51,7 @@ impl TryInto<User> for UserDb {
     }
 }
 
-impl RecordIdTrait for UserDb {
+impl RecordTrait for UserDb {
     type Id = String;
 
     fn id(self) -> Self::Id {

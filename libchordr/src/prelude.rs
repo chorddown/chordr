@@ -23,7 +23,9 @@ pub use crate::models::chord::fmt::Formatting;
 pub use crate::models::file_type::FileType;
 pub use crate::models::list::*;
 pub use crate::models::meta::{BNotation, MetaTrait, SemitoneNotation};
+#[allow(deprecated)]
 pub use crate::models::record_id_trait::RecordIdTrait;
+pub use crate::models::record_trait::RecordTrait;
 pub use crate::models::setlist::{Setlist, SetlistCollection, SetlistEntry};
 pub use crate::models::song::Song;
 pub use crate::models::song_data::SongData;

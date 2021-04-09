@@ -1,4 +1,4 @@
-use crate::models::record_id_trait::RecordIdTrait;
+use crate::models::record_trait::RecordTrait;
 use crate::models::song_id::SongId;
 use crate::models::song_settings::SongSettings;
 use serde::{Deserialize, Serialize};
@@ -28,7 +28,7 @@ impl Default for SongSettingsMap {
     }
 }
 
-impl RecordIdTrait for SongSettingsMap {
+impl RecordTrait for SongSettingsMap {
     type Id = &'static str;
 
     fn id(self) -> Self::Id {

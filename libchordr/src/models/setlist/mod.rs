@@ -9,7 +9,7 @@ use crate::models::song_id::SongId;
 use crate::models::song_list::{SongList, SongListTrait};
 use crate::models::team::Team;
 use crate::models::user::User;
-use crate::prelude::RecordIdTrait;
+use crate::prelude::RecordTrait;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::ops;
@@ -183,7 +183,7 @@ impl AsRef<Setlist> for Setlist {
     }
 }
 
-impl RecordIdTrait for Setlist {
+impl RecordTrait for Setlist {
     type Id = i32;
 
     fn id(self) -> Self::Id {

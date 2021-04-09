@@ -4,7 +4,7 @@ pub use self::catalog_trait::CatalogTrait;
 use crate::models::list::ListEntryTrait;
 use crate::models::song::Song;
 use crate::models::song_id::SongId;
-use crate::prelude::RecordIdTrait;
+use crate::prelude::RecordTrait;
 use serde::{Deserialize, Serialize};
 use std::slice::Iter;
 
@@ -46,7 +46,7 @@ impl CatalogTrait<Song> for Catalog {
     }
 }
 
-impl RecordIdTrait for Catalog {
+impl RecordTrait for Catalog {
     type Id = String;
 
     fn id(self) -> Self::Id {

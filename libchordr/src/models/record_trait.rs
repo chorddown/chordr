@@ -3,8 +3,7 @@ use std::hash::Hash;
 /// Trait for struct's that have a unique identifier
 ///
 /// See also http://docs.diesel.rs/diesel/associations/trait.Identifiable.html
-#[deprecated(note = "use RecordTrait")]
-pub trait RecordIdTrait {
+pub trait RecordTrait {
     /// The type of this struct's identifier
     ///
     /// For single-field primary keys, this is typically `&'a i32`, or `&'a String`
@@ -20,13 +19,12 @@ pub trait RecordIdTrait {
     /// We could not return `&(String, String)` if each string is a separate field.
     ///
     /// Because of Rust's rules about specifying lifetimes,
-    /// this means that `RecordIdTrait` is usually implemented on references
+    /// this means that `RecordTrait` is usually implemented on references
     /// so that we have a lifetime to use for `Id`.
     fn id(self) -> Self::Id;
 }
 
-#[allow(deprecated)]
-impl RecordIdTrait for i32 {
+impl RecordTrait for i32 {
     type Id = i32;
 
     fn id(self) -> Self::Id {

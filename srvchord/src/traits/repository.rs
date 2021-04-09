@@ -1,10 +1,10 @@
 use crate::ConnectionType;
-use libchordr::prelude::RecordIdTrait;
+use libchordr::prelude::RecordTrait;
 
 pub type Count = i64;
 
 pub trait RepositoryTrait {
-    type ManagedType: RecordIdTrait;
+    type ManagedType: RecordTrait;
     type Error;
 
     /// Find all instances of `ManagedType` in the `Repository`
@@ -17,7 +17,7 @@ pub trait RepositoryTrait {
     fn find_by_id(
         &self,
         connection: &ConnectionType,
-        id: <Self::ManagedType as RecordIdTrait>::Id,
+        id: <Self::ManagedType as RecordTrait>::Id,
     ) -> Result<Self::ManagedType, Self::Error>;
 
     /// Add the instance of `ManagedType` to the `Repository`

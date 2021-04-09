@@ -1,6 +1,6 @@
 use crate::errors::WebError;
 use async_trait::async_trait;
-use libchordr::prelude::RecordIdTrait;
+use libchordr::prelude::RecordTrait;
 use serde::{Deserialize, Serialize};
 
 /// Trait for a persistent data Backend.
@@ -12,7 +12,7 @@ pub trait BackendTrait {
     /// Store `value` with the given `key` in the `namespace`
     ///
     /// `value` will be serialized before it is stored
-    async fn store<T: Serialize + RecordIdTrait, N: AsRef<str>, K: AsRef<str>>(
+    async fn store<T: Serialize + RecordTrait, N: AsRef<str>, K: AsRef<str>>(
         &self,
         namespace: N,
         key: K,
@@ -36,8 +36,8 @@ pub trait BackendTrait {
     //     identifier: I,
     // ) -> Result<Option<T>, WebError>
     // where
-    //     I: Into<<T as RecordIdTrait>::Id>,
-    //     T: for<'a> Deserialize<'a> + RecordIdTrait,
+    //     I: Into<<T as RecordTrait>::Id>,
+    //     T: for<'a> Deserialize<'a> + RecordTrait,
     // {
     //     self.load(namespace, key).await
     //     // Err(WebError::custom_error("f"))

@@ -1,10 +1,10 @@
 use crate::errors::{PersistenceError, WebError};
 use crate::persistence::backend::BackendTrait;
 use async_trait::async_trait;
-use libchordr::models::record_id_trait::RecordIdTrait;
 use serde::{Deserialize, Serialize};
 use std::cell::RefCell;
 use std::collections::HashMap;
+use libchordr::prelude::RecordTrait;
 
 pub struct TransientBackend {
     map: RefCell<HashMap<String, String>>,
@@ -20,7 +20,7 @@ impl TransientBackend {
 
 #[async_trait(? Send)]
 impl BackendTrait for TransientBackend {
-    async fn store<T: Serialize + RecordIdTrait, N: AsRef<str>, K: AsRef<str>>(
+    async fn store<T: Serialize + RecordTrait, N: AsRef<str>, K: AsRef<str>>(
         &self,
         namespace: N,
         key: K,

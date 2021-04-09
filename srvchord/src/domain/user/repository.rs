@@ -7,7 +7,7 @@ use crate::schema::user::dsl::user as all_users;
 use crate::traits::*;
 use crate::ConnectionType;
 use diesel::{self, prelude::*};
-use libchordr::prelude::RecordIdTrait;
+use libchordr::prelude::RecordTrait;
 
 pub struct UserRepository {}
 
@@ -42,7 +42,7 @@ impl RepositoryTrait for UserRepository {
     fn find_by_id(
         &self,
         connection: &ConnectionType,
-        id: <UserDb as RecordIdTrait>::Id,
+        id: <UserDb as RecordTrait>::Id,
     ) -> Result<Self::ManagedType, Self::Error> {
         Ok(all_users.find(id).get_result::<UserDb>(connection)?)
     }

@@ -10,7 +10,7 @@ use crate::schema::setlist::dsl::setlist as all_setlists;
 use crate::traits::*;
 use crate::ConnectionType;
 use diesel::{self, prelude::*};
-use libchordr::prelude::{RecordIdTrait, Setlist, Team, User, Username};
+use libchordr::prelude::{RecordTrait, Setlist, Team, User, Username};
 
 pub struct SetlistRepository {}
 
@@ -155,7 +155,7 @@ impl RepositoryTrait for SetlistRepository {
     fn find_by_id(
         &self,
         connection: &ConnectionType,
-        id: <Setlist as RecordIdTrait>::Id,
+        id: <Setlist as RecordTrait>::Id,
     ) -> Result<Self::ManagedType, Self::Error> {
         match all_setlists.find(id).get_result::<SetlistDb>(connection) {
             Ok(setlist_db_instance) => {
