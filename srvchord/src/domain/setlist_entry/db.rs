@@ -3,6 +3,7 @@ use crate::error::SrvError;
 use crate::schema::setlist_entry;
 use crate::schema::setlist_entry::dsl::setlist_entry as setlist_entries;
 use crate::ConnectionType;
+use chrono::NaiveDateTime;
 use diesel::{self, prelude::*};
 use libchordr::models::file_type::FileType;
 use libchordr::models::list::ListEntryTrait;
@@ -23,6 +24,7 @@ pub struct SetlistDbEntry {
     pub title: Option<String>,
     pub settings: Option<String>,
     pub setlist_db_id: i32,
+    pub modification_date: Option<NaiveDateTime>,
 }
 
 impl SetlistDbEntry {
@@ -53,6 +55,7 @@ impl SetlistDbEntry {
             title: Some(entry.title()),
             settings: entry.settings().map(|s| serialize_song_settings(&s)),
             setlist_db_id: setlist_db.id,
+            modification_date: None,
         }
     }
 }
