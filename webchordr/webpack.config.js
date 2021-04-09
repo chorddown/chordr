@@ -42,6 +42,7 @@ module.exports = (env, argv) => {
         {from: './static', to: distPath}
       ]),
       new WasmPackPlugin({
+        forceMode: 'production',
         crateDirectory: ".",
         withTypeScript: true
       }),
@@ -77,6 +78,9 @@ module.exports = (env, argv) => {
         ]
       })
     ],
-    watch: argv.mode !== 'production'
+    watch: argv.mode !== 'production',
+    watchOptions: {
+      aggregateTimeout: 3000
+    }
   };
 };
