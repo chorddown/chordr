@@ -3,7 +3,6 @@ use crate::errors::PersistenceError;
 use crate::persistence::persistence_manager::PersistenceManagerTrait;
 use crate::{fetch, WebError};
 use async_trait::async_trait;
-use js_sys::Date;
 use libchordr::prelude::Catalog;
 use wasm_bindgen::__rt::core::marker::PhantomData;
 
@@ -19,18 +18,6 @@ where
         Self {
             _phantom: PhantomData,
         }
-    }
-
-    async fn load_catalog(no_cache: bool) -> Result<Option<Catalog>, WebError> {
-        let uri_base = "/catalog.json".to_owned();
-        let uri = if no_cache {
-            format!("{}?{}", uri_base, Date::now())
-        } else {
-            uri_base
-        };
-
-        let catalog = fetch::<Catalog>(&uri).await?;
-        Ok(Some(catalog))
     }
 }
 
@@ -54,9 +41,7 @@ where
     }
 
     async fn load(&mut self) -> Result<Option<Self::ManagedType>, WebError> {
-        match <CatalogWebRepository<'a, P>>::load_catalog(true).await {
-            Ok(r) => Ok(r),
-            Err(_) => <CatalogWebRepository<'a, P>>::load_catalog(false).await,
-        }
+        let catalog = fetch::<Catalog>("/catalog.json").await?;
+        Ok(Some(catalog))
     }
 }
