@@ -1,10 +1,12 @@
-use super::file_type::FileType;
-use super::song_data::SongData;
-use super::song_id::SongId;
+use serde::{Deserialize, Serialize};
+
 use crate::models::list::ListEntryTrait;
 use crate::models::meta::*;
 use crate::models::song_id::SongIdTrait;
-use serde::{Deserialize, Serialize};
+
+use super::file_type::FileType;
+use super::song_data::SongData;
+use super::song_id::SongId;
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
 pub struct SongMeta {
@@ -25,6 +27,8 @@ pub struct SongMeta {
     tempo: Option<String>,
     duration: Option<String>,
     capo: Option<String>,
+    alternative_title: Option<String>,
+    ccli_song_id: Option<String>,
     b_notation: BNotation,
 }
 
@@ -46,6 +50,8 @@ impl SongMeta {
             tempo: None,
             duration: None,
             capo: None,
+            alternative_title: None,
+            ccli_song_id: None,
             b_notation: Default::default(),
         }
     }
@@ -72,6 +78,8 @@ impl SongMeta {
             tempo: meta.tempo(),
             duration: meta.duration(),
             capo: meta.capo(),
+            alternative_title: meta.alternative_title(),
+            ccli_song_id: meta.ccli_song_id(),
             b_notation: meta.b_notation(),
         }
     }
@@ -128,6 +136,14 @@ impl MetaTrait for SongMeta {
 
     fn capo(&self) -> Option<String> {
         self.capo.as_ref().cloned()
+    }
+
+    fn alternative_title(&self) -> Option<String> {
+        self.alternative_title.as_ref().cloned()
+    }
+
+    fn ccli_song_id(&self) -> Option<String> {
+        self.ccli_song_id.as_ref().cloned()
     }
 
     fn b_notation(&self) -> BNotation {

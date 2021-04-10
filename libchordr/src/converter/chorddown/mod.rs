@@ -1,10 +1,11 @@
-use super::ConverterTrait;
 use crate::error::Result;
 use crate::models::chord::fmt::*;
 use crate::models::chord::Chords;
 use crate::models::meta::MetaTrait;
 use crate::parser::Node;
 use crate::tokenizer::Token;
+
+use super::ConverterTrait;
 
 pub struct ChorddownConverter {}
 
@@ -97,6 +98,9 @@ impl ChorddownConverter {
         if let Some(v) = meta.subtitle() {
             buffer.push(format!("Subtitle: {}", v))
         }
+        if let Some(v) = meta.alternative_title() {
+            buffer.push(format!("Alternative Title: {}", v))
+        }
         if let Some(v) = meta.artist() {
             buffer.push(format!("Artist: {}", v))
         }
@@ -129,6 +133,9 @@ impl ChorddownConverter {
         }
         if let Some(v) = meta.capo() {
             buffer.push(format!("Capo: {}", v))
+        }
+        if let Some(v) = meta.ccli_song_id() {
+            buffer.push(format!("CCLI Song ID: {}", v))
         }
         //        meta.b_notation()  // -> BNotation;
         buffer.join("\n")
@@ -172,13 +179,14 @@ fn remove_double_blank_lines(input: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::format::Format;
     use crate::parser::MetaInformation;
     use crate::test_helpers::get_test_metadata;
     use crate::test_helpers::{
         get_test_ast, get_test_ast_w_inline_metadata, get_test_ast_with_quote,
     };
+
+    use super::*;
 
     #[test]
     fn test_convert() {

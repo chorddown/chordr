@@ -18,6 +18,8 @@ pub struct MetaInformation {
     pub tempo: Option<String>,
     pub duration: Option<String>,
     pub capo: Option<String>,
+    pub alternative_title: Option<String>,
+    pub ccli_song_id: Option<String>,
     pub b_notation: BNotation,
 }
 
@@ -37,6 +39,8 @@ impl MetaInformation {
             Meta::Tempo(content) => self.tempo = Some(content.clone()),
             Meta::Duration(content) => self.duration = Some(content.clone()),
             Meta::Capo(content) => self.capo = Some(content.clone()),
+            Meta::AlternativeTitle(content) => self.alternative_title = Some(content.clone()),
+            Meta::CCLISongId(content) => self.ccli_song_id = Some(content.clone()),
             Meta::BNotation(notation) => self.b_notation = *notation,
         }
     }
@@ -95,6 +99,14 @@ impl SongMetaTrait for MetaInformation {
         self.capo.as_ref().cloned()
     }
 
+    fn alternative_title(&self) -> Option<String> {
+        self.alternative_title.as_ref().cloned()
+    }
+
+    fn ccli_song_id(&self) -> Option<String> {
+        self.ccli_song_id.as_ref().cloned()
+    }
+
     fn b_notation(&self) -> BNotation {
         self.b_notation
     }
@@ -116,6 +128,8 @@ impl Default for MetaInformation {
             tempo: None,
             duration: None,
             capo: None,
+            alternative_title: None,
+            ccli_song_id: None,
             b_notation: Default::default(),
         }
     }

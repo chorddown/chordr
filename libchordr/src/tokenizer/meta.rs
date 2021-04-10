@@ -1,5 +1,6 @@
-use crate::models::meta::BNotation;
 use std::convert::TryFrom;
+
+use crate::models::meta::BNotation;
 
 /// Meta information gathered during tokenization
 ///
@@ -19,6 +20,8 @@ pub enum Meta {
     Tempo(String),
     Duration(String),
     Capo(String),
+    AlternativeTitle(String),
+    CCLISongId(String),
     BNotation(BNotation),
 }
 
@@ -38,6 +41,8 @@ impl Meta {
             "duration" => Some(Self::duration(content)),
             "subtitle" => Some(Self::subtitle(content)),
             "capo" => Some(Self::capo(content)),
+            "alternative-title" | "alternative title" => Some(Self::alternative_title(content)),
+            "ccli song #" | "ccli song" | "ccli song id" => Some(Self::ccli_song_id(content)),
             "bnotation" | "b_notation" | "b notation" | "b-notation" => {
                 Some(Self::b_notation(content))
             }
@@ -59,6 +64,8 @@ impl Meta {
             Self::Duration(_) => "Duration",
             Self::Subtitle(_) => "Subtitle",
             Self::Capo(_) => "Capo",
+            Self::AlternativeTitle(_) => "Alternative Title",
+            Self::CCLISongId(_) => "CCLI Song #",
             Self::BNotation(_) => "B-Notation",
         }
     }
@@ -77,6 +84,8 @@ impl Meta {
             Self::Duration(c) => c,
             Self::Subtitle(c) => c,
             Self::Capo(c) => c,
+            Self::AlternativeTitle(c) => c,
+            Self::CCLISongId(c) => c,
             Self::BNotation(c) => c.as_str(),
         }
     }
@@ -127,6 +136,14 @@ impl Meta {
 
     pub fn capo<S: Into<String>>(content: S) -> Self {
         Self::Capo(content.into())
+    }
+
+    pub fn alternative_title<S: Into<String>>(content: S) -> Self {
+        Self::AlternativeTitle(content.into())
+    }
+
+    pub fn ccli_song_id<S: Into<String>>(content: S) -> Self {
+        Self::CCLISongId(content.into())
     }
 
     pub fn b_notation<S: AsRef<str>>(content: S) -> Self {

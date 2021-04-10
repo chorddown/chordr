@@ -237,6 +237,8 @@ pub fn get_test_metadata() -> MetaInformation {
         tempo: None,
         duration: None,
         capo: Some("1".to_owned()),
+        alternative_title: None,
+        ccli_song_id: None,
         b_notation: BNotation::B,
     }
 }

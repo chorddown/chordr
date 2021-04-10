@@ -15,6 +15,8 @@ pub trait MetaTrait: Debug {
     fn tempo(&self) -> Option<String>;
     fn duration(&self) -> Option<String>;
     fn capo(&self) -> Option<String>;
+    fn alternative_title(&self) -> Option<String>;
+    fn ccli_song_id(&self) -> Option<String>;
     fn b_notation(&self) -> BNotation;
 }
 
