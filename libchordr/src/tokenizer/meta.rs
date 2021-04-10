@@ -7,6 +7,7 @@ use std::convert::TryFrom;
 /// will be determined by the Parser
 #[derive(Clone, Debug, PartialOrd, PartialEq)]
 pub enum Meta {
+    Subtitle(String),
     Artist(String),
     Composer(String),
     Lyricist(String),
@@ -35,6 +36,7 @@ impl Meta {
             "time" => Some(Self::time(content)),
             "tempo" => Some(Self::tempo(content)),
             "duration" => Some(Self::duration(content)),
+            "subtitle" => Some(Self::subtitle(content)),
             "capo" => Some(Self::capo(content)),
             "bnotation" | "b_notation" | "b notation" | "b-notation" => {
                 Some(Self::b_notation(content))
@@ -55,6 +57,7 @@ impl Meta {
             Self::Time(_) => "Time",
             Self::Tempo(_) => "Tempo",
             Self::Duration(_) => "Duration",
+            Self::Subtitle(_) => "Subtitle",
             Self::Capo(_) => "Capo",
             Self::BNotation(_) => "B-Notation",
         }
@@ -72,6 +75,7 @@ impl Meta {
             Self::Time(c) => c,
             Self::Tempo(c) => c,
             Self::Duration(c) => c,
+            Self::Subtitle(c) => c,
             Self::Capo(c) => c,
             Self::BNotation(c) => c.as_str(),
         }
@@ -115,6 +119,10 @@ impl Meta {
 
     pub fn duration<S: Into<String>>(content: S) -> Self {
         Self::Duration(content.into())
+    }
+
+    pub fn subtitle<S: Into<String>>(content: S) -> Self {
+        Self::Subtitle(content.into())
     }
 
     pub fn capo<S: Into<String>>(content: S) -> Self {

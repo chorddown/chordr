@@ -25,6 +25,7 @@ impl MetaInformation {
     /// Copy the Meta content into the appropriate field
     pub(crate) fn assign_from_token(&mut self, t: &Meta) {
         match t {
+            Meta::Subtitle(content) => self.subtitle = Some(content.clone()),
             Meta::Artist(content) => self.artist = Some(content.clone()),
             Meta::Composer(content) => self.composer = Some(content.clone()),
             Meta::Lyricist(content) => self.lyricist = Some(content.clone()),
