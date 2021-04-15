@@ -98,6 +98,9 @@ impl ChorddownConverter {
         if let Some(v) = meta.subtitle() {
             buffer.push(format!("Subtitle: {}", v))
         }
+        if let Some(v) = meta.original_title() {
+            buffer.push(format!("Original Title: {}", v))
+        }
         if let Some(v) = meta.alternative_title() {
             buffer.push(format!("Alternative Title: {}", v))
         }

@@ -35,21 +35,28 @@ impl HtmlConverter {
             r"<!--
 Meta
 
-Title:      {}
-Subtitle:   {}
-Artist:     {}
-Composer:   {}
-Lyricist:   {}
-Copyright:  {}
-Album:      {}
-Year:       {}
-Key:        {}
-Time:       {}
-Tempo:      {}
-Duration:   {}
-Capo:       {}
+Title:              {}
+Original Title:     {}
+Alternative Title:  {}
+Subtitle:           {}
+Artist:             {}
+Composer:           {}
+Lyricist:           {}
+Copyright:          {}
+Album:              {}
+Year:               {}
+Key:                {}
+Time:               {}
+Tempo:              {}
+Duration:           {}
+Capo:               {}
+CCLI Song #         {}
 -->",
             meta.title().unwrap_or_else(|| none_text.to_owned()),
+            meta.original_title()
+                .unwrap_or_else(|| none_text.to_owned()),
+            meta.alternative_title()
+                .unwrap_or_else(|| none_text.to_owned()),
             meta.subtitle().unwrap_or_else(|| none_text.to_owned()),
             meta.artist().unwrap_or_else(|| none_text.to_owned()),
             meta.composer().unwrap_or_else(|| none_text.to_owned()),
@@ -62,6 +69,7 @@ Capo:       {}
             meta.tempo().unwrap_or_else(|| none_text.to_owned()),
             meta.duration().unwrap_or_else(|| none_text.to_owned()),
             meta.capo().unwrap_or_else(|| none_text.to_owned()),
+            meta.ccli_song_id().unwrap_or_else(|| none_text.to_owned()),
         )
     }
 }

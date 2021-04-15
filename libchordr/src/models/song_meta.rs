@@ -27,6 +27,7 @@ pub struct SongMeta {
     tempo: Option<String>,
     duration: Option<String>,
     capo: Option<String>,
+    original_title: Option<String>,
     alternative_title: Option<String>,
     ccli_song_id: Option<String>,
     b_notation: BNotation,
@@ -50,6 +51,7 @@ impl SongMeta {
             tempo: None,
             duration: None,
             capo: None,
+            original_title: None,
             alternative_title: None,
             ccli_song_id: None,
             b_notation: Default::default(),
@@ -78,6 +80,7 @@ impl SongMeta {
             tempo: meta.tempo(),
             duration: meta.duration(),
             capo: meta.capo(),
+            original_title: meta.original_title(),
             alternative_title: meta.alternative_title(),
             ccli_song_id: meta.ccli_song_id(),
             b_notation: meta.b_notation(),
@@ -136,6 +139,10 @@ impl MetaTrait for SongMeta {
 
     fn capo(&self) -> Option<String> {
         self.capo.as_ref().cloned()
+    }
+
+    fn original_title(&self) -> Option<String> {
+        self.original_title.as_ref().cloned()
     }
 
     fn alternative_title(&self) -> Option<String> {

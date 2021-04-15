@@ -20,6 +20,7 @@ pub enum Meta {
     Tempo(String),
     Duration(String),
     Capo(String),
+    OriginalTitle(String),
     AlternativeTitle(String),
     CCLISongId(String),
     BNotation(BNotation),
@@ -41,6 +42,9 @@ impl Meta {
             "duration" => Some(Self::duration(content)),
             "subtitle" => Some(Self::subtitle(content)),
             "capo" => Some(Self::capo(content)),
+            "original-title" | "original title" | "originaltitle" => {
+                Some(Self::original_title(content))
+            }
             "alternative-title" | "alternative title" => Some(Self::alternative_title(content)),
             "ccli song #" | "ccli song" | "ccli song id" => Some(Self::ccli_song_id(content)),
             "bnotation" | "b_notation" | "b notation" | "b-notation" => {
@@ -64,6 +68,7 @@ impl Meta {
             Self::Duration(_) => "Duration",
             Self::Subtitle(_) => "Subtitle",
             Self::Capo(_) => "Capo",
+            Self::OriginalTitle(_) => "Original Title",
             Self::AlternativeTitle(_) => "Alternative Title",
             Self::CCLISongId(_) => "CCLI Song #",
             Self::BNotation(_) => "B-Notation",
@@ -84,6 +89,7 @@ impl Meta {
             Self::Duration(c) => c,
             Self::Subtitle(c) => c,
             Self::Capo(c) => c,
+            Self::OriginalTitle(c) => c,
             Self::AlternativeTitle(c) => c,
             Self::CCLISongId(c) => c,
             Self::BNotation(c) => c.as_str(),
@@ -136,6 +142,10 @@ impl Meta {
 
     pub fn capo<S: Into<String>>(content: S) -> Self {
         Self::Capo(content.into())
+    }
+
+    pub fn original_title<S: Into<String>>(content: S) -> Self {
+        Self::OriginalTitle(content.into())
     }
 
     pub fn alternative_title<S: Into<String>>(content: S) -> Self {
