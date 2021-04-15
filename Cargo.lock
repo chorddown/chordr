@@ -1432,7 +1432,7 @@ checksum = "bd7d4bd64732af4bf3a67f367c27df8520ad7e230c5817b8ff485864d80242b9"
 
 [[package]]
 name = "libchordr"
-version = "0.1.0"
+version = "0.1.11"
 dependencies = [
  "chrono",
  "encoding",
@@ -3637,7 +3637,7 @@ dependencies = [
 
 [[package]]
 name = "webchordr"
-version = "0.1.9"
+version = "0.1.11"
 dependencies = [
  "async-trait",
  "base64 0.12.3",
