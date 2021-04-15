@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-cd $(dirname $0);
+cd $(dirname $0)
 
-if [[ "$1" == "" ]];then
-  echo "[ERROR] Missing argument 1 'rsync target'";
-  exit 1;
+if [[ "$1" == "" ]]; then
+  echo "[ERROR] Missing argument 1 'rsync target'"
+  exit 1
 fi
 
 echo "[TASK] Build the catalog"
@@ -12,12 +12,17 @@ cargo run --bin chordr -- build-catalog webchordr/static/songs webchordr/static/
 
 echo "[TASK] Create deploy-build"
 pushd webchordr
-if hash yarn 2>/dev/null; then
-  yarn build
+if [[ $* == *--dev* ]]; then
+  command="build:dev"
 else
-  npm run build
+  command="build"
+fi
+if hash yarn 2>/dev/null; then
+  yarn ${command}
+else
+  npm run ${command}
 fi
 popd
 
 echo "[TASK] Upload to $1"
-rsync --progress -rzu webchordr/dist/ $1
+rsync -i --exclude '*.scss' -rzu webchordr/dist/ $1

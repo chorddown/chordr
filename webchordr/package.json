@@ -4,6 +4,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "webpack --mode development",
     "build": "webpack --mode production",
+    "build:dev": "webpack --mode development",
     "start:dev": "webpack-dev-server --mode development",
     "build:stylesheets": "sassc --sourcemap=auto static/stylesheets/chordr-app.scss static/stylesheets/chordr-app.css"
   },
