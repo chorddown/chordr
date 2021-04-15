@@ -52,7 +52,7 @@ module.exports = (env, argv) => {
         clientsClaim: true,
         skipWaiting: true,
         cacheId: 'net.chordr',
-        exclude: ['static/songs/.*', /songs/, /.*\.scss/],
+        exclude: ['static/songs/.*', /songs/, /.*\.scss/, 'catalog.json'],
         maximumFileSizeToCacheInBytes: 50 * 1024 * 1024,
         runtimeCaching: [
           {
@@ -78,7 +78,6 @@ module.exports = (env, argv) => {
         ]
       })
     ],
-    watch: argv.mode !== 'production',
     watchOptions: {
       aggregateTimeout: 3000
     }
