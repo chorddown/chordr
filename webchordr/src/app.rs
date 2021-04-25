@@ -1,3 +1,13 @@
+use std::rc::Rc;
+
+use log::{debug, error, info};
+use percent_encoding::percent_decode_str;
+use serde::{Deserialize, Serialize};
+use yew::{html, Callback, Component, ComponentLink, Html, Properties, ShouldRender};
+use yew_router::prelude::*;
+
+use libchordr::prelude::*;
+
 use crate::components::nav::Nav;
 use crate::components::reload_section::ReloadSection;
 use crate::components::setlist::SetlistLoad;
@@ -13,13 +23,6 @@ use crate::route::{AppRoute, SetlistRoute, UserRoute};
 use crate::session::Session;
 use crate::state::{SongInfo, State};
 use crate::WebError;
-use libchordr::prelude::*;
-use log::{debug, error, info};
-use percent_encoding::percent_decode_str;
-use serde::{Deserialize, Serialize};
-use std::rc::Rc;
-use yew::{html, Callback, Component, ComponentLink, Html, Properties, ShouldRender};
-use yew_router::prelude::*;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct AppRouteState {}
@@ -57,7 +60,10 @@ pub enum Msg {
 
 impl App {
     fn route(&self) -> Html {
-        (match AppRoute::switch(self.route.clone()) {
+        let app_route = AppRoute::switch(self.route.clone());
+        debug!("Render Route: {:?}", app_route);
+
+        (match app_route {
             Some(AppRoute::Song(id)) => self.view_song(id),
             Some(AppRoute::SongBrowser(chars)) => self.view_song_browser(chars),
             Some(AppRoute::SongSearch) => self.view_song_search(true),
@@ -101,12 +107,8 @@ impl App {
                     Box::new(SetlistEvent::SettingsChange(s.0, s.1).into()),
                 )
             });
-            let is_on_setlist = if let Some(ref setlist) = state.current_setlist() {
-                setlist.contains_id(song_id.clone())
-            } else {
-                false
-            };
-            debug!("Song {} is on list? {}", song_id, is_on_setlist);
+            assert_eq!(song_id, song_info.song.id());
+            debug!("Song {} is on list? {}", song_id, song_info.is_on_setlist);
 
             return self.compose(
                 html! {
@@ -129,7 +131,10 @@ impl App {
                 if &decoded != song_id.as_str() {
                     self.view_song(SongId::new(decoded))
                 } else {
-                    html! {}
+                    self.compose(
+                        html! {<h1>{format!("Could not find song {}", song_id)}</h1>},
+                        self.view_nav(Some(song_id)),
+                    )
                 }
             }
             Err(e) => {
@@ -140,10 +145,16 @@ impl App {
     }
 
     fn get_song_info(&self, song_id: &SongId) -> Option<SongInfo> {
+        let is_on_setlist = if let Some(ref setlist) = self.props.state.current_setlist() {
+            setlist.contains_id(song_id.clone())
+        } else {
+            false
+        };
+
         Some(SongInfo {
             song: self.get_song(song_id)?,
             song_settings: self.get_settings_for_song(song_id),
-            is_on_setlist: false,
+            is_on_setlist,
         })
     }
 
@@ -156,6 +167,7 @@ impl App {
         let catalog = state.catalog().unwrap();
         catalog.get(song_id).cloned()
     }
+
     fn get_settings_for_song(&self, song_id: &SongId) -> SongSettings {
         // Look if there are settings for the `SongId` in the `Setlist`
         if let Some(settings) = self.get_settings_from_setlist(song_id) {
@@ -272,12 +284,20 @@ impl App {
         let on_toggle = self.link.callback(|_| Msg::ToggleMenu);
         let on_setlist_change = self.props.on_setlist_change.reform(|i| i);
         let state = self.props.state.clone();
+        let current_song_info = current_song_id.and_then(|s| self.get_song_info(&s));
+        let on_settings_change = self.props.on_event.reform(|s: (SongId, SongSettings)| {
+            Event::Pair(
+                Box::new(SettingsEvent::Change(s.0.clone(), s.1.clone()).into()),
+                Box::new(SetlistEvent::SettingsChange(s.0, s.1).into()),
+            )
+        });
 
         html! {
             <Nav
                 expand=self.expand
-                current_song_id=current_song_id
+                current_song_info=current_song_info
                 on_toggle=on_toggle
+                on_settings_change=on_settings_change
                 on_setlist_change=on_setlist_change
                 state=state
             />

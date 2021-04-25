@@ -1,27 +1,32 @@
+use std::rc::Rc;
+
+use yew::prelude::*;
+
+use libchordr::models::song_list::SongList as SongListModel;
+use libchordr::prelude::{ListEntryTrait, SongId, SongSettings};
+
 // use crate::components::setlist::SetlistShareButton;
 use crate::components::song_list::SongList as SongListView;
+use crate::components::song_view::SongNotes;
 use crate::components::user::NavItem as UserNavButton;
 use crate::events::Event;
-use crate::state::State;
-use libchordr::models::song_list::SongList as SongListModel;
-use libchordr::prelude::SongId;
-use std::rc::Rc;
-use yew::prelude::*;
+use crate::state::{SongInfo, State};
 
 #[derive(Properties, Clone)]
 pub struct NavProps {
     pub expand: bool,
-    pub current_song_id: Option<SongId>,
     pub on_toggle: Callback<()>,
     pub on_setlist_change: Callback<Event>,
+    pub on_settings_change: Callback<(SongId, SongSettings)>,
+    pub current_song_info: Option<SongInfo>,
     pub state: Rc<State>,
 }
 
 impl PartialEq for NavProps {
     fn eq(&self, other: &Self) -> bool {
         self.state == other.state
+            && self.current_song_info == other.current_song_info
             && self.expand == other.expand
-            && self.current_song_id == other.current_song_id
     }
 }
 
@@ -37,13 +42,17 @@ impl Nav {
             None => SongListModel::new(),
         };
         let on_setlist_change = self.props.on_setlist_change.reform(|e| e);
+        let highlighted_song_id = match self.props.current_song_info {
+            Some(ref info) => Some(info.song.id()),
+            None => None,
+        };
 
         html! {
             <SongListView
                 songs=songs
                 on_setlist_change=on_setlist_change
                 sortable=self.props.expand
-                highlighted_song_id=self.props.current_song_id.clone()
+                highlighted_song_id=highlighted_song_id
             />
         }
     }
@@ -84,6 +93,22 @@ impl Nav {
             }
         }) as Html
     }
+
+    fn view_notes_section(&self) -> Html {
+        // TODO: Check if the Song Notes should be hidden if the nav is collapsed
+        // if !self.props.expand {
+        //     return html! {};
+        // }
+
+        (match &self.props.current_song_info {
+            Some(i) => {
+                let on_settings_change = self.props.on_settings_change.reform(|e| e);
+
+                html! {<SongNotes song_info=i on_change=on_settings_change/>}
+            }
+            None => html! {},
+        }) as Html
+    }
 }
 
 impl Component for Nav {
@@ -118,6 +143,7 @@ impl Component for Nav {
         (html! {
             <nav class=menu_classes>
                 { self.view_song_list() }
+                { self.view_notes_section() }
                 { self.view_nav_footer() }
             </nav>
         }) as Html

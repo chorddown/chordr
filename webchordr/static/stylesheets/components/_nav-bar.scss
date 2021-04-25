@@ -31,10 +31,7 @@ nav {
         display: flex;
         flex-flow: column;
         overflow: scroll;
-        height: calc(100vh - #{3 * $nav-button-height + $nav-footer-border-width});
-        @include min-screen-tablet {
-            height: calc(100vh - #{$nav-button-height + $nav-footer-border-width});
-        }
+        height: 50vh;
 
         &:focus,
         & > div:focus {

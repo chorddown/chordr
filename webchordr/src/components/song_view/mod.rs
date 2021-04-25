@@ -13,10 +13,12 @@ use crate::components::song_view::semitone_notation_tool::SemitoneNotationTool;
 use crate::state::SongInfo;
 
 use self::setlist_tool::Setlist;
+pub use self::song_notes::SongNotes;
 use self::transpose_tool::TransposeTool;
 
 mod semitone_notation_tool;
 mod setlist_tool;
+mod song_notes;
 mod transpose_tool;
 
 #[derive(Properties, Clone, Debug)]
