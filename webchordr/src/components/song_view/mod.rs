@@ -35,7 +35,7 @@ pub struct SongViewProps {
 
 impl PartialEq for SongViewProps {
     fn eq(&self, other: &Self) -> bool {
-        self.song_info != other.song_info
+        self.song_info == other.song_info
             && self.enable_setlists == other.enable_setlists
             && self.show_input_field == other.show_input_field
     }
