@@ -11,7 +11,7 @@ use crate::config::Config;
 use crate::events::{Event, SetlistEvent, SettingsEvent};
 use crate::route::{AppRoute, SetlistRoute, UserRoute};
 use crate::session::Session;
-use crate::state::State;
+use crate::state::{SongInfo, State};
 use crate::WebError;
 use libchordr::prelude::*;
 use log::{debug, error, info};
@@ -89,8 +89,7 @@ impl App {
             return html! {};
         }
 
-        let catalog = state.catalog().unwrap();
-        if let Some(song) = catalog.get(song_id.clone()) {
+        if let Some(song_info) = self.get_song_info(&song_id) {
             let add = self.props.on_event.reform(|s| SetlistEvent::Add(s).into());
             let remove = self
                 .props
@@ -107,21 +106,16 @@ impl App {
             } else {
                 false
             };
-
-            let song_settings = self.get_settings_for_song(&song_id);
-
             debug!("Song {} is on list? {}", song_id, is_on_setlist);
 
             return self.compose(
                 html! {
                     <SongView
-                        song=song
-                        song_settings=song_settings
+                        song_info=song_info
                         enable_setlists=true
                         on_setlist_add=add
                         on_setlist_remove=remove
                         on_settings_change=change
-                        is_on_setlist=is_on_setlist
                     />
                 },
                 self.view_nav(Some(song_id)),
@@ -145,6 +139,23 @@ impl App {
         }) as Html
     }
 
+    fn get_song_info(&self, song_id: &SongId) -> Option<SongInfo> {
+        Some(SongInfo {
+            song: self.get_song(song_id)?,
+            song_settings: self.get_settings_for_song(song_id),
+            is_on_setlist: false,
+        })
+    }
+
+    fn get_song(&self, song_id: &SongId) -> Option<Song> {
+        let state = self.props.state.clone();
+        if state.catalog().is_none() {
+            return None;
+        }
+
+        let catalog = state.catalog().unwrap();
+        catalog.get(song_id).cloned()
+    }
     fn get_settings_for_song(&self, song_id: &SongId) -> SongSettings {
         // Look if there are settings for the `SongId` in the `Setlist`
         if let Some(settings) = self.get_settings_from_setlist(song_id) {

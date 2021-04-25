@@ -1,9 +1,11 @@
-use crate::models::list::ListEntryTrait;
-use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::fmt::{Display, Formatter};
 use std::hash::{Hash, Hasher};
 use std::path::Path;
+
+use serde::{Deserialize, Serialize};
+
+use crate::models::list::ListEntryTrait;
 
 /// Trait for objects that have an associated SongId
 pub trait SongIdTrait: ListEntryTrait<Id = SongId> {}
@@ -57,13 +59,19 @@ impl Display for SongId {
     }
 }
 
+impl From<&SongId> for SongId {
+    fn from(song_id: &SongId) -> Self {
+        song_id.clone()
+    }
+}
+
 impl From<&Path> for SongId {
     fn from(path: &Path) -> Self {
         SongId::new(path.file_name().unwrap().to_str().unwrap().to_owned())
     }
 }
 
-impl ::std::convert::From<&str> for SongId {
+impl From<&str> for SongId {
     fn from(input: &str) -> Self {
         SongId::new(input.to_owned())
     }

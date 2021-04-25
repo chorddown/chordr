@@ -1,9 +1,14 @@
-use crate::connection::ConnectionStatus;
-use crate::session::Session;
+use std::rc::Rc;
+
 use libchordr::models::catalog::Catalog;
 use libchordr::models::setlist::Setlist;
 use libchordr::prelude::SongSettingsMap;
-use std::rc::Rc;
+pub use song_info::SongInfo;
+
+use crate::connection::ConnectionStatus;
+use crate::session::Session;
+
+mod song_info;
 
 #[allow(unused)]
 #[derive(Debug, Clone, PartialEq)]
