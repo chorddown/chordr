@@ -32,6 +32,7 @@ pub struct Handler {
     /// Keep a reference to the IntervalTask so that it doesn't get dropped
     _clock_handle: IntervalTask,
     link: ComponentLink<Handler>,
+    #[allow(unused)]
     fetching: bool,
     config: Config,
     session_service: Rc<SessionService>,
