@@ -20,10 +20,35 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
-          override: true
+      #          override: true
       - name: Install openssl
         run: sudo apt-get install libssl-dev
-      - name: Build
-        run: cargo build --verbose
-      - name: Run tests
-        run: cargo test --verbose
+      - name: Build libchordr
+        run: cargo build --verbose -p libchordr
+      - name: Build srvchord
+        run: cargo +nightly build --verbose -p srvchord
+      - name: Build cqrs
+        run: cargo build --verbose -p cqrs
+      - name: Build webchordr
+        run: cargo build --verbose -p webchordr
+      - name: Build runner
+        run: cargo build --verbose -p chordr-runner
+      - name: Build synchord
+        run: cargo build --verbose -p synchord
+      - name: Build chordr
+        run: cargo build --verbose -p chordr
+
+      - name: Run libchordr tests
+        run: cargo test --verbose -p libchordr
+      - name: Run srvchord tests
+        run: cargo +nightly test --verbose -p srvchord
+      - name: Run cqrs tests
+        run: cargo test --verbose -p cqrs
+      - name: Run webchordr tests
+        run: cargo test --verbose -p webchordr
+      - name: Run runner tests
+        run: cargo test --verbose -p chordr-runner
+      - name: Run synchord tests
+        run: cargo test --verbose -p synchord
+      - name: Run chordr tests
+        run: cargo test --verbose -p chordr
