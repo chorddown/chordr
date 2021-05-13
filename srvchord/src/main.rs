@@ -21,7 +21,6 @@ mod domain;
 mod error;
 mod routes;
 mod schema;
-mod task;
 #[cfg(test)]
 mod test_helpers;
 mod traits;
