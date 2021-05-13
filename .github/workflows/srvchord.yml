@@ -1,0 +1,29 @@
+name: srvchord
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install latest nightly
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+      - name: Install openssl
+        run: sudo apt-get install libssl-dev
+      - name: Build srvchord
+        run: cargo +nightly build --verbose -p srvchord
+      - name: Run srvchord tests
+        run: cargo +nightly test --verbose -p srvchord
