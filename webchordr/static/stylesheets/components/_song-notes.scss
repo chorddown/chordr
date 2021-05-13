@@ -4,8 +4,9 @@
     textarea {
         resize: none;
         background: transparent;
-        border: 1px solid $button-border;
+        border: $button-border;
         border-radius: 0;
+        padding: $std-half;
 
         font-family: $ui-font;
         font-size: $font-size-web;
@@ -17,6 +18,9 @@
         @include min-screen-tablet {
             width: $nav-width;
             height: calc(50vh - #{$nav-button-height + $nav-footer-border-width});
+        }
+        @include if-dark-mode {
+            border-color: $gray-ultra-dark;
         }
     }
 }
