@@ -1,7 +1,8 @@
-use dropbox_sdk::files::{DownloadError, ListFolderError};
-use reqwest::Error as RequestError;
 use std::error::Error as StdError;
 use std::fmt::{Display, Error as FmtError, Formatter};
+
+use dropbox_sdk::files::{DownloadError, ListFolderError};
+use reqwest::Error as RequestError;
 use xml::reader::Error as XmlError;
 
 /// Shorthand for synchord results
@@ -101,11 +102,12 @@ impl From<::chrono::format::ParseError> for Error {
         Error::xml_parser_error(format!("{}", error))
     }
 }
-impl From<::url::ParseError> for Error {
-    fn from(error: ::url::ParseError) -> Self {
-        Error::url_error(format!("{}", error))
-    }
-}
+
+// impl From<::url::ParseError> for Error {
+//     fn from(error: ::url::ParseError) -> Self {
+//         Error::url_error(format!("{}", error))
+//     }
+// }
 
 //impl From<&Error> for Error {
 //    fn from(error: &Error) -> Self {

@@ -1,16 +1,20 @@
-mod propfind_parser;
+use std::borrow::Cow;
+use std::fs::File;
+use std::path::{Path, PathBuf};
 
-use self::propfind_parser::parse_propfind_response;
+use hyper::{Method, StatusCode};
+use hyperdav::{Client, Response};
+use reqwest::Url;
+
 use crate::error::{Error, Result};
 use crate::service::file_entry::FileEntry;
 use crate::service::{
     AbstractServiceConfig, ServiceConfigurationTrait, ServiceIdentifier, ServiceTrait,
 };
-use hyperdav::Client;
-use reqwest::{Method, Response, StatusCode, Url};
-use std::borrow::Cow;
-use std::fs::File;
-use std::path::{Path, PathBuf};
+
+use self::propfind_parser::parse_propfind_response;
+
+mod propfind_parser;
 
 pub struct WebDAVService {
     client: Client,
@@ -35,11 +39,12 @@ impl WebDAVService {
             </D:propfind>
         "#;
 
-        let res = self
-            .client
-            .request(Method::Extension("PROPFIND".to_string()), path)
-            .body(body)
-            .send()?;
+        let res = prepare_hyperdav_result(
+            self.client
+                .request(Method::Extension("PROPFIND".to_string()), path)
+                .body(body)
+                .send(),
+        )?;
 
         self.check_status_code(&res.status())?;
 
@@ -53,7 +58,7 @@ impl WebDAVService {
 
     fn fetch_file(&self, path: String) -> Result<Response> {
         let clean_path = self.remove_overlapping_path_segments(path);
-        let res = self.client.request(Method::Get, clean_path).send()?;
+        let res = prepare_hyperdav_result(self.client.request(Method::Get, clean_path).send())?;
         self.check_status_code(&res.status())?;
 
         Ok(res)
@@ -137,7 +142,10 @@ impl ServiceTrait for WebDAVService {
     type Configuration = WebDAVServiceConfiguration;
 
     fn new(configuration: Self::Configuration) -> Result<Self, Error> {
-        let url: Url = Url::parse(configuration.url.as_ref())?;
+        let url = match Url::parse(configuration.url.as_ref()) {
+            Ok(u) => u,
+            Err(e) => return Err(Error::url_error(e.to_string())),
+        };
         let client_result = Client::new()
             .credentials(configuration.username, configuration.password)
             .build(url.as_ref());
@@ -164,7 +172,14 @@ impl ServiceTrait for WebDAVService {
     fn download(&self, file: FileEntry, destination: &Path) -> Result<()> {
         let mut res = self.fetch_file(file.path().to_owned())?;
         let mut file_handle = File::create(destination)?;
-        res.copy_to(&mut file_handle)?;
+        prepare_hyperdav_result(res.copy_to(&mut file_handle))?;
         Ok(())
+    }
+}
+
+fn prepare_hyperdav_result<O, E: std::error::Error>(result: Result<O, E>) -> Result<O, Error> {
+    match result {
+        Ok(o) => Ok(o),
+        Err(e) => Err(Error::download_error(e.to_string())),
     }
 }

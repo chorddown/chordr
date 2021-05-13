@@ -1,29 +1,30 @@
-use crate::error::{Error, Result};
-use crate::service::file_entry::FileEntry;
-use crate::service::{
-    AbstractServiceConfig, ServiceConfigurationTrait, ServiceIdentifier, ServiceTrait,
-};
-use chrono::DateTime;
-use dropbox_sdk::files::{DownloadArg, FileMetadata, ListFolderArg, Metadata};
 use std::convert::TryFrom;
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 use std::path::{Path, PathBuf};
 
+use chrono::DateTime;
+use dropbox_sdk::client_trait::{Endpoint, HttpClient, HttpRequestResultRaw, ParamsType, Style};
+use dropbox_sdk::files::{DownloadArg, FileMetadata, ListFolderArg, Metadata};
+use dropbox_sdk::UserAuthClient;
+
+use crate::error::{Error, Result};
+use crate::service::file_entry::FileEntry;
+use crate::service::{
+    AbstractServiceConfig, ServiceConfigurationTrait, ServiceIdentifier, ServiceTrait,
+};
+
 pub struct DropboxService {
-    http_client: Box<dyn dropbox_sdk::client_trait::HttpClient>,
+    http_client: Box<dyn dropbox_sdk::client_trait::UserAuthClient>,
+    // http_client: Box<dyn dropbox_sdk::client_trait::HttpClient>,
 }
 
 impl DropboxService {
     fn fetch_file_stream(&self, file: String) -> Result<Box<dyn Read>> {
         let request_argument = DownloadArg::new(file);
-        let result = dropbox_sdk::files::download(
-            self.http_client.as_ref(),
-            &request_argument,
-            None,
-            None,
-        )??;
+
+        let result = dropbox_sdk::files::download(&self, &request_argument, None, None)??;
 
         match result.body {
             Some(body) => Ok(body),
@@ -62,7 +63,9 @@ impl ServiceTrait for DropboxService {
         Self: Sized,
     {
         Ok(Self {
-            http_client: Box::new(dropbox_sdk::HyperClient::new(configuration.api_key)),
+            http_client: Box::new(dropbox_sdk::default_client::UserAuthDefaultClient::new(
+                configuration.api_key,
+            )),
         })
     }
 
@@ -80,8 +83,7 @@ impl ServiceTrait for DropboxService {
     fn list_files(&self) -> Result<Vec<FileEntry>, Error> {
         let path_relative_to_app_folder = "".to_owned();
         let request_argument: ListFolderArg = ListFolderArg::new(path_relative_to_app_folder);
-        let result =
-            dropbox_sdk::files::list_folder(self.http_client.as_ref(), &request_argument)??;
+        let result = dropbox_sdk::files::list_folder(&self, &request_argument)??;
 
         Ok(result
             .entries
@@ -104,6 +106,33 @@ impl ServiceTrait for DropboxService {
         Ok(())
     }
 }
+
+impl HttpClient for &DropboxService {
+    fn request(
+        &self,
+        endpoint: Endpoint,
+        style: Style,
+        function: &str,
+        params: String,
+        params_type: ParamsType,
+        body: Option<&[u8]>,
+        range_start: Option<u64>,
+        range_end: Option<u64>,
+    ) -> dropbox_sdk::Result<HttpRequestResultRaw> {
+        self.http_client.request(
+            endpoint,
+            style,
+            function,
+            params,
+            params_type,
+            body,
+            range_start,
+            range_end,
+        )
+    }
+}
+
+impl UserAuthClient for &DropboxService {}
 
 impl TryFrom<&FileMetadata> for FileEntry {
     type Error = ();
