@@ -1,21 +1,24 @@
-mod json_formatting;
+use chrono::Utc;
+use diesel::Connection;
+use parking_lot::{const_mutex, Mutex};
+use rand::{thread_rng, Rng};
+use rocket::config::RocketConfig;
+use rocket::local::Client;
 
-pub use self::json_formatting::*;
+use cqrs::prelude::{Command, CommandExecutor};
+use libchordr::models::user::User;
+use libchordr::prelude::{FileType, Password, Setlist, SetlistEntry, Username};
+
 use crate::domain::setlist::command::SetlistCommandExecutor;
 use crate::domain::user::command::UserCommandExecutor;
 use crate::domain::user::repository::UserRepository;
 use crate::domain::user::UserDb;
 use crate::traits::RepositoryTrait;
 use crate::{ConnectionType, DbConn};
-use chrono::Utc;
-use cqrs::prelude::{Command, CommandExecutor};
-use diesel::Connection;
-use libchordr::models::user::User;
-use libchordr::prelude::{FileType, Password, Setlist, SetlistEntry, Username};
-use parking_lot::Mutex;
-use rand::{thread_rng, Rng};
-use rocket::config::RocketConfig;
-use rocket::local::Client;
+
+pub use self::json_formatting::*;
+
+mod json_formatting;
 
 #[allow(unused)]
 enum UseDatabase {
@@ -29,7 +32,7 @@ const USE_DATABASE: UseDatabase = UseDatabase::InMemory;
 // We use a lock to synchronize between tests so DB operations don't collide.
 // For now. In the future, we'll have a nice way to run each test in a DB
 // transaction so we can regain concurrency.
-pub(crate) static DB_LOCK: Mutex<()> = Mutex::new(());
+pub(crate) static DB_LOCK: Mutex<()> = const_mutex(());
 
 #[macro_export]
 macro_rules! run_test {
@@ -135,7 +138,7 @@ pub fn insert_test_user<S1: Into<String>, S2: Into<String>, S3: Into<String>>(
         &UserCommandExecutor::with_connection(conn),
         Command::add(new_user.clone()),
     )
-        .unwrap();
+    .unwrap();
 
     new_user
 }
@@ -167,7 +170,7 @@ pub fn create_setlist<S: AsRef<str>>(conn: &ConnectionType, id: i32, username: S
         &SetlistCommandExecutor::with_connection(&conn),
         Command::add(setlist.clone()),
     )
-        .unwrap();
+    .unwrap();
 
     setlist
 }
