@@ -1,5 +1,5 @@
 use crate::models::meta::b_notation::BNotation;
-use crate::models::song_meta_trait::SongMetaTrait;
+use crate::models::meta::MetaTrait;
 use crate::tokenizer::Meta;
 
 /// Meta Information for a parsed song
@@ -48,7 +48,7 @@ impl MetaInformation {
     }
 }
 
-impl SongMetaTrait for MetaInformation {
+impl MetaTrait for MetaInformation {
     fn title(&self) -> Option<String> {
         self.title.as_ref().cloned()
     }
