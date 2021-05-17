@@ -210,7 +210,7 @@ mod test {
                     vec![
                         random_id.into(),
                         username.into(),
-                        r#"[{"song_id":"song-1","file_type":"chorddown","title":"Song 1","settings":null},{"song_id":"song-2","file_type":"chorddown","title":"Song 2","settings":null},{"song_id":"song-3","file_type":"chorddown","title":"Song 3","settings":null}]"#.into(),
+                        r#"[{"song_id":"song-1","title":"Song 1","settings":null},{"song_id":"song-2","title":"Song 2","settings":null},{"song_id":"song-3","title":"Song 3","settings":null}]"#.into(),
                         format!("{:?}", setlist.creation_date()).into(),
                         format!("{:?}", setlist.modification_date()).into(),
                     ],

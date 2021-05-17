@@ -1,16 +1,18 @@
+use std::convert::TryFrom;
+
+use chrono::NaiveDateTime;
+use diesel::{self, prelude::*};
+
+use libchordr::models::list::ListEntryTrait;
+use libchordr::models::song_data::SongData;
+use libchordr::models::song_id::{SongId, SongIdTrait};
+use libchordr::prelude::{SetlistEntry, SongSettings};
+
 use crate::domain::setlist::db::SetlistDb;
 use crate::error::SrvError;
 use crate::schema::setlist_entry;
 use crate::schema::setlist_entry::dsl::setlist_entry as setlist_entries;
 use crate::ConnectionType;
-use chrono::NaiveDateTime;
-use diesel::{self, prelude::*};
-use libchordr::models::file_type::FileType;
-use libchordr::models::list::ListEntryTrait;
-use libchordr::models::song_data::SongData;
-use libchordr::models::song_id::{SongId, SongIdTrait};
-use libchordr::prelude::{SetlistEntry, SongSettings};
-use std::convert::{TryFrom, TryInto};
 
 #[derive(
     Serialize, Identifiable, Associations, Queryable, Insertable, AsChangeset, Debug, Clone,
@@ -20,7 +22,7 @@ use std::convert::{TryFrom, TryInto};
 pub struct SetlistDbEntry {
     pub id: Option<i32>,
     pub song_id: String,
-    pub file_type: String,
+    pub file_type: Option<String>,
     pub title: Option<String>,
     pub settings: Option<String>,
     pub setlist_db_id: i32,
@@ -51,7 +53,7 @@ impl SetlistDbEntry {
         Self {
             id: None,
             song_id: entry.id().to_string(),
-            file_type: entry.file_type().to_string(),
+            file_type: None,
             title: Some(entry.title()),
             settings: entry.settings().map(|s| serialize_song_settings(&s)),
             setlist_db_id: setlist_db.id,
@@ -81,10 +83,6 @@ impl SongData for SetlistDbEntry {
     fn title(&self) -> String {
         self.title.clone().unwrap_or(String::new())
     }
-
-    fn file_type(&self) -> FileType {
-        FileType::try_from(self.file_type.as_str()).unwrap_or(FileType::Chorddown)
-    }
 }
 
 impl TryFrom<SetlistDbEntry> for SetlistEntry {
@@ -98,7 +96,6 @@ impl TryFrom<SetlistDbEntry> for SetlistEntry {
 
         Ok(SetlistEntry::new(
             value.song_id.as_str(),
-            value.file_type.try_into()?,
             value.title.unwrap_or("".to_string()),
             settings,
         ))

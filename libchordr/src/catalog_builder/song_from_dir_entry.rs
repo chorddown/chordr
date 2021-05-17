@@ -1,6 +1,5 @@
 use super::CatalogBuildError;
 use crate::helper::parse_content;
-use crate::models::file_type::FileType;
 use crate::models::song::Song;
 use crate::models::song_id::SongId;
 use crate::models::song_meta::SongMeta;
@@ -31,18 +30,12 @@ impl TryFrom<&Path> for Song {
             Ok(p) => p,
             Err(e) => return Err(CatalogBuildError::from_error(e, path_buf)),
         };
-        let title = parser_result.meta().title.unwrap_or_else(|| song_id.to_string());
-        let file_type = match FileType::try_from(path) {
-            Ok(f) => f,
-            Err(e) => return Err(CatalogBuildError::from_error(e, path_buf)),
-        };
-        //        let meta = SongMeta::new(song_id, title, file_type);
-        let meta = SongMeta::new_with_meta_information(
-            song_id,
-            title,
-            file_type,
-            parser_result.meta_as_ref(),
-        );
+        let title = parser_result
+            .meta()
+            .title
+            .unwrap_or_else(|| song_id.to_string());
+
+        let meta = SongMeta::new_with_meta_information(song_id, title, parser_result.meta_as_ref());
         Ok(Song::new(meta, src))
     }
 }
@@ -73,7 +66,6 @@ mod tests {
         let song = result.unwrap();
         assert_eq!(SongId::new("swing_low_sweet_chariot.chorddown"), song.id());
         assert_eq!("Swing Low Sweet Chariot", &song.title());
-        assert_eq!(FileType::Chorddown, song.file_type());
         assert!(!song.src().is_empty());
     }
 }

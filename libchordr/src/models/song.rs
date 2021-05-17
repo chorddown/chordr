@@ -1,4 +1,3 @@
-use crate::models::file_type::FileType;
 use crate::models::list::ListEntryTrait;
 use crate::models::song_data::SongData;
 use crate::models::song_id::{SongId, SongIdTrait};
@@ -41,9 +40,5 @@ impl ListEntryTrait for Song {
 impl SongData for Song {
     fn title(&self) -> String {
         self.meta.title()
-    }
-
-    fn file_type(&self) -> FileType {
-        self.meta.file_type()
     }
 }

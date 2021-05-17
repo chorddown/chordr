@@ -4,7 +4,6 @@ use crate::models::list::ListEntryTrait;
 use crate::models::meta::*;
 use crate::models::song_id::SongIdTrait;
 
-use super::file_type::FileType;
 use super::song_data::SongData;
 use super::song_id::SongId;
 
@@ -12,8 +11,6 @@ use super::song_id::SongId;
 pub struct SongMeta {
     id: SongId,
     title: String,
-    #[serde(rename = "type")]
-    file_type: FileType,
 
     subtitle: Option<String>,
     artist: Option<String>,
@@ -34,11 +31,10 @@ pub struct SongMeta {
 }
 
 impl SongMeta {
-    pub fn new(id: SongId, title: String, file_type: FileType) -> Self {
+    pub fn new(id: SongId, title: String) -> Self {
         Self {
             id,
             title,
-            file_type,
             subtitle: None,
             artist: None,
             composer: None,
@@ -58,16 +54,10 @@ impl SongMeta {
         }
     }
 
-    pub fn new_with_meta_information(
-        id: SongId,
-        title: String,
-        file_type: FileType,
-        meta: &dyn MetaTrait,
-    ) -> Self {
+    pub fn new_with_meta_information(id: SongId, title: String, meta: &dyn MetaTrait) -> Self {
         Self {
             id,
             title,
-            file_type,
             subtitle: meta.subtitle(),
             artist: meta.artist(),
             composer: meta.composer(),
@@ -171,9 +161,5 @@ impl ListEntryTrait for SongMeta {
 impl SongData for SongMeta {
     fn title(&self) -> String {
         self.title.clone()
-    }
-
-    fn file_type(&self) -> FileType {
-        self.file_type
     }
 }

@@ -4,7 +4,6 @@ mod song_from_dir_entry;
 pub use self::catalog_build_error::CatalogBuildError;
 use crate::error::{Error, Result};
 use crate::models::catalog::*;
-use crate::models::file_type::FileType;
 use crate::models::list::ListEntryTrait;
 use crate::models::song::Song;
 use rand::distributions::Alphanumeric;
@@ -29,7 +28,6 @@ impl CatalogBuilder {
     pub fn build_catalog_for_directory<P: AsRef<Path>>(
         &self,
         path: P,
-        file_type: FileType,
         recursive: bool,
     ) -> Result<CatalogBuildResult> {
         let path_ref = path.as_ref();
@@ -40,7 +38,7 @@ impl CatalogBuilder {
             ));
         }
 
-        let song_results = self.collect_songs(path_ref, file_type, recursive);
+        let song_results = self.collect_songs(path_ref, recursive);
         let (songs, errors) = self.partition_songs(song_results);
 
         let rand_string: String = thread_rng().sample_iter(&Alphanumeric).take(30).collect();
@@ -69,12 +67,7 @@ impl CatalogBuilder {
         )
     }
 
-    fn collect_songs(
-        &self,
-        path: &Path,
-        file_type: FileType,
-        recursive: bool,
-    ) -> Vec<Result<Song, CatalogBuildError>> {
+    fn collect_songs(&self, path: &Path, recursive: bool) -> Vec<Result<Song, CatalogBuildError>> {
         if !path.is_dir() {
             panic!("Given path is not a directory");
         }
@@ -87,9 +80,7 @@ impl CatalogBuilder {
         let mut songs = vec![];
         for entry in entry_iterator {
             match entry {
-                Ok(entry) => {
-                    songs.append(&mut self.collect_songs_of_entry(entry, file_type, recursive))
-                }
+                Ok(entry) => songs.append(&mut self.collect_songs_of_entry(entry, recursive)),
                 Err(error) => songs.push(Err(CatalogBuildError::from_error(error, path))),
             }
         }
@@ -99,12 +90,11 @@ impl CatalogBuilder {
     fn collect_songs_of_entry(
         &self,
         entry: DirEntry,
-        file_type: FileType,
         recursive: bool,
     ) -> Vec<Result<Song, CatalogBuildError>> {
         let path = entry.path();
         if path.is_file() {
-            if file_type.dir_entry_matches(&entry) {
+            if dir_entry_is_chorddown_file(&entry) {
                 vec![Song::try_from(entry)]
             } else {
                 // This is **not** an error situation. If `entry` is not of `file_type` skip the entry
@@ -112,7 +102,7 @@ impl CatalogBuilder {
             }
         } else if path.is_dir() {
             if recursive {
-                self.collect_songs(path.as_path(), file_type, recursive)
+                self.collect_songs(path.as_path(), recursive)
             } else {
                 vec![]
             }
@@ -131,6 +121,13 @@ impl Default for CatalogBuilder {
     }
 }
 
+pub fn dir_entry_is_chorddown_file(dir_entry: &DirEntry) -> bool {
+    match dir_entry.path().extension() {
+        Some(t) => t == "chorddown",
+        None => false,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -141,8 +138,7 @@ mod tests {
     fn test_build_catalog_for_directory() {
         let songs_dir = format!("{}/../webchordr/static/songs", env!("CARGO_MANIFEST_DIR"));
         let songs_dir = Path::new(&songs_dir);
-        let result =
-            CatalogBuilder::new().build_catalog_for_directory(songs_dir, FileType::Chorddown, true);
+        let result = CatalogBuilder::new().build_catalog_for_directory(songs_dir, true);
         assert!(result.is_ok());
         let catalog_and_errors = result.unwrap();
         let catalog = catalog_and_errors.catalog;
@@ -160,8 +156,7 @@ mod tests {
     fn test_build_catalog_for_test_directory() {
         let songs_dir = format!("{}/tests/resources", env!("CARGO_MANIFEST_DIR"));
         let songs_dir = Path::new(&songs_dir);
-        let result =
-            CatalogBuilder::new().build_catalog_for_directory(songs_dir, FileType::Chorddown, true);
+        let result = CatalogBuilder::new().build_catalog_for_directory(songs_dir, true);
         assert!(result.is_ok());
         let catalog_and_errors = result.unwrap();
         let catalog = catalog_and_errors.catalog;

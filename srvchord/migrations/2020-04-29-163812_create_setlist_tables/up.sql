@@ -5,9 +5,9 @@ CREATE TABLE setlist
     "sorting"           INTEGER   NOT NULL,
     "owner"             VARCHAR   NOT NULL,
     "team"              VARCHAR,
-    "gig_date"          TIMESTAMP,          -- INTEGER,
-    "creation_date"     TIMESTAMP NOT NULL, -- INTEGER NOT NULL,
-    "modification_date" TIMESTAMP NOT NULL  -- INTEGER NOT NULL
+    "gig_date"          TIMESTAMP,
+    "creation_date"     TIMESTAMP NOT NULL,
+    "modification_date" TIMESTAMP NOT NULL
 );
 
 CREATE TABLE setlist_entry

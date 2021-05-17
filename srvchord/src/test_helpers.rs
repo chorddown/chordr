@@ -7,7 +7,7 @@ use rocket::local::Client;
 
 use cqrs::prelude::{Command, CommandExecutor};
 use libchordr::models::user::User;
-use libchordr::prelude::{FileType, Password, Setlist, SetlistEntry, Username};
+use libchordr::prelude::{Password, Setlist, SetlistEntry, Username};
 
 use crate::domain::setlist::command::SetlistCommandExecutor;
 use crate::domain::user::command::UserCommandExecutor;
@@ -160,9 +160,9 @@ pub fn create_setlist<S: AsRef<str>>(conn: &ConnectionType, id: i32, username: S
         now,
         now,
         vec![
-            SetlistEntry::new("song-1", FileType::Chorddown, "Song 1", None),
-            SetlistEntry::new("song-2", FileType::Chorddown, "Song 2", None),
-            SetlistEntry::new("song-3", FileType::Chorddown, "Song 3", None),
+            SetlistEntry::new("song-1", "Song 1", None),
+            SetlistEntry::new("song-2", "Song 2", None),
+            SetlistEntry::new("song-3", "Song 3", None),
         ],
     );
 

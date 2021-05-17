@@ -126,7 +126,10 @@ impl SetlistRepository {
         Ok(users)
     }
 
-    fn get_command_executor<'a>(&self, connection: &'a ConnectionType) -> SetlistCommandExecutor<'a> {
+    fn get_command_executor<'a>(
+        &self,
+        connection: &'a ConnectionType,
+    ) -> SetlistCommandExecutor<'a> {
         SetlistCommandExecutor::with_connection(connection)
     }
 }
@@ -240,7 +243,6 @@ mod test {
     use crate::domain::setlist_entry::db::SetlistDbEntry;
     use crate::test_helpers::*;
     use chrono::Utc;
-    use libchordr::models::file_type::FileType;
     use libchordr::prelude::{Setlist, SetlistEntry, User, Username};
 
     #[test]
@@ -402,9 +404,9 @@ mod test {
                 Utc::now(),
                 Utc::now(),
                 vec![
-                    SetlistEntry::new("song-1", FileType::Chorddown, "Song 1", None),
-                    SetlistEntry::new("song-2", FileType::Chorddown, "Song 2", None),
-                    SetlistEntry::new("song-3", FileType::Chorddown, "Song 3", None),
+                    SetlistEntry::new("song-1", "Song 1", None),
+                    SetlistEntry::new("song-2", "Song 2", None),
+                    SetlistEntry::new("song-3", "Song 3", None),
                 ],
             );
 
@@ -481,12 +483,7 @@ mod test {
                         None,
                         Utc::now(),
                         Utc::now(),
-                        vec![SetlistEntry::new(
-                            "song-4",
-                            FileType::Chorddown,
-                            "Song 4",
-                            None,
-                        )],
+                        vec![SetlistEntry::new("song-4", "Song 4", None)],
                     ),
                 )
                 .unwrap();

@@ -31,10 +31,6 @@ impl SongData for TestSong {
     fn title(&self) -> String {
         self.id.clone()
     }
-
-    fn file_type(&self) -> FileType {
-        FileType::Chorddown
-    }
 }
 
 pub(crate) fn get_test_user() -> User {

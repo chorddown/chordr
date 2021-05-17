@@ -194,14 +194,13 @@ impl RecordTrait for Setlist {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::prelude::FileType;
     use crate::test_helpers::get_test_user;
 
     fn entry<S: Into<SongId>>(id: S) -> SetlistEntry {
         let song_id = id.into();
         let title = format!("Song {}", song_id);
 
-        SetlistEntry::new(song_id, FileType::Chorddown, title, None)
+        SetlistEntry::new(song_id, title, None)
     }
 
     fn build_setlist() -> Setlist {

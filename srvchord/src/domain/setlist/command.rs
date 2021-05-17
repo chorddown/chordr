@@ -114,7 +114,7 @@ mod test {
     use crate::test_helpers::*;
     use crate::ConnectionType;
     use chrono::Utc;
-    use libchordr::prelude::{FileType, SetlistEntry, User, Username};
+    use libchordr::prelude::{SetlistEntry, User, Username};
 
     #[test]
     fn test_add_empty() {
@@ -144,7 +144,7 @@ mod test {
                 &SetlistCommandExecutor::with_connection(&conn),
                 Command::add(new_setlist),
             )
-                .unwrap();
+            .unwrap();
 
             let new_setlists = SetlistDb::all(&conn);
             assert_eq!(new_setlists.len(), init_setlists.len() + 1);
@@ -178,9 +178,9 @@ mod test {
                 Utc::now(),
                 Utc::now(),
                 vec![
-                    SetlistEntry::new("song-1", FileType::Chorddown, "Song 1", None),
-                    SetlistEntry::new("song-2", FileType::Chorddown, "Song 2", None),
-                    SetlistEntry::new("song-3", FileType::Chorddown, "Song 3", None),
+                    SetlistEntry::new("song-1", "Song 1", None),
+                    SetlistEntry::new("song-2", "Song 2", None),
+                    SetlistEntry::new("song-3", "Song 3", None),
                 ],
             );
 
@@ -188,7 +188,7 @@ mod test {
                 &SetlistCommandExecutor::with_connection(&conn),
                 Command::add(new_setlist),
             )
-                .unwrap();
+            .unwrap();
 
             let new_setlists = SetlistDb::all(&conn);
             assert_eq!(new_setlists.len(), init_setlists.len() + 1);
@@ -229,7 +229,7 @@ mod test {
                     vec![],
                 )),
             )
-                .unwrap();
+            .unwrap();
 
             assert_eq!(SetlistDb::count_all(&conn), 2);
             assert_eq!(SetlistDbEntry::count_all(&conn), 3);
@@ -263,15 +263,10 @@ mod test {
                     None,
                     Utc::now(),
                     Utc::now(),
-                    vec![SetlistEntry::new(
-                        "song-4",
-                        FileType::Chorddown,
-                        "Song 4",
-                        None,
-                    )],
+                    vec![SetlistEntry::new("song-4", "Song 4", None)],
                 )),
             )
-                .unwrap();
+            .unwrap();
 
             assert_eq!(SetlistDb::count_all(&conn), 2);
             assert_eq!(SetlistDbEntry::count_all(&conn), 4);
@@ -292,12 +287,7 @@ mod test {
                     None,
                     Utc::now(),
                     Utc::now(),
-                    vec![SetlistEntry::new(
-                        "song-4",
-                        FileType::Chorddown,
-                        "Song 4",
-                        None,
-                    )],
+                    vec![SetlistEntry::new("song-4", "Song 4", None)],
                 )),
             );
             assert_eq!(
@@ -321,7 +311,7 @@ mod test {
                 &SetlistCommandExecutor::with_connection(&conn),
                 Command::delete(918),
             )
-                .unwrap();
+            .unwrap();
 
             assert_eq!(SetlistDb::count_all(&conn), 1);
         })

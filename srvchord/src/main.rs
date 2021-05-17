@@ -28,7 +28,7 @@ mod traits;
 use crate::config::Config;
 use diesel::SqliteConnection;
 use libchordr::models::catalog::Catalog;
-use libchordr::prelude::{CatalogBuilder, FileType};
+use libchordr::prelude::CatalogBuilder;
 use rocket::fairing::AdHoc;
 use rocket::http::Method;
 use rocket::response::NamedFile;
@@ -55,11 +55,7 @@ fn index(config: State<Config>) -> io::Result<NamedFile> {
 
 #[get("/catalog.json")]
 fn catalog(config: State<Config>) -> Result<Json<Catalog>, libchordr::prelude::Error> {
-    match CatalogBuilder::new().build_catalog_for_directory(
-        &config.song_dir,
-        FileType::Chorddown,
-        true,
-    ) {
+    match CatalogBuilder::new().build_catalog_for_directory(&config.song_dir, true) {
         Err(e) => Err(e),
         Ok(catalog_result) => {
             if catalog_result.errors.len() > 0 {
