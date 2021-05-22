@@ -190,8 +190,7 @@ fn build_catalog(args: &ArgMatches) -> Result<()> {
     let pretty = args.is_present("pretty");
     let output_file_path = args.value_of("output").unwrap();
 
-    let catalog_result =
-        CatalogBuilder::new().build_catalog_for_directory(dir_path, FileType::Chorddown, true)?;
+    let catalog_result = CatalogBuilder::new().build_catalog_for_directory(dir_path, true)?;
 
     let serialization_result = if pretty {
         serde_json::to_string_pretty(&catalog_result.catalog)
