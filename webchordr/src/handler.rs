@@ -1,3 +1,17 @@
+use std::rc::Rc;
+use std::sync::Arc;
+use std::time::Duration;
+
+use chrono::Utc;
+use log::{debug, error, info, warn};
+use wasm_bindgen_futures::spawn_local;
+use yew::services::interval::IntervalTask;
+use yew::services::IntervalService;
+use yew::{html, Component, ComponentLink, Html, ShouldRender};
+
+use libchordr::models::user::MainData;
+use libchordr::prelude::*;
+
 use crate::app::App;
 use crate::config::Config;
 use crate::connection::{ConnectionService, ConnectionStatus};
@@ -13,17 +27,6 @@ use crate::persistence::prelude::*;
 use crate::persistence::web_repository::{CatalogWebRepository, SettingsWebRepository};
 use crate::session::{Session, SessionMainData, SessionService};
 use crate::state::State;
-use chrono::Utc;
-use libchordr::models::user::MainData;
-use libchordr::prelude::*;
-use log::{debug, error, info, warn};
-use std::rc::Rc;
-use std::sync::Arc;
-use std::time::Duration;
-use wasm_bindgen_futures::spawn_local;
-use yew::services::interval::IntervalTask;
-use yew::services::IntervalService;
-use yew::{html, Component, ComponentLink, Html, ShouldRender};
 
 type InitialDataResult = Result<Box<SessionMainData>, Option<WebError>>;
 
@@ -437,8 +440,19 @@ impl Component for Handler {
         match msg {
             Msg::FetchCatalogReady(response) => {
                 self.fetching = false;
-                debug!("Catalog fetched");
-                self.set_state(self.state.with_catalog(response.ok()), true);
+                self.set_state(
+                    match response {
+                        Ok(o) => {
+                            debug!("Catalog fetched");
+                            self.state.with_catalog(Some(o))
+                        }
+                        Err(e) => {
+                            error!("Could not fetch catalog: {}", e);
+                            self.state.with_catalog(None)
+                        }
+                    },
+                    true,
+                )
             }
             Msg::Ignore => return false,
             Msg::SessionChanged(session) => self.update_session(session, true),
