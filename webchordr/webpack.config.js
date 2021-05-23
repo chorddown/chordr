@@ -56,10 +56,6 @@ module.exports = (env, argv) => {
         maximumFileSizeToCacheInBytes: 50 * 1024 * 1024,
         runtimeCaching: [
           {
-            urlPattern: /.*/,
-            handler: 'NetworkFirst'
-          },
-          {
             urlPattern: '/catalog.json',
             handler: 'NetworkFirst'
           },
@@ -68,12 +64,21 @@ module.exports = (env, argv) => {
             handler: 'NetworkOnly'
           },
           {
-            urlPattern: /status/,
+            urlPattern: /\/status\/$/,
+            handler: 'NetworkOnly'
+          },
+          {
+            // Development server URI
+            urlPattern: 'http://localhost:9000/status/',
             handler: 'NetworkOnly'
           },
           {
             urlPattern: /assets/,
             handler: 'StaleWhileRevalidate'
+          },
+          {
+            urlPattern: /.*/,
+            handler: 'NetworkFirst'
           }
         ]
       })
