@@ -50,7 +50,7 @@ Time:               {}
 Tempo:              {}
 Duration:           {}
 Capo:               {}
-CCLI Song #         {}
+CCLI Song #:        {}
 -->",
             meta.title().unwrap_or_else(|| none_text.to_owned()),
             meta.original_title()
