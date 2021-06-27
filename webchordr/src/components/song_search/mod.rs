@@ -57,7 +57,7 @@ impl SongSearch {
             <>
                 <h1><SongSearchLink />{"Search Songs"}</h1>
                 <input type="search"
-                       value=&self.search
+                       value=self.search.clone()
                        oninput=self.link.callback(|e: InputData| Msg::SearchChange(e.value))
                        placeholder="Search"/>
             </>
@@ -106,7 +106,7 @@ impl Component for SongSearch {
             html! {
                 <SongItem<Song> class="song-item button"
                     data_key=key
-                    song=song/>
+                    song=song.clone()/>
             }
         };
 

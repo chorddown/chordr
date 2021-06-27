@@ -1,4 +1,5 @@
 use std::fmt::{Display, Error, Formatter};
+use yew::html::IntoPropValue;
 use yew::Classes;
 
 #[derive(Clone, Debug, PartialEq)]
@@ -69,20 +70,12 @@ impl From<&String> for Class {
 // Transform an instance of Class into something else
 impl From<Class> for Classes {
     fn from(c: Class) -> Self {
-        Classes::from(c.0.as_str())
+        Classes::from(c.0)
     }
 }
 
-impl yew::virtual_dom::Transformer<&str, Class> for Class {
-    fn transform(from: &str) -> Class {
-        Class::from(from)
+impl IntoPropValue<Class> for &str {
+    fn into_prop_value(self) -> Class {
+        Class::from(self)
     }
 }
-
-impl yew::virtual_dom::Transformer<&str, Class> for yew::virtual_dom::vcomp::VComp {
-    fn transform(from: &str) -> Class {
-        Class::from(from)
-    }
-}
-
-//impl From<Class> for yew::virtual_dom::Transformer<&str, helpers::class::Class>` is not implemented for `yew::virtual_dom::vcomp::VComp

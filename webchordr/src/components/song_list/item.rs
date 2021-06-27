@@ -1,8 +1,10 @@
-use crate::helpers::Class;
-use libchordr::prelude::*;
 use yew::prelude::*;
 use yew::virtual_dom::VNode;
 use yew::{Component, ComponentLink};
+
+use libchordr::prelude::*;
+
+use crate::helpers::Class;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct SongListItemProps<S: SongData + Clone> {
@@ -77,7 +79,8 @@ impl<S: SongData + PartialEq + 'static + Clone> Component for Item<S> {
         let href = format!("#/song/{}", self.props.song.id());
         let class = self.get_class();
 
-        let link = html! { <a role="button" class="discreet" data-key=key href=href>{title}</a> };
+        let link =
+            html! { <a role="button" class="discreet" data-key=key.clone() href=href>{title}</a> };
 
         (if self.props.sortable {
             html! { <div class=class>{link}<span class="sortable-handle">{"::"}</span></div> }

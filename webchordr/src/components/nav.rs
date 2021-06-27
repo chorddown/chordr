@@ -104,7 +104,7 @@ impl Nav {
             Some(i) => {
                 let on_settings_change = self.props.on_settings_change.reform(|e| e);
 
-                html! {<SongNotes song_info=i on_change=on_settings_change/>}
+                html! {<SongNotes song_info=i.clone() on_change=on_settings_change/>}
             }
             None => html! {},
         }) as Html

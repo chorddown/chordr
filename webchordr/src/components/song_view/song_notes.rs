@@ -59,7 +59,7 @@ impl Component for SongNotes {
 
     fn view(&self) -> Html {
         let onchange = self.link.callback(|e: ChangeData| Msg::InputChange(e));
-        let notes = self.props.song_info.song_settings.note();
+        let notes = self.props.song_info.song_settings.note().to_owned();
         debug!(
             "Show notes: '{}' from Song Settings {:?}",
             notes, self.props.song_info.song_settings

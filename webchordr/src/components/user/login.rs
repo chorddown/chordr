@@ -192,7 +192,7 @@ impl Component for Login {
                             <label for="user-login-username">{"Username"}</label>
                             <input type="text"
                                    id="user-login-username"
-                                   value=self.username_raw
+                                   value=self.username_raw.clone()
                                    oninput=self.link.callback(|e: InputData|Msg::UsernameChange(e.value))/>
                             {username_error}
                         </div>
@@ -200,14 +200,14 @@ impl Component for Login {
                             <label for="user-login-password">{"Password"}</label>
                             <input type="password"
                                    id="user-login-password"
-                                   value=self.password_raw
+                                   value=self.password_raw.clone()
                                    oninput=self.link.callback(|e: InputData|Msg::PasswordChange(e.value))
                             />
                             {password_error}
                         </div>
                         {login_error}
                         {connection_warning}
-                        <button onclick=self.link.callback(|e|Msg::Clicked)>{"Submit"}</button>
+                        <button onclick=self.link.callback(|_|Msg::Clicked)>{"Submit"}</button>
                     </div>
                 </form>
             </DetailView>

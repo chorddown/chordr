@@ -129,7 +129,7 @@ impl Component for SongBrowser {
                 <div class="col-xs-6 col-3">
                     <SongItem<Song> class="song-item grid-button"
                         data_key=key
-                        song=song/>
+                        song=song.clone()/>
                 </div>
             }
         };
