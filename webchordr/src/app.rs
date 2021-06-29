@@ -81,7 +81,7 @@ impl App {
                 <>
                     <StartScreen />
                     {self.render_song_browser("")}
-                    <ReloadSection />
+                    <ReloadSection catalog=self.props.state.catalog() />
                     {self.render_song_search(false)}
                 </>
             },
@@ -101,12 +101,10 @@ impl App {
                 .props
                 .on_event
                 .reform(|s| SetlistEvent::Remove(s).into());
-            let change = self.props.on_event.reform(|s: (SongId, SongSettings)| {
-                Event::Pair(
-                    Box::new(SettingsEvent::Change(s.0.clone(), s.1.clone()).into()),
-                    Box::new(SetlistEvent::SettingsChange(s.0, s.1).into()),
-                )
-            });
+            let change = self
+                .props
+                .on_event
+                .reform(App::reform_settings_change_to_event);
             assert_eq!(song_id, song_info.song.id());
             debug!("Song {} is on list? {}", song_id, song_info.is_on_setlist);
 
@@ -285,12 +283,10 @@ impl App {
         let on_setlist_change = self.props.on_setlist_change.reform(|i| i);
         let state = self.props.state.clone();
         let current_song_info = current_song_id.and_then(|s| self.get_song_info(&s));
-        let on_settings_change = self.props.on_event.reform(|s: (SongId, SongSettings)| {
-            Event::Pair(
-                Box::new(SettingsEvent::Change(s.0.clone(), s.1.clone()).into()),
-                Box::new(SetlistEvent::SettingsChange(s.0, s.1).into()),
-            )
-        });
+        let on_settings_change = self
+            .props
+            .on_event
+            .reform(App::reform_settings_change_to_event);
 
         html! {
             <Nav
@@ -302,6 +298,13 @@ impl App {
                 state=state
             />
         }
+    }
+
+    fn reform_settings_change_to_event(s: (SongId, SongSettings)) -> Event {
+        Event::Pair(
+            Box::new(SettingsEvent::Change(s.0.clone(), s.1.clone()).into()),
+            Box::new(SetlistEvent::SettingsChange(s.0, s.1).into()),
+        )
     }
 
     /// Wrap `content` and `navigation` blocks into the required HTML structure

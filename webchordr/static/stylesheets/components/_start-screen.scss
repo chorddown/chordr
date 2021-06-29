@@ -23,6 +23,7 @@
 }
 
 .reload-button,
+.reload-section-catalog-revision,
 .reload-section-version {
     display: inline-block;
     letter-spacing: $button-letter-spacing;
@@ -32,9 +33,18 @@
 }
 
 .reload-button-container {
-    flex: 1 0 75%;
+    flex: 1 0 50%;
 }
 
+.reload-section-catalog-revision {
+    flex: 1 1 25%
+}
+
+.reload-section-version {
+    //flex: 1 1 25%;
+}
+
+.reload-section-catalog-revision,
 .reload-section-version {
     color: $gray;
     font-size: $font-size-small;
