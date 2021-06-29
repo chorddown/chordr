@@ -1,17 +1,19 @@
-mod catalog_build_error;
-mod song_from_dir_entry;
+use std::convert::TryFrom;
+use std::fs::{self, DirEntry};
+use std::path::Path;
 
-pub use self::catalog_build_error::CatalogBuildError;
+use chrono::Local;
+
 use crate::error::{Error, Result};
 use crate::models::catalog::*;
 use crate::models::file_type::FileType;
 use crate::models::list::ListEntryTrait;
 use crate::models::song::Song;
-use rand::distributions::Alphanumeric;
-use rand::{thread_rng, Rng};
-use std::convert::TryFrom;
-use std::fs::{self, DirEntry};
-use std::path::Path;
+
+pub use self::catalog_build_error::CatalogBuildError;
+
+mod catalog_build_error;
+mod song_from_dir_entry;
 
 /// Catalog Builder provides functions to build a Song Catalog from a given directory
 pub struct CatalogBuilder;
@@ -43,10 +45,8 @@ impl CatalogBuilder {
         let song_results = self.collect_songs(path_ref, file_type, recursive);
         let (songs, errors) = self.partition_songs(song_results);
 
-        let rand_string: String = thread_rng().sample_iter(&Alphanumeric).take(30).collect();
-
         Ok(CatalogBuildResult {
-            catalog: Catalog::new(rand_string, songs),
+            catalog: Catalog::new(Local::now().to_rfc2822(), songs),
             errors,
         })
     }
@@ -133,9 +133,10 @@ impl Default for CatalogBuilder {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::models::song_data::SongData;
     use crate::models::song_id::SongId;
+
+    use super::*;
 
     #[test]
     fn test_build_catalog_for_directory() {
