@@ -62,6 +62,7 @@ module.exports = (env, argv) => {
         cacheId: 'net.chordr',
         exclude: ['static/songs/.*', /songs/, /.*\.scss/, 'catalog.json'],
         maximumFileSizeToCacheInBytes: 50 * 1024 * 1024,
+        navigateFallback: '/index.html',
         runtimeCaching: [
           {
             urlPattern: '/catalog.json',
