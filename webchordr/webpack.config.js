@@ -38,9 +38,17 @@ module.exports = (env, argv) => {
       extensions: ['.tsx', '.ts', '.js'],
     },
     plugins: [
-      new CopyWebpackPlugin([
-        {from: './static', to: distPath}
-      ]),
+      new CopyWebpackPlugin({
+        patterns: [
+          {
+            from: './static',
+            globOptions: {
+              dot: false,
+              ignore: ['**/songs/**', '**/*.scss', '**/*.chorddown'],
+            },
+          }
+        ]
+      }),
       new WasmPackPlugin({
         forceMode: 'production',
         crateDirectory: ".",
