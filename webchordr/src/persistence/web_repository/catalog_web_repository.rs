@@ -1,23 +1,43 @@
-use super::WebRepositoryTrait;
-use crate::errors::PersistenceError;
-use crate::persistence::persistence_manager::PersistenceManagerTrait;
-use crate::{fetch, WebError};
 use async_trait::async_trait;
-use libchordr::prelude::Catalog;
 use wasm_bindgen::__rt::core::marker::PhantomData;
+
+use libchordr::prelude::Catalog;
+
+use crate::constants::{STORAGE_KEY_CATALOG, STORAGE_NAMESPACE};
+use crate::errors::PersistenceError;
+use crate::persistence::backend::BrowserStorageBackend;
+use crate::persistence::persistence_manager::PersistenceManagerTrait;
+use crate::persistence::prelude::{BackendTrait, BrowserStorage};
+use crate::{fetch, WebError};
+
+use super::WebRepositoryTrait;
 
 pub struct CatalogWebRepository<'a, P: PersistenceManagerTrait> {
     _phantom: ::std::marker::PhantomData<&'a P>,
+    backend: BrowserStorageBackend<BrowserStorage>,
 }
 
 impl<'a, P> CatalogWebRepository<'a, P>
 where
     P: PersistenceManagerTrait,
 {
-    pub fn new(_persistence_manager: &'a P) -> Self {
+    pub fn new(_persistence_manager: &'a P, browser_storage: BrowserStorage) -> Self {
         Self {
+            backend: BrowserStorageBackend::new(browser_storage),
             _phantom: PhantomData,
         }
+    }
+
+    async fn fetch_catalog(&self, append_timestamp: bool) -> Result<Option<Catalog>, WebError> {
+        let base_uri = "/catalog.json";
+        let uri = if append_timestamp {
+            format!("{}?{}", base_uri, chrono::Local::now().timestamp())
+        } else {
+            format!("{}", base_uri)
+        };
+
+        let catalog = fetch::<Catalog>(&uri).await?;
+        Ok(Some(catalog))
     }
 }
 
@@ -41,7 +61,22 @@ where
     }
 
     async fn load(&mut self) -> Result<Option<Self::ManagedType>, WebError> {
-        let catalog = fetch::<Catalog>("/catalog.json").await?;
-        Ok(Some(catalog))
+        match self.fetch_catalog(true).await {
+            Ok(Some(c)) => {
+                // Store/cache the loaded Catalog
+                let _ = self
+                    .backend
+                    .store(STORAGE_NAMESPACE, STORAGE_KEY_CATALOG, &c)
+                    .await;
+
+                return Ok(Some(c));
+            }
+            Ok(None) => {}
+            Err(_) => {}
+        }
+
+        self.backend
+            .load(STORAGE_NAMESPACE, STORAGE_KEY_CATALOG)
+            .await
     }
 }

@@ -1,3 +1,17 @@
+use std::rc::Rc;
+use std::sync::Arc;
+use std::time::Duration;
+
+use chrono::Utc;
+use log::{debug, error, info, warn};
+use wasm_bindgen_futures::spawn_local;
+use yew::services::interval::IntervalTask;
+use yew::services::IntervalService;
+use yew::{html, Component, ComponentLink, Html, ShouldRender};
+
+use libchordr::models::user::MainData;
+use libchordr::prelude::*;
+
 use crate::app::App;
 use crate::config::Config;
 use crate::connection::{ConnectionService, ConnectionStatus};
@@ -13,17 +27,6 @@ use crate::persistence::prelude::*;
 use crate::persistence::web_repository::{CatalogWebRepository, SettingsWebRepository};
 use crate::session::{Session, SessionMainData, SessionService};
 use crate::state::State;
-use chrono::Utc;
-use libchordr::models::user::MainData;
-use libchordr::prelude::*;
-use log::{debug, error, info, warn};
-use std::rc::Rc;
-use std::sync::Arc;
-use std::time::Duration;
-use wasm_bindgen_futures::spawn_local;
-use yew::services::interval::IntervalTask;
-use yew::services::IntervalService;
-use yew::{html, Component, ComponentLink, Html, ShouldRender};
 
 type InitialDataResult = Result<Box<SessionMainData>, Option<WebError>>;
 
@@ -175,14 +178,28 @@ impl Handler {
 impl CatalogHandler for Handler {
     fn fetch_catalog(&mut self) {
         let pm = self.persistence_manager.clone();
-        let callback = self.link.callback(move |result| {
-            debug!("Catalog response {:?}", result);
-            Msg::FetchCatalogReady(result)
-        });
+        let callback = self
+            .link
+            .callback(move |result: Result<Catalog, WebError>| {
+                if let Ok(catalog) = &result {
+                    debug!("Catalog revision: {:?}", catalog.revision());
+                } else {
+                    debug!("Catalog response {:?}", result);
+                }
+                Msg::FetchCatalogReady(result)
+            });
 
         spawn_local(async move {
             type Repository<'a> = CatalogWebRepository<'a, PMType>;
-            let result = Repository::new(&pm).load().await;
+            let browser_storage = match BrowserStorage::local_storage() {
+                Ok(s) => s,
+                Err(e) => {
+                    callback.emit(Err(e));
+
+                    return;
+                }
+            };
+            let result = Repository::new(&pm, browser_storage).load().await;
 
             match result {
                 Ok(Some(catalog)) => callback.emit(Ok(catalog)),
@@ -197,7 +214,16 @@ impl CatalogHandler for Handler {
         let catalog = self.state.catalog().clone();
         spawn_local(async move {
             type Repository<'a> = CatalogWebRepository<'a, PMType>;
-            let result = Repository::new(&pm).store(&catalog.unwrap()).await;
+            let browser_storage = match BrowserStorage::local_storage() {
+                Ok(s) => s,
+                Err(e) => {
+                    error!("Could not commit Catalog changes: {}", e.to_string());
+                    return;
+                }
+            };
+            let result = Repository::new(&pm, browser_storage)
+                .store(&catalog.unwrap())
+                .await;
 
             if let Err(e) = result {
                 error!("Could not commit Catalog changes: {}", e.to_string())
@@ -249,7 +275,7 @@ impl SetlistHandler for Handler {
     }
 
     fn setlist_settings_changed(&mut self, song_id: SongId, song_settings: SongSettings) {
-        info!(
+        debug!(
             "Settings changed song {} {:#?}",
             song_id,
             self.state.current_setlist().as_ref()
