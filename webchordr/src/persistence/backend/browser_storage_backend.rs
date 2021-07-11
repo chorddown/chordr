@@ -2,6 +2,7 @@ use crate::errors::PersistenceError;
 use crate::errors::WebError;
 use crate::persistence::backend::BackendTrait;
 use crate::persistence::browser_storage::*;
+use crate::persistence::storage_key_utility::build_combined_key;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use std::sync::{Arc, RwLock};
@@ -14,14 +15,6 @@ impl<B: BrowserStorageTrait> BrowserStorageBackend<B> {
     pub fn new(browser_storage: B) -> Self {
         Self {
             browser_storage: Arc::new(RwLock::new(browser_storage)),
-        }
-    }
-
-    fn build_combined_key<N: AsRef<str>, K: AsRef<str>>(&self, namespace: &N, key: &K) -> String {
-        if namespace.as_ref().is_empty() {
-            key.as_ref().to_string()
-        } else {
-            format!("{}.{}", namespace.as_ref(), key.as_ref())
         }
     }
 }
@@ -39,7 +32,7 @@ impl<B: BrowserStorageTrait> BackendTrait for BrowserStorageBackend<B> {
                 .browser_storage
                 .write()
                 .expect("Could not acquire lock for writing")
-                .set_item(self.build_combined_key(&namespace, &key), serialized),
+                .set_item(build_combined_key(&namespace, &key), serialized),
             Err(e) => Err(PersistenceError::serialization_error(e.to_string()).into()),
         }
     }
@@ -56,7 +49,7 @@ impl<B: BrowserStorageTrait> BackendTrait for BrowserStorageBackend<B> {
             .browser_storage
             .read()
             .expect("Could not acquire lock for reading")
-            .get_item(self.build_combined_key(&namespace, &key))
+            .get_item(build_combined_key(&namespace, &key))
         {
             Some(v) => match serde_json::from_str(v.as_str()) {
                 Ok(serialized) => Ok(serialized),

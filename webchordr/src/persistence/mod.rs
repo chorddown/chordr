@@ -1,6 +1,7 @@
 pub mod backend;
 pub mod browser_storage;
 pub mod persistence_manager;
+pub mod storage_key_utility;
 pub mod web_repository;
 
 pub mod prelude {
