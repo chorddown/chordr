@@ -50,7 +50,6 @@ module.exports = (env, argv) => {
         ]
       }),
       new WasmPackPlugin({
-        forceMode: 'production',
         crateDirectory: ".",
         withTypeScript: true
       }),
