@@ -30,6 +30,8 @@ use crate::state::State;
 
 type InitialDataResult = Result<Box<SessionMainData>, Option<WebError>>;
 
+const TICK_INTERVAL: u64 = 300;
+
 pub struct Handler {
     persistence_manager: Arc<PMType>,
     /// Keep a reference to the IntervalTask so that it doesn't get dropped
@@ -426,8 +428,10 @@ impl Component for Handler {
     type Properties = ();
 
     fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
-        let clock_handle =
-            IntervalService::spawn(Duration::from_secs(60), link.callback(|_| Msg::Tick));
+        let clock_handle = IntervalService::spawn(
+            Duration::from_secs(TICK_INTERVAL),
+            link.callback(|_| Msg::Tick),
+        );
 
         let user = User::unknown();
         let config = Config::default();
