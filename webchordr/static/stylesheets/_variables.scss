@@ -11,7 +11,7 @@ $green-darker: #17541e !default;
 $blue: #14949b !default;
 
 $std-space: 14px !default;
-$std-half: $std-space / 2 !default;
+$std-half: $std-space * .5 !default;
 $grid-gutter-width: $std-half !default;
 $grid-columns: 12 !default;
 
@@ -145,12 +145,12 @@ $chord: (
 $chord-dark: map-merge(
                 $chord,
                         (
-                          // font-color: value,
-                          // font-weight: value,
-                          // font-style: value,
-                          // background: value,
-                          // block-width: value,
-                          // block-color: value,
+                            // font-color: value,
+                            // font-weight: value,
+                            // font-style: value,
+                            // background: value,
+                            // block-width: value,
+                            // block-color: value,
                         )
 ) !default;
 
@@ -167,11 +167,11 @@ $chorus-dark: map-merge(
                 $chorus,
                 (
                         font-color: $dark-mode-text-color,
-                  // font-weight: value,
-                  // font-style: value,
-                  // background: value,
-                  // block-width: value,
-                  // block-color: value,
+                    // font-weight: value,
+                    // font-style: value,
+                    // background: value,
+                    // block-width: value,
+                    // block-color: value,
                 )
 ) !default;
 
@@ -209,11 +209,11 @@ $bridge-dark: map-merge(
                 $bridge,
                 (
                         font-color: $dark-mode-text-color,
-                  // font-weight: value,
-                  // font-style: value,
-                  // background: value,
-                  // block-width: value,
-                  // block-color: value,
+                    // font-weight: value,
+                    // font-style: value,
+                    // background: value,
+                    // block-width: value,
+                    // block-color: value,
                 )
 ) !default;
 
@@ -230,11 +230,11 @@ $blockquote-dark: map-merge(
                 $blockquote,
                 (
                         font-color: $dark-mode-text-color,
-                  // font-weight: value,
-                  // font-style: value,
-                  // background: value,
-                  // block-width: value,
-                  // block-color: value,
+                    // font-weight: value,
+                    // font-style: value,
+                    // background: value,
+                    // block-width: value,
+                    // block-color: value,
                 )
 ) !default;
 
