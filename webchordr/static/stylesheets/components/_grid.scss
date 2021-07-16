@@ -61,7 +61,9 @@
 
 @include build-columns($grid-columns);
 
-@include max-screen-xs {
-    @include build-columns($grid-columns, 'xs-');
+@each $screen in map-keys($grid-breakpoints) {
+    @include max-screen($screen) {
+        @include build-columns($grid-columns, '#{$screen}-');
+    }
 }
 

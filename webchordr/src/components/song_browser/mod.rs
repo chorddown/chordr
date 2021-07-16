@@ -117,7 +117,7 @@ impl Component for SongBrowser {
     fn view(&self) -> Html {
         let render_index_item = |index| {
             html! {
-                <div class="col-xs-6 col-3">
+                <div class="col-xs-12 col-sm-6 col-3">
                     <IndexItem class="song-browser-index-item grid-button"
                         index=index/>
                 </div>
