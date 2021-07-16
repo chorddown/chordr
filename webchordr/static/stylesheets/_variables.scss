@@ -14,6 +14,14 @@ $std-space: 14px !default;
 $std-half: $std-space * .5 !default;
 $grid-gutter-width: $std-half !default;
 $grid-columns: 12 !default;
+$grid-breakpoints: (
+        xs: 0,
+        sm: 576px,
+        md: 768px,
+        lg: 992px,
+        xl: 1200px,
+        xxl: 1400px
+) !default;
 
 $background: white !default;
 $dark-mode-background: $gray-ultra-dark !default;

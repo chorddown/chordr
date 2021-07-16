@@ -1,4 +1,26 @@
 @import "variables";
+@import "functions";
+
+@mixin debug-screen-breakpoints() {
+    body::after {
+        position: fixed;
+        right: 0;
+        top: 0;
+        background: rgba(white, .4);
+        padding: 4px;
+        font-size: 12px;
+        pointer-events: none;
+        font-family: Menlo, monospace;
+        opacity: .3;
+        @each $name, $min in $grid-breakpoints {
+            @include screen($name) {
+                $max: max-screen($name);
+                content: '[#{$min}] < #{$name} > [#{$max}]';
+
+            }
+        }
+    }
+}
 
 @mixin clearfix() {
     &::before,
@@ -128,6 +150,7 @@
         font-weight: normal;
         font-variant: normal;
         font-style: normal;
+        //noinspection CssNoGenericFontName
         font-family: 'iconmonstr-iconic-font';
         font-size: 1em;
         line-height: 1;
@@ -138,14 +161,40 @@
     }
 }
 
+@mixin min-screen($screen) {
+    @media screen and (min-width: min-screen($screen)) {
+        @content;
+    }
+}
+
+@mixin screen($screen) {
+    @media screen and (min-width: min-screen($screen)) and (max-width: max-screen($screen)) {
+        @content;
+    }
+}
+
+@mixin max-screen($screen) {
+    @media screen and (max-width: max-screen($screen)) {
+        @content;
+    }
+}
+
 @mixin max-screen-xs {
-    @media screen and (max-width: 768px - .001) {
+    @include max-screen(xs) {
         @content;
     }
 }
 
 @mixin min-screen-tablet {
-    @media screen and (min-width: 768px) {
+    @include min-screen(md) {
         @content;
     }
 }
+
+@mixin screen-tablet {
+    @include screen(md) {
+        @content;
+    }
+}
+
+
