@@ -45,6 +45,13 @@ impl Component for ReloadSection {
                 Err(_) => c.revision(),
             },
         };
+
+        let app_version = format!(
+            "{}-{}",
+            env!("CARGO_PKG_VERSION"),
+            env!("CUNDD_BUILD_REVISION")
+        );
+
         html! {
             <div class="reload-section">
                 <div class="reload-button-container">
@@ -59,7 +66,7 @@ impl Component for ReloadSection {
                 </div>
 
                 <div class="reload-section-version">
-                    {"App version: "}{env!("CARGO_PKG_VERSION")}
+                    {"App version: "}{app_version}
                 </div>
             </div>
         }
