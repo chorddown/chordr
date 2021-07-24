@@ -1,8 +1,10 @@
 use std::rc::Rc;
 
+use chrono::Utc;
+
 use libchordr::models::catalog::Catalog;
 use libchordr::models::setlist::Setlist;
-use libchordr::prelude::SongSettingsMap;
+use libchordr::prelude::{SongSettingsMap, User};
 pub use song_info::SongInfo;
 
 use crate::connection::ConnectionStatus;
@@ -30,6 +32,7 @@ impl State {
         song_settings: SongSettingsMap,
         connection_status: ConnectionStatus,
         session: Session,
+        error: Option<WebError>,
     ) -> Self {
         Self {
             catalog: catalog.map(|c| Rc::new(c)),
@@ -129,5 +132,21 @@ impl State {
         clone.set_song_settings(song_settings_map);
 
         clone
+    }
+}
+
+impl Default for State {
+    fn default() -> Self {
+        let user = User::unknown();
+        let now = Utc::now();
+
+        Self::new(
+            None,
+            Some(Setlist::new("", 0, user, None, Some(now), now, now, vec![])),
+            SongSettingsMap::new(),
+            ConnectionStatus::OnLine,
+            Session::default(),
+            None,
+        )
     }
 }

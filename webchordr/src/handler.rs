@@ -2,7 +2,6 @@ use std::rc::Rc;
 use std::sync::Arc;
 use std::time::Duration;
 
-use chrono::Utc;
 use log::{debug, error, info, warn};
 use wasm_bindgen_futures::spawn_local;
 use yew::services::interval::IntervalTask;
@@ -121,6 +120,7 @@ impl Handler {
                         song_settings.unwrap_or_else(SongSettingsMap::new),
                         ConnectionStatus::OnLine,
                         initial_data.session,
+                        None,
                     ),
                     true,
                 );
@@ -433,23 +433,12 @@ impl Component for Handler {
             link.callback(|_| Msg::Tick),
         );
 
-        let user = User::unknown();
         let config = Config::default();
         let session_service = Rc::new(SessionService::new(config.clone()));
         let persistence_manager = Handler::build_persistence_manager(&config, Session::default());
 
-        let now = Utc::now();
-        let setlist = Setlist::new("", 0, user, None, Some(now), now, now, vec![]);
-        let settings = SongSettingsMap::new();
-
+        let state = Rc::new(State::default());
         let connection_service = ConnectionService::new(config.clone());
-        let state = Rc::new(State::new(
-            None,
-            Some(setlist),
-            settings,
-            ConnectionStatus::OnLine,
-            Session::default(),
-        ));
 
         Self {
             persistence_manager,
@@ -512,6 +501,14 @@ impl Component for Handler {
             error!("{}", e);
             Msg::Ignore
         });
+
+        if let Some(e) = state.error() {
+            let window: web_sys::Window = web_sys::window().expect("window not available");
+            window
+                .alert_with_message(&format!("Could not load the song catalog (error: {})", e))
+                .expect("alert failed");
+        }
+
         if state.catalog().is_some() {
             (html! {
                 <App state=state
