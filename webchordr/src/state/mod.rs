@@ -7,6 +7,7 @@ pub use song_info::SongInfo;
 
 use crate::connection::ConnectionStatus;
 use crate::session::Session;
+use crate::WebError;
 
 mod song_info;
 
@@ -18,6 +19,7 @@ pub struct State {
     current_setlist: Option<Rc<Setlist>>,
     session: Rc<Session>,
     song_settings: Rc<SongSettingsMap>,
+    error: Option<WebError>,
 }
 
 #[allow(unused)]
@@ -35,6 +37,7 @@ impl State {
             current_setlist: setlist.map(|c| Rc::new(c)),
             session: Rc::new(session),
             song_settings: Rc::new(song_settings),
+            error,
         }
     }
 
@@ -49,6 +52,21 @@ impl State {
     pub fn with_catalog(&self, catalog: Option<Catalog>) -> Self {
         let mut clone = self.clone();
         clone.set_catalog(catalog);
+
+        clone
+    }
+
+    pub fn error(&self) -> Option<WebError> {
+        self.error.clone()
+    }
+
+    pub fn set_error(&mut self, error: Option<WebError>) {
+        self.error = error
+    }
+
+    pub fn with_error(&self, error: Option<WebError>) -> Self {
+        let mut clone = self.clone();
+        clone.set_error(error);
 
         clone
     }

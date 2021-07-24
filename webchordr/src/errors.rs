@@ -3,7 +3,7 @@ use std::fmt::{Display, Formatter, Result};
 use wasm_bindgen::JsValue;
 use web_sys::Response;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum WebError {
     SortableError(String),
     JsError(String),
@@ -85,7 +85,7 @@ impl From<PersistenceError> for WebError {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum PersistenceError {
     SerializationError(String),
     DeserializationError(String, Option<String>),
