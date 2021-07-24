@@ -182,14 +182,7 @@ impl CatalogHandler for Handler {
         let pm = self.persistence_manager.clone();
         let callback = self
             .link
-            .callback(move |result: Result<Catalog, WebError>| {
-                if let Ok(catalog) = &result {
-                    debug!("Catalog revision: {:?}", catalog.revision());
-                } else {
-                    debug!("Catalog response {:?}", result);
-                }
-                Msg::FetchCatalogReady(result)
-            });
+            .callback(move |result: Result<Catalog, WebError>| Msg::FetchCatalogReady(result));
 
         spawn_local(async move {
             type Repository<'a> = CatalogWebRepository<'a, PMType>;
@@ -306,11 +299,8 @@ impl SetlistHandler for Handler {
     }
 
     fn setlist_replace(&mut self, setlist: Setlist) {
-        info!(
-            "Replace setlist {:?} with {:?}",
-            self.state.current_setlist(),
-            setlist
-        );
+        info!("Replace setlist");
+        debug!("{:?} => {:?}", self.state.current_setlist(), setlist);
         self.set_state(self.state.with_current_setlist(setlist), true);
         <Handler as SetlistHandler>::commit_changes(self);
     }
@@ -456,8 +446,17 @@ impl Component for Handler {
         match msg {
             Msg::FetchCatalogReady(response) => {
                 self.fetching = false;
-                debug!("Catalog fetched");
-                self.set_state(self.state.with_catalog(response.ok()), true);
+
+                match response {
+                    Ok(catalog) => {
+                        debug!("Catalog fetched with revision: {:?}", catalog.revision());
+                        self.set_state(self.state.with_catalog(Some(catalog)), true);
+                    }
+                    Err(error) => {
+                        debug!("Catalog fetched with error {}", error);
+                        self.set_state(self.state.with_error(Some(error)), true);
+                    }
+                }
             }
             Msg::Ignore => return false,
             Msg::SessionChanged(session) => self.update_session(session, true),
