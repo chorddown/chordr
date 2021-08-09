@@ -4,14 +4,15 @@ pub mod file_type;
 pub mod list;
 pub mod meta;
 pub mod prelude;
-pub mod record_trait;
 pub mod record_id_trait;
+pub mod record_trait;
 pub mod setlist;
 pub mod song;
 pub mod song_data;
 pub mod song_id;
 pub mod song_list;
 pub mod song_settings;
+pub mod song_sorting;
 pub mod team;
 pub mod user;
 
