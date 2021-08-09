@@ -1,17 +1,22 @@
-mod index;
-mod index_item;
-mod link;
+use std::rc::Rc;
+
+use yew::prelude::*;
+use yew::{Component, ComponentLink, ShouldRender};
+
+use libchordr::models::catalog::*;
+use libchordr::models::song_data::SongData;
+use libchordr::prelude::Song;
+use libchordr::prelude::SongSorting;
+
+use crate::components::song_list::Item as SongItem;
 
 use self::index::*;
 use self::index_item::IndexItem;
 use self::link::SongBrowserLink;
-use crate::components::song_list::Item as SongItem;
-use libchordr::models::catalog::*;
-use libchordr::models::song_data::SongData;
-use libchordr::prelude::Song;
-use std::rc::Rc;
-use yew::prelude::*;
-use yew::{Component, ComponentLink, ShouldRender};
+
+mod index;
+mod index_item;
+mod link;
 
 pub struct SongBrowser {
     props: SongBrowserProps,
@@ -28,7 +33,7 @@ pub struct SongBrowserProps {
 impl SongBrowser {
     /// Return the [Song]s from the [Catalog] filtered by [props.chars]
     fn get_filtered_songs(&self) -> Vec<&Song> {
-        if self.has_chars() {
+        let songs: Vec<&Song> = if self.has_chars() {
             let chars = &self.props.chars;
             self.props
                 .catalog
@@ -37,7 +42,9 @@ impl SongBrowser {
                 .collect()
         } else {
             self.props.catalog.iter().collect()
-        }
+        };
+
+        songs.sort_by_title()
     }
 
     /// Return the indexes for the filtered [Song]s
