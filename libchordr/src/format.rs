@@ -1,12 +1,14 @@
-use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 use std::fmt::{self, Display, Formatter};
+
+use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, PartialEq, Debug, Deserialize, Serialize)]
 pub enum Format {
     HTML,
     Chorddown,
     SongBeamer,
+    Text,
     #[cfg(feature = "pdf")]
     PDF,
 }
@@ -17,6 +19,7 @@ impl Format {
             Self::HTML,
             Self::Chorddown,
             Self::SongBeamer,
+            Self::Text,
             #[cfg(feature = "pdf")]
             Self::PDF,
         ]
@@ -29,6 +32,7 @@ impl Display for Format {
             Self::HTML => f.write_str("HTML"),
             Self::Chorddown => f.write_str("Chorddown"),
             Self::SongBeamer => f.write_str("SongBeamer"),
+            Self::Text => f.write_str("Text"),
             #[cfg(feature = "pdf")]
             Self::PDF => f.write_str("PDF"),
         }
@@ -43,6 +47,7 @@ impl TryFrom<&str> for Format {
             "html" => Ok(Self::HTML),
             "chorddown" => Ok(Self::Chorddown),
             "songbeamer" => Ok(Self::SongBeamer),
+            "text" => Ok(Self::Text),
             #[cfg(feature = "pdf")]
             "pdf" => Ok(Self::PDF),
             _ => Err(()),

@@ -3,6 +3,7 @@ use self::html::HtmlConverter;
 #[cfg(feature = "pdf")]
 use self::pdf::PdfConverter;
 use crate::converter::songbeamer::SongBeamerConverter;
+use crate::converter::text::TextConverter;
 use crate::error::Result;
 use crate::models::chord::fmt::Formatting;
 use crate::models::song_meta_trait::SongMetaTrait;
@@ -13,6 +14,7 @@ mod html;
 #[cfg(feature = "pdf")]
 mod pdf;
 mod songbeamer;
+mod text;
 
 /// Trait for converting between formats
 pub trait ConverterTrait {
@@ -40,6 +42,7 @@ impl Converter {
             Format::HTML => Box::new(HtmlConverter {}),
             Format::Chorddown => Box::new(ChorddownConverter {}),
             Format::SongBeamer => Box::new(SongBeamerConverter {}),
+            Format::Text => Box::new(TextConverter {}),
             #[cfg(feature = "pdf")]
             Format::PDF => Box::new(PdfConverter {}),
         }
