@@ -1,11 +1,14 @@
-use super::list_error::ListError;
-use super::list_trait::ListTrait;
-use crate::models::list::list_trait::ListEntryTrait;
-use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 use std::slice::Iter;
 use std::vec::IntoIter;
 use std::{mem, ops};
+
+use serde::{Deserialize, Serialize};
+
+use crate::models::list::list_trait::ListEntryTrait;
+
+use super::list_error::ListError;
+use super::list_trait::ListTrait;
 
 /// A generic list of entries
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -146,9 +149,10 @@ where
 
 #[cfg(test)]
 mod test {
-    use super::*;
     use crate::models::list::list_trait::ListEntryTrait;
     use crate::models::song_id::SongId;
+
+    use super::*;
 
     #[derive(Debug, PartialOrd, PartialEq, Clone, Serialize, Deserialize)]
     struct TestItem(usize);
@@ -174,6 +178,22 @@ mod test {
         assert_eq!(list[0], TestItem(0));
         assert_eq!(list[1], TestItem(2));
         assert_eq!(list[3], TestItem(1));
+    }
+
+    #[test]
+    fn move_entry_to_same_position_test() {
+        let mut list = List(vec![
+            TestItem(0),
+            TestItem(1),
+            TestItem(2),
+            TestItem(3),
+            TestItem(4),
+        ]);
+        assert!(list.move_entry(1, 1).is_ok());
+        assert_eq!(list[0], TestItem(0));
+        assert_eq!(list[1], TestItem(1));
+        assert_eq!(list[3], TestItem(3));
+        assert_eq!(list[4], TestItem(4));
     }
 
     #[test]
