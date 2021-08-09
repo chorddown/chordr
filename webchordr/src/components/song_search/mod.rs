@@ -1,14 +1,18 @@
-mod link;
-
-use self::link::SongSearchLink;
-use crate::components::song_list::Item as SongItem;
-use libchordr::models::catalog::*;
-use libchordr::models::song_data::SongData;
-use libchordr::prelude::Song;
-use log::info;
 use std::rc::Rc;
+
+use log::info;
 use yew::prelude::*;
 use yew::{Component, ComponentLink, ShouldRender};
+
+use libchordr::models::catalog::*;
+use libchordr::prelude::{Song, SongData, SongSorting};
+
+use crate::components::song_list::Item as SongItem;
+use crate::search::SearchUtility;
+
+use self::link::SongSearchLink;
+
+mod link;
 
 pub struct SongSearch {
     search: String,
@@ -26,20 +30,7 @@ pub struct SongSearchProps {
 impl SongSearch {
     /// Return the [Song]s from the [Catalog] filtered by [self.search]
     fn get_filtered_songs(&self) -> Vec<&Song> {
-        let mut songs: Vec<&Song> = if self.search.is_empty() {
-            self.props.catalog.iter().collect()
-        } else {
-            let search_normalized = self.search.to_lowercase();
-            self.props
-                .catalog
-                .iter()
-                .filter(|s| str::contains(&s.title().to_lowercase(), &search_normalized))
-                .collect()
-        };
-
-        // Todo: Do not re-sort on each render
-        songs.sort_by(|a, b| a.title().partial_cmp(&b.title()).unwrap());
-        songs
+        SearchUtility::search_catalog_by_term(&self.props.catalog, &self.search).sort_by_title()
     }
 
     fn get_back_link(&self) -> Html {
