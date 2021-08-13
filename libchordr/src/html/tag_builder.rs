@@ -1,7 +1,9 @@
-use crate::html::attribute::Attribute;
-use crate::html::tag::{Content, Tag};
-use crate::html::validate_xml_identifier;
 use std::collections::HashSet;
+
+use crate::html::attribute::Attribute;
+use crate::html::content::Content;
+use crate::html::tag::Tag;
+use crate::html::validate_xml_identifier;
 
 #[derive(Debug)]
 pub struct TagBuilder<'a> {

@@ -1,6 +1,7 @@
 use crate::error::{Error, Result};
 
 pub mod attribute;
+pub mod content;
 pub mod escape;
 pub mod tag;
 pub mod tag_builder;

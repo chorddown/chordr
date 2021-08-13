@@ -1,5 +1,6 @@
 use crate::html::attribute::Attribute;
-use crate::html::tag::{Content, Tag};
+use crate::html::content::Content;
+use crate::html::tag::Tag;
 use crate::html::tag_builder::TagBuilder;
 use crate::models::chord::fmt::Formatting;
 use crate::models::chord::{Chords, NoteDisplay};
