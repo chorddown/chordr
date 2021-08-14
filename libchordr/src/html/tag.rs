@@ -1,10 +1,9 @@
-use std::collections::HashSet;
 use std::fmt::{Display, Error, Formatter};
 
 use crate::error::Result;
+use crate::html::attribute::AttributeCollection;
 use crate::html::content::Content;
 
-use super::attribute::Attribute;
 use super::validate_xml_identifier;
 
 #[derive(Clone, Debug)]
@@ -12,14 +11,14 @@ pub struct Tag /*<'a>*/ {
     blank: bool,
     tag_name: Option<String>,
     content: Content,
-    attributes: Option<HashSet<Attribute /*<'a>*/>>,
+    attributes: Option<AttributeCollection>,
 }
 
 impl<'a> Tag /*<'a>*/ {
     pub fn new<S: Into<String>>(
         tag_name: S,
         content: Content,
-        attributes: Option<HashSet<Attribute /*<'a>*/>>,
+        attributes: Option<AttributeCollection>,
     ) -> Self {
         let tag_name_string = tag_name.into();
         if let Err(e) = validate_xml_identifier(&tag_name_string) {
@@ -32,11 +31,12 @@ impl<'a> Tag /*<'a>*/ {
             blank: false,
         }
     }
-    pub fn raw(content: Content) -> Self {
+
+    pub const fn raw(content: String) -> Self {
         Self {
             tag_name: None,
-            content,
-            attributes: Default::default(),
+            content: Content::Raw(content),
+            attributes: None,
             blank: false,
         }
     }
@@ -45,12 +45,17 @@ impl<'a> Tag /*<'a>*/ {
     ///
     /// (like a Fragment in React)
     #[allow(dead_code)]
-    pub fn empty() -> Self {
-        Self::new("".to_owned(), Content::None, None)
+    pub const fn empty() -> Self {
+        Self {
+            tag_name: Some(String::new()),
+            content: Content::None,
+            attributes: None,
+            blank: false,
+        }
     }
 
     /// Build a new Tag instance that will render as an empty string
-    pub fn blank() -> Self {
+    pub const fn blank() -> Self {
         Self {
             tag_name: None,
             content: Content::None,
@@ -64,8 +69,13 @@ impl<'a> Tag /*<'a>*/ {
     }
 
     #[allow(dead_code)]
-    pub fn text_node(content: &'a str) -> Self {
-        Self::new("".to_owned(), Content::Some(content.into()), None)
+    pub const fn text_node(content: String) -> Self {
+        Self {
+            tag_name: Some(String::new()),
+            content: Content::Some(content),
+            attributes: None,
+            blank: false,
+        }
     }
 
     pub fn content(&self) -> &Content {
@@ -103,7 +113,7 @@ impl<'a> Tag /*<'a>*/ {
 impl<'a> Display for Tag /*<'a>*/ {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
         if self.is_blank() {
-            return write!(f, "");
+            return Ok(());
         }
 
         if self.has_attributes() && self.tag_name().is_none() {
@@ -120,28 +130,26 @@ impl<'a> Display for Tag /*<'a>*/ {
             write!(f, "<{}/>", self.tag_name().unwrap())
         } else {
             let tag_name = self.tag_name().unwrap();
-            let mut node = String::new();
             if !tag_name.is_empty() {
-                node = format!("<{}", tag_name);
+                f.write_str("<")?;
+                f.write_str(&tag_name)?;
             }
 
             if let Some(attributes) = &self.attributes {
-                let mut attributes_sorted = attributes.iter().collect::<Vec<_>>();
+                let mut attributes_sorted = attributes.into_iter().collect::<Vec<_>>();
                 attributes_sorted.sort();
-                node.push_str(&format!(
-                    " {}",
-                    attributes_sorted
-                        .iter()
-                        .map(|a| a.to_string())
-                        .collect::<Vec<String>>()
-                        .join(" ")
-                ));
+                for attribute in attributes_sorted {
+                    f.write_str(" ")?;
+                    f.write_str(&attribute.to_string())?;
+                }
             }
 
-            node.push_str(&format!(">{}", self.content));
-            node.push_str(&format!("</{}>", tag_name));
-
-            write!(f, "{}", node)
+            f.write_str(">")?;
+            f.write_str(&self.content.to_string())?;
+            f.write_str("</")?;
+            f.write_str(&tag_name)?;
+            f.write_str(">")?;
+            Ok(())
         }
     }
 }

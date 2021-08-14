@@ -9,6 +9,6 @@ mod parser;
 #[cfg(feature = "pdf")]
 mod pdf;
 pub mod prelude;
-#[cfg(test)]
-mod test_helpers;
+#[doc(hidden)]
+pub mod test_helpers;
 mod tokenizer;

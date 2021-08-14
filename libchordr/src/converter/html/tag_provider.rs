@@ -15,8 +15,6 @@ impl TagProvider {
     }
 
     pub fn build_tag_for_node<'a>(&'a self, node: &'a Node, formatting: Formatting) -> Tag {
-        let mut gtb = TagBuilder::new();
-
         match node {
             Node::ChordTextPair {
                 chords,
@@ -32,7 +30,7 @@ impl TagProvider {
             Node::Text(text) => {
                 self.build_column(Tag::blank(), self.build_tag_for_token(text, formatting))
             }
-            Node::Document(children) => gtb
+            Node::Document(children) => TagBuilder::new()
                 .set_tag_name("div")
                 .set_id("chordr-song")
                 .set_content_tag(self.build_tag_for_children(children, formatting))
@@ -42,53 +40,59 @@ impl TagProvider {
             Node::Meta(m) => {
                 let inner = format!(
                     "{} {}",
-                    gtb.set_tag_name("span")
+                    TagBuilder::new()
+                        .set_tag_name("span")
                         .set_class_name("meta-keyword")
-                        .set_content_str(&format!("{}:", m.keyword()))
+                        .set_content_str(format!("{}:", m.keyword()))
                         .build(),
-                    gtb.set_tag_name("span")
+                    TagBuilder::new()
+                        .set_tag_name("span")
                         .set_class_name("meta-value")
                         .set_content_str(m.content())
                         .build()
                 );
 
-                gtb.set_content(Content::Raw(inner)).build()
+                Tag::raw(inner)
             }
-            Node::Newline => {
-                let inner = format!("{}\n", Tag::with_name("hr"));
-
-                Tag::raw(Content::Raw(inner))
-            }
+            Node::Newline => Tag::raw(format!("{}\n", Tag::with_name("hr"))),
             Node::Section {
                 head,
                 children,
                 section_type,
-            } => {
-                gtb.set_tag_name("section");
-                if let Some(class_name) = class_name_for_type(section_type) {
-                    gtb.set_class_name(class_name);
-                }
+            } => self.build_tag_for_section(formatting, head, children, section_type),
+        }
+    }
 
-                if let Some(head) = head {
-                    self.build_tag_for_children(children, formatting)
-                        .to_string();
-                    let inner = format!(
-                        "{}{}",
-                        self.build_tag_for_node(head, formatting),
-                        self.build_tag_for_children(children, formatting)
-                    );
+    fn build_tag_for_section(
+        &self,
+        formatting: Formatting,
+        head: &Option<Box<Node>>,
+        children: &Vec<Node>,
+        section_type: &SectionType,
+    ) -> Tag {
+        let mut gtb = TagBuilder::new().set_tag_name("section");
+        if let Some(class_name) = class_name_for_type(section_type) {
+            gtb = gtb.set_class_name(class_name);
+        }
 
-                    gtb.set_content(Content::Raw(inner)).build()
-                } else {
-                    gtb.set_content_tag(self.build_tag_for_children(children, formatting))
-                        .build()
-                }
-            }
+        if let Some(head) = head {
+            self.build_tag_for_children(children, formatting)
+                .to_string();
+            let inner = format!(
+                "{}{}",
+                self.build_tag_for_node(head, formatting),
+                self.build_tag_for_children(children, formatting)
+            );
+
+            gtb.set_content(Content::Raw(inner)).build()
+        } else {
+            gtb.set_content_tag(self.build_tag_for_children(children, formatting))
+                .build()
         }
     }
 
     fn build_tag_for_token<'a>(&'a self, token: &'a Token, _formatting: Formatting) -> Tag {
-        let mut gtb = TagBuilder::new();
+        let gtb = TagBuilder::new();
 
         match token {
             Token::Literal(c) => gtb.set_tag_name("span").set_content_str(c).build(),
@@ -106,20 +110,21 @@ impl TagProvider {
             Token::Newline => unreachable!(),
         }
     }
-    fn build_tag_for_chord_text_token<'a>(
-        &'a self,
-        token: &'a Token,
+
+    fn build_tag_for_chord_text_token(
+        &self,
+        token: &Token,
         _formatting: Formatting,
         last_in_line: bool,
     ) -> Tag {
-        let mut gtb = TagBuilder::new();
-
         if let Token::Literal(c) = token {
-            let span = gtb.set_tag_name("span").set_content_str(c);
-            if last_in_line {
-                span.set_class_name("-last-in-line");
-            }
+            let mut span = TagBuilder::new().set_tag_name("span").set_content_str(c);
 
+            span = if last_in_line {
+                span.set_class_name("-last-in-line")
+            } else {
+                span
+            };
             span.build()
         } else {
             unreachable!()
@@ -131,27 +136,28 @@ impl TagProvider {
     }
 
     fn build_tag_for_chords(&self, chords: &Chords, formatting: Formatting) -> Tag {
-        let mut gtb = TagBuilder::new();
-        gtb.set_tag_name("span")
-            .set_content_str(chords.note_format(formatting))
+        let formatted_chords = chords.note_format(formatting);
+
+        TagBuilder::new()
+            .set_tag_name("span")
+            .set_content_str(&formatted_chords)
             .set_class_name("chordr-chord")
-            .set_attribute(Attribute::new("data-chord", &chords.note_format(formatting)).unwrap())
+            .set_attribute(Attribute::new("data-chord", formatted_chords).unwrap())
             .build()
     }
 
     fn build_tag_for_children<'a>(&'a self, children: &'a [Node], formatting: Formatting) -> Tag {
-        let mut gtb = TagBuilder::new();
         if children.is_empty() {
-            return Tag::blank();
+            Tag::blank()
+        } else {
+            Tag::raw(
+                children
+                    .iter()
+                    .map(|n| self.build_tag_for_node(n, formatting).to_string())
+                    .collect::<Vec<String>>()
+                    .join(""),
+            )
         }
-
-        let inner = children
-            .iter()
-            .map(|n| self.build_tag_for_node(n, formatting).to_string())
-            .collect::<Vec<String>>()
-            .join("");
-
-        gtb.set_content(Content::Raw(inner)).build()
     }
 
     fn build_column(&self, chord: Tag, lyric: Tag) -> Tag {
@@ -160,11 +166,6 @@ impl TagProvider {
         } else {
             chord.to_string()
         };
-        let lyric_text = if lyric.is_blank() {
-            "".to_owned()
-        } else {
-            lyric.to_string()
-        };
 
         let lyric_text_class = match lyric.content() {
             Content::Some(s) if s.ends_with(char::is_alphanumeric) => "text-row -word-split",
@@ -172,15 +173,15 @@ impl TagProvider {
             _ => "text-row",
         };
 
-        let string = format!(
+        let html = format!(
             "<div class='chord-row'>{}</div><div class='{}'>{}</div>",
-            chord_text, lyric_text_class, lyric_text
+            chord_text, lyric_text_class, lyric
         );
 
         TagBuilder::new()
             .set_tag_name("div")
             .set_class_name("col")
-            .set_content(Content::Raw(string))
+            .set_content(Content::Raw(html))
             .build()
     }
 }

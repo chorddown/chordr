@@ -1,28 +1,49 @@
-use super::validate_xml_identifier;
-use crate::error::Result;
-use crate::html::escape::Escape;
 use std::cmp::Ordering;
+use std::collections::HashSet;
 use std::fmt::{Display, Error, Formatter};
 use std::hash::{Hash, Hasher};
 
+use crate::error::Result;
+use crate::html::escape::Escape;
+
+use super::validate_xml_identifier;
+
+pub type AttributeCollection = HashSet<Attribute>;
+
 #[derive(Clone, Debug, Ord)]
 pub struct Attribute {
-    name: String,
+    name: &'static str,
     value: String,
 }
 
 impl<'a> Attribute {
-    pub fn new(name: &'a str, value: &'a str) -> Result<Self> {
+    pub fn new<S: Into<String>>(name: &'static str, value: S) -> Result<Self> {
         Ok(Self {
-            name: validate_xml_identifier(name)?.to_owned(),
-            value: value.to_owned(),
+            name: validate_xml_identifier(name)?,
+            value: value.into(),
         })
     }
 
+    pub fn id<S: Into<String>>(value: S) -> Self {
+        Self {
+            name: "id",
+            value: value.into(),
+        }
+    }
+
+    pub fn class_name<S: Into<String>>(value: S) -> Self {
+        Self {
+            name: "class",
+            value: value.into(),
+        }
+    }
+
+    #[inline(always)]
     pub fn name(&self) -> &str {
         &self.name
     }
 
+    #[inline(always)]
     pub fn value(&self) -> &str {
         &self.value
     }
@@ -56,8 +77,9 @@ impl Display for Attribute {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use std::collections::hash_map::DefaultHasher;
+
+    use super::*;
 
     fn get_hash<T>(obj: T) -> u64
     where

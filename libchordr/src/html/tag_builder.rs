@@ -1,15 +1,12 @@
-use std::collections::HashSet;
-
-use crate::html::attribute::Attribute;
+use crate::html::attribute::{Attribute, AttributeCollection};
 use crate::html::content::Content;
 use crate::html::tag::Tag;
-use crate::html::validate_xml_identifier;
 
 #[derive(Debug)]
 pub struct TagBuilder<'a> {
     tag_name: &'a str,
     content: Content,
-    attributes: HashSet<Attribute /*<'a>*/>,
+    attributes: AttributeCollection,
 }
 
 impl<'a> TagBuilder<'a> {
@@ -17,72 +14,54 @@ impl<'a> TagBuilder<'a> {
         Self {
             tag_name: "",
             content: Content::None,
-            attributes: HashSet::new(),
+            attributes: Default::default(),
         }
     }
 
-    pub fn set_content_str<S: Into<String>>(&mut self, content: S) -> &mut Self {
+    pub fn set_content_str<S: Into<String>>(self, content: S) -> Self {
         self.set_content(Content::Some(content.into()))
     }
 
-    pub fn set_content_tag(&mut self, content: Tag) -> &mut Self {
+    pub fn set_content_tag(self, content: Tag) -> Self {
         self.set_content(Content::Tag(Box::new(content)))
     }
 
-    pub fn set_content(&mut self, content: Content) -> &mut Self {
+    pub fn set_content(mut self, content: Content) -> Self {
         self.content = content;
 
         self
     }
 
-    pub fn set_tag_name(&mut self, tag_name: &'a str) -> &mut Self {
-        self.tag_name = validate_xml_identifier(tag_name).unwrap();
+    pub fn set_tag_name(mut self, tag_name: &'a str) -> Self {
+        self.tag_name = tag_name;
 
         self
     }
 
-    pub fn set_class_name(&mut self, class_name: &'a str) -> &mut Self {
-        let attribute = Attribute::new("class", class_name).unwrap();
-        self.set_attribute(attribute);
-
-        self
+    pub fn set_class_name(self, class_name: &'a str) -> Self {
+        self.set_attribute(Attribute::class_name(class_name))
     }
 
-    pub fn set_id(&mut self, id: &'a str) -> &mut Self {
-        let attribute = Attribute::new("id", id).unwrap();
-        self.set_attribute(attribute);
-
-        self
+    pub fn set_id(self, id: &'a str) -> Self {
+        self.set_attribute(Attribute::id(id))
     }
 
-    pub fn set_attribute(&mut self, attribute: Attribute /*<'a>*/) -> &mut Self {
+    pub fn set_attribute(mut self, attribute: Attribute /*<'a>*/) -> Self {
         self.attributes.replace(attribute);
 
         self
     }
 
-    #[allow(dead_code)]
-    pub fn reset(&mut self) -> &mut Self {
-        self.tag_name = "";
-        self.content = Content::None;
-        self.attributes.clear();
-
-        self
-    }
-
-    pub fn build(&self) -> Tag {
+    pub fn build(self) -> Tag {
         if self.tag_name.is_empty() && (!self.attributes.is_empty()) {
             println!("{:?}", self);
             panic!("Can not build a Fragment tag with attributes and content")
         }
+
         if self.attributes.is_empty() {
-            Tag::new(self.tag_name.to_owned(), self.content.clone(), None)
+            Tag::new(self.tag_name, self.content, None)
         } else {
-            Tag::new(
-                self.tag_name.to_owned(),
-                self.content.clone(),
-                Some(self.attributes.clone()),
-            )
+            Tag::new(self.tag_name, self.content, Some(self.attributes))
         }
     }
 }
@@ -93,10 +72,10 @@ mod tests {
 
     #[test]
     fn test_build_a() {
-        let mut gtb = TagBuilder::new();
-        gtb.set_tag_name("a");
-        gtb.set_attribute(Attribute::new("href", "https://cundd.net").unwrap());
-        gtb.set_content_str("Homepage link");
+        let gtb = TagBuilder::new()
+            .set_tag_name("a")
+            .set_attribute(Attribute::new("href", "https://cundd.net").unwrap())
+            .set_content_str("Homepage link");
 
         assert_eq!(
             "<a href='https://cundd.net'>Homepage link</a>",
@@ -106,10 +85,10 @@ mod tests {
 
     #[test]
     fn test_escape_class_name() {
-        let mut gtb = TagBuilder::new();
-        gtb.set_tag_name("div");
-        gtb.set_content_str("Some content");
-        gtb.set_class_name("some-nice-class' try to hack you");
+        let gtb = TagBuilder::new()
+            .set_tag_name("div")
+            .set_content_str("Some content")
+            .set_class_name("some-nice-class' try to hack you");
 
         assert_eq!(
             &gtb.build().to_string(),
@@ -119,10 +98,10 @@ mod tests {
 
     #[test]
     fn test_escape_attribute() {
-        let mut gtb = TagBuilder::new();
-        gtb.set_tag_name("a");
-        gtb.set_attribute(Attribute::new("href", "https://cundd.net' try to hack you").unwrap());
-        gtb.set_content_str("Homepage link");
+        let gtb = TagBuilder::new()
+            .set_tag_name("a")
+            .set_attribute(Attribute::new("href", "https://cundd.net' try to hack you").unwrap())
+            .set_content_str("Homepage link");
 
         assert_eq!(
             &gtb.build().to_string(),
@@ -132,11 +111,11 @@ mod tests {
 
     #[test]
     fn test_class_name_attribute_twice() {
-        let mut gtb = TagBuilder::new();
-        gtb.set_tag_name("div");
-        gtb.set_content_str("Some content");
-        gtb.set_class_name("some-nice-class");
-        gtb.set_attribute(Attribute::new("class", "another-nice-class").unwrap());
+        let gtb = TagBuilder::new()
+            .set_tag_name("div")
+            .set_content_str("Some content")
+            .set_class_name("some-nice-class")
+            .set_attribute(Attribute::new("class", "another-nice-class").unwrap());
 
         assert_eq!(
             &gtb.build().to_string(),
@@ -146,11 +125,11 @@ mod tests {
 
     #[test]
     fn test_attribute_twice() {
-        let mut gtb = TagBuilder::new();
-        gtb.set_tag_name("div");
-        gtb.set_content_str("Some content");
-        gtb.set_attribute(Attribute::new("id", "some-nice-id").unwrap());
-        gtb.set_attribute(Attribute::new("id", "another-nice-id").unwrap());
+        let gtb = TagBuilder::new()
+            .set_tag_name("div")
+            .set_content_str("Some content")
+            .set_attribute(Attribute::new("id", "some-nice-id").unwrap())
+            .set_attribute(Attribute::new("id", "another-nice-id").unwrap());
 
         assert_eq!(
             &gtb.build().to_string(),
@@ -160,22 +139,22 @@ mod tests {
 
     #[test]
     fn test_different_attributes() {
-        let mut gtb = TagBuilder::new();
-        gtb.set_tag_name("div");
-        gtb.set_content_str("Some content");
-        gtb.set_attribute(Attribute::new("id", "a-nice-id").unwrap());
-        gtb.set_attribute(Attribute::new("class", "some-nice-class").unwrap());
+        let gtb = TagBuilder::new()
+            .set_tag_name("div")
+            .set_content_str("Some content")
+            .set_attribute(Attribute::new("id", "a-nice-id").unwrap())
+            .set_attribute(Attribute::new("class", "some-nice-class").unwrap());
 
         assert_eq!(
             &gtb.build().to_string(),
             "<div class='some-nice-class' id='a-nice-id'>Some content</div>"
         );
 
-        gtb.reset();
-        gtb.set_tag_name("div");
-        gtb.set_content_str("Some content");
-        gtb.set_attribute(Attribute::new("id", "a-nice-id-that-is-longer").unwrap());
-        gtb.set_attribute(Attribute::new("class", "some-nice-class").unwrap());
+        let gtb = TagBuilder::new()
+            .set_tag_name("div")
+            .set_content_str("Some content")
+            .set_attribute(Attribute::new("id", "a-nice-id-that-is-longer").unwrap())
+            .set_attribute(Attribute::new("class", "some-nice-class").unwrap());
 
         assert_eq!(
             &gtb.build().to_string(),
@@ -185,16 +164,16 @@ mod tests {
 
     #[test]
     fn test_reset() {
-        let mut gtb = TagBuilder::new();
-        gtb.set_tag_name("span");
-        gtb.set_content_str("My content");
-        gtb.set_attribute(Attribute::new("class", "some-nice-class").unwrap());
+        let gtb = TagBuilder::new()
+            .set_tag_name("span")
+            .set_content_str("My content")
+            .set_attribute(Attribute::new("class", "some-nice-class").unwrap());
         assert_eq!(
             &gtb.build().to_string(),
             "<span class='some-nice-class'>My content</span>"
         );
 
-        gtb.reset();
+        let gtb = TagBuilder::new();
         assert_eq!(&gtb.build().to_string(), "</>");
     }
 }

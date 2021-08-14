@@ -17,9 +17,10 @@ path = "src/lib.rs"
 
 [features]
 pdf = ["printpdf"]
+internals = []
 
 [dependencies]
-serde = {version ="^1.0", features = ["derive"]}
+serde = { version = "^1.0", features = ["derive"] }
 serde_derive = "^1.0"
 printpdf = { version = "0.2.8", optional = true }
 rand = "0.7.2"
@@ -28,3 +29,16 @@ chrono = { version = "0.4", features = ["serde"] }
 
 [dev-dependencies]
 serde_json = "^1.0"
+criterion = { version = "0.3", features = ["html_reports"] }
+
+[[bench]]
+name = "parse_benchmark"
+harness = false
+
+[[bench]]
+name = "converter_benchmark"
+harness = false
+
+[[bench]]
+name = "tokenize_benchmark"
+harness = false

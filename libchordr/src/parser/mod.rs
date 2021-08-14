@@ -1,19 +1,20 @@
+use crate::error::Error;
+use crate::models::meta::*;
+use crate::parser::meta_parser::MetaParser;
+use crate::parser::node_parser::NodeParser;
+use crate::tokenizer::Token;
+
+pub use self::meta_information::MetaInformation;
+pub use self::node::Node;
+pub use self::parser_result::ParserResult;
+pub use self::section_type::SectionType;
+
 mod meta_information;
 mod meta_parser;
 mod node;
 mod node_parser;
 mod parser_result;
 mod section_type;
-
-pub use self::meta_information::MetaInformation;
-pub use self::node::Node;
-pub use self::parser_result::ParserResult;
-pub use self::section_type::SectionType;
-use crate::error::Error;
-use crate::models::meta::*;
-use crate::parser::meta_parser::MetaParser;
-use crate::parser::node_parser::NodeParser;
-use crate::tokenizer::Token;
 
 pub trait ParserTrait {
     type OkType;
@@ -75,9 +76,10 @@ impl Parser {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::test_helpers::get_test_parser_input;
+    use crate::test_helpers::{get_test_ast, get_test_parser_input, get_test_tokens};
     use crate::tokenizer::Modifier;
+
+    use super::*;
 
     #[test]
     fn test_parse() {
@@ -133,6 +135,21 @@ mod tests {
         ]);
 
         assert_eq!(ast, expected_ast);
+    }
+
+    #[test]
+    fn test_parse_2() {
+        let mut parser = Parser::new();
+        let result = parser.parse(get_test_tokens());
+
+        assert!(result.is_ok());
+        let parser_result = result.unwrap();
+        assert_eq!(
+            Some("Swing Low Sweet Chariot".to_string()),
+            parser_result.meta().title
+        );
+
+        assert_eq!(parser_result.node(), get_test_ast());
     }
 
     #[test]

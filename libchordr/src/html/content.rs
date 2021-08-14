@@ -1,15 +1,15 @@
 use std::fmt::{Display, Error, Formatter};
 
 use crate::error::Result;
+use crate::html::tag::Tag;
 
 use super::escape::Escape;
-use crate::html::tag::Tag;
 
 #[derive(Clone, Debug)]
 pub enum Content {
     None,
     Some(String),
-    Tag(Box<Tag /*<'a>*/>),
+    Tag(Box<Tag>),
     Raw(String),
 }
 
