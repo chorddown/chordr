@@ -1,10 +1,13 @@
 use crate::error::{Error, Result};
 
 pub mod attribute;
+pub mod const_tag;
 pub mod content;
+pub mod dynamic_tag;
 pub mod escape;
 pub mod tag;
 pub mod tag_builder;
+pub mod tag_name;
 
 fn validate_xml_identifier(content: &str) -> Result<&str> {
     let bad_character_option =

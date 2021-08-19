@@ -18,6 +18,7 @@ impl<'a> TagBuilder<'a> {
         }
     }
 
+    #[allow(unused)]
     pub fn set_content_str<S: Into<String>>(self, content: S) -> Self {
         self.set_content(Content::Some(content.into()))
     }
@@ -42,6 +43,7 @@ impl<'a> TagBuilder<'a> {
         self.set_attribute(Attribute::class_name(class_name))
     }
 
+    #[allow(unused)]
     pub fn set_id(self, id: &'a str) -> Self {
         self.set_attribute(Attribute::id(id))
     }

@@ -14,6 +14,10 @@ pub enum Content {
 }
 
 impl Content {
+    pub(crate) fn from_string<S: Into<String>>(content: S) -> Content {
+        Content::Some(content.into())
+    }
+
     pub fn is_empty(&self) -> bool {
         match self {
             Content::None => true,
@@ -32,5 +36,11 @@ impl Display for Content {
             Content::Raw(c) => write!(f, "{}", c),
             Content::Tag(t) => write!(f, "{}", *t),
         }
+    }
+}
+
+impl From<Tag> for Content {
+    fn from(t: Tag) -> Self {
+        Content::Tag(Box::new(t))
     }
 }

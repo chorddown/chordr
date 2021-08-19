@@ -17,6 +17,7 @@ pub struct Attribute {
 }
 
 impl<'a> Attribute {
+    #[allow(unused)]
     pub fn new<S: Into<String>>(name: &'static str, value: S) -> Result<Self> {
         Ok(Self {
             name: validate_xml_identifier(name)?,
@@ -24,6 +25,7 @@ impl<'a> Attribute {
         })
     }
 
+    #[allow(unused)]
     pub fn id<S: Into<String>>(value: S) -> Self {
         Self {
             name: "id",
@@ -31,6 +33,7 @@ impl<'a> Attribute {
         }
     }
 
+    #[allow(unused)]
     pub fn class_name<S: Into<String>>(value: S) -> Self {
         Self {
             name: "class",

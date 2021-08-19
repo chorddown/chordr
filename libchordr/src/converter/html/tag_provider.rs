@@ -1,11 +1,10 @@
-use crate::html::attribute::Attribute;
 use crate::html::content::Content;
 use crate::html::tag::Tag;
 use crate::html::tag_builder::TagBuilder;
 use crate::models::chord::fmt::Formatting;
 use crate::models::chord::{Chords, NoteDisplay};
 use crate::parser::{Node, SectionType};
-use crate::tokenizer::Token;
+use crate::tokenizer::{Meta, Token};
 
 pub struct TagProvider {}
 
@@ -37,30 +36,25 @@ impl TagProvider {
                 .build(),
             Node::Headline(token) => self.build_tag_for_token(token, formatting),
             Node::Quote(token) => self.build_tag_for_token(token, formatting),
-            Node::Meta(m) => {
-                let inner = format!(
-                    "{} {}",
-                    TagBuilder::new()
-                        .set_tag_name("span")
-                        .set_class_name("meta-keyword")
-                        .set_content_str(format!("{}:", m.keyword()))
-                        .build(),
-                    TagBuilder::new()
-                        .set_tag_name("span")
-                        .set_class_name("meta-value")
-                        .set_content_str(m.content())
-                        .build()
-                );
-
-                Tag::raw(inner)
-            }
-            Node::Newline => Tag::raw(format!("{}\n", Tag::with_name("hr"))),
+            Node::Meta(m) => self.build_tag_for_meta(m),
+            Node::Newline => Tag::raw(format!("{}\n", Tag::hr())),
             Node::Section {
                 head,
                 children,
                 section_type,
             } => self.build_tag_for_section(formatting, head, children, section_type),
         }
+    }
+
+    fn build_tag_for_meta(&self, m: &Meta) -> Tag {
+        Tag::raw(format!(
+            "{} {}",
+            Tag::span(
+                Content::from_string(format!("{}:", m.keyword())),
+                Some("meta-keyword"),
+            ),
+            Tag::span(Content::from_string(m.content()), Some("meta-value")),
+        ))
     }
 
     fn build_tag_for_section(
@@ -90,19 +84,14 @@ impl TagProvider {
     }
 
     fn build_tag_for_token<'a>(&'a self, token: &'a Token, _formatting: Formatting) -> Tag {
-        let gtb = TagBuilder::new();
-
         match token {
-            Token::Literal(c) => gtb.set_tag_name("span").set_content_str(c).build(),
-            Token::Quote(c) => gtb.set_tag_name("blockquote").set_content_str(c).build(),
+            Token::Literal(c) => Tag::span(Content::from_string(c), None),
+            Token::Quote(c) => Tag::blockquote(Content::from_string(c), None),
             Token::Headline {
                 level,
                 text: c,
                 modifier: _,
-            } => gtb
-                .set_tag_name(&format!("h{}", level))
-                .set_content_str(c)
-                .build(),
+            } => Tag::headline(*level, Content::from_string(c), None),
             Token::Chord(_) => unreachable!(),
             Token::Meta(_) => unreachable!(),
             Token::Newline => unreachable!(),
@@ -116,32 +105,24 @@ impl TagProvider {
         last_in_line: bool,
     ) -> Tag {
         if let Token::Literal(c) = token {
-            let mut span = TagBuilder::new().set_tag_name("span").set_content_str(c);
-
-            span = if last_in_line {
-                span.set_class_name("-last-in-line")
+            if last_in_line {
+                Tag::span(Content::from_string(c), Some("-last-in-line"))
             } else {
-                span
-            };
-            span.build()
+                Tag::span(Content::from_string(c), None)
+            }
         } else {
             unreachable!()
         }
-        // match token {
-        //     Token::Literal(c) => gtb.set_tag_name("span").set_content_str(c).set_class_name(if eol { "-last-of-line" } else { "" }).build(),
-        //     _ => unreachable!()
-        // }
     }
 
     fn build_tag_for_chords(&self, chords: &Chords, formatting: Formatting) -> Tag {
         let formatted_chords = chords.note_format(formatting);
 
-        TagBuilder::new()
-            .set_tag_name("span")
-            .set_content_str(&formatted_chords)
-            .set_class_name("chordr-chord")
-            .set_attribute(Attribute::new("data-chord", formatted_chords).unwrap())
-            .build()
+        Tag::span_with_chord(
+            Content::from_string(formatted_chords.clone()),
+            Some("chordr-chord"),
+            formatted_chords,
+        )
     }
 
     fn build_tag_for_children<'a>(&'a self, children: &'a [Node], formatting: Formatting) -> Tag {
@@ -176,11 +157,7 @@ impl TagProvider {
             chord_text, lyric_text_class, lyric
         );
 
-        TagBuilder::new()
-            .set_tag_name("div")
-            .set_class_name("col")
-            .set_content(Content::Raw(html))
-            .build()
+        Tag::div(Content::Raw(html), Some("col"))
     }
 }
 
