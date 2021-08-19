@@ -1,32 +1,40 @@
 const path = require('path');
+const webpack = require('webpack');
 const WasmPackPlugin = require('@wasm-tool/wasm-pack-plugin');
 const WorkboxPlugin = require('workbox-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const distPath = path.resolve(__dirname, "dist");
-module.exports = (env, argv) => {
+
+const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
+
+const smp = new SpeedMeasurePlugin();
+
+module.exports = smp.wrap((env, argv) => {
   return {
     devServer: {
       contentBase: distPath,
       compress: argv.mode === 'production',
-      port: 8000
+      port: 8000,
+      historyApiFallback: {disableDotRule: true}
     },
     entry: './bootstrap.ts',
     output: {
+      publicPath: '/',
       path: distPath,
       filename: "webchordr.js",
       webassemblyModuleFilename: "webchordr.wasm"
     },
     module: {
       rules: [
-        {
-          test: /\.s[ac]ss$/i,
-          use: [
-            'style-loader',
-            'css-loader',
-            'sass-loader',
-          ],
-        },
+        // {
+        //   test: /\.s[ac]ss$/i,
+        //   use: [
+        //     'style-loader',
+        //     'css-loader?sourceMap',
+        //     'sass-loader?sourceMap',
+        //   ],
+        // },
         {
           test: /\.tsx?$/,
           use: 'ts-loader',
@@ -50,8 +58,7 @@ module.exports = (env, argv) => {
         ]
       }),
       new WasmPackPlugin({
-        crateDirectory: ".",
-        withTypeScript: true
+        crateDirectory: __dirname
       }),
       new WorkboxPlugin.GenerateSW({
         // these options encourage the ServiceWorkers to get in there fast
@@ -89,10 +96,14 @@ module.exports = (env, argv) => {
             handler: 'NetworkFirst'
           }
         ]
-      })
+      }),
+      new webpack.HotModuleReplacementPlugin(),
+
     ],
     watchOptions: {
-      aggregateTimeout: 3000
-    }
+      aggregateTimeout: 3000,
+      ignored: ['**/*.scss', '**/node_modules'],
+    },
+    cache: true
   };
-};
+});

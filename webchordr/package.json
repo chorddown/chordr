@@ -16,6 +16,7 @@
     "sass": "^1.26.5",
     "sass-loader": "^8.0.2",
     "sortablejs": "1.10.2",
+    "speed-measure-webpack-plugin": "^1.5.0",
     "style-loader": "^1.2.1",
     "wasm-pack": "^0.10.0",
     "webpack": "^4.46.0",
@@ -25,8 +26,8 @@
   },
   "dependencies": {
     "@types/sortablejs": "^1.10.4",
+    "binary-install": "^0.1.0",
     "ts-loader": "^7.0.5",
-    "typescript": "^3.9.3",
-    "binary-install": "^0.1.0"
+    "typescript": "^3.9.3"
   }
 }
