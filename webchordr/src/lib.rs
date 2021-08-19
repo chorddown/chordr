@@ -19,6 +19,7 @@ mod helpers;
 mod lock;
 mod persistence;
 mod route;
+mod search;
 mod session;
 mod sortable_service;
 mod state;
