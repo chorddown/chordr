@@ -32,7 +32,7 @@ class RootedHTTPRequestHandler(SimpleHTTPRequestHandler):
 
 
 def serve(HandlerClass=RootedHTTPRequestHandler, ServerClass=RootedHTTPServer):
-    default_path = os.path.abspath(os.path.dirname(os.path.abspath(__file__)) + "/../target/deploy")
+    default_path = os.path.abspath(os.path.dirname(os.path.abspath(__file__)) + "/dist")
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--port', '-p', default=9000, type=int)
