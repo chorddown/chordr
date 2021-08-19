@@ -1,14 +1,17 @@
-mod item;
-
-pub use self::item::Item;
-use crate::events::setlist_events::SetlistEvent;
-use crate::events::{Event, SortingChange};
-use crate::sortable_service::{SortableHandle, SortableOptions, SortableService};
-use libchordr::models::song_list::SongList as SongListLibModel;
-use libchordr::prelude::*;
 use log::info;
 use web_sys::HtmlElement;
 use yew::prelude::*;
+
+use libchordr::models::song_list::SongList as SongListLibModel;
+use libchordr::prelude::*;
+
+use crate::events::setlist_events::SetlistEvent;
+use crate::events::{Event, SortingChange};
+use crate::sortable_service::{SortableHandle, SortableOptions, SortableService};
+
+pub use self::item::Item;
+
+mod item;
 
 type SongListModel = SongListLibModel<SetlistEntry>;
 
@@ -60,11 +63,15 @@ impl Component for SongList {
         match msg {
             Msg::SetlistChangeSorting(e) => {
                 let sorting_change = self.patch_sorting_change(e);
-                self.props.on_setlist_change.emit(Event::SetlistEvent(
-                    SetlistEvent::SortingChange(sorting_change),
-                ));
-                self.props.songs = SongListModel::new();
-                true
+                if sorting_change.new_index() != sorting_change.old_index() {
+                    self.props.on_setlist_change.emit(Event::SetlistEvent(
+                        SetlistEvent::SortingChange(sorting_change),
+                    ));
+                    self.props.songs = SongListModel::new();
+                    true
+                } else {
+                    false
+                }
             }
         }
     }
@@ -102,10 +109,7 @@ impl Component for SongList {
 
         let entries = songs.clone().into_iter().collect::<Vec<SetlistEntry>>();
 
-        info!(
-            "Redraw song list {:?}",
-            entries.iter().map(|s| s.id()).collect::<Vec<SongId>>()
-        );
+        info!("Redraw song list {:?}", songs);
 
         (html! {
             <div class="song-list" ref=self.node_ref.clone()>
