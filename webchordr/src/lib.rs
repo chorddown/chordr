@@ -1,5 +1,12 @@
 #![recursion_limit = "256"]
 
+use wasm_bindgen::prelude::*;
+use wasm_bindgen::JsValue;
+
+pub use errors::WebError;
+pub use fetch_helper::*;
+use libchordr::prelude::Setlist;
+
 // Use `wee_alloc` as the global allocator.
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
@@ -25,13 +32,6 @@ mod sortable_service;
 mod state;
 #[cfg(test)]
 mod test_helpers;
-
-pub use errors::WebError;
-pub use fetch_helper::*;
-use libchordr::prelude::Setlist;
-
-use wasm_bindgen::prelude::*;
-use wasm_bindgen::JsValue;
 
 // This is the entry point for the web app
 #[wasm_bindgen]
