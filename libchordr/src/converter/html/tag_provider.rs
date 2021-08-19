@@ -76,8 +76,6 @@ impl TagProvider {
         }
 
         if let Some(head) = head {
-            self.build_tag_for_children(children, formatting)
-                .to_string();
             let inner = format!(
                 "{}{}",
                 self.build_tag_for_node(head, formatting),
