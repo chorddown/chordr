@@ -102,9 +102,11 @@
         }, 10000);
     };
 
-    if (false && window.location.hostname === 'localhost') {
+    // const skipServiceWorker = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const skipServiceWorker = false
+    if (skipServiceWorker) {
         console.info(
-            consoleStyles.label.info.text + 'Service Worker is not used on localhost',
+            consoleStyles.label.info.text + 'Service Worker is disabled',
             consoleStyles.label.info.style,
             consoleStyles.pathStyle,
             consoleStyles.normalStyle
