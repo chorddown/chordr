@@ -1,19 +1,25 @@
 <!doctype html>
+<!-- THIS IS THE ENTRY POINT FOR DEVELOPMENT WITH [TRUNK](https://trunkrs.dev/) -->
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
     <title>Chorddown Web</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <link rel="icon" href="/assets/images/logo-32-light.png">
-    <link rel="apple-touch-icon" href="/assets/images/logo-120.png">
-    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/static/assets/images/logo-32-light.png">
+    <link rel="apple-touch-icon" href="/static/assets/images/logo-120.png">
+    <link rel="manifest" href="/static/manifest.json">
+    <link data-trunk rel="copy-file" href="/static/manifest.json">
+    <link data-trunk rel="copy-file" href="/static/catalog.json">
+    <link data-trunk rel="copy-dir" href="/static/assets">
+    <link data-trunk rel="rust" data-cargo-features="trunk_build">
+    <script src="/assets/library/Sortable.js"></script>
+
     <meta name="viewport" content="width=device-width">
 
-    <link rel="stylesheet" href="/stylesheets/chordr-default-styles.css?1627158129"/>
-    <link rel="stylesheet" href="/stylesheets/chordr-app.css?1627158129"/>
+    <link data-trunk rel="scss" href="/static/stylesheets/chordr-default-styles.scss"/>
+    <link data-trunk rel="scss" href="/static/stylesheets/chordr-app.scss"/>
 </head>
 <body>
-<script src="/webchordr.js"></script>
 
 <div class="center-fullscreen loading">
     <div class="loading-inner">
@@ -101,7 +107,9 @@
         }, 10000);
     };
 
-    if (false && window.location.hostname === 'localhost') {
+    // const skipServiceWorker = window.location.hostname === 'localhost'||window.location.hostname === '127.0.0.1';
+    const skipServiceWorker = true
+    if (skipServiceWorker) {
         console.info(
             consoleStyles.label.info.text + 'Service Worker is not used on localhost',
             consoleStyles.label.info.style,
