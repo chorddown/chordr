@@ -1,8 +1,9 @@
-use crate::models::meta::b_notation::NotationError;
-use crate::models::meta::semitone_notation::SemitoneNotationError;
 use std::error::Error as StdError;
 use std::fmt::{Display, Error as FmtError, Formatter};
 use std::path::PathBuf;
+
+use crate::models::meta::b_notation::NotationError;
+use crate::models::meta::semitone_notation::SemitoneNotationError;
 
 /// Shorthand for chord library results
 pub type Result<T, E = Error> = ::std::result::Result<T, E>;

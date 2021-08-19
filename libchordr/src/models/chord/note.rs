@@ -1,9 +1,10 @@
+use std::fmt::{Debug, Formatter};
+
 use crate::error::Error;
 use crate::models::chord::fmt::Formatting;
 use crate::models::chord::transposition::TransposableTrait;
 use crate::models::chord::NoteDisplay;
 use crate::models::meta::{BNotation, SemitoneNotation};
-use std::fmt::{Debug, Formatter};
 
 #[derive(Clone, Copy, PartialEq, PartialOrd)]
 pub enum Note {
@@ -214,8 +215,9 @@ impl TransposableTrait for Note {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::format::Format;
+
+    use super::*;
 
     #[test]
     fn try_from_test() {

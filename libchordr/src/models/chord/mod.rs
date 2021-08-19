@@ -1,15 +1,16 @@
-mod chords;
-pub mod fmt;
-mod note;
-mod transposition;
+use crate::error::Error;
+use crate::models::chord::fmt::Formatting;
+use crate::models::meta::BNotation;
 
 pub use self::chords::Chords;
 pub use self::fmt::NoteDisplay;
 pub use self::note::Note;
 pub use self::transposition::TransposableTrait;
-use crate::error::Error;
-use crate::models::chord::fmt::Formatting;
-use crate::models::meta::BNotation;
+
+mod chords;
+pub mod fmt;
+mod note;
+mod transposition;
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct Chord {
