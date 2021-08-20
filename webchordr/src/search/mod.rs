@@ -35,6 +35,7 @@ impl SearchUtility {
     }
 }
 
+#[allow(unused)]
 fn extract_text(s: &Song) -> Result<String> {
     let mut formatting = Formatting::default();
     formatting.format = Format::Text;

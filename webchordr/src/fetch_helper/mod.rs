@@ -15,7 +15,7 @@ pub type FetchResult<OUT> = Result<OUT, WebError>;
 ///
 /// # Example
 /// ```rust,no_run
-/// # use webchordr::fetch;
+/// # use webchordlib::fetch;
 /// # type TargetType = String;
 /// # let uri = "some_uri";
 ///
@@ -35,14 +35,14 @@ where
 ///
 /// # Example
 /// ```rust,no_run
-/// # use webchordr::fetch_with_callback;
+/// # use webchordlib::fetch_with_callback;
 /// # use yew::Callback;
 ///
 /// # type TargetType = String;
 ///
 /// # let uri = "some_uri";
 ///
-/// # fn cb(_:Result<TargetType,webchordr::WebError>) {}
+/// # fn cb(_:Result<TargetType, webchordlib::WebError>) {}
 /// # let callback = Callback::from(cb);
 /// use wasm_bindgen_futures::spawn_local;
 /// spawn_local(async move {
@@ -85,7 +85,7 @@ where
 ///
 /// # Example: POST request
 /// ```rust,no_run
-/// # use webchordr::fetch_with_options_and_additional_headers;
+/// # use webchordlib::fetch_with_options_and_additional_headers;
 /// # let uri = "some_uri";
 ///
 /// use wasm_bindgen_futures::spawn_local;
