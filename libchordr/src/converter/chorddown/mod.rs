@@ -11,7 +11,6 @@ pub struct ChorddownConverter {}
 
 impl ConverterTrait for ChorddownConverter {
     fn convert(&self, node: &Node, meta: &dyn MetaTrait, formatting: Formatting) -> Result<String> {
-        // return Ok(cleanup_output(&self.build_node(node, formatting)?));
         let output = format!(
             "{}{}{}",
             self.build_title(meta),
@@ -31,14 +30,14 @@ impl ChorddownConverter {
                 last_in_line: _,
             } => Ok(format!(
                 "{}{}",
-                self.build_tag_for_chords(chords, formatting),
+                self.build_string_for_chords(chords, formatting),
                 self.build_token(text),
             )),
             Node::ChordStandalone(chord) => {
-                Ok(self.build_column(self.build_tag_for_chords(chord, formatting), ""))
+                Ok(self.build_column(self.build_string_for_chords(chord, formatting), ""))
             }
             Node::Text(text) => Ok(self.build_token(text)),
-            Node::Document(children) => Ok(self.build_tag_for_children(children, formatting)),
+            Node::Document(children) => Ok(self.build_string_for_children(children, formatting)),
             Node::Headline(token) => Ok(self.build_token(token)),
             Node::Quote(token) => Ok(self.build_token(token)),
             Node::Meta(_) => {
@@ -55,9 +54,9 @@ impl ChorddownConverter {
                     Some(head) => format!(
                         "{}{}",
                         self.build_node(head, formatting)?,
-                        self.build_tag_for_children(children, formatting)
+                        self.build_string_for_children(children, formatting)
                     ),
-                    None => self.build_tag_for_children(children, formatting),
+                    None => self.build_string_for_children(children, formatting),
                 };
 
                 Ok(format!("{}\n", inner))
@@ -144,11 +143,11 @@ impl ChorddownConverter {
         buffer.join("\n")
     }
 
-    fn build_tag_for_chords(&self, chords: &Chords, formatting: Formatting) -> String {
+    fn build_string_for_chords(&self, chords: &Chords, formatting: Formatting) -> String {
         format!("[{}]", chords.note_format(formatting))
     }
 
-    fn build_tag_for_children<'a>(
+    fn build_string_for_children<'a>(
         &'a self,
         children: &'a [Node],
         formatting: Formatting,
