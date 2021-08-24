@@ -170,14 +170,14 @@ impl SongView {
         let start = Utc::now().time();
         let converter_result = if transpose_semitone != 0 {
             transpose_and_convert_to_format(
-                &props.song_info.song.src(),
+                props.song_info.song.src().as_bytes(),
                 transpose_semitone,
                 props.song_info.song.meta(),
                 formatting,
             )
         } else {
             convert_to_format(
-                &props.song_info.song.src(),
+                props.song_info.song.src().as_bytes(),
                 props.song_info.song.meta(),
                 formatting,
             )

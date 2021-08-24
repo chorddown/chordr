@@ -1,5 +1,5 @@
+use super::lexeme::Lexeme;
 use super::mode::Mode;
-use super::scanner::Lexeme;
 use crate::tokenizer::{Meta, Modifier, Token};
 use std::convert::TryFrom;
 use std::error::Error;

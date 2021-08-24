@@ -1,19 +1,20 @@
-mod chorddown_tokenizer;
-mod meta;
-mod modifier;
-mod token;
+use std::io::BufRead;
+
+use crate::error::Error;
 
 use self::chorddown_tokenizer::ChorddownTokenizer;
 pub use self::meta::Meta;
 pub use self::modifier::Modifier;
 pub use self::token::Token;
 
+mod chorddown_tokenizer;
+mod meta;
+mod modifier;
+mod token;
+
 pub trait Tokenizer {
     /// Tokenize the given input
-    ///
-    /// The input will be split into individual lines. These lines will then be sent to
-    /// `tokenize_line()`. Each sent line will contain a trailing newline (`\n`)
-    fn tokenize(&self, input: &str) -> Vec<Token>;
+    fn tokenize<R: BufRead>(&self, input: R) -> Result<Vec<Token>, Error>;
 }
 
 /// Build a new Tokenizer instance

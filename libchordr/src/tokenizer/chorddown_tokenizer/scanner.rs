@@ -1,106 +1,13 @@
-use crate::tokenizer::Modifier;
-use std::fmt::{Display, Formatter, Result};
+use std::io::BufRead;
 
-#[derive(Debug, Clone, PartialEq)]
-pub enum Lexeme {
-    Newline,
-    ChordStart,
-    ChordEnd,
-    HeaderStart,
-    QuoteStart,
-    Colon,
-    ChorusMark,
-    BridgeMark,
-    Literal(String),
-    Eof,
-}
+use keywords::{
+    BRIDGE_MARK, CHORD_END, CHORD_START, CHORUS_MARK, COLON, HEADER_START, NEWLINE, QUOTE_START,
+};
 
-const NEWLINE: char = '\n';
-const CHORD_START: char = '[';
-const CHORD_END: char = ']';
-const HEADER_START: char = '#';
-// const HEADER_END: char = NEWLINE;
-const QUOTE_START: char = '>';
-// const QUOTE_END: char = NEWLINE;
-const COLON: char = ':';
-const CHORUS_MARK: char = '!';
-const BRIDGE_MARK: char = '-';
+use crate::error::Error;
+use crate::tokenizer::chorddown_tokenizer::lexeme::Lexeme;
 
-impl Lexeme {
-    fn literal<S: Into<String>>(s: S) -> Self {
-        Lexeme::Literal(s.into())
-    }
-
-    pub fn to_string(&self) -> String {
-        match self {
-            Lexeme::Newline => NEWLINE.to_string(),
-            Lexeme::ChordStart => CHORD_START.to_string(),
-            Lexeme::ChordEnd => CHORD_END.to_string(),
-            Lexeme::HeaderStart => HEADER_START.to_string(),
-            Lexeme::QuoteStart => QUOTE_START.to_string(),
-            Lexeme::Colon => COLON.to_string(),
-            Lexeme::ChorusMark => CHORUS_MARK.to_string(),
-            Lexeme::BridgeMark => BRIDGE_MARK.to_string(),
-            Lexeme::Literal(inner) => inner.clone(),
-            Lexeme::Eof => "".to_owned(),
-        }
-    }
-
-    pub fn detect_modifier(&self) -> Option<Modifier> {
-        match self {
-            Lexeme::ChordStart | Lexeme::ChordEnd | Lexeme::QuoteStart | Lexeme::Colon => {
-                Some(Modifier::None)
-            }
-            Lexeme::ChorusMark => Some(Modifier::Chorus),
-            Lexeme::BridgeMark => Some(Modifier::Bridge),
-            Lexeme::Literal(text) => {
-                if text.is_empty() {
-                    None
-                } else if text.trim().is_empty() {
-                    None
-                } else {
-                    Some(Modifier::None)
-                }
-            }
-            Lexeme::HeaderStart => None,
-            Lexeme::Newline => {
-                // unreachable?
-                None
-            }
-            Lexeme::Eof => {
-                // unreachable?
-                None
-            }
-        }
-    }
-}
-
-impl Display for Lexeme {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        if let Lexeme::Literal(inner) = self {
-            write!(f, "{}", inner)
-        } else if let Lexeme::Eof = self {
-            write!(f, "")
-        } else {
-            write!(
-                f,
-                "{}",
-                match self {
-                    Lexeme::Newline => NEWLINE,
-                    Lexeme::ChordStart => CHORD_START,
-                    Lexeme::ChordEnd => CHORD_END,
-                    Lexeme::HeaderStart => HEADER_START,
-                    Lexeme::QuoteStart => QUOTE_START,
-                    Lexeme::Colon => COLON,
-                    Lexeme::ChorusMark => CHORUS_MARK,
-                    Lexeme::BridgeMark => BRIDGE_MARK,
-                    Lexeme::Literal(_) => unreachable!(),
-                    Lexeme::Eof => unreachable!(),
-                }
-            )
-        }
-    }
-}
+use super::keywords;
 
 pub struct Scanner {
     lexemes: Vec<Lexeme>,
@@ -110,27 +17,35 @@ impl Scanner {
     pub fn new() -> Self {
         Self { lexemes: vec![] }
     }
-    pub fn scan(mut self, input: &str) -> Vec<Lexeme> {
-        // let mut lexemes: Vec<Lexeme> = vec![];
+
+    pub fn scan<R: BufRead>(mut self, mut input: R) -> Result<Vec<Lexeme>, Error> {
         let mut literal_buffer = String::new();
-        let chars = input.chars();
-        for current_character in chars {
-            match current_character {
-                NEWLINE => self.push_n_drain(&mut literal_buffer, Lexeme::Newline),
-                CHORD_START => self.push_n_drain(&mut literal_buffer, Lexeme::ChordStart),
-                CHORD_END => self.push_n_drain(&mut literal_buffer, Lexeme::ChordEnd),
-                HEADER_START => self.push_n_drain(&mut literal_buffer, Lexeme::HeaderStart),
-                QUOTE_START => self.push_n_drain(&mut literal_buffer, Lexeme::QuoteStart),
-                COLON => self.push_n_drain(&mut literal_buffer, Lexeme::Colon),
-                CHORUS_MARK => self.push_n_drain(&mut literal_buffer, Lexeme::ChorusMark),
-                BRIDGE_MARK => self.push_n_drain(&mut literal_buffer, Lexeme::BridgeMark),
-                _ => literal_buffer.push(current_character),
+
+        let mut line = String::new();
+        while 0 < input.read_line(&mut line)? {
+            let chars = line.chars();
+
+            for current_character in chars {
+                match current_character {
+                    NEWLINE => self.push_n_drain(&mut literal_buffer, Lexeme::Newline),
+                    CHORD_START => self.push_n_drain(&mut literal_buffer, Lexeme::ChordStart),
+                    CHORD_END => self.push_n_drain(&mut literal_buffer, Lexeme::ChordEnd),
+                    HEADER_START => self.push_n_drain(&mut literal_buffer, Lexeme::HeaderStart),
+                    QUOTE_START => self.push_n_drain(&mut literal_buffer, Lexeme::QuoteStart),
+                    COLON => self.push_n_drain(&mut literal_buffer, Lexeme::Colon),
+                    CHORUS_MARK => self.push_n_drain(&mut literal_buffer, Lexeme::ChorusMark),
+                    BRIDGE_MARK => self.push_n_drain(&mut literal_buffer, Lexeme::BridgeMark),
+                    _ => literal_buffer.push(current_character),
+                }
             }
+
+            line.clear()
         }
+
         self.build_literal(&mut literal_buffer);
 
         self.lexemes.push(Lexeme::Eof);
-        self.lexemes
+        Ok(self.lexemes)
     }
 
     fn push_n_drain(&mut self, literal_buffer: &mut String, l: Lexeme) {
@@ -141,14 +56,14 @@ impl Scanner {
 
     fn build_literal(&mut self, literal_buffer: &mut String) {
         if !literal_buffer.is_empty() {
-            self.lexemes.push(Lexeme::Literal(literal_buffer.clone()));
-            literal_buffer.clear();
+            self.lexemes
+                .push(Lexeme::Literal(std::mem::take(literal_buffer)));
+            // literal_buffer.clear();
         }
     }
 }
 
 mod shortcuts {
-    use super::Lexeme;
     #[allow(unused_imports)]
     pub(super) use Lexeme::BridgeMark as B;
     #[allow(unused_imports)]
@@ -163,6 +78,8 @@ mod shortcuts {
     pub(super) use Lexeme::HeaderStart as H;
     #[allow(unused_imports)]
     pub(super) use Lexeme::Newline as NL;
+
+    use super::Lexeme;
 
     #[allow(dead_code)]
     pub(super) fn lit(literal: &str) -> Lexeme {
@@ -186,7 +103,7 @@ Composer: Daniel Corn
 Swing [D]low, sweet [G]chari[D]ot,
 ";
         let scanner = Scanner::new();
-        let lexemes = scanner.scan(content);
+        let lexemes = scanner.scan(content.as_bytes()).unwrap();
         assert_eq!(lexemes.len(), 30);
 
         assert_eq!(
@@ -228,16 +145,16 @@ Swing [D]low, sweet [G]chari[D]ot,
 
     #[test]
     fn scan_test_complex_chords() {
-        let lexemes = Scanner::new().scan("[Dm7]");
+        let lexemes = Scanner::new().scan("[Dm7]".as_bytes()).unwrap();
         assert_eq!(lexemes, vec![CS, lit("Dm7"), CE, EOF]);
 
-        let lexemes = Scanner::new().scan("[Dm7/B]");
+        let lexemes = Scanner::new().scan("[Dm7/B]".as_bytes()).unwrap();
         assert_eq!(lexemes, vec![CS, lit("Dm7/B"), CE, EOF]);
 
-        let lexemes = Scanner::new().scan("[D#m7]");
+        let lexemes = Scanner::new().scan("[D#m7]".as_bytes()).unwrap();
         assert_eq!(lexemes, vec![CS, lit("D"), H, lit("m7"), CE, EOF]);
 
-        let lexemes = Scanner::new().scan("[B/F#maj7]");
+        let lexemes = Scanner::new().scan("[B/F#maj7]".as_bytes()).unwrap();
         assert_eq!(lexemes, vec![CS, lit("B/F"), H, lit("maj7"), CE, EOF]);
     }
 
@@ -247,12 +164,12 @@ Swing [D]low, sweet [G]chari[D]ot,
 ##- Pre-chorus
 ";
         let scanner = Scanner::new();
-        let lexemes = scanner.scan(content);
+        let lexemes = scanner.scan(content.as_bytes()).unwrap();
         assert_eq!(lexemes.len(), 9);
 
         assert_eq!(
             lexemes,
-            vec![NL, H, H, B, lit(" Pre"), B, lit("chorus"), NL, EOF,]
+            vec![NL, H, H, B, lit(" Pre"), B, lit("chorus"), NL, EOF]
         );
     }
 
@@ -260,8 +177,8 @@ Swing [D]low, sweet [G]chari[D]ot,
     fn scan_bride_with_exclamation_marks_test() {
         let content = r"##- Bride Loud!!";
         let scanner = Scanner::new();
-        let lexemes = scanner.scan(content);
-        assert_eq!(lexemes.len(), 7);
+        let lexemes = scanner.scan(content.as_bytes()).unwrap();
+        // assert_eq!(lexemes.len(), 7);
 
         assert_eq!(lexemes, vec![H, H, B, lit(" Bride Loud"), CM, CM, EOF,]);
     }
@@ -270,7 +187,7 @@ Swing [D]low, sweet [G]chari[D]ot,
     fn scan_chorus_with_exclamation_marks_test() {
         let content = r"##! Chorus Loud!!";
         let scanner = Scanner::new();
-        let lexemes = scanner.scan(content);
+        let lexemes = scanner.scan(content.as_bytes()).unwrap();
         assert_eq!(lexemes.len(), 7);
 
         assert_eq!(lexemes, vec![H, H, CM, lit(" Chorus Loud"), CM, CM, EOF,]);

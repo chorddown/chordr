@@ -1,13 +1,15 @@
-use super::CatalogBuildError;
+use std::convert::TryFrom;
+use std::fs;
+use std::fs::DirEntry;
+use std::path::Path;
+
 use crate::helper::parse_content;
 use crate::models::file_type::FileType;
 use crate::models::song::Song;
 use crate::models::song_id::SongId;
 use crate::models::song_meta::SongMeta;
-use std::convert::TryFrom;
-use std::fs;
-use std::fs::DirEntry;
-use std::path::Path;
+
+use super::CatalogBuildError;
 
 impl TryFrom<&Path> for Song {
     type Error = CatalogBuildError;
@@ -27,11 +29,14 @@ impl TryFrom<&Path> for Song {
         };
 
         let song_id = SongId::from(path);
-        let parser_result = match parse_content(&src) {
+        let parser_result = match parse_content(src.as_bytes()) {
             Ok(p) => p,
             Err(e) => return Err(CatalogBuildError::from_error(e, path_buf)),
         };
-        let title = parser_result.meta().title.unwrap_or_else(|| song_id.to_string());
+        let title = parser_result
+            .meta()
+            .title
+            .unwrap_or_else(|| song_id.to_string());
         let file_type = match FileType::try_from(path) {
             Ok(f) => f,
             Err(e) => return Err(CatalogBuildError::from_error(e, path_buf)),
@@ -57,9 +62,10 @@ impl TryFrom<DirEntry> for Song {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::models::list::ListEntryTrait;
     use crate::models::song_data::SongData;
+
+    use super::*;
 
     #[test]
     fn test_try_from() {

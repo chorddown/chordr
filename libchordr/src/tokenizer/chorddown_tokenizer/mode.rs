@@ -1,4 +1,4 @@
-use crate::tokenizer::chorddown_tokenizer::scanner::Lexeme;
+use crate::tokenizer::chorddown_tokenizer::lexeme::Lexeme;
 
 #[derive(Debug, PartialOrd, PartialEq, Copy, Clone)]
 pub enum Mode {

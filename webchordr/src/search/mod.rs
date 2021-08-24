@@ -40,5 +40,5 @@ fn extract_text(s: &Song) -> Result<String> {
     let mut formatting = Formatting::default();
     formatting.format = Format::Text;
 
-    convert_to_format(s.src(), s.meta(), formatting)
+    convert_to_format(s.src().as_bytes(), s.meta(), formatting)
 }

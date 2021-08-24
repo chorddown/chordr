@@ -1,24 +1,33 @@
 extern crate clap;
 extern crate libchordr;
 
-use clap::{App, Arg, ArgMatches, SubCommand};
+use std::convert::TryFrom;
+use std::error::Error as StdError;
 use std::fs;
+use std::fs::File;
+use std::io::BufReader;
+use std::process::exit;
 
 use ansi_term::Colour;
 use atty::Stream;
+use clap::{App, Arg, ArgMatches, SubCommand};
+use log::LevelFilter;
+use simplelog::{ColorChoice, CombinedLogger, Config, TermLogger, TerminalMode};
+
 use libchordr::models::chord::fmt::Formatting;
 use libchordr::models::chord::TransposableTrait;
 use libchordr::prelude::Error;
 use libchordr::prelude::Result;
 use libchordr::prelude::*;
-use std::convert::TryFrom;
-use std::error::Error as StdError;
-use std::process::exit;
 
 fn main() {
     let output_arg = Arg::with_name("output")
         .required(true)
         .help("Output file name");
+    let verbosity_arg = Arg::with_name("verbosity")
+        .short("v")
+        .multiple(true)
+        .help("Set the output verbosity");
 
     let format_help = get_output_format_help();
     let subcommand_convert = SubCommand::with_name("convert")
@@ -47,7 +56,8 @@ fn main() {
                 .long("semitone-notation")
                 .takes_value(true)
                 .help("Define if `#` or `b` should be used"),
-        );
+        )
+        .arg(verbosity_arg.clone());
 
     let subcommand_build_catalog = SubCommand::with_name("build-catalog")
         .about("Build a catalog from chorddown files")
@@ -62,7 +72,8 @@ fn main() {
                 .long("pretty")
                 .short("p")
                 .help("Output indented JSON"),
-        );
+        )
+        .arg(verbosity_arg);
 
     let args = App::new("chordr")
         .version(env!("CARGO_PKG_VERSION"))
@@ -72,17 +83,21 @@ fn main() {
         .subcommand(subcommand_build_catalog)
         .get_matches();
 
-    let error = if let Some(matches) = args.subcommand_matches("convert") {
+    if let Err(error) = run(args) {
+        eprintln!("{}", error);
+        exit(1);
+    }
+}
+
+fn run(args: ArgMatches) -> Result<()> {
+    if let Some(matches) = args.subcommand_matches("convert") {
+        configure_logging(matches)?;
         convert(matches)
     } else if let Some(matches) = args.subcommand_matches("build-catalog") {
+        configure_logging(matches)?;
         build_catalog(matches)
     } else {
         eprintln!("Missing argument subcommand");
-        exit(1);
-    };
-
-    if let Err(error) = error {
-        eprintln!("{}", error);
         exit(1);
     }
 }
@@ -113,12 +128,17 @@ fn convert(args: &ArgMatches) -> Result<()> {
         format,
     };
 
-    let contents = match fs::read_to_string(input_file_path) {
+    let file = match File::open(input_file_path) {
         Ok(c) => c,
         Err(e) => return Err(Error::unknown_error(format!("Could not read file: {}", e))),
     };
-    let tokens = build_tokenizer().tokenize(&contents);
+    log::debug!("Did read file");
+
+    let tokens = build_tokenizer().tokenize(BufReader::new(file))?;
+    log::debug!("Did tokenize content");
+
     let parser_result = Parser::new().parse(tokens)?;
+    log::debug!("Did parse content");
     let meta = parser_result.meta_as_ref().clone();
     let parser_result_node = match transpose {
         None => parser_result.node(),
@@ -126,6 +146,7 @@ fn convert(args: &ArgMatches) -> Result<()> {
     };
 
     let converted = Converter::new().convert(&parser_result_node, &meta, formatting)?;
+    log::debug!("Did convert content");
 
     let output = if format == Format::HTML {
         format!(
@@ -224,6 +245,28 @@ fn build_catalog(args: &ArgMatches) -> Result<()> {
         }
     }
     Ok(())
+}
+
+fn configure_logging(matches: &ArgMatches) -> Result<()> {
+    let level_filter = match matches.occurrences_of("verbosity") {
+        0 => LevelFilter::Warn,
+        1 => LevelFilter::Info,
+        2 => LevelFilter::Debug,
+        3 | _ => LevelFilter::Trace,
+    };
+
+    match CombinedLogger::init(vec![TermLogger::new(
+        level_filter,
+        Config::default(),
+        TerminalMode::Mixed,
+        ColorChoice::Auto,
+    )]) {
+        Ok(_) => Ok(()),
+        Err(e) => Err(Error::unknown_error(format!(
+            "Could not initialize logger: {}",
+            e
+        ))),
+    }
 }
 
 fn handle_error_output(error: CatalogBuildError) -> () {
