@@ -1,13 +1,13 @@
 use std::io::BufRead;
 
-use keywords::{
-    BRIDGE_MARK, CHORD_END, CHORD_START, CHORUS_MARK, COLON, HEADER_START, NEWLINE, QUOTE_START,
-};
-
 use crate::error::Error;
 use crate::tokenizer::chorddown_tokenizer::lexeme::Lexeme;
 
-use super::keywords;
+use super::keywords::{
+    BRIDGE_MARK, CHORD_END, CHORD_START, CHORUS_MARK, COLON, HEADER_START, NEWLINE, QUOTE_START,
+};
+
+const LITERAL_BUFFER_CAPACITY: usize = 20;
 
 pub struct Scanner {
     lexemes: Vec<Lexeme>,
@@ -19,7 +19,7 @@ impl Scanner {
     }
 
     pub fn scan<R: BufRead>(mut self, mut input: R) -> Result<Vec<Lexeme>, Error> {
-        let mut literal_buffer = String::new();
+        let mut literal_buffer = String::with_capacity(LITERAL_BUFFER_CAPACITY);
 
         let mut line = String::new();
         while 0 < input.read_line(&mut line)? {
@@ -42,23 +42,23 @@ impl Scanner {
             line.clear()
         }
 
-        self.build_literal(&mut literal_buffer);
+        self.push_n_drain(&mut literal_buffer, Lexeme::Eof);
 
-        self.lexemes.push(Lexeme::Eof);
         Ok(self.lexemes)
     }
 
-    fn push_n_drain(&mut self, literal_buffer: &mut String, l: Lexeme) {
+    fn push_n_drain(&mut self, literal_buffer: &mut String, lexeme: Lexeme) {
         self.build_literal(literal_buffer);
 
-        self.lexemes.push(l)
+        self.lexemes.push(lexeme)
     }
 
     fn build_literal(&mut self, literal_buffer: &mut String) {
         if !literal_buffer.is_empty() {
-            self.lexemes
-                .push(Lexeme::Literal(std::mem::take(literal_buffer)));
-            // literal_buffer.clear();
+            self.lexemes.push(Lexeme::Literal(std::mem::replace(
+                literal_buffer,
+                String::with_capacity(LITERAL_BUFFER_CAPACITY),
+            )));
         }
     }
 }

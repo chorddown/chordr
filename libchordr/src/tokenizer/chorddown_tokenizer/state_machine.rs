@@ -1,9 +1,11 @@
-use super::lexeme::Lexeme;
-use super::mode::Mode;
-use crate::tokenizer::{Meta, Modifier, Token};
 use std::convert::TryFrom;
 use std::error::Error;
 use std::fmt::{Display, Formatter, Result};
+
+use crate::tokenizer::{Meta, Modifier, Token};
+
+use super::lexeme::Lexeme;
+use super::mode::Mode;
 
 pub(crate) struct FSM {
     state: Mode,
@@ -212,11 +214,15 @@ impl FSM {
     }
 
     fn consume_buffer(&mut self) -> String {
-        ::std::mem::replace(&mut self.literal_buffer, String::new())
+        std::mem::replace(&mut self.literal_buffer, String::new())
     }
 
     fn append_lexeme(&mut self, lexeme: &Lexeme) {
-        self.literal_buffer.push_str(lexeme.to_string().as_str())
+        match lexeme {
+            Lexeme::Literal(inner) => self.literal_buffer.push_str(&inner),
+            Lexeme::Eof => {}
+            _ => self.literal_buffer.push(lexeme.as_char()),
+        }
     }
 
     fn build_token_from_literal(&mut self) -> Option<Token> {

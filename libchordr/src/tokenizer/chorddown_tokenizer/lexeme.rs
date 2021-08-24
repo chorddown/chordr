@@ -1,4 +1,4 @@
-use std::fmt::Display;
+use std::fmt::{Display, Write};
 
 use crate::tokenizer::Modifier;
 
@@ -21,6 +21,7 @@ impl Lexeme {
         Lexeme::Literal(s.into())
     }
 
+    #[allow(unused)]
     pub fn to_string(&self) -> String {
         match self {
             Lexeme::Newline => super::keywords::NEWLINE.to_string(),
@@ -63,6 +64,21 @@ impl Lexeme {
             }
         }
     }
+
+    pub(crate) fn as_char(&self) -> char {
+        match self {
+            Lexeme::Newline => super::keywords::NEWLINE,
+            Lexeme::ChordStart => super::keywords::CHORD_START,
+            Lexeme::ChordEnd => super::keywords::CHORD_END,
+            Lexeme::HeaderStart => super::keywords::HEADER_START,
+            Lexeme::QuoteStart => super::keywords::QUOTE_START,
+            Lexeme::Colon => super::keywords::COLON,
+            Lexeme::ChorusMark => super::keywords::CHORUS_MARK,
+            Lexeme::BridgeMark => super::keywords::BRIDGE_MARK,
+            Lexeme::Literal(_) => unimplemented!("Lexeme::Literal does not support `as_char()`"),
+            Lexeme::Eof => unimplemented!("Lexeme::Eof does not support `as_char()`"),
+        }
+    }
 }
 
 impl Display for Lexeme {
@@ -70,24 +86,20 @@ impl Display for Lexeme {
         if let Lexeme::Literal(inner) = self {
             write!(f, "{}", inner)
         } else if let Lexeme::Eof = self {
-            write!(f, "")
+            Ok(())
         } else {
-            write!(
-                f,
-                "{}",
-                match self {
-                    Lexeme::Newline => super::keywords::NEWLINE,
-                    Lexeme::ChordStart => super::keywords::CHORD_START,
-                    Lexeme::ChordEnd => super::keywords::CHORD_END,
-                    Lexeme::HeaderStart => super::keywords::HEADER_START,
-                    Lexeme::QuoteStart => super::keywords::QUOTE_START,
-                    Lexeme::Colon => super::keywords::COLON,
-                    Lexeme::ChorusMark => super::keywords::CHORUS_MARK,
-                    Lexeme::BridgeMark => super::keywords::BRIDGE_MARK,
-                    Lexeme::Literal(_) => unreachable!(),
-                    Lexeme::Eof => unreachable!(),
-                }
-            )
+            f.write_char(match self {
+                Lexeme::Newline => super::keywords::NEWLINE,
+                Lexeme::ChordStart => super::keywords::CHORD_START,
+                Lexeme::ChordEnd => super::keywords::CHORD_END,
+                Lexeme::HeaderStart => super::keywords::HEADER_START,
+                Lexeme::QuoteStart => super::keywords::QUOTE_START,
+                Lexeme::Colon => super::keywords::COLON,
+                Lexeme::ChorusMark => super::keywords::CHORUS_MARK,
+                Lexeme::BridgeMark => super::keywords::BRIDGE_MARK,
+                Lexeme::Literal(_) => unreachable!(),
+                Lexeme::Eof => unreachable!(),
+            })
         }
     }
 }

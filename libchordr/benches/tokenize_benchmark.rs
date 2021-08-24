@@ -1,11 +1,9 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
 use libchordr::prelude::{build_tokenizer, Tokenizer};
-use libchordr::test_helpers::get_test_tokens;
 
 fn tokenize(content: &str) -> () {
-    let token_lines = build_tokenizer().tokenize(content);
-    assert_eq!(token_lines, get_test_tokens());
+    let _ = build_tokenizer().tokenize(content.as_bytes()).unwrap();
 }
 
 fn criterion_benchmark(c: &mut Criterion) {
