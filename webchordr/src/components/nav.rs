@@ -24,7 +24,7 @@ pub struct NavProps {
 
 impl PartialEq for NavProps {
     fn eq(&self, other: &Self) -> bool {
-        self.state == other.state
+        Rc::ptr_eq(&self.state, &other.state)
             && self.current_song_info == other.current_song_info
             && self.expand == other.expand
     }

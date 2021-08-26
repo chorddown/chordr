@@ -1,14 +1,22 @@
+use std::rc::Rc;
+
+use yew::prelude::*;
+
 use crate::connection::ConnectionStatus;
 use crate::helpers::Class;
 use crate::session::{Session, SessionUser};
 use crate::state::State;
-use std::rc::Rc;
-use yew::prelude::*;
 
-#[derive(Properties, Clone, PartialEq)]
+#[derive(Properties, Clone)]
 pub struct NavItemProps {
     pub state: Rc<State>,
     pub session: Rc<Session>,
+}
+
+impl PartialEq for NavItemProps {
+    fn eq(&self, other: &Self) -> bool {
+        Rc::ptr_eq(&self.state, &other.state) && Rc::ptr_eq(&self.session, &other.session)
+    }
 }
 
 pub enum Msg {}

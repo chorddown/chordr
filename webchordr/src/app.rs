@@ -33,13 +33,23 @@ impl Default for AppRouteState {
     }
 }
 
-#[derive(Properties, PartialEq, Clone)]
+#[derive(Properties, Clone)]
 pub struct AppProperties {
     pub on_event: Callback<Event>,
     pub on_setlist_change: Callback<Event>,
     pub on_user_login_success: Callback<Session>,
     pub on_user_login_error: Callback<WebError>,
     pub state: Rc<State>,
+}
+
+impl PartialEq for AppProperties {
+    fn eq(&self, other: &Self) -> bool {
+        Rc::ptr_eq(&self.state, &other.state)
+            && self.on_event == other.on_event
+            && self.on_setlist_change == other.on_setlist_change
+            && self.on_user_login_error == other.on_user_login_error
+            && self.on_user_login_success == other.on_user_login_success
+    }
 }
 
 pub struct App {
