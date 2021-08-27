@@ -18,3 +18,13 @@ impl From<Modifier> for SectionType {
         }
     }
 }
+
+impl From<&Modifier> for SectionType {
+    fn from(m: &Modifier) -> Self {
+        match m {
+            Modifier::Chorus => SectionType::Chorus,
+            Modifier::Bridge => SectionType::Bridge,
+            Modifier::None => SectionType::Unknown,
+        }
+    }
+}

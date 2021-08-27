@@ -41,7 +41,7 @@ impl ParserTrait for Parser {
     type OkType = ParserResult;
 
     fn parse(&mut self, tokens: Vec<Token>) -> Result<ParserResult, Error> {
-        let meta = MetaParser::new().parse(tokens.clone())?;
+        let meta = MetaParser::new().parse_borrowed(&tokens)?;
         let node = NodeParser::with_b_notation(meta.b_notation).parse(tokens)?;
 
         Ok(ParserResult::new(node, meta))

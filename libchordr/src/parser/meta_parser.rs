@@ -1,22 +1,18 @@
+use crate::tokenizer::Token;
+
 pub use super::meta_information::MetaInformation;
 pub use super::node::Node;
 pub use super::parser_result::ParserResult;
 pub use super::section_type::SectionType;
 pub use super::*;
-use crate::tokenizer::Token;
 
 pub struct MetaParser {}
 
 impl ParserTrait for MetaParser {
     type OkType = MetaInformation;
 
-    fn parse(&mut self, tokens: Vec<Token>) -> Result<MetaInformation, Error> {
-        let mut meta = MetaInformation::default();
-        for token in tokens {
-            meta = self.visit(token, meta);
-        }
-
-        Ok(meta)
+    fn parse(&mut self, tokens: Vec<Token>) -> Result<Self::OkType, Error> {
+        self.parse_borrowed(&tokens)
     }
 }
 
@@ -25,7 +21,17 @@ impl MetaParser {
         Self {}
     }
 
-    fn visit(&mut self, token: Token, meta: MetaInformation) -> MetaInformation {
+    pub fn parse_borrowed(&mut self, tokens: &[Token]) -> Result<MetaInformation, Error> {
+        let mut meta = MetaInformation::default();
+        for token in tokens {
+            meta = self.visit(token, meta);
+        }
+
+        Ok(meta)
+    }
+
+    fn visit(&mut self, token: &Token, meta: MetaInformation) -> MetaInformation {
+        log::trace!("Visit token: {:?}", token);
         match token {
             Token::Chord(_) => self.visit_chord(token, meta),
             Token::Headline {
@@ -33,7 +39,7 @@ impl MetaParser {
                 ref text,
                 modifier: _,
             } => {
-                if level == 1 {
+                if *level == 1 {
                     MetaInformation {
                         title: Some(text.clone()),
                         ..meta
@@ -51,7 +57,7 @@ impl MetaParser {
         }
     }
 
-    fn visit_chord(&mut self, token: Token, meta: MetaInformation) -> MetaInformation {
+    fn visit_chord(&mut self, token: &Token, meta: MetaInformation) -> MetaInformation {
         let chords = if let Token::Chord(c) = token {
             c
         } else {
@@ -70,9 +76,10 @@ impl MetaParser {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::test_helpers::get_test_parser_input;
     use crate::tokenizer::Modifier;
+
+    use super::*;
 
     #[test]
     fn test_parse() {
