@@ -1,8 +1,8 @@
 use super::{MetaInformation, Node};
 
 pub struct ParserResult {
-    meta: MetaInformation,
-    node: Node,
+    pub meta: MetaInformation,
+    pub node: Node,
 }
 
 impl ParserResult {

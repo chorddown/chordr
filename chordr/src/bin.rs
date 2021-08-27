@@ -132,17 +132,20 @@ fn convert(args: &ArgMatches) -> Result<()> {
         Ok(c) => c,
         Err(e) => return Err(Error::unknown_error(format!("Could not read file: {}", e))),
     };
-    log::debug!("Did read file");
 
     let tokens = build_tokenizer().tokenize(BufReader::new(file))?;
     log::debug!("Did tokenize content");
 
     let parser_result = Parser::new().parse(tokens)?;
     log::debug!("Did parse content");
-    let meta = parser_result.meta_as_ref().clone();
+    let ParserResult { meta, node } = parser_result;
     let parser_result_node = match transpose {
-        None => parser_result.node(),
-        Some(t) => parser_result.node().transpose(t),
+        None => node,
+        Some(t) => {
+            let transposed = node.transpose(t);
+            log::debug!("Did transpose");
+            transposed
+        }
     };
 
     let converted = Converter::new().convert(&parser_result_node, &meta, formatting)?;
@@ -224,7 +227,7 @@ fn build_catalog(args: &ArgMatches) -> Result<()> {
         Ok(s) => s,
         Err(e) => return Err(Error::unknown_error(format!("{}", e))),
     };
-    if catalog_result.errors.len() > 0 {
+    if !catalog_result.errors.is_empty() {
         for error in catalog_result.errors {
             handle_error_output(error)
         }
@@ -270,7 +273,7 @@ fn configure_logging(matches: &ArgMatches) -> Result<()> {
     }
 }
 
-fn handle_error_output(error: CatalogBuildError) -> () {
+fn handle_error_output(error: CatalogBuildError) {
     let header = format!(
         "Error during analysis of file {}:",
         error.path().to_string_lossy()
