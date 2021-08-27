@@ -26,10 +26,11 @@ pub fn parse_content<R: BufRead>(contents: R) -> Result<ParserResult> {
 }
 
 pub fn transpose_content<R: BufRead>(contents: R, semitones: isize) -> Result<ParserResult> {
-    let parser_result = parse_content(contents)?;
-    let transposed_node = parser_result.node_as_ref().transpose(semitones);
+    let ParserResult { node, meta } = parse_content(contents)?;
 
-    Ok(ParserResult::new(transposed_node, parser_result.meta()))
+    let transposed_node = node.transpose(semitones);
+
+    Ok(ParserResult::new(transposed_node, meta))
 }
 
 pub fn convert_to_format<R: BufRead>(

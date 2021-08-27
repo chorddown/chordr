@@ -32,8 +32,8 @@ impl Chords {
 }
 
 impl TransposableTrait for Chords {
-    fn transpose(&self, semitones: isize) -> Self {
-        match &self.1 {
+    fn transpose(self, semitones: isize) -> Self {
+        match self.1 {
             None => Self(self.0.transpose(semitones), None),
             Some(c) => Self(self.0.transpose(semitones), Some(c.transpose(semitones))),
         }

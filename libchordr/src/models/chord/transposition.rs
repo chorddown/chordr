@@ -1,3 +1,3 @@
 pub trait TransposableTrait {
-    fn transpose(&self, semitones: isize) -> Self;
+    fn transpose(self, semitones: isize) -> Self;
 }

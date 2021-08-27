@@ -208,8 +208,8 @@ impl From<isize> for Note {
 }
 
 impl TransposableTrait for Note {
-    fn transpose(&self, semitones: isize) -> Self {
-        Note::from(*self as isize + semitones)
+    fn transpose(self, semitones: isize) -> Self {
+        Note::from(self as isize + semitones)
     }
 }
 

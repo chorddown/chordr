@@ -106,10 +106,10 @@ impl From<Note> for Chord {
 }
 
 impl TransposableTrait for Chord {
-    fn transpose(&self, semitones: isize) -> Self {
+    fn transpose(self, semitones: isize) -> Self {
         Self {
             root: self.root.transpose(semitones),
-            variant: self.variant.clone(),
+            variant: self.variant,
         }
     }
 }

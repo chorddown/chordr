@@ -107,7 +107,7 @@ impl Node {
 }
 
 impl TransposableTrait for Node {
-    fn transpose(&self, semitones: isize) -> Self {
+    fn transpose(self, semitones: isize) -> Self {
         match self {
             Node::ChordTextPair {
                 chords,
@@ -115,24 +115,27 @@ impl TransposableTrait for Node {
                 last_in_line: eol,
             } => Node::ChordTextPair {
                 chords: chords.transpose(semitones),
-                text: text.clone(),
-                last_in_line: *eol,
+                text,
+                last_in_line: eol,
             },
             Node::ChordStandalone(chords) => Node::ChordStandalone(chords.transpose(semitones)),
 
             Node::Document(nodes) => {
-                Node::Document(nodes.iter().map(|n| n.transpose(semitones)).collect())
+                Node::Document(nodes.into_iter().map(|n| n.transpose(semitones)).collect())
             }
             Node::Section {
                 head,
                 section_type,
                 children,
             } => Node::Section {
-                head: head.clone(),
-                section_type: *section_type,
-                children: (children.iter().map(|n| n.transpose(semitones)).collect()),
+                head,
+                section_type,
+                children: (children
+                    .into_iter()
+                    .map(|n| n.transpose(semitones))
+                    .collect()),
             },
-            _ => self.clone(),
+            _ => self,
         }
     }
 }
