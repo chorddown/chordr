@@ -376,7 +376,9 @@ dependencies = [
  "atty",
  "clap",
  "libchordr",
+ "log 0.4.11",
  "serde_json",
+ "simplelog 0.10.0",
 ]
 
 [[package]]
@@ -393,7 +395,7 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "serde_yaml",
- "simplelog",
+ "simplelog 0.6.0",
  "synchord",
  "xml-rs",
 ]
@@ -1579,6 +1581,7 @@ dependencies = [
  "chrono",
  "criterion",
  "encoding",
+ "log 0.4.11",
  "printpdf",
  "rand 0.7.3",
  "serde",
@@ -3084,6 +3087,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "simplelog"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "59d0fe306a0ced1c88a58042dc22fc2ddd000982c26d75f6aa09a394547c41e0"
+dependencies = [
+ "chrono",
+ "log 0.4.11",
+ "termcolor",
+]
+
+[[package]]
 name = "slab"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3238,7 +3252,7 @@ dependencies = [
  "reqwest 0.11.3",
  "serde",
  "serde_derive",
- "simplelog",
+ "simplelog 0.6.0",
  "xml-rs",
 ]
 
@@ -3320,6 +3334,15 @@ dependencies = [
  "byteorder",
  "dirs",
  "winapi 0.3.9",
+]
+
+[[package]]
+name = "termcolor"
+version = "1.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2dfed899f0eb03f32ee8c6a0aabdb8a7949659e3466561fc0adf54e26d88c5f4"
+dependencies = [
+ "winapi-util",
 ]
 
 [[package]]
