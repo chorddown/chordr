@@ -23,6 +23,7 @@ impl Scanner {
 
         let mut line = String::new();
         while 0 < input.read_line(&mut line)? {
+            log::trace!("Scan line `{}`", line.trim_end());
             let chars = line.chars();
 
             for current_character in chars {

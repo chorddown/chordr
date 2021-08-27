@@ -39,6 +39,7 @@ impl NodeParser {
         token: Token,
         tokens: &mut Peekable<IntoIter<Token>>,
     ) -> Result<Node, Error> {
+        log::trace!("Visit token: {:?}", token);
         match token {
             Token::Chord(_) => self.visit_chord(token, tokens),
             Token::Headline {

@@ -26,6 +26,7 @@ printpdf = { version = "0.2.8", optional = true }
 rand = "0.7.2"
 encoding = "^0.2.33"
 chrono = { version = "0.4", features = ["serde"] }
+log = "0.4"
 
 [dev-dependencies]
 serde_json = "^1.0"
@@ -41,4 +42,8 @@ harness = false
 
 [[bench]]
 name = "tokenize_benchmark"
+harness = false
+
+[[bench]]
+name = "transpose_benchmark"
 harness = false
