@@ -15,10 +15,7 @@ pub enum BNotation {
 
 impl BNotation {
     pub fn is_european_chord(chord: &str) -> bool {
-        match Self::try_from(chord) {
-            Ok(Self::H) => true,
-            _ => false,
-        }
+        matches!(Self::try_from(chord), Ok(Self::H))
     }
 
     pub fn contains_european_chord(chord: &str) -> bool {

@@ -60,10 +60,7 @@ impl<'a> DynamicTag /*<'a>*/ {
     }
 
     pub fn tag_name(&self) -> Option<String> {
-        match self.tag_name {
-            Some(ref t) => Some(t.clone()),
-            None => None,
-        }
+        self.tag_name.as_ref().cloned()
     }
 
     pub fn is_raw_wrapper(&self) -> bool {
@@ -101,7 +98,7 @@ impl<'a> Display for DynamicTag /*<'a>*/ {
             }
 
             if let Some(attributes) = &self.attributes {
-                let mut attributes_sorted = attributes.into_iter().collect::<Vec<_>>();
+                let mut attributes_sorted = attributes.iter().collect::<Vec<_>>();
                 attributes_sorted.sort();
                 for attribute in attributes_sorted {
                     f.write_str(" ")?;

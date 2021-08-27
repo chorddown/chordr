@@ -61,7 +61,7 @@ impl TagProvider {
         &self,
         formatting: Formatting,
         head: &Option<Box<Node>>,
-        children: &Vec<Node>,
+        children: &[Node],
         section_type: &SectionType,
     ) -> Tag {
         let mut gtb = TagBuilder::new().set_tag_name("section");

@@ -130,10 +130,7 @@ impl ConstTag {
     }
 
     pub(crate) const fn is_self_closing(&self) -> bool {
-        match self.tag_name {
-            TagName::Hr => true,
-            _ => false,
-        }
+        matches!(self.tag_name, TagName::Hr)
     }
 
     pub(crate) const fn tag_name(&self) -> &TagName {

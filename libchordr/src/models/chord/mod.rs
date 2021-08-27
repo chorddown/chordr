@@ -77,10 +77,7 @@ impl Chord {
                 )))
             }
         }
-        let note_has_two_chars = match chars[1] {
-            '♭' | 'b' | '♯' | '#' => true,
-            _ => false,
-        };
+        let note_has_two_chars = matches!(chars[1], '♭' | 'b' | '♯' | '#');
 
         let (node_raw, variant_raw) = if note_has_two_chars {
             chars.split_at(2)

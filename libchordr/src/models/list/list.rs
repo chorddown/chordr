@@ -111,6 +111,16 @@ where
     }
 }
 
+impl<S> Default for List<S>
+where
+    S: ListEntryTrait + Serialize + Debug + Clone,
+    S: for<'a> Deserialize<'a>,
+{
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<S: PartialEq> PartialEq for List<S>
 where
     S: ListEntryTrait + Serialize + Debug + Clone,

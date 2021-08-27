@@ -214,7 +214,7 @@ impl FSM {
     }
 
     fn consume_buffer(&mut self) -> String {
-        std::mem::replace(&mut self.literal_buffer, String::new())
+        std::mem::take(&mut self.literal_buffer)
     }
 
     fn append_lexeme(&mut self, lexeme: &Lexeme) {

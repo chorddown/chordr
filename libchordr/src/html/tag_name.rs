@@ -18,11 +18,7 @@ pub enum TagName {
 
 impl TagName {
     pub fn is_none(&self) -> bool {
-        if let TagName::None = self {
-            true
-        } else {
-            false
-        }
+        matches!(self, TagName::None)
     }
 
     pub const fn headline_level(level: u8) -> TagName {

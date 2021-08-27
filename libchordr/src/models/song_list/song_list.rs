@@ -1,13 +1,16 @@
-use super::SongListTrait;
-use crate::error::Result;
-use crate::models::list::{List, ListEntryTrait, ListError, ListTrait};
-use crate::models::song_id::SongIdTrait;
-use serde::Deserialize;
-use serde::Serialize;
 use std::fmt::Debug;
 use std::ops;
 use std::slice::Iter;
 use std::vec::IntoIter;
+
+use serde::Deserialize;
+use serde::Serialize;
+
+use crate::error::Result;
+use crate::models::list::{List, ListEntryTrait, ListError, ListTrait};
+use crate::models::song_id::SongIdTrait;
+
+use super::SongListTrait;
 
 /// A generic set of Songs identified by their [SongId]
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -96,6 +99,16 @@ where
     }
 }
 
+impl<S> Default for SongList<S>
+where
+    S: SongIdTrait + Serialize + Debug + Clone,
+    S: for<'a> Deserialize<'a>,
+{
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<S: SongIdTrait + PartialEq> PartialEq for SongList<S>
 where
     S: ListEntryTrait + Serialize + Debug + Clone,
@@ -134,8 +147,9 @@ where
 
 #[cfg(test)]
 mod test {
-    use super::*;
     use crate::models::song_id::SongId;
+
+    use super::*;
 
     #[derive(Debug, PartialOrd, PartialEq, Clone, Serialize, Deserialize)]
     struct TestItem(usize);

@@ -21,22 +21,6 @@ impl Lexeme {
         Lexeme::Literal(s.into())
     }
 
-    #[allow(unused)]
-    pub fn to_string(&self) -> String {
-        match self {
-            Lexeme::Newline => super::keywords::NEWLINE.to_string(),
-            Lexeme::ChordStart => super::keywords::CHORD_START.to_string(),
-            Lexeme::ChordEnd => super::keywords::CHORD_END.to_string(),
-            Lexeme::HeaderStart => super::keywords::HEADER_START.to_string(),
-            Lexeme::QuoteStart => super::keywords::QUOTE_START.to_string(),
-            Lexeme::Colon => super::keywords::COLON.to_string(),
-            Lexeme::ChorusMark => super::keywords::CHORUS_MARK.to_string(),
-            Lexeme::BridgeMark => super::keywords::BRIDGE_MARK.to_string(),
-            Lexeme::Literal(inner) => inner.clone(),
-            Lexeme::Eof => "".to_owned(),
-        }
-    }
-
     pub fn detect_modifier(&self) -> Option<Modifier> {
         match self {
             Lexeme::ChordStart | Lexeme::ChordEnd | Lexeme::QuoteStart | Lexeme::Colon => {
@@ -45,9 +29,7 @@ impl Lexeme {
             Lexeme::ChorusMark => Some(Modifier::Chorus),
             Lexeme::BridgeMark => Some(Modifier::Bridge),
             Lexeme::Literal(text) => {
-                if text.is_empty() {
-                    None
-                } else if text.trim().is_empty() {
+                if text.is_empty() || text.trim().is_empty() {
                     None
                 } else {
                     Some(Modifier::None)
@@ -65,6 +47,7 @@ impl Lexeme {
         }
     }
 
+    #[inline(always)]
     pub(crate) fn as_char(&self) -> char {
         match self {
             Lexeme::Newline => super::keywords::NEWLINE,

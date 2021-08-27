@@ -10,7 +10,7 @@ use super::validate_xml_identifier;
 
 pub type AttributeCollection = HashSet<Attribute>;
 
-#[derive(Clone, Debug, Ord)]
+#[derive(Clone, Debug)]
 pub struct Attribute {
     name: &'static str,
     value: String,
@@ -69,6 +69,12 @@ impl<'a> Eq for Attribute /*<'a>*/ {}
 impl<'a> PartialOrd for Attribute /*<'a>*/ {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.name().partial_cmp(other.name())
+    }
+}
+
+impl<'a> Ord for Attribute /*<'a>*/ {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.name().cmp(other.name())
     }
 }
 
