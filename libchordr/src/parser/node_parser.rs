@@ -1,12 +1,14 @@
+use std::iter::Peekable;
+use std::vec::IntoIter;
+
+use crate::models::chord::Chords;
+use crate::tokenizer::Token;
+
 pub use super::meta_information::MetaInformation;
 pub use super::node::Node;
 pub use super::parser_result::ParserResult;
 pub use super::section_type::SectionType;
 pub use super::*;
-use crate::models::chord::Chords;
-use crate::tokenizer::Token;
-use std::iter::Peekable;
-use std::vec::IntoIter;
 
 pub struct NodeParser {
     b_notation: BNotation,
@@ -16,8 +18,7 @@ impl ParserTrait for NodeParser {
     type OkType = Node;
 
     fn parse(&mut self, tokens: Vec<Token>) -> Result<Self::OkType, Error> {
-        let tokens_clean = Parser::cleanup_tokens(&tokens);
-        let mut tokens_iterator = tokens_clean.into_iter().peekable();
+        let mut tokens_iterator = Parser::cleanup_tokens(tokens).into_iter().peekable();
 
         let mut elements = vec![];
 
@@ -109,23 +110,17 @@ impl NodeParser {
             Ok(chords) => chords,
         };
 
-        if let Some(next) = tokens.peek() {
-            if let Token::Literal(_) = next {
-                // Consume the next token
-                let text = tokens.next().unwrap();
+        if let Some(Token::Literal(_)) = tokens.peek() {
+            // Consume the next token
+            let text = tokens.next().unwrap();
 
-                let last_in_line = if let Some(Token::Newline) = tokens.peek() {
-                    true
-                } else {
-                    false
-                };
+            let last_in_line = matches!(tokens.peek(), Some(Token::Newline));
 
-                return Ok(Node::ChordTextPair {
-                    chords,
-                    text,
-                    last_in_line,
-                });
-            }
+            return Ok(Node::ChordTextPair {
+                chords,
+                text,
+                last_in_line,
+            });
         }
 
         Ok(Node::ChordStandalone(chords))
@@ -146,8 +141,9 @@ fn token_is_start_of_section(token: &Token) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::test_helpers::{get_test_ast, get_test_tokens};
+
+    use super::*;
 
     #[test]
     fn test_parse() {

@@ -49,28 +49,23 @@ impl ParserTrait for Parser {
 }
 
 impl Parser {
-    pub fn cleanup_tokens(tokens: &[Token]) -> Vec<Token> {
-        let mut tokens_clean: Vec<Token> = vec![];
+    /// Remove leading and duplicate Newline tokens from the stream
+    pub fn cleanup_tokens(tokens: Vec<Token>) -> Vec<Token> {
+        // Initialize to `true` so that leading Newline tokens will be skipped
+        let mut previous_token_was_newline: bool = true;
 
-        let token_iterator = tokens.iter();
-        let mut previous_token = None;
-        for token in token_iterator {
-            match previous_token {
-                Some(&Token::Newline) if token == &Token::Newline => continue,
-                Some(_) => {
-                    tokens_clean.push(token.clone());
-                    previous_token = Some(token);
+        tokens
+            .into_iter()
+            .filter(|token| {
+                // Skip multiple Newline tokens
+                if *token == Token::Newline && previous_token_was_newline {
+                    false
+                } else {
+                    previous_token_was_newline = *token == Token::Newline;
+                    true
                 }
-                None => {
-                    if token != &Token::Newline {
-                        tokens_clean.push(token.clone());
-                    }
-                    previous_token = Some(token);
-                }
-            }
-        }
-
-        tokens_clean
+            })
+            .collect()
     }
 }
 
@@ -202,7 +197,7 @@ mod tests {
     #[test]
     fn test_cleanup_tokens() {
         assert_eq!(
-            Parser::cleanup_tokens(&vec![
+            Parser::cleanup_tokens(vec![
                 Token::headline(1, "Test", Modifier::None),
                 Token::newline(),
                 Token::chord("H"),
@@ -215,7 +210,7 @@ mod tests {
         );
 
         assert_eq!(
-            Parser::cleanup_tokens(&vec![
+            Parser::cleanup_tokens(vec![
                 Token::headline(1, "Test", Modifier::None),
                 Token::newline(),
                 Token::newline(),
@@ -230,7 +225,7 @@ mod tests {
         );
 
         assert_eq!(
-            Parser::cleanup_tokens(&vec![
+            Parser::cleanup_tokens(vec![
                 Token::headline(1, "Test", Modifier::None),
                 Token::newline(),
                 Token::newline(),
@@ -246,7 +241,7 @@ mod tests {
         );
 
         assert_eq!(
-            Parser::cleanup_tokens(&vec![
+            Parser::cleanup_tokens(vec![
                 Token::newline(),
                 Token::newline(),
                 Token::chord("H"),
@@ -255,7 +250,7 @@ mod tests {
             vec![Token::chord("H"), Token::newline(),]
         );
         assert_eq!(
-            Parser::cleanup_tokens(&vec![
+            Parser::cleanup_tokens(vec![
                 Token::newline(),
                 Token::newline(),
                 Token::chord("H"),
