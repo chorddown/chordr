@@ -252,7 +252,8 @@ fn configure_logging(matches: &ArgMatches) -> Result<()> {
         0 => LevelFilter::Warn,
         1 => LevelFilter::Info,
         2 => LevelFilter::Debug,
-        3 | _ => LevelFilter::Trace,
+        3 => LevelFilter::Trace,
+        _ => LevelFilter::Warn,
     };
 
     match CombinedLogger::init(vec![TermLogger::new(
