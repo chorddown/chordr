@@ -112,11 +112,11 @@ impl TransposableTrait for Node {
             Node::ChordTextPair {
                 chords,
                 text,
-                last_in_line: eol,
+                last_in_line,
             } => Node::ChordTextPair {
                 chords: chords.transpose(semitones),
                 text,
-                last_in_line: eol,
+                last_in_line,
             },
             Node::ChordStandalone(chords) => Node::ChordStandalone(chords.transpose(semitones)),
 
