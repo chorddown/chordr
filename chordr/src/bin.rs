@@ -132,6 +132,7 @@ fn convert(args: &ArgMatches) -> Result<()> {
         Ok(c) => c,
         Err(e) => return Err(Error::unknown_error(format!("Could not read file: {}", e))),
     };
+    log::debug!("Did open file");
 
     let tokens = build_tokenizer().tokenize(BufReader::new(file))?;
     log::debug!("Did tokenize content");
