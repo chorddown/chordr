@@ -5,8 +5,8 @@ use yew::{Component, ComponentLink, ShouldRender};
 
 use libchordr::models::catalog::*;
 use libchordr::models::song_data::SongData;
-use libchordr::prelude::Song;
 use libchordr::prelude::SongSorting;
+use libchordr::prelude::{ListEntryTrait, Song};
 
 use crate::components::song_list::Item as SongItem;
 
@@ -135,11 +135,15 @@ impl Component for SongBrowser {
             }
         };
         let render_song_item = |song: &Song| {
-            let key = song.title();
+            let data_key = song.title();
+            let song_id = song.id();
+            let key = song_id.as_str();
+
             html! {
                 <div class="col-xs-6 col-3">
                     <SongItem<Song> class="song-item grid-button"
-                        data_key=key
+                        key=key
+                        data_key=data_key
                         song=song.clone()/>
                 </div>
             }

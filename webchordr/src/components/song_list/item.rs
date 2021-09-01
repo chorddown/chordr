@@ -59,12 +59,6 @@ impl<S: SongData + PartialEq + 'static + Clone> Component for Item<S> {
     }
 
     fn change(&mut self, props: Self::Properties) -> bool {
-        // info!("{:?} vs {:?}", self.props, props);
-        // let new_name = props.song.title();
-        // let old_name = self.props.song.title();
-        // js!(console.log("%c" + @{old_name} + " -> " + @{new_name}, "color:Orange"));
-        // self.props = props;
-        // return true;
         if self.props != props {
             self.props = props;
             true

@@ -11,6 +11,7 @@ use crate::components::song_list::Item as SongItem;
 use crate::search::SearchUtility;
 
 use self::link::SongSearchLink;
+use libchordr::models::list::ListEntryTrait;
 
 mod link;
 
@@ -93,10 +94,14 @@ impl Component for SongSearch {
 
     fn view(&self) -> Html {
         let render_song_item = |song: &Song| {
-            let key = song.title();
+            let data_key = song.title();
+            let song_id = song.id();
+            let key = song_id.as_str();
+
             html! {
                 <SongItem<Song> class="song-item button"
-                    data_key=key
+                    key=key
+                    data_key=data_key
                     song=song.clone()/>
             }
         };

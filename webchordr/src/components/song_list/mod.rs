@@ -96,7 +96,9 @@ impl Component for SongList {
         let sortable = self.props.sortable;
         let highlighted_song_id = &self.props.highlighted_song_id;
         let render = |song: SetlistEntry| {
-            let key = song.title();
+            let data_key = song.title();
+            let song_id = song.id();
+            let key = song_id.as_str();
 
             let highlight = if let Some(highlighted_song_id) = highlighted_song_id {
                 &song.id() == highlighted_song_id
@@ -104,7 +106,7 @@ impl Component for SongList {
                 false
             };
 
-            html! { <Item<SetlistEntry> data_key=key song=song sortable=sortable highlight=highlight /> }
+            html! { <Item<SetlistEntry> key=key data_key=data_key song=song sortable=sortable highlight=highlight /> }
         };
 
         let entries = songs.clone().into_iter().collect::<Vec<SetlistEntry>>();
