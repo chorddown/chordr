@@ -1,6 +1,8 @@
-use libchordr::models::prelude::*;
-use log::debug;
 use std::collections::BTreeMap;
+
+use unicode_segmentation::UnicodeSegmentation;
+
+use libchordr::models::prelude::*;
 
 /// A struct holding the character group to navigate to and the number of matching [Song]s
 #[derive(Clone, PartialEq, Debug)]
@@ -17,9 +19,10 @@ impl Index {
 
 /// Return the indexes for the given [Song]s
 pub fn build_indexes(songs: Vec<&Song>, root_chars: &str) -> Vec<Index> {
+    let prefix_length = root_chars.len() + 1;
     let indexes: Vec<String> = songs
         .iter()
-        .map(|s| get_index(s.title(), root_chars))
+        .map(|s| get_prefix(s.title(), prefix_length))
         .collect();
     //    indexes.sort();
 
@@ -39,20 +42,21 @@ pub fn build_indexes(songs: Vec<&Song>, root_chars: &str) -> Vec<Index> {
     map.values().cloned().collect()
 }
 
-/// Get the index of [s] according to the current [props.chars]
-fn get_index(s: String, root_chars: &str) -> String {
-    debug!("root_chars: {}", root_chars);
-    let len = if root_chars.is_empty() {
-        1
-    } else {
-        root_chars.len() + 1
-    };
+fn get_prefix(s: String, index_length: usize) -> String {
     let mut lowercase = s.to_lowercase();
     lowercase.retain(|c| !c.is_whitespace());
 
-    sub_string(&lowercase, len)
+    sub_string(&lowercase, index_length)
 }
 
-fn sub_string(input: &str, length: usize) -> String {
-    input.chars().take(length).collect()
+pub(super) fn sub_string(input: &str, length: usize) -> String {
+    UnicodeSegmentation::graphemes(input, true)
+        .take(length)
+        .collect::<String>()
+}
+
+pub(super) fn char_count(input: &str) -> usize {
+    UnicodeSegmentation::graphemes(input, true)
+        .collect::<Vec<&str>>()
+        .len()
 }

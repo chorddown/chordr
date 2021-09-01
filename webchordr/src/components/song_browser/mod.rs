@@ -76,7 +76,11 @@ impl SongBrowser {
         }) as Html
     }
 
-    fn get_back_link_parameter(&self, chars: &String) -> String {
+    fn get_back_link_parameter(&self, chars: &str) -> String {
+        if !self.has_chars() {
+            return SONG_BROWSER_PLACEHOLDER.to_owned();
+        }
+
         let count = char_count(chars);
         if count < 1 {
             return SONG_BROWSER_PLACEHOLDER.to_owned();
@@ -144,11 +148,13 @@ impl Component for SongBrowser {
         let songs = self.get_filtered_songs();
 
         (if songs.len() > 24 || !self.has_chars() {
+            let indexes_for_filtered_songs = self.get_indexes_for_filtered_songs();
+
             html! {
                 <div class="song-browser-index-list">
                     {self.render_header()}
                     <div class="row grid">
-                        { for self.get_indexes_for_filtered_songs().into_iter().map(render_index_item) }
+                        { for indexes_for_filtered_songs.into_iter().map(render_index_item) }
                     </div>
                     {self.get_back_link()}
                 </div>
@@ -165,12 +171,4 @@ impl Component for SongBrowser {
             }
         }) as Html
     }
-}
-
-fn sub_string(input: &str, length: usize) -> String {
-    input.chars().take(length).collect()
-}
-
-fn char_count(input: &str) -> usize {
-    input.chars().collect::<Vec<char>>().len()
 }

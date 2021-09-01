@@ -34,6 +34,7 @@ wasm-bindgen-futures = "0.4.17"
 async-trait = "0.1.37"
 chrono = { version = "*", features = ["serde", "wasmbind"] }
 base64 = "^0.12.1"
+unicode-segmentation = "1.8.0"
 # Require a current version of lexical-core
 lexical-core = "^0.7.6"
 
