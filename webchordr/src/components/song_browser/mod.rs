@@ -126,21 +126,51 @@ impl Component for SongBrowser {
     }
 
     fn view(&self) -> Html {
-        let render_index_item = |index| {
+        let songs = self.get_filtered_songs();
+
+        if songs.len() > 24 || !self.has_chars() {
+            self.render_index()
+        } else {
+            self.render_songs(songs)
+        }
+    }
+}
+
+impl SongBrowser {
+    fn render_index(&self) -> Html {
+        let render_index_item = |index: Index| {
+            let key = index.chars.clone();
+
             html! {
                 <div class="col-xs-12 col-sm-6 col-3">
                     <IndexItem class="song-browser-index-item grid-button"
+                        key=key
                         index=index/>
                 </div>
             }
         };
+
+        let indexes_for_filtered_songs = self.get_indexes_for_filtered_songs();
+
+        html! {
+            <div class="song-browser-index-list">
+                {self.render_header()}
+                <div class="row grid">
+                    { for indexes_for_filtered_songs.into_iter().map(render_index_item) }
+                </div>
+                {self.get_back_link()}
+            </div>
+        }
+    }
+
+    fn render_songs(&self, songs: Vec<&Song>) -> Html {
         let render_song_item = |song: &Song| {
             let data_key = song.title();
             let song_id = song.id();
             let key = song_id.as_str();
 
             html! {
-                <div class="col-xs-6 col-3">
+                <div class="col-xs-12 col-6">
                     <SongItem<Song> class="song-item grid-button"
                         key=key
                         data_key=data_key
@@ -149,30 +179,14 @@ impl Component for SongBrowser {
             }
         };
 
-        let songs = self.get_filtered_songs();
-
-        (if songs.len() > 24 || !self.has_chars() {
-            let indexes_for_filtered_songs = self.get_indexes_for_filtered_songs();
-
-            html! {
-                <div class="song-browser-index-list">
-                    {self.render_header()}
-                    <div class="row grid">
-                        { for indexes_for_filtered_songs.into_iter().map(render_index_item) }
-                    </div>
-                    {self.get_back_link()}
+        html! {
+            <div class="song-browser-song-list song-list">
+                {self.render_header()}
+                <div class="row grid">
+                    { for songs.into_iter().map(render_song_item) }
                 </div>
-            }
-        } else {
-            html! {
-                <div class="song-browser-song-list song-list">
-                    {self.render_header()}
-                    <div class="row grid">
-                        { for songs.into_iter().map(render_song_item) }
-                    </div>
-                    {self.get_back_link()}
-                </div>
-            }
-        }) as Html
+                {self.get_back_link()}
+            </div>
+        }
     }
 }
