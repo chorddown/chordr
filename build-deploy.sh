@@ -30,6 +30,9 @@ if hash yarn 2>/dev/null; then
 else
   npm run ${command}
 fi
+if [[ $* == *--verbose* ]] && type twiggy &>/dev/null; then
+  twiggy top -n 10 ./dist/webchordr.wasm
+fi
 popd
 
 echo "[TASK] Upload to $1"
