@@ -20,11 +20,17 @@ cargo run --bin chordr -- build-catalog webchordr/static/songs webchordr/static/
 
 echo "[TASK] Create deploy-build"
 pushd webchordr
+
 if [[ $* == *--dev* ]]; then
   command="build:dev"
+  wasm_pack_command="build --dev"
 else
   command="build"
+  wasm_pack_command="build"
 fi
+
+wasm-pack ${wasm_pack_command}
+
 if hash yarn 2>/dev/null; then
   yarn ${command}
 else
@@ -34,6 +40,5 @@ if [[ $* == *--verbose* ]] && type twiggy &>/dev/null; then
   twiggy top -n 10 ./dist/webchordr.wasm
 fi
 popd
-
 echo "[TASK] Upload to $1"
 rsync -i --exclude '*.scss' -rzu webchordr/dist/ $1
