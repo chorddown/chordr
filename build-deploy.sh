@@ -7,6 +7,14 @@ if [[ "$1" == "" ]]; then
   exit 1
 fi
 
+if pgrep trunk >/dev/null; then
+  echo "*"
+  echo "*"
+  echo "[WARN] A running trunk program was detected. This may lead to unexpected side effects"
+  echo "*"
+  echo "*"
+  echo
+fi
 echo "[TASK] Build the catalog"
 cargo run --bin chordr -- build-catalog webchordr/static/songs webchordr/static/catalog.json -p
 
