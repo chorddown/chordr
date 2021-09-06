@@ -5658,9 +5658,9 @@ vm-browserify@^1.0.1:
   integrity sha512-2ham8XPWTONajOR0ohOKOHXkm3+gaBmGut3SRuu75xLd/RRaY6vqgh8NBYYk7+RW3u5AtzPQZG8F10LHkl0lAQ==
 
 wasm-pack@^0.10.0:
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/wasm-pack/-/wasm-pack-0.10.0.tgz#b486fad9e578e9a232602a3f8a4b6513040c0c95"
-  integrity sha512-E+bs6Bh5mmSPT5lqEsyhEsFSVIIGYFEq96oG+SfQqY8gv8Hvn7TB3FGD+gVL5On5TCOgPQb7Sr2dbLkj9cN0QQ==
+  version "0.10.1"
+  resolved "https://registry.yarnpkg.com/wasm-pack/-/wasm-pack-0.10.1.tgz#5d50649aee827192c42c941991856d47b90cff27"
+  integrity sha512-bw480KaaJQhL6UX8wAm6YCO497uaULDrsvUey3EB86dKAfFc6qCGVN1kItcwUklEeufonwo9mwz9/fy9xLOPtQ==
   dependencies:
     binary-install "^0.1.0"
 
