@@ -63,12 +63,13 @@ $control: (
 ) !default;
 
 $dark-mode-control: (
-        bg: $dark-mode-background,
+        bg: $gray-very-dark,
         color: $dark-mode-text-color,
-        border: map-get($control, border),
+        border: 1px solid $gray-ultra-dark,
         hover-bg: $gray-darker,
         hover-color: $dark-mode-text-color,
 ) !default;
+
 
 $control-disabled: (
         bg: $gray,
@@ -125,7 +126,7 @@ $dark-mode-button-hover-bg: map-get($dark-mode-control, hover-bg) !default;
 $dark-mode-button-hover-color: map-get($dark-mode-control, hover-color) !default;
 
 $nav-bg: $gray-light !default;
-$dark-mode-nav-bg: $gray-dark !default;
+$dark-mode-nav-bg: $gray-very-dark !default;
 $nav-button-height: 40px !default;
 $nav-footer-border-width: 0 !default;
 $nav-footer-border-color: $gray-dark !default;
