@@ -85,6 +85,7 @@
     font-family: $ui-font;
     text-decoration: none;
     touch-action: manipulation;
+    cursor: pointer;
 
     &:focus,
     &:hover {
@@ -92,9 +93,13 @@
     }
 }
 
-@mixin button-default($padding: $button-padding, $border: $button-border, $width: 100%) {
+@mixin button-default($padding: $button-padding, $border: auto, $width: 100%) {
     background: var(--button-bg);
-    border: $border;
+    @if $border != auto {
+        border: $border;
+    } @else {
+        border: var(--button-border);
+    }
     color: var(--button-color);
     width: $width;
     padding: $padding;
@@ -106,25 +111,16 @@
     &:hover {
         color: var(--button-hover-color);
         background: var(--button-hover-bg);
-        //color: $button-hover-color;
-        //background: $button-hover-bg;
     }
-
-    //@include if-dark-mode {
-    //    background: $dark-mode-button-bg;
-    //    color: $dark-mode-button-color;
-    //
-    //    &:focus,
-    //    &:hover {
-    //        color: $dark-mode-button-hover-color;
-    //        background: $dark-mode-button-hover-bg;
-    //    }
-    //}
 }
 
-@mixin button-disabled($padding: $button-padding, $border: $button-border, $width: 100%) {
+@mixin button-disabled($padding: $button-padding, $border: auto, $width: 100%) {
     background: var(--control-disabled-bg);
-    border: $border;
+    @if $border != auto {
+        border: $border;
+    } @else {
+        border: var(--button-border);
+    }
     color: var(--control-disabled-color);
     width: $width;
     padding: $padding;
