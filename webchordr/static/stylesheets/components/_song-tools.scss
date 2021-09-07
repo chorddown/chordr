@@ -3,8 +3,8 @@
 .song-tools {
     position: fixed;
     bottom: 0;
-    background: $gray-light;
-    color: $button-color;
+    background: var(--tool-bg);
+    color: var(--button-color);
     padding: (1+$std-half) $std-half;
     line-height: $button-line-height;
     font-size: $button-font-size;
@@ -32,31 +32,18 @@
         appearance: none;
         width: 4 * $std-space;
         padding: 0 0 0 $std-half;
-        color: $button-color;
-    }
-
-    @include if-dark-mode {
-        background: $gray-darker;
-        color: $dark-mode-button-color;
-
-        input {
-            color: $dark-mode-button-color;
-        }
-    }
-
-    button {
-
+        color: var(--button-color);
     }
 
     button.discreet {
         $button-size: 30px;
         display: inline-block;
-        color: $button-color;
+        color: var(--button-color);
         height: $button-size;
         min-width: $button-size;
 
         &:hover {
-            color: $gray-dark;
+            color: var(--button-hover-color);
         }
 
         &[disabled] {
@@ -65,16 +52,7 @@
         }
 
         &.-active {
-            background: $gray;
-        }
-
-        @include if-dark-mode {
-            color: $dark-mode-button-color;
-
-            &:focus,
-            &:hover {
-                color: $dark-mode-button-hover-color;
-            }
+            background: var(--button-hover-bg);
         }
     }
 
