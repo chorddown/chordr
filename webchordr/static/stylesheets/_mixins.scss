@@ -54,7 +54,9 @@
 
 @mixin if-dark-mode {
     @media screen and (prefers-color-scheme: dark) {
-        @content;
+        @at-root html:not(.light-mode) & {
+            @content;
+        }
     }
     @at-root html.dark-mode & {
         @content;
