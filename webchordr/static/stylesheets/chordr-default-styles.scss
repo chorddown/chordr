@@ -137,7 +137,8 @@
                 content: "";
                 width: $section-border-length;
                 border-bottom: $section-border;
-                position: absolute;
+                position: relative;
+                clear: both;
                 margin-top: -$section-border-width;
             }
         }
