@@ -3,6 +3,7 @@ $gray: #b7b7b0 !default;
 $gray-medium: #a8a8a2 !default;
 $gray-dark: #8d8d88 !default;
 $gray-darker: #62625e !default;
+$gray-very-dark: lighten(#221d1c, 5%) !default;
 $gray-ultra-dark: #221d1c !default;
 
 $green: #239b32 !default;
@@ -44,6 +45,9 @@ $link-color: $gray-darker !default;
 $link-hover-color: $gray-ultra-dark !default;
 $dark-mode-link-color: $dark-mode-text-color !default;
 $dark-mode-link-hover-color: $gray-light !default;
+
+$tool-bg: $gray-light !default;
+$dark-mode-tool-bg: $gray-very-dark !default;
 
 $button-line-height: 26px !default;
 $button-font-size: $font-size-h3 !default;
