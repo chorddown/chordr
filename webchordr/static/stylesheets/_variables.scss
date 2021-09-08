@@ -271,3 +271,10 @@ $song-search-padding: $button-padding !default;
 $song-search-border: $button-border !default;
 $song-search-color: $button-color !default;
 $dark-mode-song-search-color: $dark-mode-button-color !default;
+
+$modal-bg: $gray-light !default;
+$dark-mode-modal-bg: $gray-darker !default;
+$modal-header-bg: $gray !default;
+$dark-mode-modal-header-bg: $gray-ultra-dark !default;
+$modal-padding: $std-space !default;
+$modal-shadow: 0px 1px 3px rgba(0, 0, 0, .23) !default;

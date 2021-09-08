@@ -21,13 +21,8 @@ body {
     font-size: var(--font-size-base); // $font-size-ui;
     line-height: $line-height;
     margin: 0;
-    //color: $text-color;
     color: var(--text-color);
     background: var(--background);
-    //@include if-dark-mode {
-    //    //background: $dark-mode-background;
-    //    //color: $dark-mode-text-color;
-    //}
 }
 
 label {
@@ -37,7 +32,7 @@ label {
 
 input {
     font-size: $font-size-ui;
-    font: $ui-font;
+    font-family: $ui-font;
     display: inline-block;
     margin: 0;
 
@@ -65,9 +60,7 @@ main {
     @include min-screen-tablet {
         width: calc(100% - #{$nav-width});
     }
-    //@include if-dark-mode {
-    //    background: $dark-mode-background;
-    //}
+
     @media print {
         width: 100%;
         padding: 0;

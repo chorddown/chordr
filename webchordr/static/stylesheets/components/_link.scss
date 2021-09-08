@@ -6,18 +6,9 @@ a {
 
     &:focus,
     &:hover {
-        color: var(--link-color-hover);
+        color: var(--link-hover-color);
         outline: none;
     }
-
-    //@include if-dark-mode {
-    //    color: $dark-mode-link-color;
-    //
-    //    &:focus,
-    //    &:hover {
-    //        color: $dark-mode-link-hover-color;
-    //    }
-    //}
 }
 
 .back-link {

@@ -31,7 +31,7 @@
         @return map-get($grid-breakpoints, $next) - .02px;
     }
     @if $screen == xxl {
-        @return 100000;
+        @return 100000px;
     }
     @error "No max-breakpoint for screen #{$screen} found";
 }

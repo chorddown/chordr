@@ -1,12 +1,5 @@
 @import "prelude";
 
-$modal-bg: $gray-light !default;
-$modal-header-bg: $gray !default;
-$modal-padding: $std-space !default;
-$modal-shadow: 0px 1px 3px rgba(0, 0, 0, .23) !default;
-$dark-mode-modal-bg: $gray-darker !default;
-$dark-mode-modal-header-bg: $gray-ultra-dark !default;
-
 .modal-outer {
     z-index: 100;
     position: fixed;
@@ -45,9 +38,6 @@ $dark-mode-modal-header-bg: $gray-ultra-dark !default;
         align-items: center;
         justify-content: space-between;
         background: var(--modal-header-bg);
-        //@include if-dark-mode {
-        //    background: $dark-mode-modal-header-bg;
-        //}
 
         .modal-header-text {
             padding: $button-padding;
