@@ -30,14 +30,9 @@
         -webkit-appearance: none;
         -moz-appearance: none;
         appearance: none;
-        border: $song-search-border;
+        border: var(--song-search-border);
         width: 100%;
         border-radius: 0;
         background: transparent;
-
-        //@include if-dark-mode {
-        //    color: var(--song-search-color);
-        //    //color: $dark-mode-song-search-color;
-        //}
     }
 }

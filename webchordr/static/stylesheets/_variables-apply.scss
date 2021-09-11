@@ -37,6 +37,9 @@
     @include assign-variables(control-disabled, $control-disabled);
     @include assign-variables(message-warn, $message-warn);
     @include assign-variables(message-error, $message-error);
+
+    --song-search-border: #{$song-search-border};
+    --song-search-color: #{$song-search-color};
 }
 
 @mixin dark-mode {
@@ -64,6 +67,9 @@
     @include assign-variables(control-disabled, $dark-mode-control-disabled);
     @include assign-variables(message-warn, $dark-mode-message-warn);
     @include assign-variables(message-error, $dark-mode-message-error);
+
+    --song-search-border: #{$dark-mode-song-search-border};
+    --song-search-color: #{$dark-mode-song-search-color};
 }
 
 // Default styles (=light-mode)
