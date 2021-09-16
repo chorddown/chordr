@@ -94,13 +94,13 @@
 }
 
 @mixin button-default($padding: $button-padding, $border: auto, $width: 100%) {
-    background: var(--button-bg);
+    background: var(--control-bg);
     @if $border != auto {
         border: $border;
     } @else {
-        border: var(--button-border);
+        border: var(--control-border);
     }
-    color: var(--button-color);
+    color: var(--control-color);
     width: $width;
     padding: $padding;
     text-align: center;
@@ -109,8 +109,8 @@
 
     &:focus,
     &:hover {
-        color: var(--button-hover-color);
-        background: var(--button-hover-bg);
+        color: var(--control-hover-color);
+        background: var(--control-hover-bg);
     }
 }
 
@@ -119,7 +119,7 @@
     @if $border != auto {
         border: $border;
     } @else {
-        border: var(--button-border);
+        border: var(--control-border);
     }
     color: var(--control-disabled-color);
     width: $width;
