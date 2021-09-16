@@ -60,6 +60,7 @@ $control: (
         border: 1px solid $gray-dark,
         hover-bg: $gray-dark,
         hover-color: $gray-darker,
+        hover-border: 1px solid $gray-dark,
 ) !default;
 
 $dark-mode-control: (
@@ -68,6 +69,7 @@ $dark-mode-control: (
         border: 1px solid $gray-ultra-dark,
         hover-bg: $gray-darker,
         hover-color: $dark-mode-text-color,
+        hover-border: 1px solid $gray-ultra-dark,
 ) !default;
 
 
@@ -77,6 +79,7 @@ $control-disabled: (
         border: 1px solid $gray-dark,
         hover-bg: $gray,
         hover-color: $gray-dark,
+        hover-border: 1px solid $gray-dark,
 ) !default;
 
 $dark-mode-control-disabled: (
@@ -85,6 +88,7 @@ $dark-mode-control-disabled: (
         border: map-get($control, border),
         hover-bg: $dark-mode-background,
         hover-color: $gray-darker,
+        hover-border: map-get($control, border),
 ) !default;
 
 $message-warn-light: rgb(255, 231, 149);
