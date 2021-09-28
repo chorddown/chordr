@@ -42,8 +42,10 @@
         height: $button-size;
         min-width: $button-size;
 
-        &:hover {
-            color: var(--button-hover-color);
+        @include if-hover-enabled {
+            &:hover {
+                color: var(--button-hover-color);
+            }
         }
 
         &[disabled] {

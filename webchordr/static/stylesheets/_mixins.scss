@@ -87,9 +87,11 @@
     touch-action: manipulation;
     cursor: pointer;
 
-    &:focus,
-    &:hover {
-        outline: none;
+    @include if-hover-enabled {
+        &:focus,
+        &:hover {
+            outline: none;
+        }
     }
 }
 
@@ -107,11 +109,13 @@
     letter-spacing: $button-letter-spacing;
     cursor: pointer;
 
-    &:focus,
-    &:hover {
-        color: var(--control-hover-color);
-        background: var(--control-hover-bg);
-        border: var(--control-hover-border);
+    @include if-hover-enabled {
+        &:focus,
+        &:hover {
+            color: var(--control-hover-color);
+            background: var(--control-hover-bg);
+            border: var(--control-hover-border);
+        }
     }
 }
 
@@ -129,11 +133,13 @@
     letter-spacing: $button-letter-spacing;
     cursor: pointer;
 
-    &:focus,
-    &:hover {
-        color: var(--control-disabled-hover-color);
-        background: var(--control-disabled-hover-bg);
-        border: var(--control-disabled-hover-border);
+    @include if-hover-enabled {
+        &:focus,
+        &:hover {
+            color: var(--control-disabled-hover-color);
+            background: var(--control-disabled-hover-bg);
+            border: var(--control-disabled-hover-border);
+        }
     }
 }
 
@@ -197,4 +203,8 @@
     }
 }
 
-
+@mixin if-hover-enabled {
+    @media (hover: hover) and (pointer: fine) {
+        @content;
+    }
+}

@@ -4,10 +4,12 @@ a {
     color: var(--link-color);
     text-decoration: none;
 
-    &:focus,
-    &:hover {
-        color: var(--link-hover-color);
-        outline: none;
+    @include if-hover-enabled {
+        &:focus,
+        &:hover {
+            color: var(--link-hover-color);
+            outline: none;
+        }
     }
 }
 

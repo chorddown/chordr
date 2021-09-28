@@ -68,12 +68,11 @@ nav {
         a[role=button] {
             padding: $button-padding;
 
-            &:focus,
-            &:hover {
-                color: var(--button-hover-color);
-                //@include if-dark-mode {
-                //    color: $dark-mode-button-hover-color;
-                //}
+            @include if-hover-enabled {
+                &:focus,
+                &:hover {
+                    color: var(--button-hover-color);
+                }
             }
         }
 
@@ -110,12 +109,6 @@ nav {
             white-space: nowrap;
             padding: nth($button-padding, 1);
         }
-    }
-
-    a[role=button]:not(.discreet):focus,
-    a[role=button]:not(.discreet):hover,
-    button:not(.discreet):focus,
-    button:not(.discreet):hover {
     }
 
     footer {
