@@ -41,6 +41,9 @@ lexical-core = "^0.7.6"
 [dev-dependencies]
 wasm-bindgen-test = "0.3"
 
+[build-dependencies]
+chrono = { version = "*" }
+
 [dependencies.wasm-bindgen]
 version = "0.2.67"
 features = ["serde-serialize"]
