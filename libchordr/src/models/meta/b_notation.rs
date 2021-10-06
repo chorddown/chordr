@@ -1,8 +1,7 @@
-use serde::export::fmt::Error;
-use serde::export::Formatter;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
-use std::fmt::Display;
+use std::fmt;
+use std::fmt::{Display, Formatter};
 
 /// Enum defining how the `B` is defined
 ///
@@ -37,7 +36,7 @@ impl Default for BNotation {
 }
 
 impl Display for BNotation {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
@@ -74,7 +73,7 @@ pub struct NotationError(String);
 impl std::error::Error for NotationError {}
 
 impl Display for NotationError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "Invalid b-notation '{}'", self.0)
     }
 }
