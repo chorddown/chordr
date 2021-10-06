@@ -1,0 +1,43 @@
+[package]
+name = "webchordr-song-list"
+version = "0.1.0"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+log = "0.4"
+serde = "1"
+serde_derive = "1"
+libchordr = { path = "../libchordr" }
+webchordr-events = { path = "../webchordr-events" }
+webchordr-class = { path = "../webchordr-class" }
+yew = "0.18"
+js-sys = "0.3.44"
+wasm-bindgen-futures = "0.4.17"
+
+[dependencies.wasm-bindgen]
+version = "0.2.67"
+features = ["serde-serialize"]
+
+[dependencies.web-sys]
+version = "0.3.44"
+features = [
+#    'KeyboardEvent',
+#    'HtmlElement',
+#    'Document',
+#    'HtmlDocument',
+#    'Url',
+#    'DateTimeValue',
+#    'Window',
+#    'Location',
+#    'Headers',
+#    'Request',
+#    'RequestInit',
+#    'RequestMode',
+#    'RequestCredentials',
+#    'Response',
+#    'Storage',
+#    'History',
+#    'Navigator',
+]

@@ -6,10 +6,10 @@ use libchordr::models::catalog::Catalog;
 use libchordr::models::setlist::Setlist;
 use libchordr::prelude::{SongSettingsMap, User};
 pub use song_info::SongInfo;
+use webchordr_common::errors::WebError;
 
 use crate::connection::ConnectionStatus;
 use crate::session::Session;
-use crate::WebError;
 
 mod song_info;
 

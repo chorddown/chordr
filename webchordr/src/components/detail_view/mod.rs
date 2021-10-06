@@ -77,3 +77,9 @@ impl DetailView {
         }
     }
 }
+#[cfg(test)]
+mod tests {
+
+    #[test]
+    fn dv_test() {}
+}

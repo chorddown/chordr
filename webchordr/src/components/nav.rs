@@ -6,11 +6,11 @@ use libchordr::models::song_list::SongList as SongListModel;
 use libchordr::prelude::{ListEntryTrait, SongId, SongSettings};
 
 // use crate::components::setlist::SetlistShareButton;
-use crate::components::song_list::SongList as SongListView;
 use crate::components::song_view::SongNotes;
 use crate::components::user::NavItem as UserNavButton;
-use crate::events::Event;
 use crate::state::{SongInfo, State};
+use webchordr_events::Event;
+use webchordr_song_list::SongList as SongListView;
 
 #[derive(Properties, Clone)]
 pub struct NavProps {

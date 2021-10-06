@@ -5,13 +5,13 @@ use yew::prelude::*;
 use yew::{Component, ComponentLink, ShouldRender};
 
 use libchordr::models::catalog::*;
+use libchordr::models::list::ListEntryTrait;
 use libchordr::prelude::{Song, SongData, SongSorting};
+use webchordr_song_list::Item as SongItem;
 
-use crate::components::song_list::Item as SongItem;
 use crate::search::SearchUtility;
 
 use self::link::SongSearchLink;
-use libchordr::models::list::ListEntryTrait;
 
 mod link;
 

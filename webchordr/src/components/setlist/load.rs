@@ -1,11 +1,11 @@
 use crate::components::modal::Question;
 use crate::data_exchange::SetlistDeserializeService;
-use crate::events::Event;
-use crate::events::SetlistEvent;
 use libchordr::prelude::{Catalog, Setlist, SetlistEntry, SongData};
 use log::{error, info};
 use std::rc::Rc;
 use web_sys::window;
+use webchordr_events::Event;
+use webchordr_events::SetlistEvent;
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq, Clone)]

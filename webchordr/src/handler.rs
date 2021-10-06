@@ -15,17 +15,19 @@ use crate::app::App;
 use crate::config::Config;
 use crate::connection::{ConnectionService, ConnectionStatus};
 use crate::errors::WebError;
-use crate::events::{Event, SetlistEvent, SettingsEvent, SortingChange};
 use crate::handler_traits::catalog_handler::CatalogHandler;
 use crate::handler_traits::setlist_handler::SetlistHandler;
 use crate::handler_traits::settings_handler::SettingsHandler;
 use crate::helpers::window;
-use crate::persistence::persistence_manager::PMType;
-use crate::persistence::persistence_manager::PersistenceManagerFactory;
-use crate::persistence::prelude::*;
-use crate::persistence::web_repository::{CatalogWebRepository, SettingsWebRepository};
-use crate::session::{Session, SessionMainData, SessionService};
+use crate::session::{Session, SessionMainData};
+use webchordr_persistence::persistence_manager::PMType;
+use webchordr_persistence::persistence_manager::PersistenceManagerFactory;
+use webchordr_persistence::prelude::*;
+use webchordr_persistence::session::SessionService;
+use webchordr_persistence::web_repository::{CatalogWebRepository, SettingsWebRepository};
+
 use crate::state::State;
+use webchordr_events::{Event, SetlistEvent, SettingsEvent, SortingChange};
 
 type InitialDataResult = Result<Box<SessionMainData>, Option<WebError>>;
 

@@ -1,5 +1,5 @@
-use crate::events::{SetlistEvent, SortingChange};
 use libchordr::prelude::{Setlist, SetlistEntry, SongId, SongSettings};
+use webchordr_events::{SetlistEvent, SortingChange};
 
 pub trait SetlistHandler {
     /// Handle the given [`Setlist`] related event

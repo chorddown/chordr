@@ -1,5 +1,5 @@
-use crate::events::SettingsEvent;
 use libchordr::prelude::{SongId, SongSettings, SongSettingsMap};
+use webchordr_events::SettingsEvent;
 
 pub trait SettingsHandler {
     /// Handle the given [`SongSettings`] related event

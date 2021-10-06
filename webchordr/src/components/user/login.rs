@@ -2,12 +2,13 @@ use crate::components::detail_view::DetailView;
 use crate::config::Config;
 use crate::connection::{ConnectionService, ConnectionStatus};
 use crate::helpers::Tri;
-use crate::session::{Session, SessionService, SessionUser};
-use crate::WebError;
+use crate::session::{Session, SessionUser};
 use libchordr::prelude::{Credentials, Error, Password, Username};
 use log::info;
 use std::convert::TryFrom;
 use wasm_bindgen_futures::spawn_local;
+use webchordr_common::errors::WebError;
+use webchordr_persistence::session::SessionService;
 use yew::prelude::*;
 
 type LoginStatus = Tri<Session, WebError>;
