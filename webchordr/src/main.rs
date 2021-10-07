@@ -21,8 +21,6 @@ mod handler_traits;
 mod route;
 mod search;
 mod state;
-#[cfg(test)]
-mod test_helpers;
 
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
