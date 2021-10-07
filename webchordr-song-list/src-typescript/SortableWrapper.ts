@@ -12,7 +12,7 @@ export class SortableWrapper {
         callback: (oldIndex: number | undefined, newIndex: number | undefined) => void,
         options?: Options
     ) {
-        console.log('[SortableWrapper] New', element, options)
+        console.log('[SortableWrapper] New')
         options = options || {};
 
         options.onEnd = function (e: SortableEvent) {
@@ -32,12 +32,12 @@ export class SortableWrapper {
             element.dispatchEvent(customEvent);
         };
         this.sortable = Sortable.create(element, options);
-        console.debug("[SortableWrapper] Initialized sortable", this.sortable);
+        console.debug("[SortableWrapper] Initialized sortable");
     }
 
     destroy() {
         if (this.sortable) {
-            console.debug("[SortableWrapper] Destroy", this.sortable);
+            console.debug("[SortableWrapper] Destroy");
 
             this.sortable.destroy();
             this.sortable = undefined;
