@@ -3,26 +3,12 @@ name = "webchordr-common"
 version = "0.1.0"
 edition = "2018"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-#
-#[lib]
-#name = "webchordlib"
-#crate-type = ["cdylib", "rlib"]
-
-[features]
-trunk_build = []
-
 [dependencies]
 log = "0.4"
 serde = "1"
 serde_derive = "1"
 serde_json = "1.0.53"
 libchordr = { path = "../libchordr" }
-webchordr-events = { path = "../webchordr-events" }
-webchordr-song-list = { path = "../webchordr-song-list" }
-webchordr-song-browser = { path = "../webchordr-song-browser" }
-#webchordr-persistence = { path = "../webchordr-persistence" }
 yew = "0.18"
 yew-router = "0.15"
 percent-encoding = "2.1.0"
@@ -34,8 +20,6 @@ async-trait = "0.1.51"
 chrono = { version = "*", features = ["serde", "wasmbind"] }
 base64 = "^0.13.0"
 unicode-segmentation = "1.8.0"
-# Require a current version of lexical-core
-#lexical-core = "^0.7.6"
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3"
@@ -50,51 +34,8 @@ features = ["serde-serialize"]
 [dependencies.web-sys]
 version = "0.3.44"
 features = [
-    'KeyboardEvent',
-    'HtmlElement',
-    'Document',
-    'HtmlDocument',
-    'Url',
-    'DateTimeValue',
-    'Window',
-    'Location',
-    'Headers',
-    'Request',
-    'RequestInit',
     'RequestMode',
     'RequestCredentials',
     'Response',
-    'Storage',
-    'History',
     'Navigator',
 ]
-
-[package.metadata.wasm-pack.profile.dev]
-# Should `wasm-opt` be used to further optimize the wasm binary generated after
-# the Rust compiler has finished? Using `wasm-opt` can often further decrease
-# binary size or do clever tricks that haven't made their way into LLVM yet.
-#
-# Configuration is set to `false` by default for the dev profile, but it can
-# be set to an array of strings which are explicit arguments to pass to
-# `wasm-opt`. For example `['-Os']` would optimize for size while `['-O4']`
-# would execute very expensive optimizations passes
-wasm-opt = false
-
-[package.metadata.wasm-pack.profile.release]
-# Should `wasm-opt` be used to further optimize the wasm binary generated after
-# the Rust compiler has finished? Using `wasm-opt` can often further decrease
-# binary size or do clever tricks that haven't made their way into LLVM yet.
-#
-# Configuration is set to `false` by default for the dev profile, but it can
-# be set to an array of strings which are explicit arguments to pass to
-# `wasm-opt`. For example `['-Os']` would optimize for size while `['-O4']`
-# would execute very expensive optimizations passes
-wasm-opt = ['-Os']
-
-[package.metadata.wasm-pack.profile.dev.wasm-bindgen]
-# Should we enable wasm-bindgen's debug assertions in its generated JS glue?
-#debug-js-glue = true
-# Should wasm-bindgen demangle the symbols in the "name" custom section?
-demangle-name-section = true
-# Should we emit the DWARF debug info custom sections?
-dwarf-debug-info = true
