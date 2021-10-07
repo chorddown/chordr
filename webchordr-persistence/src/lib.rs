@@ -11,6 +11,10 @@ pub mod browser_storage;
 pub mod persistence_manager;
 pub mod session;
 pub mod storage_key_utility;
+
+#[doc(hidden)]
+#[cfg(test)]
+mod test_helpers;
 pub mod web_repository;
 
 pub mod prelude {
