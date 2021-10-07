@@ -4,7 +4,6 @@ members = [
     "libchordr",
     "cqrs",
     "webchordr",
-    "webchordr-class",
     "webchordr-common",
     "webchordr-events",
     "webchordr-persistence",

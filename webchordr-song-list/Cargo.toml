@@ -11,7 +11,7 @@ serde = "1"
 serde_derive = "1"
 libchordr = { path = "../libchordr" }
 webchordr-events = { path = "../webchordr-events" }
-webchordr-class = { path = "../webchordr-class" }
+webchordr-common = { path = "../webchordr-common" }
 yew = "0.18"
 js-sys = "0.3.44"
 wasm-bindgen-futures = "0.4.17"

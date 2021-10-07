@@ -4260,13 +4260,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "webchordr-class"
-version = "0.1.0"
-dependencies = [
- "yew",
-]
-
-[[package]]
 name = "webchordr-common"
 version = "0.1.0"
 dependencies = [
@@ -4286,9 +4279,6 @@ dependencies = [
  "wasm-bindgen-test",
  "wasm-logger",
  "web-sys",
- "webchordr-events",
- "webchordr-song-browser",
- "webchordr-song-list",
  "wee_alloc",
  "yew",
  "yew-router",
@@ -4339,7 +4329,7 @@ dependencies = [
  "wasm-bindgen-futures",
  "wasm-bindgen-test",
  "web-sys",
- "webchordr-class",
+ "webchordr-common",
  "webchordr-events",
  "webchordr-song-list",
  "yew",
@@ -4357,7 +4347,7 @@ dependencies = [
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
- "webchordr-class",
+ "webchordr-common",
  "webchordr-events",
  "yew",
 ]

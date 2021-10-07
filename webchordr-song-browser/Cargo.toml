@@ -14,7 +14,7 @@ serde_derive = "1"
 libchordr = { path = "../libchordr" }
 webchordr-events = { path = "../webchordr-events" }
 webchordr-song-list = { path = "../webchordr-song-list" }
-webchordr-class = { path = "../webchordr-class" }
+webchordr-common = { path = "../webchordr-common" }
 yew = "0.18"
 #yew-router = "0.15"
 #percent-encoding = "2.1.0"

@@ -4,7 +4,7 @@ use yew::{Component, ComponentLink};
 
 use libchordr::prelude::*;
 
-use webchordr_class::Class;
+use webchordr_common::helpers::Class;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct SongListItemProps<S: SongData + Clone> {

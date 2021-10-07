@@ -1,5 +1,5 @@
 use super::index::Index;
-use webchordr_class::Class;
+use webchordr_common::helpers::Class;
 use yew::prelude::*;
 use yew::virtual_dom::VNode;
 use yew::{Component, ComponentLink};
