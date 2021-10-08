@@ -13,7 +13,7 @@ CLI tool to manage catalogs and convert chorddown files
 ### [srvchord](srvchord)
 Chorddown web application - Server side
 
-### [webchordr](webchordr)
+### [webchordr](webchordr/app)
 Chorddown web application - Client side
 
 ### [synchord](synchord)

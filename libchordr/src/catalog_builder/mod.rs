@@ -140,7 +140,10 @@ mod tests {
 
     #[test]
     fn test_build_catalog_for_directory() {
-        let songs_dir = format!("{}/../webchordr/static/songs", env!("CARGO_MANIFEST_DIR"));
+        let songs_dir = format!(
+            "{}/../webchordr/app/static/songs",
+            env!("CARGO_MANIFEST_DIR")
+        );
         let songs_dir = Path::new(&songs_dir);
         let result =
             CatalogBuilder::new().build_catalog_for_directory(songs_dir, FileType::Chorddown, true);

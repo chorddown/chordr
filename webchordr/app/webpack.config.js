@@ -22,8 +22,8 @@ module.exports = smp.wrap((env, argv) => {
     output: {
       publicPath: '/',
       path: distPath,
-      filename: "webchordr.js",
-      webassemblyModuleFilename: "webchordr.wasm"
+      filename: "app.js",
+      webassemblyModuleFilename: "app.wasm"
     },
     module: {
       rules: [

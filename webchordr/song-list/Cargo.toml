@@ -9,9 +9,9 @@ edition = "2018"
 log = "0.4"
 serde = "1"
 serde_derive = "1"
-libchordr = { path = "../libchordr" }
-webchordr-events = { path = "../webchordr-events" }
-webchordr-common = { path = "../webchordr-common" }
+libchordr = { path = "../../libchordr" }
+webchordr-events = { path = "../events" }
+webchordr-common = { path = "../common" }
 yew = "0.18"
 js-sys = "0.3.44"
 wasm-bindgen-futures = "0.4.17"

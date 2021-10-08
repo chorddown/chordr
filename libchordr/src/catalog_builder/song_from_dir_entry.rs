@@ -70,12 +70,12 @@ mod tests {
     #[test]
     fn test_try_from() {
         let song_path = format!(
-            "{}/../webchordr/static/songs/swing_low_sweet_chariot.chorddown",
+            "{}/../webchordr/app/static/songs/swing_low_sweet_chariot.chorddown",
             env!("CARGO_MANIFEST_DIR")
         );
         let song_path = Path::new(&song_path);
         let result = Song::try_from(song_path);
-        assert!(result.is_ok());
+        assert!(result.is_ok(), "{:?}", result.unwrap());
         let song = result.unwrap();
         assert_eq!(SongId::new("swing_low_sweet_chariot.chorddown"), song.id());
         assert_eq!("Swing Low Sweet Chariot", &song.title());
