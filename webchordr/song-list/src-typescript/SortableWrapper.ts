@@ -4,6 +4,29 @@ const SETLIST_CHANGE_SORTING = "chordr:setlist-change-sorting";
 
 type Options = Sortable.Options;
 
+const consoleStyles = {
+    normalStyle: "background: inherit; color: inherit",
+    pathStyle: "font-weight: bold; color: inherit",
+    label: {
+        info: {
+            text: "%cINFO%c webchordr%c ",
+            style: "color: white; padding: 0 3px; background: #029202;"
+        },
+        error: {
+            text: "%cERROR%c webchordr%c ",
+            style: "color: white; padding: 0 3px; background: #ff2863;"
+        },
+        warn: {
+            text: "%cWARN%c webchordr%c ",
+            style: "color: white; padding: 0 3px; background: #c18d12;"
+        },
+        debug: {
+            text: "%cDEBUG%c webchordr%c ",
+            style: "color: white; padding: 0 3px; background: #0066ff;"
+        },
+    }
+}
+
 export class SortableWrapper {
     private sortable: Sortable | undefined;
 
@@ -12,7 +35,12 @@ export class SortableWrapper {
         callback: (oldIndex: number | undefined, newIndex: number | undefined) => void,
         options?: Options
     ) {
-        console.log('[SortableWrapper] New')
+        console.info(
+            consoleStyles.label.info.text + '[SortableWrapper] New',
+            consoleStyles.label.info.style,
+            consoleStyles.pathStyle,
+            consoleStyles.normalStyle
+        )
         options = options || {};
 
         options.onEnd = function (e: SortableEvent) {
@@ -32,17 +60,32 @@ export class SortableWrapper {
             element.dispatchEvent(customEvent);
         };
         this.sortable = Sortable.create(element, options);
-        console.debug("[SortableWrapper] Initialized sortable");
+        console.debug(
+            consoleStyles.label.debug.text + '[SortableWrapper] Initialized sortable',
+            consoleStyles.label.debug.style,
+            consoleStyles.pathStyle,
+            consoleStyles.normalStyle
+        )
     }
 
     destroy() {
         if (this.sortable) {
-            console.debug("[SortableWrapper] Destroy");
+            console.debug(
+                consoleStyles.label.debug.text + '[SortableWrapper] Destroy',
+                consoleStyles.label.debug.style,
+                consoleStyles.pathStyle,
+                consoleStyles.normalStyle
+            );
 
             this.sortable.destroy();
             this.sortable = undefined;
         } else {
-            console.debug("[SortableWrapper] Already destroyed");
+            console.debug(
+                consoleStyles.label.debug.text + '[SortableWrapper] Already destroyed',
+                consoleStyles.label.debug.style,
+                consoleStyles.pathStyle,
+                consoleStyles.normalStyle
+            );
         }
     }
 }
