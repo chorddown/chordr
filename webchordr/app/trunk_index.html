@@ -90,19 +90,9 @@
                 consoleStyles.pathStyle,
                 consoleStyles.normalStyle
             );
-            caches.keys().then(function (cacheNames) {
-                Promise.all(
-                    cacheNames.filter(function (cacheName) {
-                        return cacheName === CACHE_NAME;
-                    }).map(function (cacheName) {
-                        return caches.delete(cacheName);
-                    })
-                ).then(function () {
-                    setTimeout(function () {
-                        // window.location.reload()
-                    }, 4000)
-                })
-            })
+            caches.delete(CACHE_NAME).then(() => setTimeout(() => {
+                window.location.reload()
+            }, 4000))
         }, 10000);
     };
 
@@ -118,7 +108,7 @@
     } else if ('serviceWorker' in navigator) {
         navigator.serviceWorker
             .register('/service-worker.js')
-            .then(function () {
+            .then(() => {
                 console.info(
                     consoleStyles.label.info.text + 'Service Worker registered',
                     consoleStyles.label.info.style,
@@ -126,7 +116,7 @@
                     consoleStyles.normalStyle
                 );
                 checkWebApp()
-            }).catch(function (e) {
+            }).catch(e => {
                 console.error(
                     consoleStyles.label.error.text + 'Service Worker could not be registered',
                     consoleStyles.label.error.style,
