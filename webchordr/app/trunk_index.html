@@ -144,13 +144,6 @@
             consoleStyles.normalStyle
         );
     }
-
-    /* Add the current timestamp to the reload-button's URI */
-    /** @type {HTMLLinkElement|HTMLElement} */
-    const fallback = getReloadButtonFallback();
-    if (fallback) {
-        fallback.href += '?' + (+new Date());
-    }
 </script>
 
 </body>
