@@ -5,17 +5,15 @@
     <meta charset="utf-8"/>
     <title>Chorddown Web</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width">
     <link rel="icon" href="/assets/images/logo-32-light.png">
     <link rel="apple-touch-icon" href="/assets/images/logo-120.png">
     <link rel="manifest" href="/manifest.json">
     <link data-trunk rel="copy-file" href="/static/manifest.json">
     <link data-trunk rel="copy-file" href="/static/catalog.json">
+    <link data-trunk rel="copy-file" href="/static/service-worker.js">
     <link data-trunk rel="copy-dir" href="/static/assets">
     <link data-trunk rel="rust" data-cargo-features="trunk_build">
-
-    <meta name="viewport" content="width=device-width">
-
-
     <link data-trunk rel="scss" data-inline href="/static/stylesheets/chordr-app.scss"/>
 </head>
 <body>
@@ -38,24 +36,45 @@
 
 <script>
     const CACHE_NAME = 'chordr';
-    const consoleStyles = {
-        normalStyle: "background: inherit; color: inherit",
-        pathStyle: "font-weight: bold; color: inherit",
-        label: {
-            info: {
-                text: "%cINFO%c webchordr%c ",
-                style: "color: white; padding: 0 3px; background: #029202;"
-            },
-            error: {
-                text: "%cERROR%c webchordr%c ",
-                style: "color: white; padding: 0 3px; background: #ff2863;"
-            },
-            debug: {
-                text: "%cDEBUG%c webchordr%c ",
-                style: "color: white; padding: 0 3px; background: #0066ff;"
-            },
+    const initOutput = enable => {
+        /* See also webchordr/app/static/service-worker.js:159 */
+        const consoleStyles = {
+            normalStyle: "background: inherit; color: inherit",
+            pathStyle: "font-weight: bold; color: inherit",
+            label: {
+                info: {
+                    text: "%cINFO%c webchordr SW%c ",
+                    style: "color: white; padding: 0 3px; background: #029202;"
+                },
+                error: {
+                    text: "%cERROR%c webchordr SW%c ",
+                    style: "color: white; padding: 0 3px; background: #ff2863;"
+                },
+                warn: {
+                    text: "%cWARN%c webchordr SW%c ",
+                    style: "color: white; padding: 0 3px; background: #c18d12;"
+                },
+                debug: {
+                    text: "%cDEBUG%c webchordr SW%c ",
+                    style: "color: white; padding: 0 3px; background: #0066ff;"
+                },
+            }
         }
+
+        const ef = () => {
+        };
+        const output = {debug: ef, info: ef, warn: ef, error: ef,};
+        if (enable) {
+            output.debug = window.console.debug.bind(window.console, consoleStyles.label.debug.text + '%s', consoleStyles.label.debug.style, consoleStyles.pathStyle, consoleStyles.normalStyle);
+            output.info = window.console.info.bind(window.console, consoleStyles.label.info.text + '%s', consoleStyles.label.info.style, consoleStyles.pathStyle, consoleStyles.normalStyle);
+            output.warn = window.console.warn.bind(window.console, consoleStyles.label.warn.text + '%s', consoleStyles.label.warn.style, consoleStyles.pathStyle, consoleStyles.normalStyle);
+            output.error = window.console.error.bind(window.console, consoleStyles.label.error.text + '%s', consoleStyles.label.error.style, consoleStyles.pathStyle, consoleStyles.normalStyle);
+        }
+
+        return output
     }
+
+    const output = initOutput();
 
     const getReloadButtonFallback = function () {
         /** @type {HTMLLinkElement|HTMLElement} */
@@ -73,23 +92,13 @@
                 /* Button has been removed by the Web App - everything seems ok */
                 return;
             }
-            const message = consoleStyles.label.debug.text + 'Web App did not start successfully.';
+            const message = 'Web App did not start successfully.';
             if (!navigator.onLine) {
-                console.debug(
-                    message + ' But device appears to be offline',
-                    consoleStyles.label.debug.style,
-                    consoleStyles.pathStyle,
-                    consoleStyles.normalStyle
-                );
+                output.debug(message + ' But device appears to be offline');
                 return;
             }
 
-            console.debug(
-                message + ' Clearing caches and reload',
-                consoleStyles.label.debug.style,
-                consoleStyles.pathStyle,
-                consoleStyles.normalStyle
-            );
+            output.debug(message + ' Clearing caches and reload');
             caches.delete(CACHE_NAME).then(() => setTimeout(() => {
                 window.location.reload()
             }, 4000))
@@ -97,42 +106,21 @@
     };
 
     // const skipServiceWorker = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const skipServiceWorker = true
+    const skipServiceWorker = false
     if (skipServiceWorker) {
-        console.info(
-            consoleStyles.label.info.text + 'Service Worker is disabled',
-            consoleStyles.label.info.style,
-            consoleStyles.pathStyle,
-            consoleStyles.normalStyle
-        );
+        output.info('Service Worker is disabled');
     } else if ('serviceWorker' in navigator) {
         navigator.serviceWorker
             .register('/service-worker.js')
             .then(() => {
-                console.info(
-                    consoleStyles.label.info.text + 'Service Worker registered',
-                    consoleStyles.label.info.style,
-                    consoleStyles.pathStyle,
-                    consoleStyles.normalStyle
-                );
+                output.info('Service Worker registered');
                 checkWebApp()
-            }).catch(e => {
-                console.error(
-                    consoleStyles.label.error.text + 'Service Worker could not be registered',
-                    consoleStyles.label.error.style,
-                    consoleStyles.pathStyle,
-                    consoleStyles.normalStyle,
-                    e
-                );
+            }).catch(error => {
+                output.error('Service Worker could not be registered', error);
             }
         );
     } else {
-        console.error(
-            consoleStyles.label.error.text + 'Service Worker not supported',
-            consoleStyles.label.error.style,
-            consoleStyles.pathStyle,
-            consoleStyles.normalStyle
-        );
+        output.error('Service Worker not supported');
     }
 </script>
 
