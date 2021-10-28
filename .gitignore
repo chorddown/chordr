@@ -1,3 +1,5 @@
 /target
 **/*.rs.bk
 .idea
+webchordr/app/dist
+**/node_modules

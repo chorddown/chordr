@@ -3,8 +3,16 @@ members = [
     "chordr",
     "libchordr",
     "cqrs",
-    "webchordr",
+    "webchordr/app",
+    "webchordr/common",
+    "webchordr/events",
+    "webchordr/persistence",
+    "webchordr/song-browser",
+    "webchordr/song-list",
     "synchord",
     "chordr-runner",
     "srvchord",
 ]
+
+[profile.release.package.webchordr]
+opt-level = 's'

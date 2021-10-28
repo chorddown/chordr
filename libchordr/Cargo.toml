@@ -23,8 +23,6 @@ internals = []
 serde = { version = "^1.0", features = ["derive"] }
 serde_derive = "^1.0"
 printpdf = { version = "0.2.8", optional = true }
-rand = "0.7.2"
-encoding = "^0.2.33"
 chrono = { version = "0.4", features = ["serde"] }
 log = "0.4"
 

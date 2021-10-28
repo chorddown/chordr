@@ -1,0 +1,210 @@
+@import "variables";
+@import "functions";
+
+@mixin debug-screen-breakpoints() {
+    body::after {
+        position: fixed;
+        right: 0;
+        top: 0;
+        background: rgba(white, .4);
+        padding: 4px;
+        font-size: 12px;
+        pointer-events: none;
+        font-family: Menlo, monospace;
+        opacity: .3;
+        @each $name, $min in $grid-breakpoints {
+            @include screen($name) {
+                $max: max-screen($name);
+                content: '[#{$min}] < #{$name} > [#{$max}]';
+
+            }
+        }
+    }
+}
+
+@mixin clearfix() {
+    &::before,
+    &::after {
+        clear: both;
+        content: '';
+        display: table-cell;
+    }
+}
+
+@mixin apply-styles($styles) {
+    color: map-get($styles, font-color);
+    font-weight: map-get($styles, font-weight);
+    font-style: map-get($styles, font-style);
+    background: map-get($styles, background);
+    margin: map-get($styles, margin);
+    @include apply-block-styles($styles);
+}
+
+@mixin apply-block-styles($styles) {
+    $color: map-get($styles, block-color);
+    $width: map-get($styles, block-width);
+    @if $width > 0 and $color != transparent {
+        border-left: $width $color solid;
+        @if map-has-key($styles, block-style) {
+            border-left-style: map-get($styles, block-style);
+        }
+        padding: 0 $std-half;
+    }
+}
+
+@mixin if-dark-mode {
+    @media screen and (prefers-color-scheme: dark) {
+        @at-root html:not(.light-mode) & {
+            @content;
+        }
+    }
+    @at-root html.dark-mode & {
+        @content;
+    }
+}
+
+@mixin print-hidden {
+    @media print {
+        display: none !important;
+    }
+}
+
+/// Mixin for Song detail tools (like transpose and setlist tool)
+@mixin song-tool() {
+    margin-bottom: $std-half;
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+@mixin button($display: block) {
+    display: $display;
+    appearance: none;
+    line-height: $button-line-height;
+    font-size: $button-font-size;
+    font-family: $ui-font;
+    text-decoration: none;
+    touch-action: manipulation;
+    cursor: pointer;
+
+    @include if-hover-enabled {
+        &:focus,
+        &:hover {
+            outline: none;
+        }
+    }
+}
+
+@mixin button-default($padding: $button-padding, $border: auto, $width: 100%) {
+    background: var(--control-bg);
+    @if $border != auto {
+        border: $border;
+    } @else {
+        border: var(--control-border);
+    }
+    color: var(--control-color);
+    width: $width;
+    padding: $padding;
+    text-align: center;
+    letter-spacing: $button-letter-spacing;
+    cursor: pointer;
+
+    @include if-hover-enabled {
+        &:focus,
+        &:hover {
+            color: var(--control-hover-color);
+            background: var(--control-hover-bg);
+            border: var(--control-hover-border);
+        }
+    }
+}
+
+@mixin button-disabled($padding: $button-padding, $border: auto, $width: 100%) {
+    background: var(--control-disabled-bg);
+    @if $border != auto {
+        border: $border;
+    } @else {
+        border: var(--control-border);
+    }
+    color: var(--control-disabled-color);
+    width: $width;
+    padding: $padding;
+    text-align: center;
+    letter-spacing: $button-letter-spacing;
+    cursor: pointer;
+
+    @include if-hover-enabled {
+        &:focus,
+        &:hover {
+            color: var(--control-disabled-hover-color);
+            background: var(--control-disabled-hover-bg);
+            border: var(--control-disabled-hover-border);
+        }
+    }
+}
+
+@mixin assign-variables($prefix, $styles) {
+    @each $key, $value in $styles {
+        --#{$prefix}-#{$key}: #{$value};
+    }
+}
+
+@mixin icon($content: normal) {
+    &::before {
+        content: $content;
+        display: inline-block;
+        font-weight: normal;
+        font-variant: normal;
+        font-style: normal;
+        //noinspection CssNoGenericFontName
+        font-family: 'iconmonstr-iconic-font';
+        font-size: 1em;
+        line-height: 1;
+        vertical-align: bottom;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+}
+
+@mixin min-screen($screen) {
+    @media screen and (min-width: min-screen($screen)) {
+        @content;
+    }
+}
+
+@mixin screen($screen) {
+    @media screen and (min-width: min-screen($screen)) and (max-width: max-screen($screen)) {
+        @content;
+    }
+}
+
+@mixin max-screen($screen) {
+    @media screen and (max-width: max-screen($screen)) {
+        @content;
+    }
+}
+
+@mixin max-screen-xs {
+    @include max-screen(xs) {
+        @content;
+    }
+}
+
+@mixin min-screen-tablet {
+    @include min-screen(md) {
+        @content;
+    }
+}
+
+@mixin screen-tablet {
+    @include screen(md) {
+        @content;
+    }
+}
+
+@mixin if-hover-enabled {
+    @media (hover: hover) and (pointer: fine) {
+        @content;
+    }
+}

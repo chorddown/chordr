@@ -1,0 +1,20 @@
+// .user-state.not-logged-in .im {
+//     transform: rotate(-90deg);
+//     background: var(--button-color);
+//     color: var(--button-bg);
+//     padding: 3px;
+// }
+
+.user-state {
+    .logged-in .im-check-mark {
+        position: absolute;
+        font-size: .6em;
+        margin-top: 3px;
+        margin-left: -2px;
+        transform: rotate(-6deg);
+    }
+
+    .offline {
+        color: var(--control-disabled-color);
+    }
+}

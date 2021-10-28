@@ -1,0 +1,38 @@
+@import "prelude";
+
+.song-search-home {
+    display: inline-block;
+    margin-right: $std-half;
+}
+
+.song-search-song-list {
+    input[type=text],
+    input[type=search],
+    .song-item {
+        margin-bottom: 2px;
+
+        a {
+            padding: $button-padding;
+            text-align: left;
+        }
+    }
+
+    div.song-item {
+        padding: 0;
+    }
+
+    input[type=text],
+    input[type=search] {
+        line-height: $song-search-line-height;
+        padding: $song-search-padding;
+        color: var(--song-search-color);
+        display: block;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        border: var(--song-search-border);
+        width: 100%;
+        border-radius: 0;
+        background: transparent;
+    }
+}

@@ -1,0 +1,90 @@
+@import "variables";
+@import "mixins";
+
+@mixin apply-variables-dark-mode {
+    @media screen and (prefers-color-scheme: dark) {
+        html {
+            @content;
+        }
+    }
+    @at-root html.dark-mode {
+        @content;
+    }
+}
+
+@mixin light-mode {
+    --background: #{$background};
+    --text-color: #{$text-color};
+    --link-color: #{$link-color};
+    --link-hover-color: #{$link-hover-color};
+    --button-bg: #{$button-bg};
+    --button-color: #{$button-color};
+    --button-border: #{$button-border};
+    --button-hover-bg: #{$button-hover-bg};
+    --button-hover-color: #{$button-hover-color};
+    --tool-bg: #{$tool-bg};
+    --nav-bg: #{$nav-bg};
+
+    --clipboard-input-bg: #{$clipboard-input-bg};
+    --clipboard-input-color: #{$clipboard-input-color};
+
+    --modal-bg: #{$modal-bg};
+    --modal-header-bg: #{$modal-header-bg};
+
+    --section-border-color: #{$section-border-color};
+
+    @include assign-variables(control, $control);
+    @include assign-variables(control-disabled, $control-disabled);
+    @include assign-variables(message-warn, $message-warn);
+    @include assign-variables(message-error, $message-error);
+
+    --song-search-border: #{$song-search-border};
+    --song-search-color: #{$song-search-color};
+}
+
+@mixin dark-mode {
+    --background: #{$dark-mode-background};
+    --text-color: #{$dark-mode-text-color};
+    --link-color: #{$dark-mode-link-color};
+    --link-hover-color: #{$dark-mode-link-hover-color};
+    --button-bg: #{$dark-mode-button-bg};
+    --button-color: #{$dark-mode-button-color};
+    --button-border: #{$dark-mode-button-border};
+    --button-hover-bg: #{$dark-mode-button-hover-bg};
+    --button-hover-color: #{$dark-mode-button-hover-color};
+    --tool-bg: #{$dark-mode-tool-bg};
+    --nav-bg: #{$dark-mode-nav-bg};
+
+    --clipboard-input-bg: #{$dark-mode-clipboard-input-bg};
+    --clipboard-input-color: #{$dark-mode-clipboard-input-color};
+
+    --modal-bg: #{$dark-mode-modal-bg};
+    --modal-header-bg: #{$dark-mode-modal-header-bg};
+
+    --section-border-color: #{$dark-mode-section-border-color};
+
+    @include assign-variables(control, $dark-mode-control);
+    @include assign-variables(control-disabled, $dark-mode-control-disabled);
+    @include assign-variables(message-warn, $dark-mode-message-warn);
+    @include assign-variables(message-error, $dark-mode-message-error);
+
+    --song-search-border: #{$dark-mode-song-search-border};
+    --song-search-color: #{$dark-mode-song-search-color};
+}
+
+// Default styles (=light-mode)
+html {
+    --font-size-base: #{$font-size-web};
+
+    @include light-mode;
+}
+
+// Automatically switch to dark-mode via `prefers-color-scheme` or `html.dark-mode`
+@include apply-variables-dark-mode {
+    @include dark-mode;
+}
+
+// Allow to force light-mode
+@at-root html.light-mode {
+    @include light-mode;
+}

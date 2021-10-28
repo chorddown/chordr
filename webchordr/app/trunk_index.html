@@ -1,0 +1,128 @@
+<!doctype html>
+<!-- THIS IS THE ENTRY POINT FOR DEVELOPMENT WITH [TRUNK](https://trunkrs.dev/) -->
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>Chorddown Web</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width">
+    <link rel="icon" href="/assets/images/logo-32-light.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo-120.png">
+    <link rel="manifest" href="/manifest.json">
+    <link data-trunk rel="copy-file" href="/static/manifest.json">
+    <link data-trunk rel="copy-file" href="/static/catalog.json">
+    <link data-trunk rel="copy-file" href="/static/service-worker.js">
+    <link data-trunk rel="copy-dir" href="/static/assets">
+    <link data-trunk rel="rust" data-cargo-features="trunk_build">
+    <link data-trunk rel="scss" data-inline href="/static/stylesheets/chordr-app.scss"/>
+</head>
+<body>
+
+<div class="center-fullscreen loading">
+    <div class="loading-inner">
+        <i class="im im-spinner"></i>
+    </div>
+</div>
+
+<div class="center-fullscreen reload-button-fallback-container">
+    <div>
+        <a id="reload-button-fallback" class="reload-button reload-button-fallback" href="/"
+           title="Reload the song catalog">
+            <i class="im im-sync"></i>
+            <span>Reload the app</span>
+        </a>
+    </div>
+</div>
+
+<script>
+    const CACHE_NAME = 'chordr';
+    const initOutput = enable => {
+        /* See also webchordr/app/static/service-worker.js:159 */
+        const consoleStyles = {
+            normalStyle: "background: inherit; color: inherit",
+            pathStyle: "font-weight: bold; color: inherit",
+            label: {
+                info: {
+                    text: "%cINFO%c webchordr SW%c ",
+                    style: "color: white; padding: 0 3px; background: #029202;"
+                },
+                error: {
+                    text: "%cERROR%c webchordr SW%c ",
+                    style: "color: white; padding: 0 3px; background: #ff2863;"
+                },
+                warn: {
+                    text: "%cWARN%c webchordr SW%c ",
+                    style: "color: white; padding: 0 3px; background: #c18d12;"
+                },
+                debug: {
+                    text: "%cDEBUG%c webchordr SW%c ",
+                    style: "color: white; padding: 0 3px; background: #0066ff;"
+                },
+            }
+        }
+
+        const ef = () => {
+        };
+        const output = {debug: ef, info: ef, warn: ef, error: ef,};
+        if (enable) {
+            output.debug = window.console.debug.bind(window.console, consoleStyles.label.debug.text + '%s', consoleStyles.label.debug.style, consoleStyles.pathStyle, consoleStyles.normalStyle);
+            output.info = window.console.info.bind(window.console, consoleStyles.label.info.text + '%s', consoleStyles.label.info.style, consoleStyles.pathStyle, consoleStyles.normalStyle);
+            output.warn = window.console.warn.bind(window.console, consoleStyles.label.warn.text + '%s', consoleStyles.label.warn.style, consoleStyles.pathStyle, consoleStyles.normalStyle);
+            output.error = window.console.error.bind(window.console, consoleStyles.label.error.text + '%s', consoleStyles.label.error.style, consoleStyles.pathStyle, consoleStyles.normalStyle);
+        }
+
+        return output
+    }
+
+    const output = initOutput();
+
+    const getReloadButtonFallback = function () {
+        /** @type {HTMLLinkElement|HTMLElement} */
+        return document.getElementById('reload-button-fallback');
+    };
+
+    /**
+     * Wait for a few seconds for the App to be running.
+     * If everything was successful the fallback-reload-button will have been removed.
+     * If not try to clear the caches.
+     */
+    const checkWebApp = function () {
+        setTimeout(function () {
+            if (!getReloadButtonFallback()) {
+                /* Button has been removed by the Web App - everything seems ok */
+                return;
+            }
+            const message = 'Web App did not start successfully.';
+            if (!navigator.onLine) {
+                output.debug(message + ' But device appears to be offline');
+                return;
+            }
+
+            output.debug(message + ' Clearing caches and reload');
+            caches.delete(CACHE_NAME).then(() => setTimeout(() => {
+                window.location.reload()
+            }, 4000))
+        }, 10000);
+    };
+
+    // const skipServiceWorker = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const skipServiceWorker = false
+    if (skipServiceWorker) {
+        output.info('Service Worker is disabled');
+    } else if ('serviceWorker' in navigator) {
+        navigator.serviceWorker
+            .register('/service-worker.js')
+            .then(() => {
+                output.info('Service Worker registered');
+                checkWebApp()
+            }).catch(error => {
+                output.error('Service Worker could not be registered', error);
+            }
+        );
+    } else {
+        output.error('Service Worker not supported');
+    }
+</script>
+
+</body>
+</html>

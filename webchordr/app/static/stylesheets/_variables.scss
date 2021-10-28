@@ -1,0 +1,285 @@
+$gray-light: #d8d8d0 !default;
+$gray: #b7b7b0 !default;
+$gray-medium: #a8a8a2 !default;
+$gray-dark: #8d8d88 !default;
+$gray-darker: #62625e !default;
+$gray-very-dark: lighten(#221d1c, 5%) !default;
+$gray-ultra-dark: #221d1c !default;
+
+$green: #239b32 !default;
+$green-dark: #187123 !default;
+$green-darker: #17541e !default;
+$blue: #14949b !default;
+
+$std-space: 14px !default;
+$std-half: $std-space * .5 !default;
+$grid-gutter-width: $std-half !default;
+$grid-columns: 12 !default;
+$grid-breakpoints: (
+        xs: 0,
+        sm: 576px,
+        md: 768px,
+        lg: 992px,
+        xl: 1200px,
+        xxl: 1400px
+) !default;
+
+$background: white !default;
+$dark-mode-background: $gray-ultra-dark !default;
+$text-color: $gray-ultra-dark !default;
+$dark-mode-text-color: white !default;
+
+$font: "Merriweather", "Libre Baskerville", "Times", "Times New Roman", -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji !default;
+$font-size-web: 16px !default;
+$font-size-ui: 16px !default;
+$font-size-small: .8rem !default;
+$font-size-print: 12px !default;
+$font-size-h1: 1.8em !default;
+$font-size-h2: 1em !default;
+$font-size-h3: 1em !default;
+$line-height: 1.3em !default;
+
+$ui-font: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji !default;
+
+$link-color: $gray-darker !default;
+$link-hover-color: $gray-ultra-dark !default;
+$dark-mode-link-color: $dark-mode-text-color !default;
+$dark-mode-link-hover-color: $gray-light !default;
+
+$tool-bg: $gray-light !default;
+$dark-mode-tool-bg: $gray-very-dark !default;
+
+$button-line-height: 26px !default;
+$button-font-size: $font-size-h3 !default;
+$button-padding: $std-half $std-space !default;
+$button-letter-spacing: -.01em !default;
+
+$control: (
+        bg: $gray,
+        color: $gray-darker,
+        border: 1px solid $gray-medium,
+        hover-bg: $gray-dark,
+        hover-color: $gray-darker,
+        hover-border: 1px solid $gray-dark,
+) !default;
+
+$dark-mode-control: (
+        bg: $gray-very-dark,
+        color: $dark-mode-text-color,
+        border: 1px solid $gray-ultra-dark,
+        hover-bg: $gray-darker,
+        hover-color: $dark-mode-text-color,
+        hover-border: 1px solid $gray-ultra-dark,
+) !default;
+
+
+$control-disabled: (
+        bg: $gray,
+        color: $gray-dark,
+        border: 1px solid $gray-dark,
+        hover-bg: $gray,
+        hover-color: $gray-dark,
+        hover-border: 1px solid $gray-dark,
+) !default;
+
+$dark-mode-control-disabled: (
+        bg: $dark-mode-background,
+        color: $gray-darker,
+        border: map-get($control, border),
+        hover-bg: $dark-mode-background,
+        hover-color: $gray-darker,
+        hover-border: map-get($control, border),
+) !default;
+
+$message-warn-light: rgb(255, 231, 149);
+$message-warn-dark: rgb(191, 143, 0);
+
+$message-warn: (
+        bg: $message-warn-light,
+        color: $message-warn-dark,
+        border: 1px solid $message-warn-dark
+) !default;
+$dark-mode-message-warn: (
+        bg: $message-warn-dark,
+        color: $message-warn-light,
+        border: 1px solid $message-warn-light
+) !default;
+
+$message-error-light: rgb(240, 154, 158);
+$message-error-dark: rgb(161, 5, 13);
+$message-error: (
+        bg: $message-error-light,
+        color: $message-error-dark,
+        border: 1px solid $message-error-dark
+) !default;
+$dark-mode-message-error: (
+        bg: $message-error-dark,
+        color: $message-error-light,
+        border: 1px solid $message-error-light
+) !default;
+
+$button-bg: map-get($control, bg);
+$button-color: map-get($control, color);
+$button-border: map-get($control, border);
+$button-hover-bg: map-get($control, hover-bg);
+$button-hover-color: map-get($control, hover-color);
+$dark-mode-button-bg: map-get($dark-mode-control, bg) !default;
+$dark-mode-button-color: map-get($dark-mode-control, color) !default;
+$dark-mode-button-border: map-get($dark-mode-control, border) !default;
+$dark-mode-button-hover-bg: map-get($dark-mode-control, hover-bg) !default;
+$dark-mode-button-hover-color: map-get($dark-mode-control, hover-color) !default;
+
+$nav-bg: $gray-light !default;
+$dark-mode-nav-bg: $gray-very-dark !default;
+$nav-button-height: 40px !default;
+$nav-footer-border-width: 0 !default;
+$nav-footer-border-color: $gray-dark !default;
+$nav-width: 300px !default;
+$nav-width-xs: 140px !default;
+$nav-collapsed-width: $nav-button-height !default;
+
+$tool-top-space: $nav-button-height + 5px;
+
+$_block-style: (
+        font-color: $text-color,
+        font-weight: normal,
+        font-style: normal,
+        background: transparent,
+        block-width: 10px,
+        block-color: #777,
+) !default;
+
+$chord: (
+        font-color: $green,
+        font-weight: bold,
+        font-style: normal,
+        background: transparent,
+        block-width: 0,
+        block-color: none,
+        margin: 0 1em 0 0,
+) !default;
+
+$chord-dark: map-merge(
+                $chord,
+                        (
+                            // font-color: value,
+                            // font-weight: value,
+                            // font-style: value,
+                            // background: value,
+                            // block-width: value,
+                            // block-color: value,
+                        )
+) !default;
+
+$chorus: (
+        font-color: $text-color,
+        font-weight: normal,
+        font-style: normal,
+        background: transparent,
+        block-width: .3em,
+        block-color: $green,
+) !default;
+
+$chorus-dark: map-merge(
+                $chorus,
+                (
+                        font-color: $dark-mode-text-color,
+                    // font-weight: value,
+                    // font-style: value,
+                    // background: value,
+                    // block-width: value,
+                    // block-color: value,
+                )
+) !default;
+
+//$verse: (
+//    font-color: $text-color,
+//    font-weight: normal,
+//    font-style: normal,
+//    background: transparent,
+//    block-width: .3em,
+//    block-color: #777,
+//) !default;
+//
+//$verse-dark: map-merge(
+//        $verse,
+//        (
+//            font-color: $text-color-dark-mode,
+//            // font-weight: value,
+//            // font-style: value,
+//            // background: value,
+//            // block-width: value,
+//            // block-color: value,
+//        )
+//) !default;
+
+$bridge: (
+        font-color: $text-color,
+        font-weight: normal,
+        font-style: normal,
+        background: transparent,
+        block-width: .3em,
+        block-color: $green-darker,
+) !default;
+
+$bridge-dark: map-merge(
+                $bridge,
+                (
+                        font-color: $dark-mode-text-color,
+                    // font-weight: value,
+                    // font-style: value,
+                    // background: value,
+                    // block-width: value,
+                    // block-color: value,
+                )
+) !default;
+
+$blockquote: (
+        font-color: $text-color,
+        font-weight: bold,
+        font-style: normal,
+        background: transparent,
+        block-width: .3em,
+        block-color: $gray-dark,
+) !default;
+
+$blockquote-dark: map-merge(
+                $blockquote,
+                (
+                        font-color: $dark-mode-text-color,
+                    // font-weight: value,
+                    // font-style: value,
+                    // background: value,
+                    // block-width: value,
+                    // block-color: value,
+                )
+) !default;
+
+$section-border-color: $gray-medium !default;
+$section-border-width: 1px !default;
+$section-border: $section-border-width solid $section-border-color !default;
+$section-border-length: 200px !default;
+$dark-mode-section-border-color: $section-border-color !default;
+
+
+$clipboard-input-bg: $button-bg !default;
+$clipboard-input-color: $button-color !default;
+$clipboard-input-padding: $button-padding !default;
+$clipboard-input-letter-spacing: $button-letter-spacing !default;
+$dark-mode-clipboard-input-bg: $dark-mode-button-bg !default;
+$dark-mode-clipboard-input-color: $dark-mode-button-color !default;
+
+
+$song-search-line-height: $button-line-height !default;
+$song-search-padding: $button-padding !default;
+$song-search-border: $button-border !default;
+$dark-mode-song-search-border: 1px solid $gray-very-dark !default;
+$song-search-color: $button-color !default;
+$dark-mode-song-search-color: $dark-mode-button-color !default;
+
+$modal-bg: $gray-light !default;
+$dark-mode-modal-bg: $gray-darker !default;
+$modal-header-bg: $gray !default;
+$dark-mode-modal-header-bg: $gray-ultra-dark !default;
+$modal-padding: $std-space !default;
+$modal-shadow: 0px 1px 3px rgba(0, 0, 0, .23) !default;

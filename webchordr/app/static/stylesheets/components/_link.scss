@@ -1,0 +1,19 @@
+@import "prelude";
+
+a {
+    color: var(--link-color);
+    text-decoration: none;
+
+    @include if-hover-enabled {
+        &:focus,
+        &:hover {
+            color: var(--link-hover-color);
+            outline: none;
+        }
+    }
+}
+
+.back-link {
+    display: inline-block;
+    margin-top: $std-space;
+}

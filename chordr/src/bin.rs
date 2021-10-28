@@ -170,7 +170,8 @@ fn convert(args: &ArgMatches) -> Result<()> {
 </html>
     "#,
             title = meta.title.unwrap_or("".to_owned()),
-            styles = include_str!("../../webchordr/static/stylesheets/chordr-default-styles.css"),
+            styles =
+                include_str!("../../webchordr/app/static/stylesheets/chordr-default-styles.css"),
             content = converted
         )
     } else {

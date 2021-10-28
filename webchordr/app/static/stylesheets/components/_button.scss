@@ -1,0 +1,68 @@
+@import "prelude";
+
+a[role=button],
+button,
+.button {
+    @include button();
+
+    &:not(.discreet) {
+        @include button-default();
+    }
+
+    &.-inline {
+        display: inline-block;
+        width: auto;
+    }
+
+    &.discreet {
+        background: transparent;
+        border: none;
+    }
+}
+
+a[role=button].disabled,
+button:disabled,
+.button.disabled {
+    &:not(.discreet) {
+        @include button-disabled();
+    }
+}
+
+.grid-button {
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    @include button();
+    @include button-default();
+
+    a[role=button],
+    button {
+        display: flex;
+        align-items: center;
+        height: 100%;
+        color: inherit;
+        padding: $button-padding;
+
+        &:focus,
+        &:hover {
+            color: inherit;
+        }
+    }
+}
+
+// If the grid-button is only a container, the padding must be applied to the button/a[role=button] within
+div.grid-button {
+    padding: 0;
+}
+
+.button-group {
+    display: flex;
+    flex-flow: row;
+    margin-left: -$std-half;
+    margin-right: -$std-half;
+
+    > button {
+        margin-left: $std-half;
+        margin-right: $std-half;
+    }
+}

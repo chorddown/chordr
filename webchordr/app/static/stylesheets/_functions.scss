@@ -1,0 +1,37 @@
+@import "variables";
+
+// Name of the next breakpoint, or null for the last breakpoint.
+// @see https://github.com/twbs/bootstrap/blob/main/scss/mixins/_breakpoints.scss
+//    >> breakpoint-next(sm)
+//    md
+//    >> breakpoint-next(sm, (xs: 0, sm: 576px, md: 768px, lg: 992px, xl: 1200px))
+//    md
+//    >> breakpoint-next(sm, $breakpoint-names: (xs sm md lg xl))
+//    md
+@function breakpoint-next($name, $breakpoints: $grid-breakpoints, $breakpoint-names: map-keys($breakpoints)) {
+    $n: index($breakpoint-names, $name);
+    @if not $n {
+        @error "breakpoint `#{$name}` not found in `#{$breakpoints}`";
+    }
+    @return if($n < length($breakpoint-names), nth($breakpoint-names, $n + 1), null);
+}
+
+@function min-screen($screen) {
+    @if map-has-key($grid-breakpoints, $screen) {
+        @return map-get($grid-breakpoints, $screen);
+    }
+    @error "No min-breakpoint for screen #{$screen} found";
+}
+
+@function max-screen($screen) {
+    $min: min-screen($screen);
+    $next: breakpoint-next($screen, $grid-breakpoints);
+
+    @if map-has-key($grid-breakpoints, $next) {
+        @return map-get($grid-breakpoints, $next) - .02px;
+    }
+    @if $screen == xxl {
+        @return 100000px;
+    }
+    @error "No max-breakpoint for screen #{$screen} found";
+}

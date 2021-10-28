@@ -1,0 +1,54 @@
+@import "prelude";
+
+.modal-outer {
+    z-index: 100;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(white, .8);
+    @include if-dark-mode {
+        background: rgba(black, .8);
+    }
+
+    .modal {
+        width: 100%;
+        max-width: 500px;
+        background: var(--modal-bg);
+        padding: $modal-padding;
+        box-shadow: $modal-shadow;
+        //@include if-dark-mode {
+        //    background: $dark-mode-modal-bg;
+        //}
+    }
+
+    .modal-question {
+        margin-bottom: $std-space;
+        text-align: center;
+    }
+
+    .modal-header {
+        margin: (-$std-space) (-$std-space) $std-space (-$std-space);
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--modal-header-bg);
+
+        .modal-header-text {
+            padding: $button-padding;
+            line-height: $button-line-height;
+        }
+
+        .modal-close {
+            @include button();
+            @include button-default($width: 40px);
+            height: auto;
+            border: none;
+        }
+    }
+}

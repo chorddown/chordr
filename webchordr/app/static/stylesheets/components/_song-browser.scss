@@ -1,0 +1,33 @@
+@import "prelude";
+
+.song-browser-home {
+    display: inline-block;
+    margin-right: $std-half;
+}
+
+.song-browser-header-suffix {
+    text-transform: uppercase;
+    margin-left: .3em;
+}
+
+.song-browser-index-list {
+    .grid-button {
+        text-transform: uppercase;
+        flex-flow: column;
+    }
+
+    .index-item-chars {
+        display: block;
+    }
+
+    .index-item-count {
+        display: block;
+        font-size: .6em;
+    }
+}
+
+.song-browser-song-list .song-item.grid-button {
+    a {
+        text-align: left;
+    }
+}

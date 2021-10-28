@@ -1,0 +1,7 @@
+[build]
+target = "trunk_index.html"
+
+[[hooks]]
+stage = "post_build"
+command = "sh"
+command_arguments = ["-c", "$TRUNK_SOURCE_DIR/update-service-worker.sh"]
