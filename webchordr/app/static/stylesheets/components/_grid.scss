@@ -50,7 +50,8 @@
     @for $i from 1 through $grid-columns {
         .col-#{$screen}#{$i} {
             //$width: 100%/$grid-columns * $i;
-            $width: math.div(100%, $grid-columns) * $i;
+            //$width: math.div(100%, $grid-columns) * $i;
+            $width: 8.33333 * $i;
             max-width: $width;
             flex: 0 0 $width;
         }
