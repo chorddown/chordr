@@ -4231,7 +4231,7 @@ dependencies = [
 
 [[package]]
 name = "webchordr"
-version = "0.1.13"
+version = "0.2.1"
 dependencies = [
  "async-trait",
  "base64 0.13.0",
