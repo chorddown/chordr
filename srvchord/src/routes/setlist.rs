@@ -3,8 +3,8 @@ use crate::domain::user::UserDb;
 use crate::traits::RepositoryTrait;
 use crate::DbConn;
 use libchordr::prelude::{Setlist, Username};
+use rocket::serde::json::Json;
 use rocket::{get, post};
-use rocket_contrib::json::Json;
 
 pub fn get_routes() -> Vec<rocket::Route> {
     routes![
@@ -18,28 +18,36 @@ pub fn get_routes() -> Vec<rocket::Route> {
 }
 
 #[get("/")]
-pub fn setlist_index(conn: DbConn) -> Json<Vec<Setlist>> {
-    Json(SetlistRepository::new().find_all(&conn.0).unwrap())
+pub async fn setlist_index(conn: DbConn) -> Json<Vec<Setlist>> {
+    conn.run(move |conn| Json(SetlistRepository::new().find_all(&conn).unwrap()))
+        .await
 }
 
 #[get("/<username>")]
-pub fn setlist_list(username: String, conn: DbConn, user: UserDb) -> Option<Json<Vec<Setlist>>> {
+pub async fn setlist_list(
+    username: String,
+    conn: DbConn,
+    user: UserDb,
+) -> Option<Json<Vec<Setlist>>> {
     let username_instance = match check_username(&username, &user) {
         Ok(u) => u,
         Err(_) => return None,
     };
 
-    match SetlistRepository::new().find_by_username(&conn.0, &username_instance) {
-        Ok(setlists) => Some(Json(setlists)),
-        Err(e) => {
-            warn!("No setlists for user {} found: {}", username, e);
-            None
+    conn.run(move |conn| {
+        match SetlistRepository::new().find_by_username(&conn, &username_instance) {
+            Ok(setlists) => Some(Json(setlists)),
+            Err(e) => {
+                warn!("No setlists for user {} found: {}", username, e);
+                None
+            }
         }
-    }
+    })
+    .await
 }
 
 #[get("/<username>/<setlist>")]
-pub fn setlist_get(
+pub async fn setlist_get(
     username: String,
     setlist: i32,
     conn: DbConn,
@@ -50,66 +58,84 @@ pub fn setlist_get(
         Err(_) => return None,
     };
 
-    match SetlistRepository::new().find_by_username_and_setlist_id(
-        &conn.0,
-        &username_instance,
-        setlist,
-    ) {
-        Ok(setlist) => Some(Json(setlist)),
-        Err(_) => {
-            warn!("Setlist {} for user {} not found", setlist, username);
-            None
+    conn.run(move |conn| {
+        match SetlistRepository::new().find_by_username_and_setlist_id(
+            &conn,
+            &username_instance,
+            setlist,
+        ) {
+            Ok(setlist) => Some(Json(setlist)),
+            Err(_) => {
+                warn!("Setlist {} for user {} not found", setlist, username);
+                None
+            }
         }
-    }
+    })
+    .await
 }
 
 #[get("/<username>/latest", rank = 2)]
-pub fn setlist_get_latest(username: String, conn: DbConn, user: UserDb) -> Option<Json<Setlist>> {
+pub async fn setlist_get_latest(
+    username: String,
+    conn: DbConn,
+    user: UserDb,
+) -> Option<Json<Setlist>> {
     let username_instance = match check_username(&username, &user) {
         Ok(u) => u,
         Err(_) => return None,
     };
 
-    match SetlistRepository::new().find_by_username(&conn.0, &username_instance) {
-        Ok(setlists) if setlists.is_empty() => {
-            warn!("No setlists for user {} found", username);
-            None
-        }
-        Ok(mut setlists) => {
-            setlists.sort_by(|a, b| {
-                a.modification_date()
-                    .partial_cmp(&b.modification_date())
-                    .unwrap()
-            });
+    conn.run(move |conn| {
+        match SetlistRepository::new().find_by_username(&conn, &username_instance) {
+            Ok(setlists) if setlists.is_empty() => {
+                warn!("No setlists for user {} found", username);
+                None
+            }
+            Ok(mut setlists) => {
+                setlists.sort_by(|a, b| {
+                    a.modification_date()
+                        .partial_cmp(&b.modification_date())
+                        .unwrap()
+                });
 
-            Some(Json(setlists.pop().unwrap()))
+                Some(Json(setlists.pop().unwrap()))
+            }
+            Err(e) => {
+                warn!("No setlists for user {} found: {}", username, e);
+                None
+            }
         }
-        Err(e) => {
-            warn!("No setlists for user {} found: {}", username, e);
-            None
-        }
-    }
+    })
+    .await
 }
 
 #[delete("/<username>/<setlist>")]
-pub fn setlist_delete(username: String, setlist: i32, conn: DbConn, user: UserDb) -> Option<()> {
+pub async fn setlist_delete(
+    username: String,
+    setlist: i32,
+    conn: DbConn,
+    user: UserDb,
+) -> Option<()> {
     let username_instance = match check_username(&username, &user) {
         Ok(u) => u,
         Err(_) => return None,
     };
 
     let repo = SetlistRepository::new();
-    match repo.find_by_username_and_setlist_id(&conn.0, &username_instance, setlist) {
-        Ok(setlist) => repo.delete(&conn.0, setlist).ok(),
-        Err(_) => {
-            warn!("Setlist {} for user {} not found", setlist, username);
-            None
+    conn.run(move |conn| {
+        match repo.find_by_username_and_setlist_id(&conn, &username_instance, setlist) {
+            Ok(setlist) => repo.delete(&conn, setlist).ok(),
+            Err(_) => {
+                warn!("Setlist {} for user {} not found", setlist, username);
+                None
+            }
         }
-    }
+    })
+    .await
 }
 
 #[post("/<username>", format = "application/json", data = "<setlist>")]
-pub fn setlist_put(
+pub async fn setlist_put(
     username: String,
     conn: DbConn,
     setlist: Json<Setlist>,
@@ -125,28 +151,31 @@ pub fn setlist_put(
     let setlist = setlist.into_inner();
 
     let repo = SetlistRepository::new();
-    match repo.find_by_username_and_setlist_id(&conn.0, &username_instance, setlist.id()) {
-        Ok(_) => {
-            info!("Perform update setlist {} #{}", username, setlist.id());
-            match repo.update(&conn.0, setlist.clone()) {
-                Ok(_) => Some(Json(setlist)),
-                Err(e) => {
-                    error!("{}", e);
-                    None
+    conn.run(move |conn| {
+        match repo.find_by_username_and_setlist_id(&conn, &username_instance, setlist.id()) {
+            Ok(_) => {
+                info!("Perform update setlist {} #{}", username, setlist.id());
+                match repo.update(&conn, setlist.clone()) {
+                    Ok(_) => Some(Json(setlist)),
+                    Err(e) => {
+                        error!("{}", e);
+                        None
+                    }
+                }
+            }
+            Err(_) => {
+                info!("Perform add setlist {} #{}", username, setlist.id());
+                match repo.add(&conn, setlist.clone()) {
+                    Ok(_) => Some(Json(setlist)),
+                    Err(e) => {
+                        error!("{}", e);
+                        None
+                    }
                 }
             }
         }
-        Err(_) => {
-            info!("Perform add setlist {} #{}", username, setlist.id());
-            match repo.add(&conn.0, setlist.clone()) {
-                Ok(_) => Some(Json(setlist)),
-                Err(e) => {
-                    error!("{}", e);
-                    None
-                }
-            }
-        }
-    }
+    })
+    .await
 }
 
 fn check_username(username: &str, user: &UserDb) -> Result<Username, ()> {

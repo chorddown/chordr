@@ -16,7 +16,7 @@ use rocket::Request;
 use std::convert::TryInto;
 
 #[derive(
-Serialize, Deserialize, Queryable, Identifiable, Insertable, AsChangeset, Debug, Clone,
+    Serialize, Deserialize, Queryable, Identifiable, Insertable, AsChangeset, Debug, Clone,
 )]
 #[primary_key(username)]
 #[table_name = "user"]
@@ -59,12 +59,13 @@ impl RecordTrait for UserDb {
     }
 }
 
-impl<'a, 'r> FromRequest<'a, 'r> for UserDb {
+#[rocket::async_trait]
+impl<'r> FromRequest<'r> for UserDb {
     type Error = AuthorizationError;
 
     /// Try to load the `User` from the Basic Auth header sent with `request`
-    fn from_request(request: &'a Request<'r>) -> Outcome<Self, Self::Error> {
-        let db_outcome: Outcome<DbConn, _> = DbConn::from_request(request);
+    async fn from_request(request: &'r Request<'_>) -> Outcome<Self, Self::Error> {
+        let db_outcome: Outcome<DbConn, _> = DbConn::from_request(request).await;
         match db_outcome {
             Outcome::Failure(_) => {
                 Outcome::Failure((Status::Unauthorized, AuthorizationError::IncorrectUsername))
@@ -95,20 +96,23 @@ impl<'a, 'r> FromRequest<'a, 'r> for UserDb {
                     }
                 };
 
-                match UserRepository::new().find_by_name(&conn.0, &credentials.username()) {
-                    Ok(user) if verify_password(&credentials, &user) => Outcome::Success(user),
-                    Ok(_) => {
-                        warn!("Wrong password");
-                        Outcome::Failure((
+                conn.run(move |conn| {
+                    match UserRepository::new().find_by_name(&conn, &credentials.username()) {
+                        Ok(user) if verify_password(&credentials, &user) => Outcome::Success(user),
+                        Ok(_) => {
+                            warn!("Wrong password");
+                            Outcome::Failure((
+                                Status::Unauthorized,
+                                AuthorizationError::IncorrectPassword,
+                            ))
+                        }
+                        Err(_e) => Outcome::Failure((
                             Status::Unauthorized,
-                            AuthorizationError::IncorrectPassword,
-                        ))
+                            AuthorizationError::IncorrectUsername,
+                        )),
                     }
-                    Err(_e) => Outcome::Failure((
-                        Status::Unauthorized,
-                        AuthorizationError::IncorrectUsername,
-                    )),
-                }
+                })
+                .await
             }
         }
     }

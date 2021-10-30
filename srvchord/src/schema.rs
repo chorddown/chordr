@@ -1,3 +1,5 @@
+use rocket_sync_db_pools::diesel;
+
 table! {
     /// Representation of the `setlist` table.
     ///
@@ -190,10 +192,4 @@ table! {
 
 joinable!(setlist_entry -> setlist (setlist_db_id));
 
-allow_tables_to_appear_in_same_query!(
-    setlist,
-    setlist_entry,
-    tasks,
-    team,
-    user,
-);
+diesel::allow_tables_to_appear_in_same_query!(setlist, setlist_entry, tasks, team, user,);

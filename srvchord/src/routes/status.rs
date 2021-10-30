@@ -1,5 +1,5 @@
 use rocket::get;
-use rocket_contrib::json::Json;
+use rocket::serde::json::Json;
 
 pub fn get_routes() -> Vec<rocket::Route> {
     routes![crate::routes::status::index,]

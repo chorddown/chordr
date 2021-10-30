@@ -1,23 +1,19 @@
 [global]
 # Path to the directory of chorddown files
-song_dir = "../webchordr/static/songs"
+song_dir = "../webchordr/app/static/songs"
 
 # Path to the static files
-static_files_dir = "../webchordr/dist"
+static_files_dir = "../webchordr/app/dist"
 
-template_dir = "static"
-
-
-[production.databases.main_database]
+[release.databases.main_database]
 url = "db/db.sqlite"
 
 [staging.databases.main_database]
 url = "db/stage-db.sqlite"
 
-[development]
+[debug]
 #log = "debug"
-address = "localhost"
 port = 9000
 
-[development.databases.main_database]
+[debug.databases.main_database]
 url = "db/dev-db.sqlite"
