@@ -1,4 +1,5 @@
 const CACHE_NAME = 'chordr-{RANDOM_ID}';
+const ASSET_CACHE_NAME = 'chordr-assets';
 
 const output = initOutput(true);
 
@@ -6,30 +7,39 @@ const handleInstall = event => {
     output.debug('Install the service worker', event);
     self.skipWaiting();
 
-    const urlsToCache = [
-        '/',
-        '/manifest.json',
+    const assetUrlsToCache = [
         '/assets/fonts/libre-baskerville-v7-latin_latin-ext-regular.woff2',
         '/assets/fonts/merriweather-v21-latin-regular.woff2',
         '/assets/fonts/merriweather-v21-latin-700.woff2',
         '/assets/icons/fonts/iconmonstr-iconic-font.woff2?v=1.3.0',
         '/assets/images/logo-512-light.png',
         '/assets/images/logo-32-light.png',
-        '/stylesheets/chordr-app.css',
+    ];
+    const appUrlsToCache = [
+        '/',
+        '/manifest.json',
+        // '/stylesheets/chordr-app.css',
         //{JS} // This will be replaced with the WASM JavaScript file path
         //{WASM} // This will be replaced with the WASM file path
         //{SORTABLE} // This will be replaced with the sortable.js file path
         '/catalog.json'
     ];
 
-
     event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(cache => {
-                output.debug('Add URL to the cache: ', urlsToCache);
+        Promise.all([
+            caches.open(CACHE_NAME)
+                .then(cache => {
+                    output.debug('Add app URLs to the cache: ', appUrlsToCache);
 
-                return cache.addAll(urlsToCache);
-            })
+                    return cache.addAll(appUrlsToCache);
+                }),
+            caches.open(ASSET_CACHE_NAME)
+                .then(cache => {
+                    output.debug('Add asset URLs to the cache: ', assetUrlsToCache);
+
+                    return cache.addAll(assetUrlsToCache);
+                })
+        ])
     );
 };
 
@@ -38,7 +48,7 @@ const handleActivate = event => {
     event.waitUntil(
         caches.keys().then(keys => Promise.all(
             keys.map(key => {
-                if (key !== CACHE_NAME) {
+                if (key !== CACHE_NAME && key !== ASSET_CACHE_NAME) {
                     output.debug('Clear cache ' + key);
 
                     return caches.delete(key);
@@ -51,20 +61,40 @@ const handleActivate = event => {
 }
 
 /**
+ * @param {Request} request
+ * @returns {boolean}
+ */
+const shouldCacheRequest = (request) => {
+    return request.method !== 'POST';
+}
+
+/**
+ * @param {Request} request
+ * @param {Response} response
+ * @returns {boolean}
+ */
+const shouldCache = (request, response) => {
+    if (!response || response.status !== 200 || response.type !== 'basic') {
+        return false;
+    }
+    return shouldCacheRequest(request)
+}
+
+/**
  * @param {FetchEvent} event
- * @returns {Promise<T>}
+ * @returns {Promise<Response>}
  */
 const fetchFromServer = event => {
-    return fetch(event.request).then(
+    const request = event.request;
+    return fetch(request).then(
         async response => {
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-                return response;
+            if (!shouldCache(request, response)) {
+                return response
             }
-
             /* Stash copy of response */
             const cachedResponse = response.clone();
             const cache = await caches.open(CACHE_NAME)
-            cache.put(event.request, cachedResponse).then();
+            cache.put(request, cachedResponse).then();
 
             return response;
         }
@@ -92,34 +122,38 @@ const fetchInBackground = (event) => {
  * @param {FetchEvent} event
  */
 const handleFetch = event => {
-    event.respondWith(
-        /* Check if there is a cached entry for the request */
-        caches.match(event.request)
-            .then(response => {
-                if (!response) {
-                    output.info('Live load ' + event.request.url + ' from server')
+    if (shouldCacheRequest(event.request)) {
+        event.respondWith(
+            /* Check if there is a cached entry for the request */
+            caches.match(event.request)
+                .then(response => {
+                    if (!response) {
+                        output.info('Live load ' + event.request.url + ' from server')
 
-                    return fetchFromServer(event)
-                        .then(r => r)
-                        .catch(() => output.warn('Failed to fetch ' + event.request.url));
-                } else {
-                    /*
-                    "Fetch in background" is not necessary because on each build the service-worker will change
-                    This change will install the service-worker - which in turn pre-fetches the new resources
-                    */
-                    // /* If online try to fetch the latest version in the background */
-                    // if (navigator.onLine) {
-                    //     fetchInBackground(event);
-                    // }
+                        return fetchFromServer(event)
+                            .then(r => r)
+                            .catch(() => output.warn('Failed to fetch ' + event.request.url));
+                    } else {
+                        /*
+                        "Fetch in background" is not necessary because on each build the service-worker will change
+                        This change will install the service-worker - which in turn pre-fetches the new resources
+                        */
+                        // /* If online try to fetch the latest version in the background */
+                        // if (navigator.onLine) {
+                        //     fetchInBackground(event);
+                        // }
 
-                    output.debug('Serve cached version for ' + event.request.url);
-                    return response;
-                }
-            })
+                        output.debug('Serve cached version for ' + event.request.url);
+                        return response;
+                    }
+                })
 //         fetch(event.request).catch(function () {
 //             return caches.match(event.request);
 //         })
-    );
+        );
+    } else {
+        event.respondWith(fetchFromServer(event))
+    }
     // let catalogRequest = /\/catalog\.json/.test(event.request.url);
     // if (catalogRequest) {
     //     console.log('[SW] Try to fetch new catalog and fall back to cache', event.request.url);
