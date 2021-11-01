@@ -14,6 +14,7 @@ const handleInstall = event => {
         '/assets/icons/fonts/iconmonstr-iconic-font.woff2?v=1.3.0',
         '/assets/images/logo-512-light.png',
         '/assets/images/logo-32-light.png',
+        '/assets/images/logo-120.png',
     ];
     const appUrlsToCache = [
         '/',
@@ -174,7 +175,7 @@ const handleFetch = event => {
 }
 
 function initOutput(enable) {
-    /* See also webchordr/app/trunk_index.html:41 */
+    /* See also webchordr/app/index.html:41 */
     const consoleStyles = {
         normalStyle: "background: inherit; color: inherit",
         pathStyle: "font-weight: bold; color: inherit",

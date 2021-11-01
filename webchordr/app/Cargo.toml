@@ -9,10 +9,6 @@ repository = "https://github.com/chorddown/chordr"
 description = """
 Chorddown web application - Client side
 """
-#
-#[lib]
-#name = "webchordlib"
-#crate-type = ["cdylib", "rlib"]
 
 [features]
 trunk_build = []
@@ -39,8 +35,6 @@ async-trait = "0.1.51"
 chrono = { version = "*", features = ["serde", "wasmbind"] }
 base64 = "^0.13.0"
 unicode-segmentation = "1.8.0"
-# Require a current version of lexical-core
-#lexical-core = "^0.7.6"
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3"

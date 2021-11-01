@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
+set -e
+cd "$(dirname "$0")" || exit
 
-cd $(dirname $0)
+if ! command -v trunk &> /dev/null; then
+  echo "[ERROR] Trunk must be installed (https://trunkrs.dev/#install)"
+  exit 1
+fi
 
 if [[ "$1" == "" ]]; then
   echo "[ERROR] Missing argument 1 'rsync target'"
@@ -16,29 +21,16 @@ if pgrep trunk >/dev/null; then
   echo
 fi
 echo "[TASK] Build the catalog"
-cargo run --bin chordr -- build-catalog webchordr/static/songs webchordr/static/catalog.json -p
+cargo run --bin chordr -- build-catalog webchordr/app/static/songs webchordr/app/static/catalog.json -p
 
 echo "[TASK] Create deploy-build"
-pushd webchordr
+pushd webchordr/app > /dev/null
 
-if [[ $* == *--dev* ]]; then
-  command="build:dev"
-  wasm_pack_command="build --dev"
-else
-  command="build"
-  wasm_pack_command="build"
-fi
+trunk build
 
-wasm-pack ${wasm_pack_command}
-
-if hash yarn 2>/dev/null; then
-  yarn ${command}
-else
-  npm run ${command}
-fi
 if [[ $* == *--verbose* ]] && type twiggy &>/dev/null; then
-  twiggy top -n 10 ./dist/webchordr.wasm
+  twiggy top -n 10 ./dist/*.wasm
 fi
-popd
+popd > /dev/null
 echo "[TASK] Upload to $1"
-rsync -i --exclude '*.scss' -rzu webchordr/dist/ $1
+rsync -i --exclude '*.scss' -rzu webchordr/app/dist/ $1
