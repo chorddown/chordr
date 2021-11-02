@@ -224,13 +224,13 @@ mod test {
             let authorization_header =
                 Header::new("Authorization", format!("Basic {}", encoded_credentials));
 
-            let mut get_response = client
+            let get_response = client
                 .get(format!("/setlist/{}/{}", username, random_id))
                 .header(authorization_header.clone())
                 .dispatch();
             assert_eq!(get_response.status(), Status::Ok);
 
-            let response_body = get_response.body_string().unwrap();
+            let response_body = get_response.into_string().unwrap();
 
             assert_eq!(
                 response_body,

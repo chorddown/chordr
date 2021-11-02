@@ -1,9 +1,7 @@
 use chrono::Utc;
-use diesel::Connection;
+use diesel::{Connection, SqliteConnection};
 use parking_lot::{const_mutex, Mutex};
 use rand::{thread_rng, Rng};
-use rocket::config::RocketConfig;
-use rocket::local::Client;
 
 use cqrs::prelude::{Command, CommandExecutor};
 use libchordr::models::user::User;
@@ -14,9 +12,11 @@ use crate::domain::user::command::UserCommandExecutor;
 use crate::domain::user::repository::UserRepository;
 use crate::domain::user::UserDb;
 use crate::traits::RepositoryTrait;
-use crate::{ConnectionType, DbConn};
+use crate::ConnectionType;
 
 pub use self::json_formatting::*;
+use rocket::local::blocking::Client;
+use rocket::{Build, Rocket};
 
 mod json_formatting;
 
@@ -47,17 +47,30 @@ macro_rules! run_test {
     }};
 }
 
+pub fn get_database(rocket: &Rocket<Build>) -> SqliteConnection {
+    use diesel::prelude::*;
+
+    let error = "Failed to get database connection for testing";
+
+    let database_url: String = rocket
+        .figment()
+        .extract_inner("databases.main_database.url")
+        .expect(error);
+
+    SqliteConnection::establish(&database_url).expect(error)
+}
+
+pub struct DummyDb(pub SqliteConnection);
 pub fn run_test_fn<F>(test_body: F) -> ()
 where
-    F: Fn(Client, DbConn) -> (),
+    F: Fn(Client, DummyDb) -> (),
 {
     let _lock = crate::test_helpers::DB_LOCK.lock();
-    let rocket = crate::rocket();
-    let db = crate::DbConn::get_one(&rocket);
-    let client = Client::new(rocket).expect("Rocket client");
-    let conn = db.expect("Failed to get database connection for testing");
+    let rocket = crate::rocket_build();
+    let conn = get_database(&rocket);
+    let client = Client::untracked(rocket).expect("Rocket client");
 
-    test_body(client, conn)
+    test_body(client, DummyDb(conn))
 }
 
 pub fn run_database_test<F>(test_body: F) -> ()
@@ -70,19 +83,20 @@ where
         UseDatabase::InMemory => ":memory:".to_owned(),
         UseDatabase::FromString => "db/test-db.sqlite".to_owned(),
         UseDatabase::FromConfig => {
-            let missing_database_error = "Failed to get database connection for testing";
-            let config = RocketConfig::read().unwrap().active().clone();
-            let database_url = config
-                .get_table("databases")
-                .expect(missing_database_error)
-                .get("main_database")
-                .expect(missing_database_error)
-                .get("url")
-                .expect(missing_database_error);
-            database_url
-                .as_str()
-                .expect(missing_database_error)
-                .to_owned()
+            unimplemented!();
+            // let missing_database_error = "Failed to get database connection for testing";
+            // let config = RocketConfig::read().unwrap().active().clone();
+            // let database_url = config
+            //     .get_table("databases")
+            //     .expect(missing_database_error)
+            //     .get("main_database")
+            //     .expect(missing_database_error)
+            //     .get("url")
+            //     .expect(missing_database_error);
+            // database_url
+            //     .as_str()
+            //     .expect(missing_database_error)
+            //     .to_owned()
         }
     };
 
