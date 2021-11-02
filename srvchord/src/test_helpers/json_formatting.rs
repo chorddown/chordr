@@ -1,6 +1,7 @@
 use std::convert::From;
 use std::fmt;
 
+#[allow(unused)]
 pub enum JsonTemplateValue {
     Text(String),
     PosInt(u64),
