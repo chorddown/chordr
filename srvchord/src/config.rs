@@ -1,3 +1,6 @@
+use rocket::serde::Deserialize;
+
+#[derive(Deserialize)]
 pub struct Config {
     /// Path to the directory of chorddown files
     pub song_dir: String,

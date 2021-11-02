@@ -109,20 +109,10 @@ fn rocket_build() -> Rocket<Build> {
 }
 
 fn build_application_config(rocket: &Rocket<Build>) -> Config {
-    let static_files_dir = rocket
+    rocket
         .figment()
-        .extract_inner("static_files_dir")
-        .expect("Static files directory is not specified");
-
-    let song_dir = rocket
-        .figment()
-        .extract_inner("song_dir")
-        .expect("Song directory is not specified");
-
-    Config {
-        song_dir,
-        static_files_dir,
-    }
+        .extract()
+        .expect("Could not deserialize the configuration")
 }
 
 #[launch]
