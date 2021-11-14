@@ -36,7 +36,7 @@ impl SetlistLoad {
             &*self.props.catalog,
         );
 
-        if deserialize_result.errors.len() > 0 {
+        if !deserialize_result.errors.is_empty() {
             let errors = deserialize_result
                 .errors
                 .iter()

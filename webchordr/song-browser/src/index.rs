@@ -56,7 +56,5 @@ pub(super) fn sub_string(input: &str, length: usize) -> String {
 }
 
 pub(super) fn char_count(input: &str) -> usize {
-    UnicodeSegmentation::graphemes(input, true)
-        .collect::<Vec<&str>>()
-        .len()
+    UnicodeSegmentation::graphemes(input, true).count()
 }

@@ -25,4 +25,9 @@ pub trait BrowserStorageTrait {
 
     /// Return the number of pairs in the storage
     fn len(&self) -> usize;
+
+    /// Return `true` if the storage is empty
+    fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
 }

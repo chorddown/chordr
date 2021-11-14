@@ -18,6 +18,12 @@ impl TransientBackend {
     }
 }
 
+impl Default for TransientBackend {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[async_trait(? Send)]
 impl BackendTrait for TransientBackend {
     async fn store<T: Serialize + RecordTrait, N: AsRef<str>, K: AsRef<str>>(

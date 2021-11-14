@@ -136,7 +136,7 @@ impl App {
             Ok(decoded) => {
                 let decoded = decoded.to_string();
                 info!("Decoded song ID '{}' to '{}'", song_id, decoded);
-                if &decoded != song_id.as_str() {
+                if decoded != song_id.as_str() {
                     self.view_song(SongId::new(decoded))
                 } else {
                     self.compose(
@@ -168,11 +168,8 @@ impl App {
 
     fn get_song(&self, song_id: &SongId) -> Option<Song> {
         let state = self.props.state.clone();
-        if state.catalog().is_none() {
-            return None;
-        }
 
-        let catalog = state.catalog().unwrap();
+        let catalog = state.catalog()?;
         catalog.get(song_id).cloned()
     }
 
@@ -334,7 +331,7 @@ impl Component for App {
 
     fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
         let mut route_service: RouteService<AppRouteState> = RouteService::new();
-        let route = Route::from(route_service.get_route());
+        let route = route_service.get_route();
         route_service.register_callback(link.callback(Msg::RouteChanged));
 
         let config = Config::default();
@@ -378,7 +375,7 @@ impl Component for App {
         (html! {<main class=main_classes>{ self.route() }</main>}) as Html
     }
 
-    fn rendered(&mut self, first_render: bool) -> () {
+    fn rendered(&mut self, first_render: bool) {
         if first_render {
             // self.fetch_catalog();
             // self.try_login_and_update_session();

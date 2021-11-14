@@ -30,11 +30,11 @@ pub async fn request_tick_after_timeout(
         *closure_handle.borrow_mut() = Some(closure);
 
         match set_timeout(
-            &closure_handle.clone().borrow().as_ref().unwrap(),
+            closure_handle.clone().borrow().as_ref().unwrap(),
             milliseconds,
         ) {
             Ok(_) => {}
-            Err(e) => error!("{}", WebError::from(e)),
+            Err(e) => error!("{}", e),
         }
     });
 

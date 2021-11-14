@@ -19,7 +19,7 @@ impl SearchUtility {
             {
                 return true;
             }
-            return false;
+            false
 
             // extract_text(song).map_or(false, |text| {
             //     str::contains(&text.to_lowercase(), &search_normalized)
@@ -27,7 +27,7 @@ impl SearchUtility {
         })
     }
 
-    pub fn filter<'a, P>(catalog: &Catalog, predicate: P) -> Vec<&Song>
+    pub fn filter<P>(catalog: &Catalog, predicate: P) -> Vec<&Song>
     where
         P: FnMut(&&Song) -> bool,
     {
@@ -37,8 +37,10 @@ impl SearchUtility {
 
 #[allow(unused)]
 fn extract_text(s: &Song) -> Result<String> {
-    let mut formatting = Formatting::default();
-    formatting.format = Format::Text;
+    let formatting = Formatting {
+        format: Format::Text,
+        ..Formatting::default()
+    };
 
     convert_to_format(s.src().as_bytes(), s.meta(), formatting)
 }

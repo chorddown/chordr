@@ -4,13 +4,13 @@ use yew::prelude::*;
 
 use libchordr::models::song_list::SongList as SongListModel;
 use libchordr::prelude::{ListEntryTrait, SongId, SongSettings};
+use webchordr_events::Event;
+use webchordr_song_list::SongList as SongListView;
 
 // use crate::components::setlist::SetlistShareButton;
 use crate::components::song_view::SongNotes;
 use crate::components::user::NavItem as UserNavButton;
 use crate::state::{SongInfo, State};
-use webchordr_events::Event;
-use webchordr_song_list::SongList as SongListView;
 
 #[derive(Properties, Clone)]
 pub struct NavProps {
@@ -42,10 +42,11 @@ impl Nav {
             None => SongListModel::new(),
         };
         let on_setlist_change = self.props.on_setlist_change.reform(|e| e);
-        let highlighted_song_id = match self.props.current_song_info {
-            Some(ref info) => Some(info.song.id()),
-            None => None,
-        };
+        let highlighted_song_id = self
+            .props
+            .current_song_info
+            .as_ref()
+            .map(|info| info.song.id());
 
         html! {
             <SongListView
@@ -66,7 +67,7 @@ impl Nav {
         //     None => html! {},
         // };
         let setlist_share_button = html! {};
-        let session = self.props.state.session().clone();
+        let session = self.props.state.session();
         let state = self.props.state.clone();
 
         (if self.props.expand {

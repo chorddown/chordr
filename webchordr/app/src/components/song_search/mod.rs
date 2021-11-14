@@ -108,7 +108,7 @@ impl Component for SongSearch {
 
         let songs = self.get_filtered_songs();
 
-        let inner = if songs.len() > 0 {
+        let inner = if !songs.is_empty() {
             html! { <div class="song-search-results">{ for songs.into_iter().map(render_song_item) }</div>}
         } else {
             html! { <div class="song-search-results -no-results">{"No matching songs found"}</div>}

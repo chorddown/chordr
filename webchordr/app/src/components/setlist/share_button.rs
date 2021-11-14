@@ -21,9 +21,9 @@ pub struct SetlistShareButton {
 #[derive(Debug)]
 #[allow(dead_code)]
 pub enum Msg {
-    ShowModal,
-    HideModal,
-    ToggleModal,
+    Show,
+    Hide,
+    Toggle,
 }
 
 impl Component for SetlistShareButton {
@@ -40,15 +40,15 @@ impl Component for SetlistShareButton {
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
-            Msg::ShowModal => {
+            Msg::Show => {
                 debug!("{:?}", msg);
                 self.modal_visible = true
             }
-            Msg::HideModal => {
+            Msg::Hide => {
                 debug!("{:?}", msg);
                 self.modal_visible = false
             }
-            Msg::ToggleModal => {
+            Msg::Toggle => {
                 debug!("{:?}", msg);
                 self.modal_visible = !self.modal_visible
             }
@@ -66,7 +66,7 @@ impl Component for SetlistShareButton {
     }
 
     fn view(&self) -> Html {
-        let handle_click = self.link.callback(|_| Msg::ToggleModal);
+        let handle_click = self.link.callback(|_| Msg::Toggle);
         let button = html! { <button onclick=handle_click><i class="im im-share"></i></button> };
 
         (if !self.modal_visible {
@@ -99,7 +99,7 @@ impl SetlistShareButton {
     fn build_modal(&self) -> Html {
         (match self.build_share_url() {
             Ok(share_url) => {
-                let handle_modal_close = self.link.callback(|_| Msg::HideModal);
+                let handle_modal_close = self.link.callback(|_| Msg::Hide);
 
                 html! {
                     <Modal

@@ -81,10 +81,7 @@ impl Component for SongView {
                 if flag {
                     self.props
                         .on_setlist_add
-                        .emit(SetlistEntry::from_song_with_settings(
-                            song,
-                            song_settings.clone(),
-                        ))
+                        .emit(SetlistEntry::from_song_with_settings(song, song_settings))
                 } else {
                     self.props.on_setlist_remove.emit(song.id())
                 }
@@ -117,9 +114,9 @@ impl Component for SongView {
         let detail = self.convert_song_to_html_node();
         let transpose_up = self.link.callback(|_| Msg::TransposeUp);
         let transpose_down = self.link.callback(|_| Msg::TransposeDown);
-        let transpose_set = self.link.callback(|v| Msg::TransposeSet(v));
-        let setlist_change = self.link.callback(|b| Msg::SetlistChange(b));
-        let semitone_notation_set = self.link.callback(|s| Msg::SemitoneNotationChange(s));
+        let transpose_set = self.link.callback(Msg::TransposeSet);
+        let setlist_change = self.link.callback(Msg::SetlistChange);
+        let semitone_notation_set = self.link.callback(Msg::SemitoneNotationChange);
 
         let setlist_tool = if self.props.enable_setlists {
             html! {
@@ -226,7 +223,7 @@ impl SongView {
         );
     }
 
-    fn change_semitone_notation(&mut self, s: SemitoneNotation) -> () {
+    fn change_semitone_notation(&mut self, s: SemitoneNotation) {
         let formatting = Formatting {
             semitone_notation: s,
             ..self.props.song_info.song_settings.formatting()

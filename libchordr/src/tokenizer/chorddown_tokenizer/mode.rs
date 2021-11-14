@@ -44,16 +44,10 @@ impl ModePartner for char {
         if last_mode == Mode::Chord && *self == HEADER_START {
             return false;
         }
-        match *self {
-            NEWLINE => true,
-            CHORD_START => true,
-            CHORD_END => true,
-            HEADER_START => true,
-            HEADER_END => true,
-            QUOTE_START => true,
-            QUOTE_END => true,
-            _ => false,
-        }
+        matches!(
+            *self,
+            NEWLINE | CHORD_START | CHORD_END | HEADER_START | HEADER_END | QUOTE_START | QUOTE_END
+        )
     }
 
     fn is_terminator(&self, mode: Mode) -> bool {
@@ -80,16 +74,15 @@ impl ModePartner for Lexeme {
         if last_mode == Mode::Chord && *self == Lexeme::HeaderStart {
             return false;
         }
-        match *self {
-            Lexeme::Newline => true,
-            Lexeme::ChordStart => true,
-            Lexeme::ChordEnd => true,
-            Lexeme::HeaderStart => true,
-            // Lexeme::HeaderEnd => true,
-            Lexeme::QuoteStart => true,
-            // Lexeme::QuoteEnd => true,
-            _ => false,
-        }
+
+        matches!(
+            *self,
+            Lexeme::Newline
+                | Lexeme::ChordStart
+                | Lexeme::ChordEnd
+                | Lexeme::HeaderStart
+                | Lexeme::QuoteStart
+        )
     }
 
     fn is_terminator(&self, mode: Mode) -> bool {

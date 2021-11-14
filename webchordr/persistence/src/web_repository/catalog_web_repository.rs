@@ -34,7 +34,7 @@ where
         let uri = if append_timestamp {
             format!("{}?{}", base_uri, chrono::Local::now().timestamp())
         } else {
-            format!("{}", base_uri)
+            base_uri.to_string()
         };
 
         let catalog = fetch::<Catalog>(&uri).await?;

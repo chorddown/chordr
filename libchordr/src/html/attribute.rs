@@ -43,7 +43,7 @@ impl<'a> Attribute {
 
     #[inline(always)]
     pub fn name(&self) -> &str {
-        &self.name
+        self.name
     }
 
     #[inline(always)]

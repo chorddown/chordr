@@ -219,7 +219,7 @@ impl FSM {
 
     fn append_lexeme(&mut self, lexeme: &Lexeme) {
         match lexeme {
-            Lexeme::Literal(inner) => self.literal_buffer.push_str(&inner),
+            Lexeme::Literal(inner) => self.literal_buffer.push_str(inner),
             Lexeme::Eof => {}
             _ => self.literal_buffer.push(lexeme.as_char()),
         }

@@ -20,3 +20,9 @@ impl BrowserStorageBackendFactory {
         BrowserStorageBackend::new(browser_storage)
     }
 }
+
+impl Default for BrowserStorageBackendFactory {
+    fn default() -> Self {
+        Self::new()
+    }
+}

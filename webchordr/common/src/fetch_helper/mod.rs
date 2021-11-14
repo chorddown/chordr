@@ -118,7 +118,7 @@ where
     let request = WebRequest::new_with_str_and_init(uri, options).unwrap();
     if let Some(headers) = additional_headers {
         for (key, value) in headers {
-            request.headers().set(&key.as_ref(), &value)?;
+            request.headers().set(key.as_ref(), &value)?;
         }
     }
     let request_promise = window().fetch_with_request(&request);

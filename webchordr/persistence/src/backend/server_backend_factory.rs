@@ -18,3 +18,9 @@ impl ServerBackendFactory {
         ServerBackend::new(config.api_url().to_owned(), credentials)
     }
 }
+
+impl Default for ServerBackendFactory {
+    fn default() -> Self {
+        Self::new()
+    }
+}

@@ -1,15 +1,18 @@
+use std::convert::TryFrom;
+
+use log::info;
+use wasm_bindgen_futures::spawn_local;
+use yew::prelude::*;
+
+use libchordr::prelude::{Credentials, Error, Password, Username};
+use webchordr_common::errors::WebError;
+use webchordr_persistence::session::SessionService;
+
 use crate::components::detail_view::DetailView;
 use crate::config::Config;
 use crate::connection::{ConnectionService, ConnectionStatus};
 use crate::helpers::Tri;
 use crate::session::{Session, SessionUser};
-use libchordr::prelude::{Credentials, Error, Password, Username};
-use log::info;
-use std::convert::TryFrom;
-use wasm_bindgen_futures::spawn_local;
-use webchordr_common::errors::WebError;
-use webchordr_persistence::session::SessionService;
-use yew::prelude::*;
 
 type LoginStatus = Tri<Session, WebError>;
 
@@ -80,7 +83,7 @@ impl Component for Login {
                         Tri::Some(ref u) => u.clone(),
                         _ => unreachable!(),
                     };
-                    let change_login_status = self.link.callback(|i| Msg::ChangeLoginStatus(i));
+                    let change_login_status = self.link.callback(Msg::ChangeLoginStatus);
 
                     spawn_local(async move {
                         let credentials = Credentials::new(username, password);
@@ -110,7 +113,7 @@ impl Component for Login {
             }
 
             Msg::ChangeConnectionStatus(status) => {
-                self.connection_status = status.clone();
+                self.connection_status = status;
             }
         }
         true
@@ -218,8 +221,8 @@ impl Component for Login {
     fn rendered(&mut self, first_render: bool) {
         if first_render {
             let session_service = SessionService::new(self.props.config.clone());
-            let change_login_status = self.link.callback(|i| Msg::ChangeLoginStatus(i));
-            let change_connection_status = self.link.callback(|i| Msg::ChangeConnectionStatus(i));
+            let change_login_status = self.link.callback(Msg::ChangeLoginStatus);
+            let change_connection_status = self.link.callback(Msg::ChangeConnectionStatus);
             let connection_service = ConnectionService::new(self.props.config.clone());
 
             spawn_local(async move {

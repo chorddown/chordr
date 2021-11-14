@@ -35,9 +35,9 @@ impl State {
         error: Option<WebError>,
     ) -> Self {
         Self {
-            catalog: catalog.map(|c| Rc::new(c)),
+            catalog: catalog.map(Rc::new),
             connection_status,
-            current_setlist: setlist.map(|c| Rc::new(c)),
+            current_setlist: setlist.map(Rc::new),
             session: Rc::new(session),
             song_settings: Rc::new(song_settings),
             error,

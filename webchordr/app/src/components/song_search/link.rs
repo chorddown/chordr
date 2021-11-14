@@ -19,7 +19,7 @@ impl Component for SongSearchLink {
     }
 
     fn view(&self) -> Html {
-        let href = format!("#/song-search/");
+        let href = "#/song-search/";
 
         html! { <a class="song-search-home" href=href><i class="im im-magnifier"></i></a> }
     }

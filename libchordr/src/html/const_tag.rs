@@ -171,7 +171,7 @@ impl Display for ConstTag {
 
             if let Some(data_chord) = &self.data_chord {
                 f.write_str(" data-chord='")?;
-                f.write_str(&data_chord)?;
+                f.write_str(data_chord)?;
                 f.write_str("'")?;
             }
 

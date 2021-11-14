@@ -23,7 +23,7 @@ impl ConnectionService {
 
     pub async fn get_connection_status(&self) -> ConnectionStatus {
         let navigator = window().navigator();
-        if false == navigator.on_line() {
+        if !navigator.on_line() {
             return ConnectionStatus::Offline;
         }
 

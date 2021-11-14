@@ -31,7 +31,7 @@ impl<T> Stupex<T> {
     #[allow(unused)]
     pub fn try_lock(&self) -> Result<StupexGuard<'_, T>, WebError> {
         if self.can_acquire_lock() {
-            Ok(StupexGuard::new(&self))
+            Ok(StupexGuard::new(self))
         } else {
             Err(WebError::custom_error("Already locked"))
         }
@@ -39,7 +39,7 @@ impl<T> Stupex<T> {
 
     pub async fn lock(&self) -> Result<StupexGuard<'_, T>, WebError> {
         if self.can_acquire_lock() {
-            Ok(StupexGuard::new(&self))
+            Ok(StupexGuard::new(self))
         } else {
             self.schedule_retry().await
         }
@@ -60,7 +60,7 @@ impl<T> Stupex<T> {
                 error!("{}", WebError::from(e));
             }
             if self.can_acquire_lock() {
-                return Ok(StupexGuard::with_closure_handle(&self, closure_handle));
+                return Ok(StupexGuard::with_closure_handle(self, closure_handle));
             }
             i += 1;
         }

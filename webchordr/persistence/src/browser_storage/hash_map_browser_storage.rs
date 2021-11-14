@@ -1,6 +1,8 @@
-use super::browser_storage_trait::BrowserStorageTrait;
-use crate::errors::WebError;
 use std::collections::HashMap;
+
+use crate::errors::WebError;
+
+use super::browser_storage_trait::BrowserStorageTrait;
 
 pub struct HashMapBrowserStorage {
     map: HashMap<String, String>,
@@ -12,6 +14,12 @@ impl HashMapBrowserStorage {
         Self {
             map: HashMap::new(),
         }
+    }
+}
+
+impl Default for HashMapBrowserStorage {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

@@ -110,18 +110,19 @@ impl Component for SongList {
             html! { <Item<SetlistEntry> key=key data_key=data_key song=song sortable=sortable highlight=highlight /> }
         };
 
-        let entries = songs.clone().into_iter().collect::<Vec<SetlistEntry>>();
+        let entries = songs.clone().into_iter();
+        // let entries = songs.clone().into_iter().collect::<Vec<SetlistEntry>>();
 
         info!("Redraw song list {:?}", songs);
 
         (html! {
             <div class="song-list" ref=self.node_ref.clone()>
-                {for entries.into_iter().map(render)}
+                {for entries.map(render)}
             </div>
         }) as Html
     }
 
-    fn rendered(&mut self, _: bool) -> () {
+    fn rendered(&mut self, _: bool) {
         if self.props.sortable {
             self.make_sortable();
         }
@@ -133,14 +134,16 @@ impl SongList {
         match self.sortable_handle {
             None => {
                 if let Some(element) = self.node_ref.cast::<HtmlElement>() {
-                    let mut options = SortableOptions::default();
-                    options.handle = Some(".sortable-handle".into());
-                    options.force_fallback = true;
+                    let options = SortableOptions {
+                        handle: Some(".sortable-handle".into()),
+                        force_fallback: true,
+                        ..Default::default()
+                    };
                     self.sortable_handle = self
                         .sortable_service
                         .make_sortable(
                             element,
-                            self.link.callback(|e| Msg::SetlistChangeSorting(e)),
+                            self.link.callback(Msg::SetlistChangeSorting),
                             options,
                         )
                         .ok();

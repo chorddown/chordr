@@ -128,15 +128,14 @@ impl NodeParser {
 }
 
 fn token_is_start_of_section(token: &Token) -> bool {
-    match token {
+    matches!(
+        token,
         Token::Headline {
             level: _,
             text: _,
             modifier: _,
-        } => true,
-        Token::Quote(_) => true,
-        _ => false,
-    }
+        } | Token::Quote(_)
+    )
 }
 
 #[cfg(test)]

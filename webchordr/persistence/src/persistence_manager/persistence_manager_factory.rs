@@ -1,3 +1,5 @@
+use webchordr_common::session::Session;
+
 use crate::backend::{
     BrowserStorageBackend, BrowserStorageBackendFactory, ServerBackend, ServerBackendFactory,
     TransientBackend, TransientBackendFactory,
@@ -5,7 +7,6 @@ use crate::backend::{
 use crate::browser_storage::BrowserStorage;
 use crate::config::Config;
 use crate::persistence_manager::PersistenceManager;
-use webchordr_common::session::Session;
 
 pub type PMType =
     PersistenceManager<BrowserStorageBackend<BrowserStorage>, ServerBackend, TransientBackend>;
@@ -32,5 +33,11 @@ impl PersistenceManagerFactory {
             server_backend,
             transient_backend,
         )
+    }
+}
+
+impl Default for PersistenceManagerFactory {
+    fn default() -> Self {
+        Self::new()
     }
 }

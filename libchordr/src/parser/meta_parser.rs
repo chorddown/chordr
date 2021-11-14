@@ -50,7 +50,7 @@ impl MetaParser {
             }
             Token::Meta(token_meta) => {
                 let mut new_meta = meta;
-                new_meta.assign_from_token(&token_meta);
+                new_meta.assign_from_token(token_meta);
                 new_meta
             }
             _ => meta,
@@ -63,7 +63,7 @@ impl MetaParser {
         } else {
             unreachable!("Invalid Token given")
         };
-        if BNotation::contains_european_chord(&chords) {
+        if BNotation::contains_european_chord(chords) {
             MetaInformation {
                 b_notation: BNotation::H,
                 ..meta

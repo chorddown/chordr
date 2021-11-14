@@ -10,6 +10,12 @@ use yew::{html, Component, ComponentLink, Html, ShouldRender};
 
 use libchordr::models::user::MainData;
 use libchordr::prelude::*;
+use webchordr_events::{Event, SetlistEvent, SettingsEvent, SortingChange};
+use webchordr_persistence::persistence_manager::PMType;
+use webchordr_persistence::persistence_manager::PersistenceManagerFactory;
+use webchordr_persistence::prelude::*;
+use webchordr_persistence::session::SessionService;
+use webchordr_persistence::web_repository::{CatalogWebRepository, SettingsWebRepository};
 
 use crate::app::App;
 use crate::config::Config;
@@ -20,14 +26,7 @@ use crate::handler_traits::setlist_handler::SetlistHandler;
 use crate::handler_traits::settings_handler::SettingsHandler;
 use crate::helpers::window;
 use crate::session::{Session, SessionMainData};
-use webchordr_persistence::persistence_manager::PMType;
-use webchordr_persistence::persistence_manager::PersistenceManagerFactory;
-use webchordr_persistence::prelude::*;
-use webchordr_persistence::session::SessionService;
-use webchordr_persistence::web_repository::{CatalogWebRepository, SettingsWebRepository};
-
 use crate::state::State;
-use webchordr_events::{Event, SetlistEvent, SettingsEvent, SortingChange};
 
 type InitialDataResult = Result<Box<SessionMainData>, Option<WebError>>;
 
@@ -144,7 +143,7 @@ impl Handler {
 
     fn check_connection_status(&mut self) {
         let connection_service = self.connection_service.clone();
-        let state_changed = self.link.callback(|s| Msg::ConnectionStatusChanged(s));
+        let state_changed = self.link.callback(Msg::ConnectionStatusChanged);
         spawn_local(async move {
             let connection_status = connection_service.get_connection_status().await;
             state_changed.emit(connection_status)
@@ -182,9 +181,7 @@ impl Handler {
 impl CatalogHandler for Handler {
     fn fetch_catalog(&mut self) {
         let pm = self.persistence_manager.clone();
-        let callback = self
-            .link
-            .callback(move |result: Result<Catalog, WebError>| Msg::FetchCatalogReady(result));
+        let callback = self.link.callback(Msg::FetchCatalogReady);
 
         spawn_local(async move {
             type Repository<'a> = CatalogWebRepository<'a, PMType>;
@@ -208,7 +205,7 @@ impl CatalogHandler for Handler {
 
     fn commit_changes(&mut self) {
         let pm = self.persistence_manager.clone();
-        let catalog = self.state.catalog().clone();
+        let catalog = self.state.catalog();
         spawn_local(async move {
             type Repository<'a> = CatalogWebRepository<'a, PMType>;
             let browser_storage = match BrowserStorage::local_storage() {
@@ -342,7 +339,7 @@ impl SetlistHandler for Handler {
 
     fn commit_changes(&mut self) {
         let pm = self.persistence_manager.clone();
-        match self.state.current_setlist().clone() {
+        match self.state.current_setlist() {
             Some(s) => spawn_local(async move {
                 type Repository<'a> = SetlistWebRepository<'a, PMType>;
                 let result = Repository::new(&pm).store(&s).await;
@@ -495,9 +492,9 @@ impl Component for Handler {
 
     fn view(&self) -> Html {
         let state = self.state.clone();
-        let on_event = self.link.callback(|e| Msg::Event(e));
-        let on_setlist_change = self.link.callback(|e| Msg::Event(e));
-        let on_user_login_success = self.link.callback(|s| Msg::SessionChanged(s));
+        let on_event = self.link.callback(Msg::Event);
+        let on_setlist_change = self.link.callback(Msg::Event);
+        let on_user_login_success = self.link.callback(Msg::SessionChanged);
         let on_user_login_error = self.link.callback(|e| {
             error!("{}", e);
             Msg::Ignore
@@ -530,7 +527,7 @@ impl Component for Handler {
         }
     }
 
-    fn rendered(&mut self, first_render: bool) -> () {
+    fn rendered(&mut self, first_render: bool) {
         if first_render {
             self.fetch_catalog();
             self.load_initial_data();

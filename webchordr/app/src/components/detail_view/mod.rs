@@ -1,6 +1,7 @@
-use crate::helpers::window;
 use log::error;
 use yew::prelude::*;
+
+use crate::helpers::window;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct DetailViewProps {
@@ -61,10 +62,11 @@ impl DetailView {
         }
 
         let close = self.link.callback(|_| {
-            if let Err(_) = window()
+            if window()
                 .history()
                 .expect("Could not retrieve History")
                 .back()
+                .is_err()
             {
                 error!("Could not go back to previous view/route")
             }

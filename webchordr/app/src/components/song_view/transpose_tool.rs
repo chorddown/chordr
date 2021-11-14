@@ -67,7 +67,7 @@ impl Component for TransposeTool {
         let show_input_field = self.props.show_input_field;
 
         let number_output = if show_input_field {
-            let onchange = self.link.callback(|e: ChangeData| Msg::InputChange(e));
+            let onchange = self.link.callback(Msg::InputChange);
             html! {<input type="number" min="-11" max="11" onchange=onchange value=transpose_semitone.to_string()/>}
         } else {
             html! {<span class="value">{transpose_semitone}</span>}

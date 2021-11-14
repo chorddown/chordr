@@ -7,7 +7,6 @@ use libchordr::models::catalog::*;
 use libchordr::models::song_data::SongData;
 use libchordr::prelude::SongSorting;
 use libchordr::prelude::{ListEntryTrait, Song};
-
 use webchordr_song_list::Item as SongItem;
 
 use self::index::*;
@@ -22,7 +21,7 @@ pub struct SongBrowser {
     props: SongBrowserProps,
 }
 
-const SONG_BROWSER_PLACEHOLDER: &'static str = "_";
+const SONG_BROWSER_PLACEHOLDER: &str = "_";
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct SongBrowserProps {
