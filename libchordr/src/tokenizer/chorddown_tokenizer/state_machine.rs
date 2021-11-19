@@ -7,7 +7,7 @@ use crate::tokenizer::{Meta, Modifier, Token};
 use super::lexeme::Lexeme;
 use super::mode::Mode;
 
-pub(crate) struct FSM {
+pub(crate) struct Fsm {
     state: Mode,
     literal_buffer: String,
     header_level: u8,
@@ -15,7 +15,7 @@ pub(crate) struct FSM {
     warnings: Vec<StateError>,
 }
 
-impl FSM {
+impl Fsm {
     pub fn new() -> Self {
         Self {
             state: Mode::Bof,
@@ -48,7 +48,7 @@ impl FSM {
                     self.append_lexeme(lexeme);
                     Some(Mode::Literal)
                 }
-                Lexeme::Eof => FSM::build_eof(),
+                Lexeme::Eof => Fsm::build_eof(),
             },
 
             Mode::Chord => {
@@ -84,7 +84,7 @@ impl FSM {
                     }
                     Lexeme::Eof => {
                         self.warnings.push(StateError::UnexpectedEndOfFile);
-                        FSM::build_eof()
+                        Fsm::build_eof()
                     }
                 }
             }
@@ -129,7 +129,7 @@ impl FSM {
                         self.append_lexeme(lexeme);
                         None
                     }
-                    Lexeme::Eof => FSM::build_eof(),
+                    Lexeme::Eof => Fsm::build_eof(),
                 }
             }
             Mode::Quote => match lexeme {
@@ -145,7 +145,7 @@ impl FSM {
                     self.append_lexeme(lexeme);
                     None
                 }
-                Lexeme::Eof => FSM::build_eof(),
+                Lexeme::Eof => Fsm::build_eof(),
             },
             Mode::Literal => {
                 match lexeme {
@@ -173,7 +173,7 @@ impl FSM {
                     }
                     Lexeme::Eof => {
                         self.warnings.push(StateError::UnexpectedEndOfFile);
-                        FSM::build_eof()
+                        Fsm::build_eof()
                     }
                 }
             }

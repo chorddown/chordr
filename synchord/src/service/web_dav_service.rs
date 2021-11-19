@@ -71,17 +71,16 @@ impl WebDAVService {
             .filter(|s| !s.is_empty())
             .collect();
         let url_as_string = self.url.to_string();
-        let url_parts: Vec<&str> = url_as_string
-            .split_terminator('/')
-            .filter(|s| !s.is_empty())
-            .collect();
 
-        let mut url_parts_iter = url_parts.into_iter();
+        let mut url_parts_iter = url_as_string
+            .split_terminator('/')
+            .filter(|s| !s.is_empty());
 
         let mut clean: Vec<String> = vec![];
         for path_part in path_parts {
             let mut has_match = false;
-            while let Some(url_part) = url_parts_iter.next() {
+            // while let Some(url_part) = url_parts_iter.next() {
+            for url_part in &mut url_parts_iter {
                 if url_part == path_part {
                     has_match = true;
                     break;
@@ -98,8 +97,8 @@ impl WebDAVService {
     fn check_status_code(&self, status: &StatusCode) -> Result<()> {
         if !status.is_success() {
             Err(Error::download_error(match status.canonical_reason() {
-                Some(reason) => format!("{}", reason),
-                None => format!("{}", status),
+                Some(reason) => reason.to_string(),
+                None => status.to_string(),
             }))
         } else {
             Ok(())

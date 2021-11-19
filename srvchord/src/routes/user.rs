@@ -24,7 +24,7 @@ pub async fn data(user_db: UserDb, conn: DbConn) -> Option<Json<MainData>> {
     conn.run(move |conn| match user_db.try_to_user() {
         Ok(user) => {
             let username = user.username();
-            let latest_setlist = match SetlistRepository::new().find_by_username(&conn, &username) {
+            let latest_setlist = match SetlistRepository::new().find_by_username(conn, username) {
                 Ok(setlists) if setlists.is_empty() => None,
                 Ok(mut setlists) => {
                     sort_setlist_by_date(&mut setlists);

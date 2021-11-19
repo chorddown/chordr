@@ -5,7 +5,7 @@ use crate::error::Error;
 use super::{Token, Tokenizer};
 
 use self::scanner::Scanner;
-use self::state_machine::FSM;
+use self::state_machine::Fsm;
 
 mod keywords;
 mod lexeme;
@@ -26,7 +26,7 @@ impl Tokenizer for ChorddownTokenizer {
         let lexemes_vec = Scanner::new().scan(input)?;
         let lexemes = lexemes_vec.iter().peekable();
         let mut tokens: Vec<Token> = vec![];
-        let mut fsm = FSM::new();
+        let mut fsm = Fsm::new();
 
         for lexeme in lexemes {
             if let Some(changed_state) = fsm.characterize_lexeme(lexeme) {

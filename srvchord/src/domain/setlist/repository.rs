@@ -126,7 +126,10 @@ impl SetlistRepository {
         Ok(users)
     }
 
-    fn get_command_executor<'a>(&self, connection: &'a ConnectionType) -> SetlistCommandExecutor<'a> {
+    fn get_command_executor<'a>(
+        &self,
+        connection: &'a ConnectionType,
+    ) -> SetlistCommandExecutor<'a> {
         SetlistCommandExecutor::with_connection(connection)
     }
 }
@@ -145,7 +148,7 @@ impl RepositoryTrait for SetlistRepository {
 
         Ok(populated_entries
             .into_iter()
-            .filter_map(|x| Some(assign_owner_to_populated_result(x, &users).unwrap()))
+            .map(|x| assign_owner_to_populated_result(x, &users).unwrap())
             .collect())
     }
 
@@ -202,7 +205,7 @@ impl RepositoryTrait for SetlistRepository {
 
 fn assign_owner_to_populated_result(
     populate_entry: PopulateResult,
-    users: &Vec<User>,
+    users: &[User],
 ) -> Result<Setlist, SrvError> {
     let setlist_db = populate_entry.0;
 
@@ -213,8 +216,8 @@ fn assign_owner_to_populated_result(
     };
 
     let owner = users
-        .into_iter()
-        .find(|user| user.username().to_string() == setlist_db.owner);
+        .iter()
+        .find(|user| user.username().as_ref() == setlist_db.owner);
 
     match owner {
         Some(owner) => Ok(setlist_from_data(

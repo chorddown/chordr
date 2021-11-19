@@ -1,9 +1,10 @@
+use diesel::{self, prelude::*};
+
 use crate::diesel::QueryDsl;
 use crate::domain::user::UserDb;
 use crate::error::SrvError;
 use crate::schema::user::dsl::user as all_users;
 use crate::ConnectionType;
-use diesel::{self, prelude::*};
 
 pub(crate) struct UserCommandExecutor<'a> {
     connection: &'a ConnectionType,
@@ -29,7 +30,7 @@ impl<'a> cqrs::prelude::CommandExecutor for UserCommandExecutor<'_> {
     fn update(&self, command: cqrs::prelude::Command<Self::RecordType>) -> Result<(), Self::Error> {
         let user = command.record().unwrap();
         let user_query = all_users.find(user.id());
-        if let Err(_) = user_query.get_result::<UserDb>(self.connection) {
+        if user_query.get_result::<UserDb>(self.connection).is_err() {
             return Err(SrvError::persistence_error(format!(
                 "Original object with ID '{}' could not be found",
                 user.id()
@@ -51,12 +52,14 @@ impl<'a> cqrs::prelude::CommandExecutor for UserCommandExecutor<'_> {
 
 #[cfg(test)]
 mod test {
-    use super::*;
+    use cqrs::prelude::{Command, CommandExecutor};
+
     use crate::domain::user::UserDb;
     use crate::test_helpers::*;
     use crate::traits::Count;
     use crate::ConnectionType;
-    use cqrs::prelude::{Command, CommandExecutor};
+
+    use super::*;
 
     #[test]
     fn test_add() {

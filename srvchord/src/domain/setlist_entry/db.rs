@@ -65,7 +65,7 @@ fn serialize_song_settings(s: &SongSettings) -> String {
 }
 
 fn deserialize_song_settings(s: &str) -> Result<SongSettings, SrvError> {
-    Ok(serde_json::from_str(&s)?)
+    Ok(serde_json::from_str(s)?)
 }
 
 impl SongIdTrait for SetlistDbEntry {}
@@ -79,7 +79,7 @@ impl ListEntryTrait for SetlistDbEntry {
 
 impl SongData for SetlistDbEntry {
     fn title(&self) -> String {
-        self.title.clone().unwrap_or(String::new())
+        self.title.clone().unwrap_or_default()
     }
 
     fn file_type(&self) -> FileType {
@@ -99,7 +99,7 @@ impl TryFrom<SetlistDbEntry> for SetlistEntry {
         Ok(SetlistEntry::new(
             value.song_id.as_str(),
             value.file_type.try_into()?,
-            value.title.unwrap_or("".to_string()),
+            value.title.unwrap_or_default(),
             settings,
         ))
     }

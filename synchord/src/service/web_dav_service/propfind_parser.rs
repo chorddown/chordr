@@ -1,9 +1,11 @@
-use crate::error::{Error, Result};
-use crate::service::file_entry::FileEntry;
-use chrono::{DateTime, FixedOffset};
 use std::io::prelude::*;
+
+use chrono::{DateTime, FixedOffset};
 use xml::reader::{EventReader, XmlEvent};
 use xml::ParserConfig;
+
+use crate::error::{Error, Result};
+use crate::service::file_entry::FileEntry;
 
 pub fn parse_propfind_response<R: Read>(read: R) -> Result<Vec<TempFileEntry>> {
     #[derive(Debug, PartialEq)]
@@ -154,12 +156,10 @@ impl TempFileEntry {
     }
 
     fn set_size(&mut self, s: String) {
-        match s.parse::<usize>() {
-            Ok(size) => self.size = size,
-            Err(_) => {
-                // Do nothing - keep `self.size` as it is
-            }
-        };
+        if let Ok(size) = s.parse::<usize>() {
+            self.size = size
+        }
+        // otherwise do nothing - keep `self.size` as it is
     }
 
     fn set_modified_date<S: AsRef<str>>(&mut self, date: S) -> Result<()> {

@@ -46,7 +46,7 @@ impl<T> Stupex<T> {
     }
 
     pub fn can_acquire_lock(&self) -> bool {
-        false == self.locked.load(Ordering::Relaxed)
+        !self.locked.load(Ordering::Relaxed)
     }
 
     async fn schedule_retry(&self) -> Result<StupexGuard<'_, T>, WebError> {

@@ -13,19 +13,19 @@ pub struct Error {
 #[doc(hidden)]
 impl Error {
     pub fn serialization_error<S: Into<String>>(description: S) -> Self {
-        Error::new(Kind::SerializationError(description.into()))
+        Error::new(Kind::Serialization(description.into()))
     }
 
     pub fn io_error<S: Into<String>>(description: S) -> Self {
-        Error::new(Kind::IoError(description.into()))
+        Error::new(Kind::Io(description.into()))
     }
 
     pub fn configuration_error<S: Into<String>>(description: S) -> Self {
-        Error::new(Kind::ConfigurationError(description.into()))
+        Error::new(Kind::Configuration(description.into()))
     }
 
     pub fn configuration_reader_error<S: Into<String>>(description: S) -> Self {
-        Error::new(Kind::ConfigurationReaderError(description.into()))
+        Error::new(Kind::ConfigurationReader(description.into()))
     }
 
     fn from_error<E: StdError + 'static>(error: E) -> Self {
@@ -71,19 +71,19 @@ impl From<libsynchord::prelude::Error> for Error {
 #[allow(dead_code)]
 enum Kind {
     /// Error during serialization
-    SerializationError(String),
+    Serialization(String),
 
     /// Error during file IO
-    IoError(String),
+    Io(String),
 
     /// Error with the configuration
-    ConfigurationError(String),
+    Configuration(String),
 
     /// Error while reading the configuration
-    ConfigurationReaderError(String),
+    ConfigurationReader(String),
 
     /// Unknown/uncategorized error
-    UnknownError(String),
+    Unknown(String),
 }
 
 impl StdError for Kind {}
@@ -91,11 +91,11 @@ impl StdError for Kind {}
 impl Display for Kind {
     fn fmt(&self, f: &mut Formatter) -> Result<(), FmtError> {
         match self {
-            Kind::SerializationError(s) => write!(f, "Serialization error: {}", s),
-            Kind::IoError(s) => write!(f, "IO error: {}", s),
-            Kind::ConfigurationError(s) => write!(f, "Configuration error: {}", s),
-            Kind::ConfigurationReaderError(s) => write!(f, "Configuration reader error: {}", s),
-            Kind::UnknownError(s) => write!(f, "Unknown error: {}", s),
+            Kind::Serialization(s) => write!(f, "Serialization error: {}", s),
+            Kind::Io(s) => write!(f, "IO error: {}", s),
+            Kind::Configuration(s) => write!(f, "Configuration error: {}", s),
+            Kind::ConfigurationReader(s) => write!(f, "Configuration reader error: {}", s),
+            Kind::Unknown(s) => write!(f, "Unknown error: {}", s),
         }
     }
 }

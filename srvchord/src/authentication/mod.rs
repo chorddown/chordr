@@ -43,8 +43,8 @@ fn verify_password_argon2(password: &str, hash: &str, salt: &str) -> Result<bool
         }
     };
 
-    match argon2::verify_encoded(&hash, password.as_bytes()) {
-        Ok(v) if v == true => Ok(true),
+    match argon2::verify_encoded(hash, password.as_bytes()) {
+        Ok(v) if v => Ok(true),
         Ok(_) => {
             #[cfg(debug_assertions)]
             if let Some(real_password_hash) = real_password_hash {

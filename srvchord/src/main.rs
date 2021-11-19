@@ -62,7 +62,7 @@ fn catalog(config: &State<Config>) -> Result<Json<Catalog>, status::Custom<Strin
             e.to_string(),
         )),
         Ok(catalog_result) => {
-            if catalog_result.errors.len() > 0 {
+            if !catalog_result.errors.is_empty() {
                 for error in catalog_result.errors {
                     log::error!("{}", error);
                 }

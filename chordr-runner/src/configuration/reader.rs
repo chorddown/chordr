@@ -1,9 +1,10 @@
-use crate::configuration::Configuration;
-use crate::error::*;
 use std::error::Error as StdError;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
+
+use crate::configuration::Configuration;
+use crate::error::*;
 
 pub struct Reader {}
 
@@ -66,18 +67,21 @@ fn build_deserialize_error(path: &Path, error: &dyn StdError) -> Error {
 fn get_file_reader(path: &Path) -> Result<BufReader<File>, Error> {
     let file = match File::open(path) {
         Ok(f) => f,
-        Err(e) => Err(Error::configuration_reader_error(format!(
-            "Could not open file {:?} for reading: {}",
-            path, e
-        )))?,
+        Err(e) => {
+            return Err(Error::configuration_reader_error(format!(
+                "Could not open file {:?} for reading: {}",
+                path, e
+            )))
+        }
     };
     Ok(BufReader::new(file))
 }
 
 #[cfg(test)]
 mod test {
-    use super::*;
     use libsynchord::prelude::ServiceIdentifier;
+
+    use super::*;
 
     fn assert_valid_mandatory_configuration(result: Result<Configuration, Error>) -> Configuration {
         let configuration = result.unwrap();

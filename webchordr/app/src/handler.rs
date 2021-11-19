@@ -48,7 +48,7 @@ pub struct Handler {
 #[derive(Debug)]
 pub enum Msg {
     Tick,
-    Event(Event),
+    Event(Box<Event>),
     FetchCatalogReady(Result<Catalog, WebError>),
     #[allow(dead_code)]
     Reload,
@@ -323,7 +323,7 @@ impl SetlistHandler for Handler {
         let pm = self.persistence_manager.clone();
         let callback = self
             .link
-            .callback(move |setlist| Msg::Event(SetlistEvent::Replace(setlist).into()));
+            .callback(move |setlist| Msg::Event(Box::new(SetlistEvent::Replace(setlist).into())));
 
         spawn_local(async move {
             type Repository<'a> = SetlistWebRepository<'a, PMType>;
@@ -382,9 +382,9 @@ impl SettingsHandler for Handler {
 
     fn fetch_song_settings(&mut self) {
         let pm = self.persistence_manager.clone();
-        let callback = self
-            .link
-            .callback(move |settings_map| Msg::Event(SettingsEvent::Replace(settings_map).into()));
+        let callback = self.link.callback(move |settings_map| {
+            Msg::Event(Box::new(SettingsEvent::Replace(settings_map).into()))
+        });
 
         spawn_local(async move {
             type Repository<'a> = SettingsWebRepository<'a, PMType>;
@@ -475,7 +475,7 @@ impl Component for Handler {
                     .reload()
                     .expect("Could not reload the top-frame");
             }
-            Msg::Event(e) => self.handle_event(e),
+            Msg::Event(e) => self.handle_event(*e),
             Msg::StateChanged(_state) => unreachable!(), //self.state = Rc::new(state),
             Msg::InitialDataLoaded(r) => self.handle_initial_data(r),
             Msg::Tick => {
@@ -492,8 +492,8 @@ impl Component for Handler {
 
     fn view(&self) -> Html {
         let state = self.state.clone();
-        let on_event = self.link.callback(Msg::Event);
-        let on_setlist_change = self.link.callback(Msg::Event);
+        let on_event = self.link.callback(|e| Msg::Event(Box::new(e)));
+        let on_setlist_change = self.link.callback(|e| Msg::Event(Box::new(e)));
         let on_user_login_success = self.link.callback(Msg::SessionChanged);
         let on_user_login_error = self.link.callback(|e| {
             error!("{}", e);

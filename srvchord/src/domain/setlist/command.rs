@@ -40,7 +40,7 @@ impl<'a> SetlistCommandExecutor<'a> {
             setlist
                 .as_song_list()
                 .iter()
-                .map(|e| SetlistDbEntry::from(&e, &setlist_db))
+                .map(|e| SetlistDbEntry::from(e, &setlist_db))
                 .collect()
         }
 
@@ -94,7 +94,7 @@ impl<'a> CommandExecutor for SetlistCommandExecutor<'_> {
                 .execute(self.connection)?;
 
             // Insert the updated Setlist Entries
-            self.insert_setlist_db_entries(&setlist, &command)
+            self.insert_setlist_db_entries(setlist, &command)
         })?;
 
         Ok(())
@@ -144,7 +144,7 @@ mod test {
                 &SetlistCommandExecutor::with_connection(&conn),
                 Command::add(new_setlist),
             )
-                .unwrap();
+            .unwrap();
 
             let new_setlists = SetlistDb::all(&conn);
             assert_eq!(new_setlists.len(), init_setlists.len() + 1);
@@ -188,7 +188,7 @@ mod test {
                 &SetlistCommandExecutor::with_connection(&conn),
                 Command::add(new_setlist),
             )
-                .unwrap();
+            .unwrap();
 
             let new_setlists = SetlistDb::all(&conn);
             assert_eq!(new_setlists.len(), init_setlists.len() + 1);
@@ -229,7 +229,7 @@ mod test {
                     vec![],
                 )),
             )
-                .unwrap();
+            .unwrap();
 
             assert_eq!(SetlistDb::count_all(&conn), 2);
             assert_eq!(SetlistDbEntry::count_all(&conn), 3);
@@ -271,7 +271,7 @@ mod test {
                     )],
                 )),
             )
-                .unwrap();
+            .unwrap();
 
             assert_eq!(SetlistDb::count_all(&conn), 2);
             assert_eq!(SetlistDbEntry::count_all(&conn), 4);
@@ -321,7 +321,7 @@ mod test {
                 &SetlistCommandExecutor::with_connection(&conn),
                 Command::delete(918),
             )
-                .unwrap();
+            .unwrap();
 
             assert_eq!(SetlistDb::count_all(&conn), 1);
         })

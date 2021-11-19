@@ -19,7 +19,7 @@ pub fn get_routes() -> Vec<rocket::Route> {
 
 #[get("/")]
 pub async fn setlist_index(conn: DbConn) -> Json<Vec<Setlist>> {
-    conn.run(move |conn| Json(SetlistRepository::new().find_all(&conn).unwrap()))
+    conn.run(move |conn| Json(SetlistRepository::new().find_all(conn).unwrap()))
         .await
 }
 
@@ -35,7 +35,7 @@ pub async fn setlist_list(
     };
 
     conn.run(move |conn| {
-        match SetlistRepository::new().find_by_username(&conn, &username_instance) {
+        match SetlistRepository::new().find_by_username(conn, &username_instance) {
             Ok(setlists) => Some(Json(setlists)),
             Err(e) => {
                 warn!("No setlists for user {} found: {}", username, e);
@@ -60,7 +60,7 @@ pub async fn setlist_get(
 
     conn.run(move |conn| {
         match SetlistRepository::new().find_by_username_and_setlist_id(
-            &conn,
+            conn,
             &username_instance,
             setlist,
         ) {
@@ -86,7 +86,7 @@ pub async fn setlist_get_latest(
     };
 
     conn.run(move |conn| {
-        match SetlistRepository::new().find_by_username(&conn, &username_instance) {
+        match SetlistRepository::new().find_by_username(conn, &username_instance) {
             Ok(setlists) if setlists.is_empty() => {
                 warn!("No setlists for user {} found", username);
                 None
@@ -123,8 +123,8 @@ pub async fn setlist_delete(
 
     let repo = SetlistRepository::new();
     conn.run(move |conn| {
-        match repo.find_by_username_and_setlist_id(&conn, &username_instance, setlist) {
-            Ok(setlist) => repo.delete(&conn, setlist).ok(),
+        match repo.find_by_username_and_setlist_id(conn, &username_instance, setlist) {
+            Ok(setlist) => repo.delete(conn, setlist).ok(),
             Err(_) => {
                 warn!("Setlist {} for user {} not found", setlist, username);
                 None
@@ -152,10 +152,10 @@ pub async fn setlist_put(
 
     let repo = SetlistRepository::new();
     conn.run(move |conn| {
-        match repo.find_by_username_and_setlist_id(&conn, &username_instance, setlist.id()) {
+        match repo.find_by_username_and_setlist_id(conn, &username_instance, setlist.id()) {
             Ok(_) => {
                 info!("Perform update setlist {} #{}", username, setlist.id());
-                match repo.update(&conn, setlist.clone()) {
+                match repo.update(conn, setlist.clone()) {
                     Ok(_) => Some(Json(setlist)),
                     Err(e) => {
                         error!("{}", e);
@@ -165,7 +165,7 @@ pub async fn setlist_put(
             }
             Err(_) => {
                 info!("Perform add setlist {} #{}", username, setlist.id());
-                match repo.add(&conn, setlist.clone()) {
+                match repo.add(conn, setlist.clone()) {
                     Ok(_) => Some(Json(setlist)),
                     Err(e) => {
                         error!("{}", e);

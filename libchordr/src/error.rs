@@ -17,34 +17,34 @@ pub struct Error {
 #[doc(hidden)]
 impl Error {
     pub fn parser_error<S: Into<String>>(description: S) -> Self {
-        Error::new(Kind::ParserError(description.into()))
+        Error::new(Kind::Parser(description.into()))
     }
 
     pub fn tag_builder_error<S: Into<String>>(description: S) -> Self {
-        Error::new(Kind::TagBuilderError(description.into()))
+        Error::new(Kind::TagBuilder(description.into()))
     }
 
     pub fn catalog_builder_fatal_error<S: Into<String>>(description: S, path: PathBuf) -> Self {
-        Error::new(Kind::CatalogBuilderFatalError(description.into(), path))
+        Error::new(Kind::CatalogBuilderFatal(description.into(), path))
     }
 
     pub fn file_type_error<S: Into<String>>(description: S) -> Self {
-        Error::new(Kind::FileTypeError(description.into()))
+        Error::new(Kind::FileType(description.into()))
     }
 
     pub fn chord_error<S: Into<String>>(description: S) -> Self {
-        Error::new(Kind::ChordError(description.into()))
+        Error::new(Kind::Chord(description.into()))
     }
 
     pub fn setlist_error<S: Into<String>>(description: S) -> Self {
-        Error::new(Kind::SetlistError(description.into()))
+        Error::new(Kind::Setlist(description.into()))
     }
 
     pub fn invalid_username_error<S1: Into<String>, S2: Into<String>>(
         invalid_username: S1,
         message: S2,
     ) -> Self {
-        Error::new(Kind::InvalidUsernameError(
+        Error::new(Kind::InvalidUsername(
             invalid_username.into(),
             message.into(),
         ))
@@ -54,7 +54,7 @@ impl Error {
         invalid_password: S1,
         message: S2,
     ) -> Self {
-        Error::new(Kind::InvalidPasswordError(
+        Error::new(Kind::InvalidPassword(
             invalid_password.into(),
             message.into(),
         ))
@@ -64,14 +64,11 @@ impl Error {
         invalid_team_id: S1,
         message: S2,
     ) -> Self {
-        Error::new(Kind::InvalidTeamIdError(
-            invalid_team_id.into(),
-            message.into(),
-        ))
+        Error::new(Kind::InvalidTeamId(invalid_team_id.into(), message.into()))
     }
 
     pub fn unknown_error<S: Into<String>>(description: S) -> Self {
-        Error::new(Kind::UnknownError(description.into()))
+        Error::new(Kind::Unknown(description.into()))
     }
 
     pub fn from_error<E: StdError + 'static>(error: E) -> Self {
@@ -125,16 +122,16 @@ impl From<std::num::ParseIntError> for Error {
 
 #[derive(Debug)]
 enum Kind {
-    ParserError(String),
-    TagBuilderError(String),
-    CatalogBuilderFatalError(String, PathBuf),
-    FileTypeError(String),
-    ChordError(String),
-    SetlistError(String),
-    UnknownError(String),
-    InvalidUsernameError(String, String),
-    InvalidPasswordError(String, String),
-    InvalidTeamIdError(String, String),
+    Parser(String),
+    TagBuilder(String),
+    CatalogBuilderFatal(String, PathBuf),
+    FileType(String),
+    Chord(String),
+    Setlist(String),
+    Unknown(String),
+    InvalidUsername(String, String),
+    InvalidPassword(String, String),
+    InvalidTeamId(String, String),
 }
 
 impl StdError for Kind {}
@@ -142,18 +139,18 @@ impl StdError for Kind {}
 impl Display for Kind {
     fn fmt(&self, f: &mut Formatter) -> Result<(), FmtError> {
         match self {
-            Kind::ParserError(s) => write!(f, "{}", s),
-            Kind::TagBuilderError(s) => write!(f, "{}", s),
-            Kind::CatalogBuilderFatalError(s, p) => {
+            Kind::Parser(s) => write!(f, "{}", s),
+            Kind::TagBuilder(s) => write!(f, "{}", s),
+            Kind::CatalogBuilderFatal(s, p) => {
                 write!(f, "Error while building catalog: {} for path {:?}", s, p)
             }
-            Kind::FileTypeError(s) => write!(f, "{}", s),
-            Kind::ChordError(s) => write!(f, "{}", s),
-            Kind::SetlistError(s) => write!(f, "{}", s),
-            Kind::UnknownError(s) => write!(f, "{}", s),
-            Kind::InvalidUsernameError(_name, message) => write!(f, "{}", message),
-            Kind::InvalidPasswordError(_password, message) => write!(f, "{}", message),
-            Kind::InvalidTeamIdError(invalid_id, _message) => {
+            Kind::FileType(s) => write!(f, "{}", s),
+            Kind::Chord(s) => write!(f, "{}", s),
+            Kind::Setlist(s) => write!(f, "{}", s),
+            Kind::Unknown(s) => write!(f, "{}", s),
+            Kind::InvalidUsername(_name, message) => write!(f, "{}", message),
+            Kind::InvalidPassword(_password, message) => write!(f, "{}", message),
+            Kind::InvalidTeamId(invalid_id, _message) => {
                 write!(f, "Team ID '{}' is not valid", invalid_id)
             }
         }

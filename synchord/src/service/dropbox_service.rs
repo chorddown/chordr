@@ -91,8 +91,8 @@ impl ServiceTrait for DropboxService {
             .filter_map(|m| {
                 match m {
                     Metadata::File(data) => FileEntry::try_from(data).ok(),
-                    Metadata::Folder(_) => return None, // Not implemented
-                    Metadata::Deleted(_) => return None, // Not implemented
+                    Metadata::Folder(_) => None,  // Not implemented
+                    Metadata::Deleted(_) => None, // Not implemented
                 }
             })
             .collect())

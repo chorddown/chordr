@@ -3,22 +3,24 @@ extern crate libchordr;
 extern crate libsynchord;
 extern crate log;
 
-mod configuration;
-mod error;
-mod task;
-
-use crate::configuration::Configuration;
-use crate::error::{Error, Result};
-use crate::task::{BuildCatalogTask, CollectionTask, DownloadTask, RecurringTaskTrait, TaskTrait};
-use clap::{App, Arg, ArgMatches};
-use configuration::reader::Reader;
-use log::{error, info};
-use simplelog;
-use simplelog::TerminalMode;
 use std::env;
 use std::path::Path;
 use std::process::exit;
 use std::{thread, time};
+
+use clap::{App, Arg, ArgMatches};
+use log::{error, info};
+use simplelog::TerminalMode;
+
+use configuration::reader::Reader;
+
+use crate::configuration::Configuration;
+use crate::error::{Error, Result};
+use crate::task::{BuildCatalogTask, CollectionTask, DownloadTask, RecurringTaskTrait, TaskTrait};
+
+mod configuration;
+mod error;
+mod task;
 
 fn main() {
     if let Err(e) = run() {
@@ -56,7 +58,7 @@ fn run() -> Result<()> {
     configure_logging(&matches)?;
     let configuration = read_configuration(&matches)?;
 
-    Ok(start_loop(&configuration)?)
+    start_loop(&configuration)
 }
 
 fn start_loop(configuration: &Configuration) -> Result<()> {
@@ -79,7 +81,7 @@ fn start_loop(configuration: &Configuration) -> Result<()> {
 }
 
 fn read_configuration(args: &ArgMatches) -> Result<Configuration> {
-    Reader::read_configuration_from_file(&Path::new(args.value_of("configuration").unwrap()))
+    Reader::read_configuration_from_file(Path::new(args.value_of("configuration").unwrap()))
 }
 
 fn configure_logging(matches: &ArgMatches<'_>) -> Result<()> {
@@ -91,8 +93,10 @@ fn configure_logging(matches: &ArgMatches<'_>) -> Result<()> {
     };
 
     let mut loggers: Vec<Box<dyn simplelog::SharedLogger>> = vec![];
-    let mut config = simplelog::Config::default();
-    config.time_format = Some("%H:%M:%S%.3f");
+    let config = simplelog::Config {
+        time_format: Some("%H:%M:%S%.3f"),
+        ..Default::default()
+    };
 
     if let Some(core_logger) =
         simplelog::TermLogger::new(log_level_filter, config, TerminalMode::Mixed)

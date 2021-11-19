@@ -1,12 +1,16 @@
-use super::{RecurringTaskTrait, TaskTrait};
-use crate::configuration::Configuration;
-use crate::error::Result;
+use std::env;
+
+use log::info;
+
 use libsynchord::error::Error as SynchordError;
 use libsynchord::prelude::{
     AbstractServiceConfig, ServiceConfigurationTrait, ServiceTrait, Services,
 };
-use log::info;
-use std::env;
+
+use crate::configuration::Configuration;
+use crate::error::Result;
+
+use super::{RecurringTaskTrait, TaskTrait};
 
 pub struct DownloadTask {
     service_config: AbstractServiceConfig,
@@ -60,15 +64,15 @@ fn build_service_config(configuration: Configuration) -> AbstractServiceConfig {
         configuration
             .service
             .url
-            .ok_or(SynchordError::missing_argument_error("URL")),
+            .ok_or_else(|| SynchordError::missing_argument_error("URL")),
         configuration
             .service
             .remote_directory
-            .ok_or(SynchordError::missing_argument_error("Remote-directory")),
+            .ok_or_else(|| SynchordError::missing_argument_error("Remote-directory")),
         configuration
             .service
             .username
-            .ok_or(SynchordError::missing_argument_error("Username")),
+            .ok_or_else(|| SynchordError::missing_argument_error("Username")),
         password,
         configuration.output_directory.clone(),
         configuration.service.identifier,

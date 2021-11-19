@@ -9,7 +9,7 @@ pub fn download(
     service_config: &AbstractServiceConfig,
 ) -> Result<Vec<FileEntry>> {
     let files = service.list_files()?;
-    if files.len() == 0 {
+    if files.is_empty() {
         info!("No files found");
     }
     for file in &files {

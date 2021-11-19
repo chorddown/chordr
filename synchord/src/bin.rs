@@ -9,7 +9,6 @@ mod service;
 use crate::error::{Error, Result};
 use crate::prelude::*;
 use clap::{App, Arg, ArgMatches, SubCommand};
-use simplelog;
 use simplelog::TerminalMode;
 use std::convert::TryFrom;
 use std::env;
@@ -153,8 +152,10 @@ fn configure_logging(matches: &ArgMatches<'_>) -> Result<()> {
     };
 
     let mut loggers: Vec<Box<dyn simplelog::SharedLogger>> = vec![];
-    let mut config = simplelog::Config::default();
-    config.time_format = Some("%H:%M:%S%.3f");
+    let config = simplelog::Config {
+        time_format: Some("%H:%M:%S%.3f"),
+        ..Default::default()
+    };
 
     if let Some(core_logger) =
         simplelog::TermLogger::new(log_level_filter, config, TerminalMode::Mixed)
