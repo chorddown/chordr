@@ -45,6 +45,7 @@ const handleInstall = event => {
 };
 
 const handleActivate = event => {
+    clients.claim();
     /* Delete caches of old versions */
     event.waitUntil(
         caches.keys().then(keys => Promise.all(
