@@ -9,6 +9,7 @@ use super::file_type::FileType;
 use super::song_data::SongData;
 use super::song_id::SongId;
 
+/// Representation of a Song's metadata, used e.g. in the JSON export
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
 pub struct SongMeta {
     id: SongId,
@@ -16,6 +17,7 @@ pub struct SongMeta {
     #[serde(rename = "type")]
     file_type: FileType,
 
+    // TODO: check if #[serde(flatten)] should be used
     subtitle: Option<String>,
     artist: Option<String>,
     composer: Option<String>,

@@ -3,6 +3,7 @@ use crate::html::tag::Tag;
 use crate::html::tag_builder::TagBuilder;
 use crate::models::chord::fmt::Formatting;
 use crate::models::chord::{Chords, NoteDisplay};
+use crate::models::meta::MetaTrait;
 use crate::parser::{Node, SectionType};
 use crate::tokenizer::{Meta, Token};
 
@@ -13,7 +14,12 @@ impl TagProvider {
         TagProvider {}
     }
 
-    pub fn build_tag_for_node<'a>(&'a self, node: &'a Node, formatting: Formatting) -> Tag {
+    pub fn build_tag_for_node<'a>(
+        &'a self,
+        node: &'a Node,
+        meta: &dyn MetaTrait,
+        formatting: Formatting,
+    ) -> Tag {
         match node {
             Node::ChordTextPair {
                 chords,
@@ -32,37 +38,50 @@ impl TagProvider {
             Node::Document(children) => TagBuilder::new()
                 .set_tag_name("div")
                 .set_id("chordr-song")
-                .set_content_tag(self.build_tag_for_children(children, formatting))
+                .set_content_tag(self.build_tag_for_children(children, meta, formatting))
                 .build(),
             Node::Headline(token) => self.build_tag_for_token(token, formatting),
             Node::Quote(token) => self.build_tag_for_token(token, formatting),
-            Node::Meta(m) => self.build_tag_for_meta(m),
+            Node::Meta(m) => self.build_tag_for_meta(m, meta, formatting),
             Node::Newline => Tag::raw(format!("{}\n", Tag::hr())),
             Node::Section {
                 head,
                 children,
                 section_type,
-            } => self.build_tag_for_section(formatting, head, children, section_type),
+            } => self.build_tag_for_section(head, children, section_type, meta, formatting),
         }
     }
 
-    fn build_tag_for_meta(&self, m: &Meta) -> Tag {
+    fn build_tag_for_meta(
+        &self,
+        metadata_token: &Meta,
+        song_metadata: &dyn MetaTrait,
+        formatting: Formatting,
+    ) -> Tag {
+        let content = get_song_metadata_content(metadata_token, song_metadata, formatting);
+
         Tag::raw(format!(
             "{} {}",
             Tag::span(
-                Content::from_string(format!("{}:", m.keyword())),
+                Content::from_string(format!("{}:", metadata_token.keyword())),
                 Some("meta-keyword"),
             ),
-            Tag::span(Content::from_string(m.content()), Some("meta-value")),
+            Tag::span(
+                Content::from_string(
+                    content.unwrap_or_else(|| metadata_token.content().to_string())
+                ),
+                Some("meta-value")
+            ),
         ))
     }
 
     fn build_tag_for_section(
         &self,
-        formatting: Formatting,
         head: &Option<Box<Node>>,
         children: &[Node],
         section_type: &SectionType,
+        meta: &dyn MetaTrait,
+        formatting: Formatting,
     ) -> Tag {
         let mut gtb = TagBuilder::new().set_tag_name("section");
         if let Some(class_name) = class_name_for_type(section_type) {
@@ -72,13 +91,13 @@ impl TagProvider {
         if let Some(head) = head {
             let inner = format!(
                 "{}{}",
-                self.build_tag_for_node(head, formatting),
-                self.build_tag_for_children(children, formatting)
+                self.build_tag_for_node(head, meta, formatting),
+                self.build_tag_for_children(children, meta, formatting)
             );
 
             gtb.set_content(Content::Raw(inner)).build()
         } else {
-            gtb.set_content_tag(self.build_tag_for_children(children, formatting))
+            gtb.set_content_tag(self.build_tag_for_children(children, meta, formatting))
                 .build()
         }
     }
@@ -125,14 +144,19 @@ impl TagProvider {
         )
     }
 
-    fn build_tag_for_children<'a>(&'a self, children: &'a [Node], formatting: Formatting) -> Tag {
+    fn build_tag_for_children<'a>(
+        &'a self,
+        children: &'a [Node],
+        meta: &dyn MetaTrait,
+        formatting: Formatting,
+    ) -> Tag {
         if children.is_empty() {
             Tag::blank()
         } else {
             Tag::raw(
                 children
                     .iter()
-                    .map(|n| self.build_tag_for_node(n, formatting).to_string())
+                    .map(|n| self.build_tag_for_node(n, meta, formatting).to_string())
                     .collect::<Vec<String>>()
                     .join(""),
             )
@@ -158,6 +182,34 @@ impl TagProvider {
         );
 
         Tag::div(Content::Raw(html), Some("col"))
+    }
+}
+
+fn get_song_metadata_content(
+    metadata_token: &Meta,
+    song_metadata: &dyn MetaTrait,
+    formatting: Formatting,
+) -> Option<String> {
+    match metadata_token {
+        Meta::Subtitle(_) => song_metadata.subtitle(),
+        Meta::Artist(_) => song_metadata.artist(),
+        Meta::Composer(_) => song_metadata.composer(),
+        Meta::Lyricist(_) => song_metadata.lyricist(),
+        Meta::Copyright(_) => song_metadata.copyright(),
+        Meta::Album(_) => song_metadata.album(),
+        Meta::Year(_) => song_metadata.year(),
+        Meta::Key(_) => song_metadata.key().map(|c| c.note_format(formatting)),
+        Meta::OriginalKey(_) => song_metadata
+            .original_key()
+            .map(|c| c.note_format(formatting)),
+        Meta::Time(_) => song_metadata.time(),
+        Meta::Tempo(_) => song_metadata.tempo(),
+        Meta::Duration(_) => song_metadata.duration(),
+        Meta::Capo(_) => song_metadata.capo(),
+        Meta::OriginalTitle(_) => song_metadata.original_title(),
+        Meta::AlternativeTitle(_) => song_metadata.alternative_title(),
+        Meta::CCLISongId(_) => song_metadata.ccli_song_id(),
+        Meta::BNotation(_) => Some(song_metadata.b_notation().to_string()),
     }
 }
 

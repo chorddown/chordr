@@ -18,7 +18,7 @@ impl HtmlConverter {
         tag_builder: &TagProvider,
         formatting: Formatting,
     ) -> Result<String> {
-        let tag = tag_builder.build_tag_for_node(node, formatting);
+        let tag = tag_builder.build_tag_for_node(node, meta, formatting);
 
         Ok(format!(
             r#"<div id="chordr">
