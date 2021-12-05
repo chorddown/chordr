@@ -41,7 +41,7 @@ impl ChorddownConverter {
             Node::Headline(token) => Ok(self.build_token(token)),
             Node::Quote(token) => Ok(self.build_token(token)),
             Node::Meta(_) => {
-                // Meta data must have been already output
+                // Metadata must have already been rendered
                 Ok(String::new())
             }
             Node::Newline => Ok("\n".to_owned()),
@@ -93,54 +93,84 @@ impl ChorddownConverter {
     }
 
     fn build_meta(&self, meta: &dyn MetaTrait, formatting: Formatting) -> String {
-        let mut buffer: Vec<String> = vec![];
+        let mut buffer = String::new();
         if let Some(v) = meta.subtitle() {
-            buffer.push(format!("Subtitle: {}", v))
+            buffer.push_str("Subtitle: ");
+            buffer.push_str(&v);
+            buffer.push_str("\n")
         }
         if let Some(v) = meta.original_title() {
-            buffer.push(format!("Original Title: {}", v))
+            buffer.push_str("Original Title: ");
+            buffer.push_str(&v);
+            buffer.push_str("\n")
         }
         if let Some(v) = meta.alternative_title() {
-            buffer.push(format!("Alternative Title: {}", v))
+            buffer.push_str("Alternative Title: ");
+            buffer.push_str(&v);
+            buffer.push_str("\n")
         }
         if let Some(v) = meta.artist() {
-            buffer.push(format!("Artist: {}", v))
+            buffer.push_str("Artist: ");
+            buffer.push_str(&v);
+            buffer.push_str("\n")
         }
         if let Some(v) = meta.composer() {
-            buffer.push(format!("Composer: {}", v))
+            buffer.push_str("Composer: ");
+            buffer.push_str(&v);
+            buffer.push_str("\n")
         }
         if let Some(v) = meta.lyricist() {
-            buffer.push(format!("Lyricist: {}", v))
+            buffer.push_str("Lyricist: ");
+            buffer.push_str(&v);
+            buffer.push_str("\n")
         }
         if let Some(v) = meta.copyright() {
-            buffer.push(format!("Copyright: {}", v))
+            buffer.push_str("Copyright: ");
+            buffer.push_str(&v);
+            buffer.push_str("\n")
         }
         if let Some(v) = meta.album() {
-            buffer.push(format!("Album: {}", v))
+            buffer.push_str("Album: ");
+            buffer.push_str(&v);
+            buffer.push_str("\n")
         }
         if let Some(v) = meta.year() {
-            buffer.push(format!("Year: {}", v))
+            buffer.push_str("Year: ");
+            buffer.push_str(&v);
+            buffer.push_str("\n")
         }
         if let Some(v) = meta.key() {
-            buffer.push(format!("Key: {}", v.note_format(formatting)))
+            buffer.push_str("Key: ");
+            buffer.push_str(&v.note_format(formatting));
+            buffer.push_str("\n")
         }
         if let Some(v) = meta.time() {
-            buffer.push(format!("Time: {}", v))
+            buffer.push_str("Time: ");
+            buffer.push_str(&v);
+            buffer.push_str("\n")
         }
         if let Some(v) = meta.tempo() {
-            buffer.push(format!("Tempo: {}", v))
+            buffer.push_str("Tempo: ");
+            buffer.push_str(&v);
+            buffer.push_str("\n")
         }
         if let Some(v) = meta.duration() {
-            buffer.push(format!("Duration: {}", v))
+            buffer.push_str("Duration: ");
+            buffer.push_str(&v);
+            buffer.push_str("\n")
         }
         if let Some(v) = meta.capo() {
-            buffer.push(format!("Capo: {}", v))
+            buffer.push_str("Capo: ");
+            buffer.push_str(&v);
+            buffer.push_str("\n")
         }
         if let Some(v) = meta.ccli_song_id() {
-            buffer.push(format!("CCLI Song ID: {}", v))
+            buffer.push_str("CCLI Song ID: ");
+            buffer.push_str(&v);
+            buffer.push_str("\n")
         }
         //        meta.b_notation()  // -> BNotation;
-        buffer.join("\n")
+        buffer.trim_end().to_string()
     }
 
     fn build_string_for_chords(&self, chords: &Chords, formatting: Formatting) -> String {
