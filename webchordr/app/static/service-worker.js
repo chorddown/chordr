@@ -1,4 +1,5 @@
-const CACHE_NAME = 'chordr-{RANDOM_ID}';
+const VERSION = '{RANDOM_ID}';
+const CACHE_NAME = 'chordr-' + VERSION;
 const ASSET_CACHE_NAME = 'chordr-assets';
 
 const output = initOutput(true);
