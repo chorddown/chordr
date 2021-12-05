@@ -169,7 +169,7 @@ fn convert(args: &ArgMatches) -> Result<()> {
 </body>
 </html>
     "#,
-            title = meta.title.unwrap_or_default(),
+            title = meta.title().unwrap_or_default(),
             styles =
                 include_str!("../../webchordr/app/static/stylesheets/chordr-default-styles.css"),
             content = converted
