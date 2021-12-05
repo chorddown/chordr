@@ -1,4 +1,4 @@
-use crate::tokenizer::Token;
+use crate::tokenizer::{Meta, Token};
 
 pub use super::meta_information::MetaInformation;
 pub use super::node::Node;
@@ -30,7 +30,7 @@ impl MetaParser {
         Ok(meta)
     }
 
-    fn visit(&mut self, token: &Token, meta: MetaInformation) -> MetaInformation {
+    fn visit(&self, token: &Token, meta: MetaInformation) -> MetaInformation {
         log::trace!("Visit token: {:?}", token);
         match token {
             Token::Chord(_) => self.visit_chord(token, meta),
@@ -48,16 +48,25 @@ impl MetaParser {
                     meta
                 }
             }
+            // Token::Meta(Meta::BNotation(notation)) => {
+            //     let mut new_meta = meta;
+            //     new_meta.reinterpret_keys_with_b_notation(*notation);
+            //     // new_meta.assign_from_token(token_meta);
+            //     new_meta
+            // }
             Token::Meta(token_meta) => {
                 let mut new_meta = meta;
                 new_meta.assign_from_token(token_meta);
+                if let Meta::BNotation(b_notation) = token_meta {
+                    new_meta.reinterpret_keys_with_b_notation(*b_notation);
+                }
                 new_meta
             }
             _ => meta,
         }
     }
 
-    fn visit_chord(&mut self, token: &Token, meta: MetaInformation) -> MetaInformation {
+    fn visit_chord(&self, token: &Token, meta: MetaInformation) -> MetaInformation {
         let chords = if let Token::Chord(c) = token {
             c
         } else {

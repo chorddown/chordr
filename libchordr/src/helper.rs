@@ -29,8 +29,9 @@ pub fn transpose_content<R: BufRead>(contents: R, semitones: isize) -> Result<Pa
     let ParserResult { node, meta } = parse_content(contents)?;
 
     let transposed_node = node.transpose(semitones);
+    let transposed_meta = meta.transpose(semitones);
 
-    Ok(ParserResult::new(transposed_node, meta))
+    Ok(ParserResult::new(transposed_node, transposed_meta))
 }
 
 pub fn convert_to_format<R: BufRead>(
@@ -44,14 +45,11 @@ pub fn convert_to_format<R: BufRead>(
 pub fn transpose_and_convert_to_format<R: BufRead>(
     contents: R,
     semitones: isize,
-    meta: &dyn SongMetaTrait,
+    _meta: &dyn SongMetaTrait,
     formatting: Formatting,
 ) -> Result<String> {
-    Converter::new().convert(
-        transpose_content(contents, semitones)?.node_as_ref(),
-        meta,
-        formatting,
-    )
+    let result = transpose_content(contents, semitones)?;
+    Converter::new().convert(result.node_as_ref(), result.meta_as_ref(), formatting)
 }
 
 #[allow(unused)]

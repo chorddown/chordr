@@ -16,6 +16,7 @@ pub enum Meta {
     Album(String),
     Year(String),
     Key(String),
+    OriginalKey(String),
     Time(String),
     Tempo(String),
     Duration(String),
@@ -37,6 +38,7 @@ impl Meta {
             "album" => Some(Self::album(content)),
             "year" => Some(Self::year(content)),
             "key" => Some(Self::key(content)),
+            "original-key" | "original key" | "originalkey" => Some(Self::original_key(content)),
             "time" => Some(Self::time(content)),
             "tempo" => Some(Self::tempo(content)),
             "duration" => Some(Self::duration(content)),
@@ -63,6 +65,7 @@ impl Meta {
             Self::Album(_) => "Album",
             Self::Year(_) => "Year",
             Self::Key(_) => "Key",
+            Self::OriginalKey(_) => "Original Key",
             Self::Time(_) => "Time",
             Self::Tempo(_) => "Tempo",
             Self::Duration(_) => "Duration",
@@ -84,6 +87,7 @@ impl Meta {
             Self::Album(c) => c,
             Self::Year(c) => c,
             Self::Key(c) => c,
+            Self::OriginalKey(c) => c,
             Self::Time(c) => c,
             Self::Tempo(c) => c,
             Self::Duration(c) => c,
@@ -122,6 +126,9 @@ impl Meta {
 
     pub fn key<S: Into<String>>(content: S) -> Self {
         Self::Key(content.into())
+    }
+    pub fn original_key<S: Into<String>>(content: S) -> Self {
+        Self::OriginalKey(content.into())
     }
 
     pub fn time<S: Into<String>>(content: S) -> Self {

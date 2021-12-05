@@ -1,12 +1,14 @@
 use std::fmt::{Debug, Formatter};
 
+use serde::{Deserialize, Serialize};
+
 use crate::error::Error;
 use crate::models::chord::fmt::Formatting;
 use crate::models::chord::transposition::TransposableTrait;
 use crate::models::chord::NoteDisplay;
 use crate::models::meta::{BNotation, SemitoneNotation};
 
-#[derive(Clone, Copy, PartialEq, PartialOrd)]
+#[derive(Deserialize, Serialize, Clone, Copy, PartialEq, PartialOrd)]
 pub enum Note {
     C = 1,
     Cis,

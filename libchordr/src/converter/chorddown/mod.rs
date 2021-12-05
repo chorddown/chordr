@@ -14,7 +14,7 @@ impl ConverterTrait for ChorddownConverter {
         let output = format!(
             "{}{}{}",
             self.build_title(meta),
-            self.build_meta(meta),
+            self.build_meta(meta, formatting),
             self.build_node(node, formatting)?
         );
         Ok(cleanup_output(&output))
@@ -92,7 +92,7 @@ impl ChorddownConverter {
         }
     }
 
-    fn build_meta(&self, meta: &dyn MetaTrait) -> String {
+    fn build_meta(&self, meta: &dyn MetaTrait, formatting: Formatting) -> String {
         let mut buffer: Vec<String> = vec![];
         if let Some(v) = meta.subtitle() {
             buffer.push(format!("Subtitle: {}", v))
@@ -122,7 +122,7 @@ impl ChorddownConverter {
             buffer.push(format!("Year: {}", v))
         }
         if let Some(v) = meta.key() {
-            buffer.push(format!("Key: {}", v))
+            buffer.push(format!("Key: {}", v.note_format(formatting)))
         }
         if let Some(v) = meta.time() {
             buffer.push(format!("Time: {}", v))

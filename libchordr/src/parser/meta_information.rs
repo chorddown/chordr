@@ -1,3 +1,4 @@
+use crate::models::chord::{Chord, TransposableTrait};
 use crate::models::meta::b_notation::BNotation;
 use crate::models::meta::MetaTrait;
 use crate::tokenizer::Meta;
@@ -5,23 +6,26 @@ use crate::tokenizer::Meta;
 /// Meta Information for a parsed song
 #[derive(Clone, Debug)]
 pub struct MetaInformation {
-    pub title: Option<String>,
-    pub subtitle: Option<String>,
-    pub artist: Option<String>,
-    pub composer: Option<String>,
-    pub lyricist: Option<String>,
-    pub copyright: Option<String>,
-    pub album: Option<String>,
-    pub year: Option<String>,
-    pub key: Option<String>,
-    pub time: Option<String>,
-    pub tempo: Option<String>,
-    pub duration: Option<String>,
-    pub capo: Option<String>,
-    pub original_title: Option<String>,
-    pub alternative_title: Option<String>,
-    pub ccli_song_id: Option<String>,
-    pub b_notation: BNotation,
+    pub(crate) title: Option<String>,
+    pub(crate) subtitle: Option<String>,
+    pub(crate) artist: Option<String>,
+    pub(crate) composer: Option<String>,
+    pub(crate) lyricist: Option<String>,
+    pub(crate) copyright: Option<String>,
+    pub(crate) album: Option<String>,
+    pub(crate) year: Option<String>,
+    pub(crate) key: Option<Chord>,
+    pub(crate) key_raw: Option<String>,
+    pub(crate) original_key: Option<Chord>,
+    pub(crate) original_key_raw: Option<String>,
+    pub(crate) time: Option<String>,
+    pub(crate) tempo: Option<String>,
+    pub(crate) duration: Option<String>,
+    pub(crate) capo: Option<String>,
+    pub(crate) original_title: Option<String>,
+    pub(crate) alternative_title: Option<String>,
+    pub(crate) ccli_song_id: Option<String>,
+    pub(crate) b_notation: BNotation,
 }
 
 impl MetaInformation {
@@ -35,7 +39,6 @@ impl MetaInformation {
             Meta::Copyright(content) => self.copyright = Some(content.clone()),
             Meta::Album(content) => self.album = Some(content.clone()),
             Meta::Year(content) => self.year = Some(content.clone()),
-            Meta::Key(content) => self.key = Some(content.clone()),
             Meta::Time(content) => self.time = Some(content.clone()),
             Meta::Tempo(content) => self.tempo = Some(content.clone()),
             Meta::Duration(content) => self.duration = Some(content.clone()),
@@ -43,8 +46,30 @@ impl MetaInformation {
             Meta::OriginalTitle(content) => self.original_title = Some(content.clone()),
             Meta::AlternativeTitle(content) => self.alternative_title = Some(content.clone()),
             Meta::CCLISongId(content) => self.ccli_song_id = Some(content.clone()),
+            Meta::Key(content) => self.set_key(content.clone()),
+            Meta::OriginalKey(content) => self.set_original_key(content.clone()),
             Meta::BNotation(notation) => self.b_notation = *notation,
         }
+    }
+
+    /// Update the `key` and `original_key` fields with a new B-Notation
+    pub(crate) fn reinterpret_keys_with_b_notation(&mut self, to_notation: BNotation) {
+        if let Some(key) = &self.key_raw {
+            self.key = Chord::try_from(&key, to_notation).ok();
+        }
+        if let Some(key) = &self.original_key_raw {
+            self.original_key = Chord::try_from(&key, to_notation).ok();
+        }
+    }
+
+    fn set_key(&mut self, content: String) {
+        self.key = Chord::try_from(&content, self.b_notation).ok();
+        self.key_raw = Some(content);
+    }
+
+    fn set_original_key(&mut self, content: String) {
+        self.original_key = Chord::try_from(&content, self.b_notation).ok();
+        self.original_key_raw = Some(content);
     }
 }
 
@@ -81,8 +106,12 @@ impl MetaTrait for MetaInformation {
         self.year.as_ref().cloned()
     }
 
-    fn key(&self) -> Option<String> {
+    fn key(&self) -> Option<Chord> {
         self.key.as_ref().cloned()
+    }
+
+    fn original_key(&self) -> Option<Chord> {
+        self.original_key.as_ref().cloned()
     }
 
     fn time(&self) -> Option<String> {
@@ -118,6 +147,22 @@ impl MetaTrait for MetaInformation {
     }
 }
 
+impl TransposableTrait for MetaInformation {
+    fn transpose(self, semitones: isize) -> Self {
+        if self.key_raw.is_some() && self.original_key_raw.is_none() {
+            let mut transposed_meta = self.clone();
+            let key = transposed_meta.key.take();
+            if transposed_meta.original_key.is_none() {
+                transposed_meta.original_key = key.clone();
+            }
+            transposed_meta.key = Some(key.unwrap().transpose(semitones));
+
+            transposed_meta
+        } else {
+            self
+        }
+    }
+}
 impl Default for MetaInformation {
     fn default() -> Self {
         Self {
@@ -130,6 +175,9 @@ impl Default for MetaInformation {
             album: None,
             year: None,
             key: None,
+            key_raw: None,
+            original_key: None,
+            original_key_raw: None,
             time: None,
             tempo: None,
             duration: None,
@@ -138,6 +186,62 @@ impl Default for MetaInformation {
             alternative_title: None,
             ccli_song_id: None,
             b_notation: Default::default(),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::models::chord::Note;
+
+    #[test]
+    fn test_assign_from_token_key() {
+        let test_cases = vec![
+            ("D", Chord::new_without_variant(Note::D)),
+            ("Dm", Chord::new_with_variant(Note::D, "m")),
+            ("B", Chord::new_without_variant(Note::B)),
+            ("Bb", Chord::new_without_variant(Note::Ais)),
+            ("H", Chord::new_without_variant(Note::B)),
+        ];
+
+        for case in test_cases {
+            let mut meta = MetaInformation::default();
+            meta.assign_from_token(&Meta::key(case.0));
+            assert_eq!(meta.key, Some(case.1));
+        }
+    }
+    #[test]
+    fn test_update_b_notation() {
+        let chord_w = Chord::new_with_variant;
+        let chord_wo = Chord::new_without_variant;
+
+        let test_cases = vec![
+            // Change to H
+            ("D", BNotation::H, chord_wo(Note::D)),
+            ("Dm", BNotation::H, chord_w(Note::D, "m")),
+            ("A♯", BNotation::H, chord_wo(Note::Ais)),
+            ("A#", BNotation::H, chord_wo(Note::Ais)),
+            ("B", BNotation::H, chord_wo(Note::Ais)),
+            ("B♭", BNotation::H, chord_wo(Note::Ais)),
+            ("Bb", BNotation::H, chord_wo(Note::Ais)),
+            ("H", BNotation::H, chord_wo(Note::B)),
+            // Change to B
+            ("D", BNotation::B, chord_wo(Note::D)),
+            ("Dm", BNotation::B, chord_w(Note::D, "m")),
+            ("A♯", BNotation::B, chord_wo(Note::Ais)),
+            ("A#", BNotation::B, chord_wo(Note::Ais)),
+            ("B", BNotation::B, chord_wo(Note::B)),
+            ("B♭", BNotation::B, chord_wo(Note::Ais)),
+            ("Bb", BNotation::B, chord_wo(Note::Ais)),
+            ("H", BNotation::B, chord_wo(Note::B)),
+        ];
+
+        for case in test_cases {
+            let mut meta = MetaInformation::default();
+            meta.assign_from_token(&Meta::key(case.0));
+            meta.reinterpret_keys_with_b_notation(case.1);
+            assert_eq!(meta.key, Some(case.2));
         }
     }
 }

@@ -1,5 +1,11 @@
-use super::b_notation::BNotation;
 use std::fmt::Debug;
+
+#[deprecated(note = "Please use meta::MetaTrait instead")]
+pub use MetaTrait as SongMetaTrait;
+
+use crate::models::chord::Chord;
+
+use super::b_notation::BNotation;
 
 pub trait MetaTrait: Debug {
     fn title(&self) -> Option<String>;
@@ -10,7 +16,8 @@ pub trait MetaTrait: Debug {
     fn copyright(&self) -> Option<String>;
     fn album(&self) -> Option<String>;
     fn year(&self) -> Option<String>;
-    fn key(&self) -> Option<String>;
+    fn key(&self) -> Option<Chord>;
+    fn original_key(&self) -> Option<Chord>;
     fn time(&self) -> Option<String>;
     fn tempo(&self) -> Option<String>;
     fn duration(&self) -> Option<String>;
@@ -20,6 +27,3 @@ pub trait MetaTrait: Debug {
     fn ccli_song_id(&self) -> Option<String>;
     fn b_notation(&self) -> BNotation;
 }
-
-#[deprecated(note = "Please use meta::MetaTrait instead")]
-pub use MetaTrait as SongMetaTrait;

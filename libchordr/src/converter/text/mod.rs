@@ -2,6 +2,7 @@ use std::ops::Add;
 
 use crate::error::Result;
 use crate::models::chord::fmt::Formatting;
+use crate::models::chord::NoteDisplay;
 use crate::models::meta::MetaTrait;
 use crate::parser::Node;
 use crate::tokenizer::Token;
@@ -11,13 +12,12 @@ use super::ConverterTrait;
 pub struct TextConverter {}
 
 impl ConverterTrait for TextConverter {
-    fn convert(
-        &self,
-        node: &Node,
-        meta: &dyn MetaTrait,
-        _formatting: Formatting,
-    ) -> Result<String> {
-        let output = format!("{}\n{}", self.build_meta(meta), self.build_node(node)?);
+    fn convert(&self, node: &Node, meta: &dyn MetaTrait, formatting: Formatting) -> Result<String> {
+        let output = format!(
+            "{}\n{}",
+            self.build_meta(meta, formatting),
+            self.build_node(node)?
+        );
 
         Ok(cleanup_output(&output))
     }
@@ -58,7 +58,7 @@ impl TextConverter {
         }
     }
 
-    fn build_meta(&self, meta: &dyn MetaTrait) -> String {
+    fn build_meta(&self, meta: &dyn MetaTrait, formatting: Formatting) -> String {
         let mut buffer: Vec<String> = vec![];
         if let Some(v) = meta.title() {
             buffer.push(v)
@@ -91,7 +91,7 @@ impl TextConverter {
             buffer.push(format!("Year: {}", v))
         }
         if let Some(v) = meta.key() {
-            buffer.push(format!("Key: {}", v))
+            buffer.push(format!("Key: {}", v.note_format(formatting)))
         }
         if let Some(v) = meta.time() {
             buffer.push(format!("Time: {}", v))

@@ -1,10 +1,12 @@
-mod tag_provider;
+use tag_provider::TagProvider;
 
 use crate::converter::ConverterTrait;
 use crate::models::chord::fmt::Formatting;
+use crate::models::chord::NoteDisplay;
 use crate::models::song_meta_trait::SongMetaTrait;
 use crate::prelude::*;
-use tag_provider::TagProvider;
+
+mod tag_provider;
 
 pub struct HtmlConverter {}
 
@@ -24,11 +26,11 @@ impl HtmlConverter {
 {}
 </div>"#,
             tag,
-            self.format_meta(meta)
+            self.format_meta(meta, formatting)
         ))
     }
 
-    fn format_meta(&self, meta: &dyn SongMetaTrait) -> String {
+    fn format_meta(&self, meta: &dyn SongMetaTrait, formatting: Formatting) -> String {
         let none_text = "None";
 
         format!(
@@ -46,6 +48,7 @@ Copyright:          {}
 Album:              {}
 Year:               {}
 Key:                {}
+Original Key:       {}
 Time:               {}
 Tempo:              {}
 Duration:           {}
@@ -64,7 +67,10 @@ CCLI Song #:        {}
             meta.copyright().unwrap_or_else(|| none_text.to_owned()),
             meta.album().unwrap_or_else(|| none_text.to_owned()),
             meta.year().unwrap_or_else(|| none_text.to_owned()),
-            meta.key().unwrap_or_else(|| none_text.to_owned()),
+            meta.key()
+                .map_or_else(|| none_text.to_owned(), |c| c.note_format(formatting)),
+            meta.original_key()
+                .map_or_else(|| none_text.to_owned(), |c| c.note_format(formatting)),
             meta.time().unwrap_or_else(|| none_text.to_owned()),
             meta.tempo().unwrap_or_else(|| none_text.to_owned()),
             meta.duration().unwrap_or_else(|| none_text.to_owned()),
@@ -89,8 +95,9 @@ impl ConverterTrait for HtmlConverter {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::test_helpers::get_test_tokens;
+
+    use super::*;
 
     #[test]
     fn test_convert() {

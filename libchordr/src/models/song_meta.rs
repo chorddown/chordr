@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 
+use crate::models::chord::Chord;
 use crate::models::list::ListEntryTrait;
 use crate::models::meta::*;
 use crate::models::song_id::SongIdTrait;
@@ -22,7 +23,8 @@ pub struct SongMeta {
     copyright: Option<String>,
     album: Option<String>,
     year: Option<String>,
-    key: Option<String>,
+    key: Option<Chord>,
+    original_key: Option<Chord>,
     time: Option<String>,
     tempo: Option<String>,
     duration: Option<String>,
@@ -47,6 +49,7 @@ impl SongMeta {
             album: None,
             year: None,
             key: None,
+            original_key: None,
             time: None,
             tempo: None,
             duration: None,
@@ -76,6 +79,7 @@ impl SongMeta {
             album: meta.album(),
             year: meta.year(),
             key: meta.key(),
+            original_key: meta.original_key(),
             time: meta.time(),
             tempo: meta.tempo(),
             duration: meta.duration(),
@@ -121,8 +125,11 @@ impl MetaTrait for SongMeta {
         self.year.as_ref().cloned()
     }
 
-    fn key(&self) -> Option<String> {
+    fn key(&self) -> Option<Chord> {
         self.key.as_ref().cloned()
+    }
+    fn original_key(&self) -> Option<Chord> {
+        self.original_key.as_ref().cloned()
     }
 
     fn time(&self) -> Option<String> {
