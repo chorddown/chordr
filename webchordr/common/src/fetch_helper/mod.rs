@@ -42,7 +42,7 @@ where
 ///
 /// # let uri = "some_uri";
 ///
-/// # fn cb(_:Result<TargetType, webchordr_common::fetch_helper::WebError>) {}
+/// # fn cb(_:Result<TargetType, webchordr_common::errors::WebError>) {}
 /// # let callback = Callback::from(cb);
 /// use wasm_bindgen_futures::spawn_local;
 /// spawn_local(async move {
