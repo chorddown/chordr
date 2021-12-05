@@ -4,6 +4,7 @@ use wasm_bindgen::__rt::core::marker::PhantomData;
 use libchordr::prelude::Catalog;
 
 use crate::backend::{BackendTrait, BrowserStorageBackend};
+use crate::browser_storage::BrowserStorage;
 use crate::constants::{STORAGE_KEY_CATALOG, STORAGE_NAMESPACE};
 use crate::errors::PersistenceError;
 use crate::fetch_helper::fetch;
@@ -11,7 +12,6 @@ use crate::persistence_manager::PersistenceManagerTrait;
 use crate::WebError;
 
 use super::WebRepositoryTrait;
-use crate::browser_storage::BrowserStorage;
 
 pub struct CatalogWebRepository<'a, P: PersistenceManagerTrait> {
     _phantom: ::std::marker::PhantomData<&'a P>,
@@ -73,7 +73,7 @@ where
                 return Ok(Some(c));
             }
             Ok(None) => {}
-            Err(_) => {}
+            Err(e) => log::error!("{}", e),
         }
 
         self.backend
