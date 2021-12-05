@@ -25,8 +25,8 @@
 
     #{$list} {
         width: 100%;
-        padding-left: $grid-gutter-width * .5;
-        padding-right: $grid-gutter-width * .5;
+        padding-left: ceil($grid-gutter-width * .5);
+        padding-right: floor($grid-gutter-width * .5);
     }
 }
 
@@ -51,7 +51,7 @@
         .col-#{$screen}#{$i} {
             //$width: 100%/$grid-columns * $i;
             //$width: math.div(100%, $grid-columns) * $i;
-            $width: 8.33333 * $i;
+            $width: (8.33333 * $i) * 1%;
             max-width: $width;
             flex: 0 0 $width;
         }
