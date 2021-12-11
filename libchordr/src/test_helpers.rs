@@ -1,6 +1,6 @@
-use crate::models::meta::BNotation;
+use crate::models::metadata::BNotation;
 use crate::models::user::{User, Username};
-use crate::parser::{MetaInformation, Node};
+use crate::parser::{Metadata, Node};
 use crate::prelude::Password;
 use crate::tokenizer::{Modifier, Token};
 
@@ -222,8 +222,8 @@ pub fn get_test_ast_w_inline_metadata() -> Node {
     ])
 }
 
-pub fn get_test_metadata() -> MetaInformation {
-    MetaInformation {
+pub fn get_test_metadata() -> Metadata {
+    Metadata {
         title: Some("Great new song".to_owned()),
         subtitle: Some("Originally known as 'Swing low sweet chariot'".to_owned()),
         artist: Some("Me".to_owned()),

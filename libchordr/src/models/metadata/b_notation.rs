@@ -44,7 +44,6 @@ impl Display for BNotation {
 impl TryFrom<char> for BNotation {
     type Error = NotationError;
 
-    //noinspection RsTypeCheck
     fn try_from(value: char) -> Result<Self, Self::Error> {
         match value {
             'B' | 'b' => Ok(Self::B),
@@ -57,7 +56,6 @@ impl TryFrom<char> for BNotation {
 impl TryFrom<&str> for BNotation {
     type Error = NotationError;
 
-    //noinspection RsTypeCheck
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         match value {
             "B" | "b" => Ok(Self::B),

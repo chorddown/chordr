@@ -1,16 +1,16 @@
 use crate::error::Error;
-use crate::models::meta::*;
-use crate::parser::meta_parser::MetaParser;
+use crate::models::metadata::*;
+use crate::parser::metadata_parser::MetadataParser;
 use crate::parser::node_parser::NodeParser;
 use crate::tokenizer::Token;
 
-pub use self::meta_information::MetaInformation;
+pub use self::metadata::Metadata;
 pub use self::node::Node;
 pub use self::parser_result::ParserResult;
 pub use self::section_type::SectionType;
 
-mod meta_information;
-mod meta_parser;
+mod metadata;
+mod metadata_parser;
 mod node;
 mod node_parser;
 mod parser_result;
@@ -41,7 +41,7 @@ impl ParserTrait for Parser {
     type OkType = ParserResult;
 
     fn parse(&mut self, tokens: Vec<Token>) -> Result<ParserResult, Error> {
-        let meta = MetaParser::new().parse_borrowed(&tokens)?;
+        let meta = MetadataParser::new().parse_borrowed(&tokens)?;
         let node = NodeParser::with_b_notation(meta.b_notation).parse(tokens)?;
 
         Ok(ParserResult::new(node, meta))
@@ -85,7 +85,7 @@ mod tests {
         let parser_result = result.unwrap();
         assert_eq!(
             Some("Swing Low Sweet Chariot".to_string()),
-            parser_result.meta().title
+            parser_result.metadata().title
         );
 
         let ast = parser_result.node();
@@ -129,7 +129,7 @@ mod tests {
             ),
         ]);
 
-        assert_eq!(ast, expected_ast);
+        assert_eq!(ast, &expected_ast);
     }
 
     #[test]
@@ -141,10 +141,10 @@ mod tests {
         let parser_result = result.unwrap();
         assert_eq!(
             Some("Swing Low Sweet Chariot".to_string()),
-            parser_result.meta().title
+            parser_result.metadata().title
         );
 
-        assert_eq!(parser_result.node(), get_test_ast());
+        assert_eq!(parser_result.node(), &get_test_ast());
     }
 
     #[test]
@@ -159,7 +159,7 @@ mod tests {
             ]);
 
             assert!(result.is_ok());
-            assert_eq!(result.unwrap().meta_as_ref().b_notation, BNotation::B);
+            assert_eq!(result.unwrap().metadata().b_notation, BNotation::B);
         }
         {
             let result = parser.parse(vec![
@@ -169,7 +169,7 @@ mod tests {
             ]);
 
             assert!(result.is_ok());
-            assert_eq!(result.unwrap().meta_as_ref().b_notation, BNotation::B);
+            assert_eq!(result.unwrap().metadata().b_notation, BNotation::B);
         }
         {
             let result = parser.parse(vec![
@@ -180,7 +180,7 @@ mod tests {
             ]);
 
             assert!(result.is_ok());
-            assert_eq!(result.unwrap().meta_as_ref().b_notation, BNotation::H);
+            assert_eq!(result.unwrap().metadata().b_notation, BNotation::H);
         }
         {
             let result = parser.parse(vec![
@@ -190,7 +190,7 @@ mod tests {
             ]);
 
             assert!(result.is_ok());
-            assert_eq!(result.unwrap().meta_as_ref().b_notation, BNotation::H);
+            assert_eq!(result.unwrap().metadata().b_notation, BNotation::H);
         }
     }
 

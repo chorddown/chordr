@@ -7,7 +7,7 @@ use crate::helper::parse_content;
 use crate::models::file_type::FileType;
 use crate::models::song::Song;
 use crate::models::song_id::SongId;
-use crate::models::song_meta::SongMeta;
+use crate::models::song_metadata::SongMetadata;
 
 use super::CatalogBuildError;
 
@@ -34,21 +34,21 @@ impl TryFrom<&Path> for Song {
             Err(e) => return Err(CatalogBuildError::from_error(e, path_buf)),
         };
         let title = parser_result
-            .meta()
+            .metadata()
+            .clone()
             .title
             .unwrap_or_else(|| song_id.to_string());
         let file_type = match FileType::try_from(path) {
             Ok(f) => f,
             Err(e) => return Err(CatalogBuildError::from_error(e, path_buf)),
         };
-        //        let meta = SongMeta::new(song_id, title, file_type);
-        let meta = SongMeta::new_with_meta_information(
+        let metadata = SongMetadata::new_with_meta_information(
             song_id,
             title,
             file_type,
-            parser_result.meta_as_ref(),
+            parser_result.metadata(),
         );
-        Ok(Song::new(meta, src))
+        Ok(Song::new(metadata, src))
     }
 }
 

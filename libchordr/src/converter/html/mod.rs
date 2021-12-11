@@ -3,7 +3,6 @@ use tag_provider::TagProvider;
 use crate::converter::ConverterTrait;
 use crate::models::chord::fmt::Formatting;
 use crate::models::chord::NoteDisplay;
-use crate::models::song_meta_trait::SongMetaTrait;
 use crate::prelude::*;
 
 mod tag_provider;
@@ -14,11 +13,11 @@ impl HtmlConverter {
     fn html_for_node(
         &self,
         node: &Node,
-        meta: &dyn SongMetaTrait,
+        metadata: &dyn MetadataTrait,
         tag_builder: &TagProvider,
         formatting: Formatting,
     ) -> Result<String> {
-        let tag = tag_builder.build_tag_for_node(node, meta, formatting);
+        let tag = tag_builder.build_tag_for_node(node, metadata, formatting);
 
         Ok(format!(
             r#"<div id="chordr">
@@ -26,11 +25,11 @@ impl HtmlConverter {
 {}
 </div>"#,
             tag,
-            self.format_meta(meta, formatting)
+            self.format_meta(metadata, formatting)
         ))
     }
 
-    fn format_meta(&self, meta: &dyn SongMetaTrait, formatting: Formatting) -> String {
+    fn format_meta(&self, metadata: &dyn MetadataTrait, formatting: Formatting) -> String {
         let none_text = "None";
 
         format!(
@@ -55,27 +54,27 @@ Duration:           {}
 Capo:               {}
 CCLI Song #:        {}
 -->",
-            meta.title().unwrap_or_else(|| none_text.to_owned()),
-            meta.original_title()
-                .unwrap_or_else(|| none_text.to_owned()),
-            meta.alternative_title()
-                .unwrap_or_else(|| none_text.to_owned()),
-            meta.subtitle().unwrap_or_else(|| none_text.to_owned()),
-            meta.artist().unwrap_or_else(|| none_text.to_owned()),
-            meta.composer().unwrap_or_else(|| none_text.to_owned()),
-            meta.lyricist().unwrap_or_else(|| none_text.to_owned()),
-            meta.copyright().unwrap_or_else(|| none_text.to_owned()),
-            meta.album().unwrap_or_else(|| none_text.to_owned()),
-            meta.year().unwrap_or_else(|| none_text.to_owned()),
-            meta.key()
+            metadata.title().unwrap_or_else(|| none_text),
+            metadata.original_title().unwrap_or_else(|| none_text),
+            metadata.alternative_title().unwrap_or_else(|| none_text),
+            metadata.subtitle().unwrap_or_else(|| none_text),
+            metadata.artist().unwrap_or_else(|| none_text),
+            metadata.composer().unwrap_or_else(|| none_text),
+            metadata.lyricist().unwrap_or_else(|| none_text),
+            metadata.copyright().unwrap_or_else(|| none_text),
+            metadata.album().unwrap_or_else(|| none_text),
+            metadata.year().unwrap_or_else(|| none_text),
+            metadata
+                .key()
                 .map_or_else(|| none_text.to_owned(), |c| c.note_format(formatting)),
-            meta.original_key()
+            metadata
+                .original_key()
                 .map_or_else(|| none_text.to_owned(), |c| c.note_format(formatting)),
-            meta.time().unwrap_or_else(|| none_text.to_owned()),
-            meta.tempo().unwrap_or_else(|| none_text.to_owned()),
-            meta.duration().unwrap_or_else(|| none_text.to_owned()),
-            meta.capo().unwrap_or_else(|| none_text.to_owned()),
-            meta.ccli_song_id().unwrap_or_else(|| none_text.to_owned()),
+            metadata.time().unwrap_or_else(|| none_text),
+            metadata.tempo().unwrap_or_else(|| none_text),
+            metadata.duration().unwrap_or_else(|| none_text),
+            metadata.capo().unwrap_or_else(|| none_text),
+            metadata.ccli_song_id().unwrap_or_else(|| none_text),
         )
     }
 }
@@ -84,12 +83,12 @@ impl ConverterTrait for HtmlConverter {
     fn convert(
         &self,
         node: &Node,
-        meta: &dyn SongMetaTrait,
+        metadata: &dyn MetadataTrait,
         formatting: Formatting,
     ) -> Result<String> {
         let tag_builder = TagProvider::new();
 
-        self.html_for_node(node, meta, &tag_builder, formatting)
+        self.html_for_node(node, metadata, &tag_builder, formatting)
     }
 }
 
@@ -108,8 +107,8 @@ mod tests {
 
         let converter = HtmlConverter {};
         let result = converter.convert(
-            parser_result.node_as_ref(),
-            parser_result.meta_as_ref(),
+            parser_result.node(),
+            parser_result.metadata(),
             Formatting::with_format(Format::HTML),
         );
 

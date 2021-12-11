@@ -3,7 +3,7 @@ use std::ops::Add;
 use crate::error::Result;
 use crate::models::chord::fmt::Formatting;
 use crate::models::chord::NoteDisplay;
-use crate::models::meta::MetaTrait;
+use crate::models::metadata::MetadataTrait;
 use crate::parser::Node;
 use crate::tokenizer::Token;
 
@@ -12,7 +12,12 @@ use super::ConverterTrait;
 pub struct TextConverter {}
 
 impl ConverterTrait for TextConverter {
-    fn convert(&self, node: &Node, meta: &dyn MetaTrait, formatting: Formatting) -> Result<String> {
+    fn convert(
+        &self,
+        node: &Node,
+        meta: &dyn MetadataTrait,
+        formatting: Formatting,
+    ) -> Result<String> {
         let output = format!(
             "{}\n{}",
             self.build_meta(meta, formatting),
@@ -58,57 +63,57 @@ impl TextConverter {
         }
     }
 
-    fn build_meta(&self, meta: &dyn MetaTrait, formatting: Formatting) -> String {
+    fn build_meta(&self, metadata: &dyn MetadataTrait, formatting: Formatting) -> String {
         let mut buffer: Vec<String> = vec![];
-        if let Some(v) = meta.title() {
-            buffer.push(v)
+        if let Some(v) = metadata.title() {
+            buffer.push(v.to_owned())
         }
-        if let Some(v) = meta.subtitle() {
+        if let Some(v) = metadata.subtitle() {
             buffer.push(format!("Subtitle: {}", v))
         }
-        if let Some(v) = meta.original_title() {
+        if let Some(v) = metadata.original_title() {
             buffer.push(format!("Original Title: {}", v))
         }
-        if let Some(v) = meta.alternative_title() {
+        if let Some(v) = metadata.alternative_title() {
             buffer.push(format!("Alternative Title: {}", v))
         }
-        if let Some(v) = meta.artist() {
+        if let Some(v) = metadata.artist() {
             buffer.push(format!("Artist: {}", v))
         }
-        if let Some(v) = meta.composer() {
+        if let Some(v) = metadata.composer() {
             buffer.push(format!("Composer: {}", v))
         }
-        if let Some(v) = meta.lyricist() {
+        if let Some(v) = metadata.lyricist() {
             buffer.push(format!("Lyricist: {}", v))
         }
-        if let Some(v) = meta.copyright() {
+        if let Some(v) = metadata.copyright() {
             buffer.push(format!("Copyright: {}", v))
         }
-        if let Some(v) = meta.album() {
+        if let Some(v) = metadata.album() {
             buffer.push(format!("Album: {}", v))
         }
-        if let Some(v) = meta.year() {
+        if let Some(v) = metadata.year() {
             buffer.push(format!("Year: {}", v))
         }
-        if let Some(v) = meta.key() {
+        if let Some(v) = metadata.key() {
             buffer.push(format!("Key: {}", v.note_format(formatting)))
         }
-        if let Some(v) = meta.time() {
+        if let Some(v) = metadata.time() {
             buffer.push(format!("Time: {}", v))
         }
-        if let Some(v) = meta.tempo() {
+        if let Some(v) = metadata.tempo() {
             buffer.push(format!("Tempo: {}", v))
         }
-        if let Some(v) = meta.duration() {
+        if let Some(v) = metadata.duration() {
             buffer.push(format!("Duration: {}", v))
         }
-        if let Some(v) = meta.capo() {
+        if let Some(v) = metadata.capo() {
             buffer.push(format!("Capo: {}", v))
         }
-        if let Some(v) = meta.ccli_song_id() {
+        if let Some(v) = metadata.ccli_song_id() {
             buffer.push(format!("CCLI Song ID: {}", v))
         }
-        //        meta.b_notation()  // -> BNotation;
+        //        metadata.b_notation()  // -> BNotation;
         buffer.join("\n")
     }
 
@@ -138,7 +143,7 @@ fn remove_blank_lines(input: &str) -> String {
 #[cfg(test)]
 mod tests {
     use crate::format::Format;
-    use crate::parser::MetaInformation;
+    use crate::parser::Metadata;
     use crate::test_helpers::get_test_metadata;
     use crate::test_helpers::{
         get_test_ast, get_test_ast_w_inline_metadata, get_test_ast_with_quote,
@@ -151,7 +156,7 @@ mod tests {
         let converter = TextConverter {};
         let result = converter.convert(
             &get_test_ast(),
-            &MetaInformation::default(),
+            &Metadata::default(),
             Formatting::with_format(Format::SongBeamer),
         );
 
@@ -242,7 +247,7 @@ Swing low, sweet chariot.
         let ast = get_test_ast_with_quote();
         let result = converter.convert(
             &ast,
-            &MetaInformation::default(),
+            &Metadata::default(),
             Formatting::with_format(Format::SongBeamer),
         );
 

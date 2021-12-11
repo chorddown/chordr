@@ -6,7 +6,7 @@ use crate::error::Error;
 use crate::models::chord::fmt::Formatting;
 use crate::models::chord::transposition::TransposableTrait;
 use crate::models::chord::NoteDisplay;
-use crate::models::meta::{BNotation, SemitoneNotation};
+use crate::models::metadata::{BNotation, SemitoneNotation};
 
 #[derive(Deserialize, Serialize, Clone, Copy, PartialEq, PartialOrd)]
 pub enum Note {

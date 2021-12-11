@@ -1,4 +1,4 @@
-use super::meta::Meta;
+use super::metadata::RawMetadata;
 use crate::tokenizer::modifier::Modifier;
 
 #[derive(Debug, PartialOrd, PartialEq, Clone)]
@@ -9,7 +9,7 @@ pub enum Token {
         modifier: Modifier,
     },
     Literal(String),
-    Meta(Meta),
+    Metadata(RawMetadata),
     Chord(String),
     Quote(String),
     Newline,

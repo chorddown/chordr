@@ -1,7 +1,7 @@
 use crate::error::Result;
 use crate::models::chord::fmt::*;
 use crate::models::chord::Chords;
-use crate::models::meta::MetaTrait;
+use crate::models::metadata::MetadataTrait;
 use crate::parser::Node;
 use crate::tokenizer::Token;
 
@@ -10,7 +10,12 @@ use super::ConverterTrait;
 pub struct ChorddownConverter {}
 
 impl ConverterTrait for ChorddownConverter {
-    fn convert(&self, node: &Node, meta: &dyn MetaTrait, formatting: Formatting) -> Result<String> {
+    fn convert(
+        &self,
+        node: &Node,
+        meta: &dyn MetadataTrait,
+        formatting: Formatting,
+    ) -> Result<String> {
         let output = format!(
             "{}{}{}",
             self.build_title(meta),
@@ -81,18 +86,18 @@ impl ChorddownConverter {
             }
             Token::Chord(_) => unreachable!(),
             Token::Newline => unreachable!(),
-            Token::Meta(_) => unreachable!(),
+            Token::Metadata(_) => unreachable!(),
         }
     }
 
-    fn build_title(&self, meta: &dyn MetaTrait) -> String {
+    fn build_title(&self, meta: &dyn MetadataTrait) -> String {
         match meta.title() {
             Some(t) => format!("# {}\n", t),
             None => String::new(),
         }
     }
 
-    fn build_meta(&self, meta: &dyn MetaTrait, formatting: Formatting) -> String {
+    fn build_meta(&self, meta: &dyn MetadataTrait, formatting: Formatting) -> String {
         let mut buffer = String::new();
         if let Some(v) = meta.subtitle() {
             buffer.push_str("Subtitle: ");
@@ -169,7 +174,7 @@ impl ChorddownConverter {
             buffer.push_str(&v);
             buffer.push_str("\n")
         }
-        //        meta.b_notation()  // -> BNotation;
+        //        metadata.b_notation()  // -> BNotation;
         buffer.trim_end().to_string()
     }
 
@@ -212,7 +217,7 @@ fn remove_double_blank_lines(input: &str) -> String {
 #[cfg(test)]
 mod tests {
     use crate::format::Format;
-    use crate::parser::MetaInformation;
+    use crate::parser::Metadata;
     use crate::test_helpers::get_test_metadata;
     use crate::test_helpers::{
         get_test_ast, get_test_ast_w_inline_metadata, get_test_ast_with_quote,
@@ -225,7 +230,7 @@ mod tests {
         let converter = ChorddownConverter {};
         let result = converter.convert(
             &get_test_ast(),
-            &MetaInformation::default(),
+            &Metadata::default(),
             Formatting::with_format(Format::Chorddown),
         );
 
@@ -328,7 +333,7 @@ Swing [D]low, sweet [G]chari[D]ot.
         let ast = get_test_ast_with_quote();
         let result = converter.convert(
             &ast,
-            &MetaInformation::default(),
+            &Metadata::default(),
             Formatting::with_format(Format::Chorddown),
         );
 

@@ -45,9 +45,9 @@ impl Tokenizer for ChorddownTokenizer {
 
 #[cfg(test)]
 mod tests {
-    use crate::models::meta::BNotation;
+    use crate::models::metadata::BNotation;
     use crate::test_helpers::get_test_tokens;
-    use crate::tokenizer::{Meta, Modifier};
+    use crate::tokenizer::{Modifier, RawMetadata};
 
     use super::*;
 
@@ -109,15 +109,18 @@ Key: Cm
             .unwrap();
         assert_eq!(
             tokens.get(0),
-            Some(&Token::Meta(Meta::composer("Daniel Corn")))
+            Some(&Token::Metadata(RawMetadata::composer("Daniel Corn")))
         );
         assert_eq!(tokens.get(1), Some(&Token::Newline));
         assert_eq!(
             tokens.get(2),
-            Some(&Token::Meta(Meta::artist("The Fantastic Corns")))
+            Some(&Token::Metadata(RawMetadata::artist("The Fantastic Corns")))
         );
         assert_eq!(tokens.get(3), Some(&Token::Newline));
-        assert_eq!(tokens.get(4), Some(&Token::Meta(Meta::key("Cm"))));
+        assert_eq!(
+            tokens.get(4),
+            Some(&Token::Metadata(RawMetadata::key("Cm")))
+        );
         assert_eq!(tokens.get(5), Some(&Token::Newline));
     }
 
@@ -144,7 +147,7 @@ Key: C#m
             tokens,
             vec![
                 Token::Newline,
-                Token::Meta(Meta::key("C#m")),
+                Token::Metadata(RawMetadata::key("C#m")),
                 Token::Newline
             ]
         );
@@ -155,7 +158,10 @@ Key: C#m
         let tokens = ChorddownTokenizer::new()
             .tokenize("Album: Song in C#m".as_bytes())
             .unwrap();
-        assert_eq!(tokens, vec![Token::Meta(Meta::album("Song in C#m"))]);
+        assert_eq!(
+            tokens,
+            vec![Token::Metadata(RawMetadata::album("Song in C#m"))]
+        );
     }
 
     #[test]
@@ -167,7 +173,7 @@ Key: C#m
 
             assert_eq!(
                 tokens.get(0),
-                Some(&Token::Meta(Meta::BNotation(BNotation::H)))
+                Some(&Token::Metadata(RawMetadata::BNotation(BNotation::H)))
             );
         }
         {
@@ -175,7 +181,7 @@ Key: C#m
 
             assert_eq!(
                 tokens.get(0),
-                Some(&Token::Meta(Meta::BNotation(BNotation::H)))
+                Some(&Token::Metadata(RawMetadata::BNotation(BNotation::H)))
             );
         }
         {
@@ -183,7 +189,7 @@ Key: C#m
 
             assert_eq!(
                 tokens.get(0),
-                Some(&Token::Meta(Meta::BNotation(BNotation::H)))
+                Some(&Token::Metadata(RawMetadata::BNotation(BNotation::H)))
             );
         }
         {
@@ -191,7 +197,7 @@ Key: C#m
 
             assert_eq!(
                 tokens.get(0),
-                Some(&Token::Meta(Meta::BNotation(BNotation::H)))
+                Some(&Token::Metadata(RawMetadata::BNotation(BNotation::H)))
             );
         }
         // B
@@ -200,7 +206,7 @@ Key: C#m
 
             assert_eq!(
                 tokens.get(0),
-                Some(&Token::Meta(Meta::BNotation(BNotation::B)))
+                Some(&Token::Metadata(RawMetadata::BNotation(BNotation::B)))
             );
         }
         {
@@ -208,7 +214,7 @@ Key: C#m
 
             assert_eq!(
                 tokens.get(0),
-                Some(&Token::Meta(Meta::BNotation(BNotation::B)))
+                Some(&Token::Metadata(RawMetadata::BNotation(BNotation::B)))
             );
         }
         {
@@ -216,7 +222,7 @@ Key: C#m
 
             assert_eq!(
                 tokens.get(0),
-                Some(&Token::Meta(Meta::BNotation(BNotation::B)))
+                Some(&Token::Metadata(RawMetadata::BNotation(BNotation::B)))
             );
         }
         {
@@ -224,7 +230,7 @@ Key: C#m
 
             assert_eq!(
                 tokens.get(0),
-                Some(&Token::Meta(Meta::BNotation(BNotation::B)))
+                Some(&Token::Metadata(RawMetadata::BNotation(BNotation::B)))
             );
         }
     }

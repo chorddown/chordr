@@ -1,9 +1,10 @@
+use std::convert::TryFrom;
+
 use crate::error::Error;
 use crate::models::chord::{Chords, TransposableTrait};
-use crate::models::meta::BNotation;
+use crate::models::metadata::BNotation;
 use crate::parser::section_type::SectionType;
-use crate::tokenizer::{Meta, Modifier, Token};
-use std::convert::TryFrom;
+use crate::tokenizer::{Modifier, RawMetadata, Token};
 
 #[derive(PartialOrd, PartialEq, Debug, Clone)]
 pub enum Node {
@@ -14,7 +15,7 @@ pub enum Node {
     },
     ChordStandalone(Chords),
     Text(Token),
-    Meta(Meta),
+    Meta(RawMetadata),
 
     Document(Vec<Node>),
     Headline(Token),
@@ -84,10 +85,10 @@ impl Node {
     }
 
     pub(crate) fn meta<S: AsRef<str>>(meta: S) -> Result<Self, Error> {
-        match Meta::try_from(meta.as_ref()) {
+        match RawMetadata::try_from(meta.as_ref()) {
             Ok(m) => Ok(Node::Meta(m)),
             Err(_) => Err(Error::parser_error(format!(
-                "Invalid meta data given: '{}'",
+                "Invalid metadata data given: '{}'",
                 meta.as_ref()
             ))),
         }

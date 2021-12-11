@@ -4,7 +4,7 @@ pub use song_settings_map::SongSettingsMap;
 
 use crate::format::Format;
 use crate::models::chord::fmt::Formatting;
-use crate::models::meta::{BNotation, SemitoneNotation};
+use crate::models::metadata::{BNotation, SemitoneNotation};
 
 mod song_settings_map;
 

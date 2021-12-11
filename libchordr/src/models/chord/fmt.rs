@@ -1,5 +1,5 @@
 use crate::format::Format;
-use crate::models::meta::{BNotation, SemitoneNotation};
+use crate::models::metadata::{BNotation, SemitoneNotation};
 use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, PartialEq, Debug, Deserialize, Serialize)]

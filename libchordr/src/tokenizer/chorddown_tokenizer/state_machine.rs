@@ -2,7 +2,7 @@ use std::convert::TryFrom;
 use std::error::Error;
 use std::fmt::{Display, Formatter, Result};
 
-use crate::tokenizer::{Meta, Modifier, Token};
+use crate::tokenizer::{Modifier, RawMetadata, Token};
 
 use super::lexeme::Lexeme;
 use super::mode::Mode;
@@ -230,8 +230,8 @@ impl Fsm {
         if literal.is_empty() {
             return None;
         }
-        match Meta::try_from(&literal) {
-            Ok(meta) => Some(Token::Meta(meta)),
+        match RawMetadata::try_from(&literal) {
+            Ok(meta) => Some(Token::Metadata(meta)),
             Err(_) => Some(Token::Literal(literal)),
         }
     }

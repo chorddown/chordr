@@ -1,7 +1,7 @@
 use super::ConverterTrait;
 use crate::error::Result;
 use crate::models::chord::fmt::Formatting;
-use crate::models::meta::MetaTrait;
+use crate::models::metadata::MetadataTrait;
 use crate::parser::Node;
 use crate::tokenizer::Token;
 
@@ -11,7 +11,7 @@ impl ConverterTrait for SongBeamerConverter {
     fn convert(
         &self,
         node: &Node,
-        meta: &dyn MetaTrait,
+        meta: &dyn MetadataTrait,
         _formatting: Formatting,
     ) -> Result<String> {
         let output = format!(
@@ -65,23 +65,23 @@ impl SongBeamerConverter {
         }
     }
 
-    fn build_std_meta(&self, _meta: &dyn MetaTrait) -> String {
+    fn build_std_meta(&self, _meta: &dyn MetadataTrait) -> String {
         r"#LangCount=1
 #Editor=Chordr
 #Version=3"
             .to_owned()
     }
 
-    fn build_meta(&self, meta: &dyn MetaTrait) -> String {
+    fn build_meta(&self, meta: &dyn MetadataTrait) -> String {
         let mut buffer: Vec<String> = vec![];
 
         if let Some(v) = meta.title() {
             buffer.push(format!("#OTitle={}", v))
         }
-        // if let Some(v) = meta.subtitle() {
+        // if let Some(v) = metadata.subtitle() {
         //     buffer.push(format!("#Subtitle={}", v))
         // }
-        // if let Some(v) = meta.artist() {
+        // if let Some(v) = metadata.artist() {
         //     buffer.push(format!("#Artist={}", v))
         // }
         if let Some(v) = meta.composer() {
@@ -93,28 +93,28 @@ impl SongBeamerConverter {
         if let Some(v) = meta.copyright() {
             buffer.push(format!("#(c)={}", v))
         }
-        // if let Some(v) = meta.album() {
+        // if let Some(v) = metadata.album() {
         //     buffer.push(format!("#Album={}", v))
         // }
-        // if let Some(v) = meta.year() {
+        // if let Some(v) = metadata.year() {
         //     buffer.push(format!("#Year={}", v))
         // }
-        // if let Some(v) = meta.key() {
+        // if let Some(v) = metadata.key() {
         //     buffer.push(format!("#Key={}", v))
         // }
-        // if let Some(v) = meta.time() {
+        // if let Some(v) = metadata.time() {
         //     buffer.push(format!("#Time={}", v))
         // }
-        // if let Some(v) = meta.tempo() {
+        // if let Some(v) = metadata.tempo() {
         //     buffer.push(format!("#Tempo={}", v))
         // }
-        // if let Some(v) = meta.duration() {
+        // if let Some(v) = metadata.duration() {
         //     buffer.push(format!("#Duration={}", v))
         // }
-        // if let Some(v) = meta.capo() {
+        // if let Some(v) = metadata.capo() {
         //     buffer.push(format!("#Capo={}", v))
         // }
-        //        meta.b_notation()  // -> BNotation;
+        //        metadata.b_notation()  // -> BNotation;
         buffer.join("\n")
     }
 
@@ -154,7 +154,7 @@ fn remove_blank_slides(input: &str) -> String {
 mod tests {
     use super::*;
     use crate::format::Format;
-    use crate::parser::MetaInformation;
+    use crate::parser::Metadata;
     use crate::test_helpers::get_test_metadata;
     use crate::test_helpers::{
         get_test_ast, get_test_ast_w_inline_metadata, get_test_ast_with_quote,
@@ -165,7 +165,7 @@ mod tests {
         let converter = SongBeamerConverter {};
         let result = converter.convert(
             &get_test_ast(),
-            &MetaInformation::default(),
+            &Metadata::default(),
             Formatting::with_format(Format::SongBeamer),
         );
 
@@ -258,7 +258,7 @@ Swing low, sweet chariot.
         let ast = get_test_ast_with_quote();
         let result = converter.convert(
             &ast,
-            &MetaInformation::default(),
+            &Metadata::default(),
             Formatting::with_format(Format::SongBeamer),
         );
 

@@ -2,9 +2,9 @@ use std::io::BufRead;
 
 use crate::converter::{Converter, ConverterTrait};
 use crate::error::Result;
+use crate::metadata::metadata_trait::MetadataTrait;
 use crate::models::chord::fmt::Formatting;
 use crate::models::chord::TransposableTrait;
-use crate::models::song_meta_trait::SongMetaTrait;
 use crate::parser::{Parser, ParserResult, ParserTrait};
 use crate::tokenizer::{build_tokenizer, Token, Tokenizer};
 
@@ -26,30 +26,31 @@ pub fn parse_content<R: BufRead>(contents: R) -> Result<ParserResult> {
 }
 
 pub fn transpose_content<R: BufRead>(contents: R, semitones: isize) -> Result<ParserResult> {
-    let ParserResult { node, meta } = parse_content(contents)?;
+    let ParserResult { node, metadata } = parse_content(contents)?;
 
     let transposed_node = node.transpose(semitones);
-    let transposed_meta = meta.transpose(semitones);
+    let transposed_meta = metadata.transpose(semitones);
 
     Ok(ParserResult::new(transposed_node, transposed_meta))
 }
 
 pub fn convert_to_format<R: BufRead>(
     contents: R,
-    meta: &dyn SongMetaTrait,
+    metadata: &dyn MetadataTrait,
     formatting: Formatting,
 ) -> Result<String> {
-    Converter::new().convert(parse_content(contents)?.node_as_ref(), meta, formatting)
+    Converter::new().convert(parse_content(contents)?.node(), metadata, formatting)
 }
 
 pub fn transpose_and_convert_to_format<R: BufRead>(
     contents: R,
     semitones: isize,
-    _meta: &dyn SongMetaTrait,
+    _metadata: &dyn MetadataTrait,
     formatting: Formatting,
 ) -> Result<String> {
-    let result = transpose_content(contents, semitones)?;
-    Converter::new().convert(result.node_as_ref(), result.meta_as_ref(), formatting)
+    let ParserResult { metadata, node } = transpose_content(contents, semitones)?;
+
+    Converter::new().convert(&node, &metadata, formatting)
 }
 
 #[allow(unused)]

@@ -139,7 +139,7 @@ fn convert(args: &ArgMatches) -> Result<()> {
 
     let parser_result = Parser::new().parse(tokens)?;
     log::debug!("Did parse content");
-    let ParserResult { meta, node } = parser_result;
+    let ParserResult { metadata, node } = parser_result;
     let parser_result_node = match transpose {
         None => node,
         Some(t) => {
@@ -149,7 +149,7 @@ fn convert(args: &ArgMatches) -> Result<()> {
         }
     };
 
-    let converted = Converter::new().convert(&parser_result_node, &meta, formatting)?;
+    let converted = Converter::new().convert(&parser_result_node, &metadata, formatting)?;
     log::debug!("Did convert content");
 
     let output = if format == Format::HTML {
@@ -158,7 +158,7 @@ fn convert(args: &ArgMatches) -> Result<()> {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <metadata charset="UTF-8">
     <title>{title}</title>
     <style>{styles}</style>
 </head>
@@ -169,7 +169,7 @@ fn convert(args: &ArgMatches) -> Result<()> {
 </body>
 </html>
     "#,
-            title = meta.title().unwrap_or_default(),
+            title = metadata.title().unwrap_or_default(),
             styles =
                 include_str!("../../webchordr/app/static/stylesheets/chordr-default-styles.css"),
             content = converted

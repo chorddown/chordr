@@ -1,28 +1,20 @@
-use super::{MetaInformation, Node};
+use super::{Metadata, Node};
 
 pub struct ParserResult {
-    pub meta: MetaInformation,
+    pub metadata: Metadata,
     pub node: Node,
 }
 
 impl ParserResult {
-    pub fn new(node: Node, meta: MetaInformation) -> Self {
-        Self { meta, node }
+    pub fn new(node: Node, metadata: Metadata) -> Self {
+        Self { metadata, node }
     }
 
-    pub fn node(self) -> Node {
-        self.node
-    }
-
-    pub fn node_as_ref(&self) -> &Node {
+    pub fn node(&self) -> &Node {
         &self.node
     }
 
-    pub fn meta(&self) -> MetaInformation {
-        self.meta.clone()
-    }
-
-    pub fn meta_as_ref(&self) -> &MetaInformation {
-        &self.meta
+    pub fn metadata(&self) -> &Metadata {
+        &self.metadata
     }
 }

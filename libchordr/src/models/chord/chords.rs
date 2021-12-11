@@ -1,7 +1,7 @@
 use crate::error::Error;
 use crate::models::chord::fmt::Formatting;
 use crate::models::chord::{Chord, NoteDisplay, TransposableTrait};
-use crate::models::meta::BNotation;
+use crate::models::metadata::BNotation;
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 pub struct Chords(Chord, Option<Chord>);

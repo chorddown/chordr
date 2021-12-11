@@ -1,28 +1,28 @@
-use crate::tokenizer::{Meta, Token};
+use crate::tokenizer::{RawMetadata, Token};
 
-pub use super::meta_information::MetaInformation;
+pub use super::metadata::Metadata;
 pub use super::node::Node;
 pub use super::parser_result::ParserResult;
 pub use super::section_type::SectionType;
 pub use super::*;
 
-pub struct MetaParser {}
+pub struct MetadataParser {}
 
-impl ParserTrait for MetaParser {
-    type OkType = MetaInformation;
+impl ParserTrait for MetadataParser {
+    type OkType = Metadata;
 
     fn parse(&mut self, tokens: Vec<Token>) -> Result<Self::OkType, Error> {
         self.parse_borrowed(&tokens)
     }
 }
 
-impl MetaParser {
+impl MetadataParser {
     pub fn new() -> Self {
         Self {}
     }
 
-    pub fn parse_borrowed(&mut self, tokens: &[Token]) -> Result<MetaInformation, Error> {
-        let mut meta = MetaInformation::default();
+    pub fn parse_borrowed(&mut self, tokens: &[Token]) -> Result<Metadata, Error> {
+        let mut meta = Metadata::default();
         for token in tokens {
             meta = self.visit(token, meta);
         }
@@ -30,7 +30,7 @@ impl MetaParser {
         Ok(meta)
     }
 
-    fn visit(&self, token: &Token, meta: MetaInformation) -> MetaInformation {
+    fn visit(&self, token: &Token, meta: Metadata) -> Metadata {
         log::trace!("Visit token: {:?}", token);
         match token {
             Token::Chord(_) => self.visit_chord(token, meta),
@@ -40,7 +40,7 @@ impl MetaParser {
                 modifier: _,
             } => {
                 if *level == 1 {
-                    MetaInformation {
+                    Metadata {
                         title: Some(text.clone()),
                         ..meta
                     }
@@ -49,15 +49,15 @@ impl MetaParser {
                 }
             }
             // Token::Meta(Meta::BNotation(notation)) => {
-            //     let mut new_meta = meta;
+            //     let mut new_meta = metadata;
             //     new_meta.reinterpret_keys_with_b_notation(*notation);
             //     // new_meta.assign_from_token(token_meta);
             //     new_meta
             // }
-            Token::Meta(token_meta) => {
+            Token::Metadata(token_meta) => {
                 let mut new_meta = meta;
                 new_meta.assign_from_token(token_meta);
-                if let Meta::BNotation(b_notation) = token_meta {
+                if let RawMetadata::BNotation(b_notation) = token_meta {
                     new_meta.reinterpret_keys_with_b_notation(*b_notation);
                 }
                 new_meta
@@ -66,14 +66,14 @@ impl MetaParser {
         }
     }
 
-    fn visit_chord(&self, token: &Token, meta: MetaInformation) -> MetaInformation {
+    fn visit_chord(&self, token: &Token, meta: Metadata) -> Metadata {
         let chords = if let Token::Chord(c) = token {
             c
         } else {
             unreachable!("Invalid Token given")
         };
         if BNotation::contains_european_chord(chords) {
-            MetaInformation {
+            Metadata {
                 b_notation: BNotation::H,
                 ..meta
             }
@@ -92,7 +92,7 @@ mod tests {
 
     #[test]
     fn test_parse() {
-        let mut parser = MetaParser::new();
+        let mut parser = MetadataParser::new();
         let result = parser.parse(get_test_parser_input());
 
         assert!(result.is_ok());
@@ -104,7 +104,7 @@ mod tests {
 
     #[test]
     fn test_detect_b_notation() {
-        let mut parser = MetaParser::new();
+        let mut parser = MetadataParser::new();
         {
             let result = parser.parse(vec![
                 Token::headline(1, "Test with standard B notation w/ text", Modifier::None),

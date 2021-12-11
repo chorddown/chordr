@@ -3,9 +3,9 @@ use crate::html::tag::Tag;
 use crate::html::tag_builder::TagBuilder;
 use crate::models::chord::fmt::Formatting;
 use crate::models::chord::{Chords, NoteDisplay};
-use crate::models::meta::MetaTrait;
+use crate::models::metadata::MetadataTrait;
 use crate::parser::{Node, SectionType};
-use crate::tokenizer::{Meta, Token};
+use crate::tokenizer::{RawMetadata, Token};
 
 pub struct TagProvider {}
 
@@ -17,7 +17,7 @@ impl TagProvider {
     pub fn build_tag_for_node<'a>(
         &'a self,
         node: &'a Node,
-        meta: &dyn MetaTrait,
+        meta: &dyn MetadataTrait,
         formatting: Formatting,
     ) -> Tag {
         match node {
@@ -54,8 +54,8 @@ impl TagProvider {
 
     fn build_tag_for_meta(
         &self,
-        metadata_token: &Meta,
-        song_metadata: &dyn MetaTrait,
+        metadata_token: &RawMetadata,
+        song_metadata: &dyn MetadataTrait,
         formatting: Formatting,
     ) -> Tag {
         let content = get_song_metadata_content(metadata_token, song_metadata, formatting);
@@ -63,14 +63,14 @@ impl TagProvider {
         Tag::raw(format!(
             "{} {}",
             Tag::span(
-                Content::from_string(format!("{}:", metadata_token.keyword())),
-                Some("meta-keyword"),
+                Content::from_string(format!("{}:", metadata_token.label())),
+                Some("metadata-keyword"),
             ),
             Tag::span(
                 Content::from_string(
                     content.unwrap_or_else(|| metadata_token.content().to_string())
                 ),
-                Some("meta-value")
+                Some("metadata-value")
             ),
         ))
     }
@@ -80,7 +80,7 @@ impl TagProvider {
         head: &Option<Box<Node>>,
         children: &[Node],
         section_type: &SectionType,
-        meta: &dyn MetaTrait,
+        meta: &dyn MetadataTrait,
         formatting: Formatting,
     ) -> Tag {
         let mut gtb = TagBuilder::new().set_tag_name("section");
@@ -112,7 +112,7 @@ impl TagProvider {
                 modifier: _,
             } => Tag::headline(*level, Content::from_string(c), None),
             Token::Chord(_) => unreachable!(),
-            Token::Meta(_) => unreachable!(),
+            Token::Metadata(_) => unreachable!(),
             Token::Newline => unreachable!(),
         }
     }
@@ -147,7 +147,7 @@ impl TagProvider {
     fn build_tag_for_children<'a>(
         &'a self,
         children: &'a [Node],
-        meta: &dyn MetaTrait,
+        meta: &dyn MetadataTrait,
         formatting: Formatting,
     ) -> Tag {
         if children.is_empty() {
@@ -186,31 +186,37 @@ impl TagProvider {
 }
 
 fn get_song_metadata_content(
-    metadata_token: &Meta,
-    song_metadata: &dyn MetaTrait,
+    metadata_token: &RawMetadata,
+    song_metadata: &dyn MetadataTrait,
     formatting: Formatting,
 ) -> Option<String> {
-    match metadata_token {
-        Meta::Subtitle(_) => song_metadata.subtitle(),
-        Meta::Artist(_) => song_metadata.artist(),
-        Meta::Composer(_) => song_metadata.composer(),
-        Meta::Lyricist(_) => song_metadata.lyricist(),
-        Meta::Copyright(_) => song_metadata.copyright(),
-        Meta::Album(_) => song_metadata.album(),
-        Meta::Year(_) => song_metadata.year(),
-        Meta::Key(_) => song_metadata.key().map(|c| c.note_format(formatting)),
-        Meta::OriginalKey(_) => song_metadata
-            .original_key()
-            .map(|c| c.note_format(formatting)),
-        Meta::Time(_) => song_metadata.time(),
-        Meta::Tempo(_) => song_metadata.tempo(),
-        Meta::Duration(_) => song_metadata.duration(),
-        Meta::Capo(_) => song_metadata.capo(),
-        Meta::OriginalTitle(_) => song_metadata.original_title(),
-        Meta::AlternativeTitle(_) => song_metadata.alternative_title(),
-        Meta::CCLISongId(_) => song_metadata.ccli_song_id(),
-        Meta::BNotation(_) => Some(song_metadata.b_notation().to_string()),
-    }
+    let result = match metadata_token {
+        RawMetadata::Subtitle(_) => song_metadata.subtitle(),
+        RawMetadata::Artist(_) => song_metadata.artist(),
+        RawMetadata::Composer(_) => song_metadata.composer(),
+        RawMetadata::Lyricist(_) => song_metadata.lyricist(),
+        RawMetadata::Copyright(_) => song_metadata.copyright(),
+        RawMetadata::Album(_) => song_metadata.album(),
+        RawMetadata::Year(_) => song_metadata.year(),
+        RawMetadata::Key(_) => {
+            return song_metadata.key().map(|c| c.note_format(formatting));
+        }
+        RawMetadata::OriginalKey(_) => {
+            return song_metadata
+                .original_key()
+                .map(|c| c.note_format(formatting));
+        }
+        RawMetadata::Time(_) => song_metadata.time(),
+        RawMetadata::Tempo(_) => song_metadata.tempo(),
+        RawMetadata::Duration(_) => song_metadata.duration(),
+        RawMetadata::Capo(_) => song_metadata.capo(),
+        RawMetadata::OriginalTitle(_) => song_metadata.original_title(),
+        RawMetadata::AlternativeTitle(_) => song_metadata.alternative_title(),
+        RawMetadata::CCLISongId(_) => song_metadata.ccli_song_id(),
+        RawMetadata::BNotation(_) => return Some(song_metadata.b_notation().to_string()),
+    };
+
+    result.map(ToOwned::to_owned)
 }
 
 fn class_name_for_type(section_type: &SectionType) -> Option<&'static str> {

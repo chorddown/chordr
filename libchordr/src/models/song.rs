@@ -4,18 +4,18 @@ use crate::models::file_type::FileType;
 use crate::models::list::ListEntryTrait;
 use crate::models::song_data::SongData;
 use crate::models::song_id::{SongId, SongIdTrait};
-use crate::models::song_meta::SongMeta;
+use crate::models::song_metadata::SongMetadata;
 use crate::models::song_sorting;
 use crate::models::song_sorting::SongSorting;
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
 pub struct Song {
-    meta: SongMeta,
+    meta: SongMetadata,
     src: String,
 }
 
 impl Song {
-    pub fn new<S: Into<String>>(meta: SongMeta, src: S) -> Self {
+    pub fn new<S: Into<String>>(meta: SongMetadata, src: S) -> Self {
         Self {
             meta,
             src: src.into(),
@@ -26,7 +26,7 @@ impl Song {
         &self.src
     }
 
-    pub fn meta(&self) -> &SongMeta {
+    pub fn meta(&self) -> &SongMetadata {
         &self.meta
     }
 }

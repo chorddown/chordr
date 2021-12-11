@@ -4,6 +4,7 @@ mod error;
 mod format;
 mod helper;
 mod html;
+mod metadata;
 pub mod models;
 mod parser;
 #[cfg(feature = "pdf")]

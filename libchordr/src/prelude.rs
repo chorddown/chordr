@@ -23,7 +23,7 @@ pub use crate::models::catalog::{Catalog, CatalogTrait};
 pub use crate::models::chord::fmt::Formatting;
 pub use crate::models::file_type::FileType;
 pub use crate::models::list::*;
-pub use crate::models::meta::{BNotation, MetaTrait, SemitoneNotation};
+pub use crate::models::metadata::{BNotation, MetadataTrait, SemitoneNotation};
 #[allow(deprecated)]
 pub use crate::models::record_id_trait::RecordIdTrait;
 pub use crate::models::record_trait::RecordTrait;
@@ -32,7 +32,7 @@ pub use crate::models::song::Song;
 pub use crate::models::song_data::SongData;
 pub use crate::models::song_id::{SongId, SongIdTrait};
 pub use crate::models::song_list::{SongList, SongListTrait};
-pub use crate::models::song_meta::SongMeta;
+pub use crate::models::song_metadata::SongMetadata;
 pub use crate::models::song_settings::{SongSettings, SongSettingsMap};
 pub use crate::models::song_sorting::SongSorting;
 pub use crate::models::team::{Team, TeamId};

@@ -4,7 +4,7 @@ use std::vec::IntoIter;
 use crate::models::chord::Chords;
 use crate::tokenizer::Token;
 
-pub use super::meta_information::MetaInformation;
+pub use super::metadata::Metadata;
 pub use super::node::Node;
 pub use super::parser_result::ParserResult;
 pub use super::section_type::SectionType;
@@ -75,7 +75,7 @@ impl NodeParser {
                     })
                 }
             }
-            Token::Meta(meta) => Ok(Node::Meta(meta)),
+            Token::Metadata(meta) => Ok(Node::Meta(meta)),
             Token::Literal(_) => Ok(Node::Text(token)),
             Token::Quote(_) => Ok(Node::Quote(token)),
             Token::Newline => Ok(Node::Newline),

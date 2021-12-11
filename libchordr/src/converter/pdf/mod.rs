@@ -1,15 +1,16 @@
-use crate::converter::ConverterTrait;
-use crate::prelude::*;
+use std::fs::File;
+use std::io::BufWriter;
 
+use printpdf::*;
+
+use crate::converter::ConverterTrait;
 use crate::error::Result;
+use crate::metadata::metadata_trait::SongMetaTrait;
 use crate::models::chord::fmt::Formatting;
-use crate::models::meta::meta_trait::SongMetaTrait;
 use crate::pdf::coordinates::Coordinates;
 use crate::pdf::pdf_builder::PdfBuilder;
 use crate::pdf::styles::{Style, Styles};
-use printpdf::*;
-use std::fs::File;
-use std::io::BufWriter;
+use crate::prelude::*;
 
 type BuildResult = Result<()>;
 
@@ -31,7 +32,7 @@ impl ConverterTrait for PdfConverter {
     fn convert(
         &self,
         node: &Node,
-        meta: &dyn SongMetaTrait,
+        metadata: &dyn MetadataTrait,
         formatting: Formatting,
     ) -> Result<String> {
         //        let (doc, page1, layer1) = PdfDocument::new("PDF_Document_title", Mm(210.0), Mm(297.0), "Layer 1");
@@ -65,16 +66,17 @@ impl ConverterTrait for PdfConverter {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::parser::MetaInformation;
+    use crate::parser::Metadata;
     use crate::test_helpers::get_test_tokens;
+
+    use super::*;
 
     #[test]
     fn test_convert() {
         let node = Parser::new().parse(get_test_tokens());
         let result = PdfConverter::new().convert(
-            node.unwrap().node_as_ref(),
-            &MetaInformation::default(),
+            node.unwrap().node(),
+            &Metadata::default(),
             Formatting::with_format(Format::PDF),
         );
 

@@ -3,12 +3,13 @@ use std::io::BufRead;
 use crate::error::Error;
 
 use self::chorddown_tokenizer::ChorddownTokenizer;
-pub use self::meta::Meta;
+pub(crate) use self::metadata::RawMetadata;
+pub(crate) use self::metadata::RawMetadata as Meta;
 pub use self::modifier::Modifier;
 pub use self::token::Token;
 
 mod chorddown_tokenizer;
-mod meta;
+mod metadata;
 mod modifier;
 mod token;
 

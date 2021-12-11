@@ -1,13 +1,14 @@
 use std::convert::TryFrom;
 
-use crate::models::meta::BNotation;
+use crate::metadata::keyword;
+use crate::models::metadata::BNotation;
 
-/// Meta information gathered during tokenization
+/// Metadata gathered during tokenization
 ///
-/// Some, but not all meta information can be retrieved during tokenization. The song title e.g.
+/// Some, but not all metadata can be retrieved during tokenization. The song title e.g.
 /// will be determined by the Parser
 #[derive(Clone, Debug, PartialOrd, PartialEq)]
-pub enum Meta {
+pub enum RawMetadata {
     Subtitle(String),
     Artist(String),
     Composer(String),
@@ -27,36 +28,45 @@ pub enum Meta {
     BNotation(BNotation),
 }
 
-impl Meta {
+impl RawMetadata {
     fn from_keyword_and_content(word: &str, content: &str) -> Option<Self> {
         let content = content.trim();
         match word.trim().to_lowercase().as_str() {
-            "artist" => Some(Self::artist(content)),
-            "composer" => Some(Self::composer(content)),
-            "lyricist" => Some(Self::lyricist(content)),
-            "copyright" => Some(Self::copyright(content)),
-            "album" => Some(Self::album(content)),
-            "year" => Some(Self::year(content)),
-            "key" => Some(Self::key(content)),
-            "original-key" | "original key" | "originalkey" => Some(Self::original_key(content)),
-            "time" => Some(Self::time(content)),
-            "tempo" => Some(Self::tempo(content)),
-            "duration" => Some(Self::duration(content)),
-            "subtitle" => Some(Self::subtitle(content)),
-            "capo" => Some(Self::capo(content)),
-            "original-title" | "original title" | "originaltitle" => {
+            keyword::ARTIST => Some(Self::artist(content)),
+            keyword::COMPOSER => Some(Self::composer(content)),
+            keyword::LYRICIST => Some(Self::lyricist(content)),
+            keyword::COPYRIGHT => Some(Self::copyright(content)),
+            keyword::ALBUM => Some(Self::album(content)),
+            keyword::YEAR => Some(Self::year(content)),
+            keyword::KEY => Some(Self::key(content)),
+            keyword::ORIGINAL_KEY | "original_key" | "original key" | "originalkey" => {
+                Some(Self::original_key(content))
+            }
+            keyword::TIME => Some(Self::time(content)),
+            keyword::TEMPO => Some(Self::tempo(content)),
+            keyword::DURATION => Some(Self::duration(content)),
+            keyword::SUBTITLE => Some(Self::subtitle(content)),
+            keyword::CAPO => Some(Self::capo(content)),
+            keyword::ORIGINAL_TITLE | "original_title" | "original title" | "originaltitle" => {
                 Some(Self::original_title(content))
             }
-            "alternative-title" | "alternative title" => Some(Self::alternative_title(content)),
-            "ccli song #" | "ccli song" | "ccli song id" => Some(Self::ccli_song_id(content)),
-            "bnotation" | "b_notation" | "b notation" | "b-notation" => {
+            keyword::ALTERNATIVE_TITLE | "alternative_title" | "alternative title" => {
+                Some(Self::alternative_title(content))
+            }
+            keyword::CCLI_SONG_ID
+            | "ccli song #"
+            | "ccli song"
+            | "ccli song id"
+            | "ccli_song_id" => Some(Self::ccli_song_id(content)),
+            keyword::B_NOTATION | "bnotation" | "b notation" | "b_notation" => {
                 Some(Self::b_notation(content))
             }
             _ => None,
         }
     }
 
-    pub fn keyword(&self) -> &'static str {
+    /// Return a descriptive title for the metadata
+    pub fn label(&self) -> &'static str {
         match self {
             Self::Artist(_) => "Artist",
             Self::Composer(_) => "Composer",
@@ -164,14 +174,11 @@ impl Meta {
     }
 
     pub fn b_notation<S: AsRef<str>>(content: S) -> Self {
-        Self::BNotation(match BNotation::try_from(content.as_ref()) {
-            Ok(n) => n,
-            Err(_) => Default::default(),
-        })
+        Self::BNotation(BNotation::try_from(content.as_ref()).unwrap_or_default())
     }
 }
 
-impl TryFrom<&str> for Meta {
+impl TryFrom<&str> for RawMetadata {
     type Error = ();
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
@@ -187,7 +194,7 @@ impl TryFrom<&str> for Meta {
     }
 }
 
-impl TryFrom<&String> for Meta {
+impl TryFrom<&String> for RawMetadata {
     type Error = ();
 
     fn try_from(value: &String) -> Result<Self, Self::Error> {

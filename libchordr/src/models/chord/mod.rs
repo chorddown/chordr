@@ -5,7 +5,7 @@ use serde::{Deserialize, Deserializer, Serialize};
 use crate::error::Error;
 use crate::format::Format;
 use crate::models::chord::fmt::Formatting;
-use crate::models::meta::BNotation;
+use crate::models::metadata::BNotation;
 use crate::prelude::SemitoneNotation;
 
 pub use self::chords::Chords;
