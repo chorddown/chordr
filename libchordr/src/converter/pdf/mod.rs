@@ -77,7 +77,7 @@ mod tests {
         let result = PdfConverter::new().convert(
             node.unwrap().node(),
             &Metadata::default(),
-            Formatting::with_format(Format::PDF),
+            Formatting::new_with_format(Format::PDF),
         );
 
         assert!(result.is_ok());

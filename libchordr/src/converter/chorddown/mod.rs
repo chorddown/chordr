@@ -231,7 +231,7 @@ mod tests {
         let result = converter.convert(
             &get_test_ast(),
             &Metadata::default(),
-            Formatting::with_format(Format::Chorddown),
+            Formatting::new_with_format(Format::Chorddown),
         );
 
         assert!(result.is_ok());
@@ -263,7 +263,7 @@ Comin’ for to [A7]carry me [D]home.
         let result = converter.convert(
             &get_test_ast(),
             &get_test_metadata(),
-            Formatting::with_format(Format::Chorddown),
+            Formatting::new_with_format(Format::Chorddown),
         );
 
         assert!(result.is_ok());
@@ -304,7 +304,7 @@ Comin’ for to [A7]carry me [D]home.
         let result = converter.convert(
             &ast,
             &get_test_metadata(),
-            Formatting::with_format(Format::Chorddown),
+            Formatting::new_with_format(Format::Chorddown),
         );
 
         assert!(result.is_ok());
@@ -334,7 +334,7 @@ Swing [D]low, sweet [G]chari[D]ot.
         let result = converter.convert(
             &ast,
             &Metadata::default(),
-            Formatting::with_format(Format::Chorddown),
+            Formatting::new_with_format(Format::Chorddown),
         );
 
         assert!(result.is_ok());

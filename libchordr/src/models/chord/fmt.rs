@@ -10,12 +10,25 @@ pub struct Formatting {
 }
 
 impl Formatting {
+    #[deprecated(note = "Please use new_with_format()")]
     pub fn with_format(format: Format) -> Self {
         Self {
             b_notation: BNotation::default(),
             semitone_notation: Default::default(),
             format,
         }
+    }
+
+    pub fn new_with_format(format: Format) -> Self {
+        Self {
+            b_notation: BNotation::default(),
+            semitone_notation: Default::default(),
+            format,
+        }
+    }
+
+    pub fn with_b_notation(self, b_notation: BNotation) -> Self {
+        Self { b_notation, ..self }
     }
 }
 

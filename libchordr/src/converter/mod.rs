@@ -79,7 +79,7 @@ mod tests {
         let result = Converter::new().convert(
             parser_result.node(),
             parser_result.metadata(),
-            Formatting::with_format(Format::HTML),
+            Formatting::new_with_format(Format::HTML),
         );
 
         assert!(result.is_ok());

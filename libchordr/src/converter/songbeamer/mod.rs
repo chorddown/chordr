@@ -166,7 +166,7 @@ mod tests {
         let result = converter.convert(
             &get_test_ast(),
             &Metadata::default(),
-            Formatting::with_format(Format::SongBeamer),
+            Formatting::new_with_format(Format::SongBeamer),
         );
 
         assert!(result.is_ok());
@@ -197,7 +197,7 @@ Comin’ for to carry me home.
         let result = converter.convert(
             &get_test_ast(),
             &get_test_metadata(),
-            Formatting::with_format(Format::SongBeamer),
+            Formatting::new_with_format(Format::SongBeamer),
         );
 
         assert!(result.is_ok());
@@ -232,7 +232,7 @@ Comin’ for to carry me home.
         let result = converter.convert(
             &ast,
             &get_test_metadata(),
-            Formatting::with_format(Format::SongBeamer),
+            Formatting::new_with_format(Format::SongBeamer),
         );
 
         assert!(result.is_ok());
@@ -259,7 +259,7 @@ Swing low, sweet chariot.
         let result = converter.convert(
             &ast,
             &Metadata::default(),
-            Formatting::with_format(Format::SongBeamer),
+            Formatting::new_with_format(Format::SongBeamer),
         );
 
         assert!(result.is_ok());
