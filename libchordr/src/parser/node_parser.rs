@@ -2,9 +2,9 @@ use std::iter::Peekable;
 use std::vec::IntoIter;
 
 use crate::models::chord::Chords;
+pub use crate::models::metadata::Metadata;
 use crate::tokenizer::Token;
 
-pub use super::metadata::Metadata;
 pub use super::node::Node;
 pub use super::parser_result::ParserResult;
 pub use super::section_type::SectionType;
@@ -31,7 +31,7 @@ impl ParserTrait for NodeParser {
 }
 
 impl NodeParser {
-    pub fn with_b_notation(b_notation: BNotation) -> Self {
+    pub fn new_with_b_notation(b_notation: BNotation) -> Self {
         Self { b_notation }
     }
 
@@ -146,7 +146,7 @@ mod tests {
 
     #[test]
     fn test_parse() {
-        let mut parser = NodeParser::with_b_notation(BNotation::B);
+        let mut parser = NodeParser::new_with_b_notation(BNotation::B);
         let result = parser.parse(get_test_tokens());
 
         assert!(result.is_ok());

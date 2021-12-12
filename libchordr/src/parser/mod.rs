@@ -42,7 +42,7 @@ impl ParserTrait for Parser {
 
     fn parse(&mut self, tokens: Vec<Token>) -> Result<ParserResult, Error> {
         let meta = MetadataParser::new().parse_borrowed(&tokens)?;
-        let node = NodeParser::with_b_notation(meta.b_notation).parse(tokens)?;
+        let node = NodeParser::new_with_b_notation(meta.b_notation).parse(tokens)?;
 
         Ok(ParserResult::new(node, meta))
     }
