@@ -154,7 +154,7 @@ fn remove_blank_slides(input: &str) -> String {
 mod tests {
     use super::*;
     use crate::format::Format;
-    use crate::parser::Metadata;
+    use crate::models::metadata::Metadata;
     use crate::test_helpers::get_test_metadata;
     use crate::test_helpers::{
         get_test_ast, get_test_ast_w_inline_metadata, get_test_ast_with_quote,

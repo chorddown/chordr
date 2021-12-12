@@ -4,8 +4,7 @@ use crate::error::Error;
 
 use self::chorddown_tokenizer::ChorddownTokenizer;
 pub(crate) use self::metadata::RawMetadata;
-pub(crate) use self::metadata::RawMetadata as Meta;
-pub use self::modifier::Modifier;
+pub(crate) use self::modifier::Modifier;
 pub use self::token::Token;
 
 mod chorddown_tokenizer;

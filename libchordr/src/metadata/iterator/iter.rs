@@ -1,7 +1,7 @@
 use crate::metadata::iterator::{MetadataIterItem, FIELDS, FIELDS_LEN};
+use crate::models::metadata::Metadata;
 use crate::models::metadata::MetadataTrait;
 use crate::models::song_metadata::SongMetadata;
-use crate::parser::Metadata;
 
 /// Iterator for the borrowed `MetaTrait` implementations
 pub struct MetadataIterator<'a, T: MetadataTrait> {

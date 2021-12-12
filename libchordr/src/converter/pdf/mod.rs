@@ -66,7 +66,7 @@ impl ConverterTrait for PdfConverter {
 
 #[cfg(test)]
 mod tests {
-    use crate::parser::Metadata;
+    use crate::models::metadata::Metadata;
     use crate::test_helpers::get_test_tokens;
 
     use super::*;

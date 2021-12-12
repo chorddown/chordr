@@ -1,6 +1,7 @@
+use serde::{Deserialize, Serialize};
+
 use crate::format::Format;
 use crate::models::metadata::{BNotation, SemitoneNotation};
-use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, PartialEq, Debug, Deserialize, Serialize)]
 pub struct Formatting {

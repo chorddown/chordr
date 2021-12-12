@@ -1,6 +1,6 @@
-use crate::models::metadata::BNotation;
+use crate::models::metadata::{BNotation, Metadata};
 use crate::models::user::{User, Username};
-use crate::parser::{Metadata, Node};
+use crate::parser::Node;
 use crate::prelude::Password;
 use crate::tokenizer::{Modifier, Token};
 

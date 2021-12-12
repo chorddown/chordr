@@ -143,7 +143,7 @@ fn remove_blank_lines(input: &str) -> String {
 #[cfg(test)]
 mod tests {
     use crate::format::Format;
-    use crate::parser::Metadata;
+    use crate::models::metadata::Metadata;
     use crate::test_helpers::get_test_metadata;
     use crate::test_helpers::{
         get_test_ast, get_test_ast_w_inline_metadata, get_test_ast_with_quote,

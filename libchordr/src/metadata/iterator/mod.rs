@@ -1,8 +1,8 @@
 use crate::metadata::iterator::iter::MetadataIterator;
 use crate::metadata::keyword;
+use crate::models::metadata::Metadata;
 use crate::models::song_meta_trait::MetadataTrait;
 use crate::models::song_metadata::SongMetadata;
-use crate::parser::Metadata;
 
 pub use self::iter_item::MetadataIterItem;
 
@@ -70,7 +70,7 @@ impl SongMetadata {
 #[cfg(test)]
 mod tests {
     use crate::models::chord::Note;
-    use crate::parser::Metadata;
+    use crate::models::metadata::Metadata;
 
     use super::*;
     use crate::models::metadata::BNotation;

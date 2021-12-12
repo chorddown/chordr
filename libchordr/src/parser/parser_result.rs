@@ -1,4 +1,6 @@
-use super::{Metadata, Node};
+use crate::models::metadata::Metadata;
+
+use super::Node;
 
 pub struct ParserResult {
     pub metadata: Metadata,

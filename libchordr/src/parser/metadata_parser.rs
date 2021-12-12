@@ -1,10 +1,10 @@
 use crate::tokenizer::{RawMetadata, Token};
 
-pub use super::metadata::Metadata;
 pub use super::node::Node;
 pub use super::parser_result::ParserResult;
 pub use super::section_type::SectionType;
 pub use super::*;
+pub use crate::models::metadata::Metadata;
 
 pub struct MetadataParser {}
 

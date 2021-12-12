@@ -1,13 +1,13 @@
 use crate::error::Error;
 use crate::models::metadata::*;
 use crate::parser::metadata_parser::MetadataParser;
-use crate::parser::node_parser::NodeParser;
+pub use crate::parser::node_parser::NodeParser;
 use crate::tokenizer::Token;
 
-pub use self::metadata::Metadata;
 pub use self::node::Node;
 pub use self::parser_result::ParserResult;
 pub use self::section_type::SectionType;
+pub use crate::models::metadata::Metadata;
 
 mod metadata;
 mod metadata_parser;
