@@ -112,7 +112,7 @@ impl MetadataTrait for Metadata {
 impl TransposableTrait for Metadata {
     fn transpose(self, semitones: isize) -> Self {
         if self.key_raw.is_some() && self.original_key_raw.is_none() {
-            let mut transposed_meta = self.clone();
+            let mut transposed_meta = self;
             let key = transposed_meta.key.take();
             if transposed_meta.original_key.is_none() {
                 transposed_meta.original_key = key.clone();

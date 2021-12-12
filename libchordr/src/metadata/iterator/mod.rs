@@ -11,7 +11,7 @@ mod iter;
 mod iter_item;
 
 const FIELDS_LEN: usize = 18;
-const FIELDS: [&'static str; 18] = [
+const FIELDS: [&str; 18] = [
     keyword::TITLE,
     keyword::SUBTITLE,
     keyword::ARTIST,
@@ -70,10 +70,10 @@ impl SongMetadata {
 #[cfg(test)]
 mod tests {
     use crate::models::chord::Note;
+    use crate::models::metadata::BNotation;
     use crate::models::metadata::Metadata;
 
     use super::*;
-    use crate::models::metadata::BNotation;
 
     #[test]
     fn iterate() {

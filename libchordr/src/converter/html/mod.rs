@@ -54,27 +54,27 @@ Duration:           {}
 Capo:               {}
 CCLI Song #:        {}
 -->",
-            metadata.title().unwrap_or_else(|| none_text),
-            metadata.original_title().unwrap_or_else(|| none_text),
-            metadata.alternative_title().unwrap_or_else(|| none_text),
-            metadata.subtitle().unwrap_or_else(|| none_text),
-            metadata.artist().unwrap_or_else(|| none_text),
-            metadata.composer().unwrap_or_else(|| none_text),
-            metadata.lyricist().unwrap_or_else(|| none_text),
-            metadata.copyright().unwrap_or_else(|| none_text),
-            metadata.album().unwrap_or_else(|| none_text),
-            metadata.year().unwrap_or_else(|| none_text),
+            metadata.title().unwrap_or(none_text),
+            metadata.original_title().unwrap_or(none_text),
+            metadata.alternative_title().unwrap_or(none_text),
+            metadata.subtitle().unwrap_or(none_text),
+            metadata.artist().unwrap_or(none_text),
+            metadata.composer().unwrap_or(none_text),
+            metadata.lyricist().unwrap_or(none_text),
+            metadata.copyright().unwrap_or(none_text),
+            metadata.album().unwrap_or(none_text),
+            metadata.year().unwrap_or(none_text),
             metadata
                 .key()
                 .map_or_else(|| none_text.to_owned(), |c| c.note_format(formatting)),
             metadata
                 .original_key()
                 .map_or_else(|| none_text.to_owned(), |c| c.note_format(formatting)),
-            metadata.time().unwrap_or_else(|| none_text),
-            metadata.tempo().unwrap_or_else(|| none_text),
-            metadata.duration().unwrap_or_else(|| none_text),
-            metadata.capo().unwrap_or_else(|| none_text),
-            metadata.ccli_song_id().unwrap_or_else(|| none_text),
+            metadata.time().unwrap_or(none_text),
+            metadata.tempo().unwrap_or(none_text),
+            metadata.duration().unwrap_or(none_text),
+            metadata.capo().unwrap_or(none_text),
+            metadata.ccli_song_id().unwrap_or(none_text),
         )
     }
 }

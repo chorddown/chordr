@@ -101,78 +101,78 @@ impl ChorddownConverter {
         let mut buffer = String::new();
         if let Some(v) = meta.subtitle() {
             buffer.push_str("Subtitle: ");
-            buffer.push_str(&v);
-            buffer.push_str("\n")
+            buffer.push_str(v);
+            buffer.push('\n')
         }
         if let Some(v) = meta.original_title() {
             buffer.push_str("Original Title: ");
-            buffer.push_str(&v);
-            buffer.push_str("\n")
+            buffer.push_str(v);
+            buffer.push('\n')
         }
         if let Some(v) = meta.alternative_title() {
             buffer.push_str("Alternative Title: ");
-            buffer.push_str(&v);
-            buffer.push_str("\n")
+            buffer.push_str(v);
+            buffer.push('\n')
         }
         if let Some(v) = meta.artist() {
             buffer.push_str("Artist: ");
-            buffer.push_str(&v);
-            buffer.push_str("\n")
+            buffer.push_str(v);
+            buffer.push('\n')
         }
         if let Some(v) = meta.composer() {
             buffer.push_str("Composer: ");
-            buffer.push_str(&v);
-            buffer.push_str("\n")
+            buffer.push_str(v);
+            buffer.push('\n')
         }
         if let Some(v) = meta.lyricist() {
             buffer.push_str("Lyricist: ");
-            buffer.push_str(&v);
-            buffer.push_str("\n")
+            buffer.push_str(v);
+            buffer.push('\n')
         }
         if let Some(v) = meta.copyright() {
             buffer.push_str("Copyright: ");
-            buffer.push_str(&v);
-            buffer.push_str("\n")
+            buffer.push_str(v);
+            buffer.push('\n')
         }
         if let Some(v) = meta.album() {
             buffer.push_str("Album: ");
-            buffer.push_str(&v);
-            buffer.push_str("\n")
+            buffer.push_str(v);
+            buffer.push('\n')
         }
         if let Some(v) = meta.year() {
             buffer.push_str("Year: ");
-            buffer.push_str(&v);
-            buffer.push_str("\n")
+            buffer.push_str(v);
+            buffer.push('\n')
         }
         if let Some(v) = meta.key() {
             buffer.push_str("Key: ");
             buffer.push_str(&v.note_format(formatting));
-            buffer.push_str("\n")
+            buffer.push('\n')
         }
         if let Some(v) = meta.time() {
             buffer.push_str("Time: ");
-            buffer.push_str(&v);
-            buffer.push_str("\n")
+            buffer.push_str(v);
+            buffer.push('\n')
         }
         if let Some(v) = meta.tempo() {
             buffer.push_str("Tempo: ");
-            buffer.push_str(&v);
-            buffer.push_str("\n")
+            buffer.push_str(v);
+            buffer.push('\n')
         }
         if let Some(v) = meta.duration() {
             buffer.push_str("Duration: ");
-            buffer.push_str(&v);
-            buffer.push_str("\n")
+            buffer.push_str(v);
+            buffer.push('\n')
         }
         if let Some(v) = meta.capo() {
             buffer.push_str("Capo: ");
-            buffer.push_str(&v);
-            buffer.push_str("\n")
+            buffer.push_str(v);
+            buffer.push('\n')
         }
         if let Some(v) = meta.ccli_song_id() {
             buffer.push_str("CCLI Song ID: ");
-            buffer.push_str(&v);
-            buffer.push_str("\n")
+            buffer.push_str(v);
+            buffer.push('\n')
         }
         //        metadata.b_notation()  // -> BNotation;
         buffer.trim_end().to_string()

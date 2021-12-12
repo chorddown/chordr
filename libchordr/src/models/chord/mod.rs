@@ -61,7 +61,7 @@ impl Chord {
     }
 
     pub fn variant(&self) -> Option<&str> {
-        self.variant.as_ref().map(String::as_str)
+        self.variant.as_deref()
     }
 
     pub fn try_from(value: &str, b_notation: BNotation) -> Result<Self, Error> {
