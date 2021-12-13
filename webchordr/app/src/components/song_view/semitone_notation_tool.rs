@@ -1,4 +1,4 @@
-use libchordr::models::meta::SemitoneNotation;
+use libchordr::models::metadata::SemitoneNotation;
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq, Clone)]
