@@ -1,10 +1,11 @@
+pub use crate::models::metadata::Metadata;
+use crate::parser::metadata_builder::MetadataBuilder;
 use crate::tokenizer::{RawMetadata, Token};
 
 pub use super::node::Node;
 pub use super::parser_result::ParserResult;
 pub use super::section_type::SectionType;
 pub use super::*;
-pub use crate::models::metadata::Metadata;
 
 pub struct MetadataParser {}
 
@@ -22,63 +23,51 @@ impl MetadataParser {
     }
 
     pub fn parse_borrowed(&mut self, tokens: &[Token]) -> Result<Metadata, Error> {
-        let mut meta = Metadata::default();
+        let mut metadata_builder = MetadataBuilder::new();
         for token in tokens {
-            meta = self.visit(token, meta);
+            metadata_builder = self.visit(token, metadata_builder);
         }
 
-        Ok(meta)
+        Ok(metadata_builder.build())
     }
 
-    fn visit(&self, token: &Token, meta: Metadata) -> Metadata {
+    fn visit(&self, token: &Token, metadata_builder: MetadataBuilder) -> MetadataBuilder {
         log::trace!("Visit token: {:?}", token);
         match token {
-            Token::Chord(_) => self.visit_chord(token, meta),
+            Token::Chord(_) => self.visit_chord(token, metadata_builder),
             Token::Headline {
                 level,
                 ref text,
                 modifier: _,
             } => {
                 if *level == 1 {
-                    Metadata {
-                        title: Some(text.clone()),
-                        ..meta
-                    }
+                    metadata_builder.with_title(text)
                 } else {
-                    meta
+                    metadata_builder
                 }
             }
-            // Token::Meta(Meta::BNotation(notation)) => {
-            //     let mut new_meta = metadata;
-            //     new_meta.reinterpret_keys_with_b_notation(*notation);
-            //     // new_meta.assign_from_token(token_meta);
-            //     new_meta
-            // }
             Token::Metadata(token_meta) => {
-                let mut new_meta = meta;
-                new_meta.assign_from_token(token_meta);
+                let mut new_metadata_builder = metadata_builder;
+                new_metadata_builder.assign_from_token(token_meta.clone());
                 if let RawMetadata::BNotation(b_notation) = token_meta {
-                    new_meta.reinterpret_keys_with_b_notation(*b_notation);
+                    new_metadata_builder.reinterpret_keys_with_b_notation(*b_notation);
                 }
-                new_meta
+                new_metadata_builder
             }
-            _ => meta,
+            _ => metadata_builder,
         }
     }
 
-    fn visit_chord(&self, token: &Token, meta: Metadata) -> Metadata {
+    fn visit_chord(&self, token: &Token, metadata_build: MetadataBuilder) -> MetadataBuilder {
         let chords = if let Token::Chord(c) = token {
             c
         } else {
             unreachable!("Invalid Token given")
         };
         if BNotation::contains_european_chord(chords) {
-            Metadata {
-                b_notation: BNotation::H,
-                ..meta
-            }
+            metadata_build.with_b_notation(BNotation::H)
         } else {
-            meta
+            metadata_build
         }
     }
 }

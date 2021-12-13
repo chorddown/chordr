@@ -1,8 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 pub use crate::metadata::metadata_trait::MetadataTrait;
-use crate::models::chord::{Chord, NoteDisplay, TransposableTrait};
-use crate::prelude::Formatting;
+use crate::models::chord::{Chord, TransposableTrait};
 
 pub use self::b_notation::BNotation;
 pub use self::semitone_notation::SemitoneNotation;
@@ -22,9 +21,7 @@ pub struct Metadata {
     pub(crate) album: Option<String>,
     pub(crate) year: Option<String>,
     pub(crate) key: Option<Chord>,
-    pub(crate) key_raw: Option<String>,
     pub(crate) original_key: Option<Chord>,
-    pub(crate) original_key_raw: Option<String>,
     pub(crate) time: Option<String>,
     pub(crate) tempo: Option<String>,
     pub(crate) duration: Option<String>,
@@ -33,6 +30,15 @@ pub struct Metadata {
     pub(crate) alternative_title: Option<String>,
     pub(crate) ccli_song_id: Option<String>,
     pub(crate) b_notation: BNotation,
+}
+
+impl Metadata {
+    pub(crate) fn with_title<S: Into<String>>(self, title: S) -> Self {
+        Self {
+            title: Some(title.into()),
+            ..self
+        }
+    }
 }
 
 impl MetadataTrait for Metadata {
@@ -111,7 +117,7 @@ impl MetadataTrait for Metadata {
 
 impl TransposableTrait for Metadata {
     fn transpose(self, semitones: isize) -> Self {
-        if self.key_raw.is_some() && self.original_key_raw.is_none() {
+        if self.key.is_some() && self.original_key.is_none() {
             let mut transposed_meta = self;
             let key = transposed_meta.key.take();
             if transposed_meta.original_key.is_none() {
@@ -138,9 +144,7 @@ impl Default for Metadata {
             album: None,
             year: None,
             key: None,
-            key_raw: None,
             original_key: None,
-            original_key_raw: None,
             time: None,
             tempo: None,
             duration: None,
@@ -158,9 +162,7 @@ impl From<&dyn MetadataTrait> for Metadata {
         fn option_to_owned(option: Option<&str>) -> Option<String> {
             option.map(ToOwned::to_owned)
         }
-        fn chord_option_to_string(option: Option<&Chord>, b_notation: BNotation) -> Option<String> {
-            option.map(|k| k.note_format(Formatting::default().with_b_notation(b_notation)))
-        }
+
         Metadata {
             title: option_to_owned(input.title()),
             subtitle: option_to_owned(input.subtitle()),
@@ -171,9 +173,7 @@ impl From<&dyn MetadataTrait> for Metadata {
             album: option_to_owned(input.album()),
             year: option_to_owned(input.year()),
             key: input.key().map(ToOwned::to_owned),
-            key_raw: chord_option_to_string(input.key(), input.b_notation()),
             original_key: input.original_key().map(ToOwned::to_owned),
-            original_key_raw: chord_option_to_string(input.original_key(), input.b_notation()),
             time: option_to_owned(input.time()),
             tempo: option_to_owned(input.tempo()),
             duration: option_to_owned(input.duration()),

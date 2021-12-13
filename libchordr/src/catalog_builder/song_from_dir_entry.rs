@@ -4,10 +4,12 @@ use std::fs::DirEntry;
 use std::path::Path;
 
 use crate::helper::parse_content;
+use crate::metadata::metadata_trait::MetadataTrait;
 use crate::models::file_type::FileType;
 use crate::models::song::Song;
 use crate::models::song_id::SongId;
 use crate::models::song_metadata::SongMetadata;
+use crate::parser::ParserResult;
 
 use super::CatalogBuildError;
 
@@ -33,21 +35,17 @@ impl TryFrom<&Path> for Song {
             Ok(p) => p,
             Err(e) => return Err(CatalogBuildError::from_error(e, path_buf)),
         };
-        let title = parser_result
-            .metadata()
-            .clone()
-            .title
-            .unwrap_or_else(|| song_id.to_string());
+        let ParserResult { metadata, .. } = parser_result;
+        let title = metadata
+            .title()
+            .unwrap_or_else(|| song_id.as_str())
+            .to_owned();
         let file_type = match FileType::try_from(path) {
             Ok(f) => f,
             Err(e) => return Err(CatalogBuildError::from_error(e, path_buf)),
         };
-        let metadata = SongMetadata::new_with_meta_information(
-            song_id,
-            title,
-            file_type,
-            parser_result.metadata(),
-        );
+        let metadata =
+            SongMetadata::new_with_metadata(song_id, file_type, &metadata.with_title(title));
         Ok(Song::new(metadata, src))
     }
 }

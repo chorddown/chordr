@@ -9,7 +9,7 @@ pub use self::parser_result::ParserResult;
 pub use self::section_type::SectionType;
 pub use crate::models::metadata::Metadata;
 
-mod metadata;
+mod metadata_builder;
 mod metadata_parser;
 mod node;
 mod node_parser;
