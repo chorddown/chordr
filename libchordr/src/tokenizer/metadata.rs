@@ -1,6 +1,6 @@
 use std::convert::TryFrom;
 
-use crate::metadata::keyword;
+use crate::metadata::keyword::MetadataKeyword;
 use crate::models::metadata::BNotation;
 
 /// Metadata gathered during tokenization
@@ -31,36 +31,25 @@ pub enum RawMetadata {
 impl RawMetadata {
     fn from_keyword_and_content(word: &str, content: &str) -> Option<Self> {
         let content = content.trim();
-        match word.trim().to_lowercase().as_str() {
-            keyword::ARTIST => Some(Self::artist(content)),
-            keyword::COMPOSER => Some(Self::composer(content)),
-            keyword::LYRICIST => Some(Self::lyricist(content)),
-            keyword::COPYRIGHT => Some(Self::copyright(content)),
-            keyword::ALBUM => Some(Self::album(content)),
-            keyword::YEAR => Some(Self::year(content)),
-            keyword::KEY => Some(Self::key(content)),
-            keyword::ORIGINAL_KEY | "original_key" | "original key" | "originalkey" => {
-                Some(Self::original_key(content))
-            }
-            keyword::TIME => Some(Self::time(content)),
-            keyword::TEMPO => Some(Self::tempo(content)),
-            keyword::DURATION => Some(Self::duration(content)),
-            keyword::SUBTITLE => Some(Self::subtitle(content)),
-            keyword::CAPO => Some(Self::capo(content)),
-            keyword::ORIGINAL_TITLE | "original_title" | "original title" | "originaltitle" => {
-                Some(Self::original_title(content))
-            }
-            keyword::ALTERNATIVE_TITLE | "alternative_title" | "alternative title" => {
-                Some(Self::alternative_title(content))
-            }
-            keyword::CCLI_SONG_ID
-            | "ccli song #"
-            | "ccli song"
-            | "ccli song id"
-            | "ccli_song_id" => Some(Self::ccli_song_id(content)),
-            keyword::B_NOTATION | "bnotation" | "b notation" | "b_notation" => {
-                Some(Self::b_notation(content))
-            }
+        let keyword = MetadataKeyword::try_from(word.trim()).ok()?;
+        match keyword {
+            MetadataKeyword::Artist => Some(Self::artist(content)),
+            MetadataKeyword::Composer => Some(Self::composer(content)),
+            MetadataKeyword::Lyricist => Some(Self::lyricist(content)),
+            MetadataKeyword::Copyright => Some(Self::copyright(content)),
+            MetadataKeyword::Album => Some(Self::album(content)),
+            MetadataKeyword::Year => Some(Self::year(content)),
+            MetadataKeyword::Key => Some(Self::key(content)),
+            MetadataKeyword::OriginalKey => Some(Self::original_key(content)),
+            MetadataKeyword::Time => Some(Self::time(content)),
+            MetadataKeyword::Tempo => Some(Self::tempo(content)),
+            MetadataKeyword::Duration => Some(Self::duration(content)),
+            MetadataKeyword::Subtitle => Some(Self::subtitle(content)),
+            MetadataKeyword::Capo => Some(Self::capo(content)),
+            MetadataKeyword::OriginalTitle => Some(Self::original_title(content)),
+            MetadataKeyword::AlternativeTitle => Some(Self::alternative_title(content)),
+            MetadataKeyword::CCLISongId => Some(Self::ccli_song_id(content)),
+            MetadataKeyword::BNotation => Some(Self::b_notation(content)),
             _ => None,
         }
     }
