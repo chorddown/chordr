@@ -1,5 +1,5 @@
-use crate::metadata::iterator::iter::MetadataIterator;
-use crate::metadata::keyword;
+pub use crate::metadata::iterator::iter::MetadataIterator;
+use crate::metadata::keyword::MetadataKeyword;
 use crate::models::metadata::Metadata;
 use crate::models::song_meta_trait::MetadataTrait;
 use crate::models::song_metadata::SongMetadata;
@@ -9,50 +9,50 @@ pub use self::iter_item::MetadataIterItem;
 mod into_iter;
 mod iter;
 mod iter_item;
+mod iter_item_value;
 
 const FIELDS_LEN: usize = 18;
-const FIELDS: [&str; 18] = [
-    keyword::TITLE,
-    keyword::SUBTITLE,
-    keyword::ARTIST,
-    keyword::COMPOSER,
-    keyword::LYRICIST,
-    keyword::COPYRIGHT,
-    keyword::ALBUM,
-    keyword::YEAR,
-    keyword::KEY,
-    keyword::ORIGINAL_KEY,
-    keyword::TIME,
-    keyword::TEMPO,
-    keyword::DURATION,
-    keyword::CAPO,
-    keyword::ORIGINAL_TITLE,
-    keyword::ALTERNATIVE_TITLE,
-    keyword::CCLI_SONG_ID,
-    keyword::B_NOTATION,
+const FIELDS: [MetadataKeyword; 18] = [
+    MetadataKeyword::Title,
+    MetadataKeyword::Subtitle,
+    MetadataKeyword::Artist,
+    MetadataKeyword::Composer,
+    MetadataKeyword::Lyricist,
+    MetadataKeyword::Copyright,
+    MetadataKeyword::Album,
+    MetadataKeyword::Year,
+    MetadataKeyword::Key,
+    MetadataKeyword::OriginalKey,
+    MetadataKeyword::Time,
+    MetadataKeyword::Tempo,
+    MetadataKeyword::Duration,
+    MetadataKeyword::Capo,
+    MetadataKeyword::OriginalTitle,
+    MetadataKeyword::AlternativeTitle,
+    MetadataKeyword::CCLISongId,
+    MetadataKeyword::BNotation,
 ];
 
-fn call_field_method<T: MetadataTrait>(metadata: &T, keyword: &str) -> MetadataIterItem {
+fn call_field_method<T: MetadataTrait>(metadata: &T, keyword: MetadataKeyword) -> MetadataIterItem {
     match keyword {
-        keyword::TITLE => metadata.title().into(),
-        keyword::SUBTITLE => metadata.subtitle().into(),
-        keyword::ARTIST => metadata.artist().into(),
-        keyword::COMPOSER => metadata.composer().into(),
-        keyword::LYRICIST => metadata.lyricist().into(),
-        keyword::COPYRIGHT => metadata.copyright().into(),
-        keyword::ALBUM => metadata.album().into(),
-        keyword::YEAR => metadata.year().into(),
-        keyword::KEY => metadata.key().into(),
-        keyword::ORIGINAL_KEY => metadata.original_key().into(),
-        keyword::TIME => metadata.time().into(),
-        keyword::TEMPO => metadata.tempo().into(),
-        keyword::DURATION => metadata.duration().into(),
-        keyword::CAPO => metadata.capo().into(),
-        keyword::ORIGINAL_TITLE => metadata.original_title().into(),
-        keyword::ALTERNATIVE_TITLE => metadata.alternative_title().into(),
-        keyword::CCLI_SONG_ID => metadata.ccli_song_id().into(),
-        keyword::B_NOTATION => metadata.b_notation().into(),
-        &_ => unreachable!(),
+        MetadataKeyword::Title => (keyword, metadata.title()).into(),
+        MetadataKeyword::Subtitle => (keyword, metadata.subtitle()).into(),
+        MetadataKeyword::Artist => (keyword, metadata.artist()).into(),
+        MetadataKeyword::Composer => (keyword, metadata.composer()).into(),
+        MetadataKeyword::Lyricist => (keyword, metadata.lyricist()).into(),
+        MetadataKeyword::Copyright => (keyword, metadata.copyright()).into(),
+        MetadataKeyword::Album => (keyword, metadata.album()).into(),
+        MetadataKeyword::Year => (keyword, metadata.year()).into(),
+        MetadataKeyword::Key => (keyword, metadata.key()).into(),
+        MetadataKeyword::OriginalKey => (keyword, metadata.original_key()).into(),
+        MetadataKeyword::Time => (keyword, metadata.time()).into(),
+        MetadataKeyword::Tempo => (keyword, metadata.tempo()).into(),
+        MetadataKeyword::Duration => (keyword, metadata.duration()).into(),
+        MetadataKeyword::Capo => (keyword, metadata.capo()).into(),
+        MetadataKeyword::OriginalTitle => (keyword, metadata.original_title()).into(),
+        MetadataKeyword::AlternativeTitle => (keyword, metadata.alternative_title()).into(),
+        MetadataKeyword::CCLISongId => (keyword, metadata.ccli_song_id()).into(),
+        MetadataKeyword::BNotation => (keyword, metadata.b_notation()).into(),
     }
 }
 
@@ -69,11 +69,10 @@ impl SongMetadata {
 
 #[cfg(test)]
 mod tests {
+    use crate::metadata::iterator::iter_item_value::MetadataIterItemValue;
     use crate::models::chord::Note;
     use crate::models::metadata::BNotation;
     use crate::models::metadata::Metadata;
-
-    use super::*;
 
     #[test]
     fn iterate() {
@@ -99,32 +98,32 @@ mod tests {
         };
         let actual = metadata.iter();
         let expected = vec![
-            MetadataIterItem::String("Great song".to_string()), // Title
-            MetadataIterItem::String("Not great".to_string()),  // Subtitle
-            MetadataIterItem::String("Me".to_string()),         // Artist
-            MetadataIterItem::String("I".to_string()),          // Composer
-            MetadataIterItem::String("Myself".to_string()),     // Lyricist
-            MetadataIterItem::String("Somebody".to_string()),   // Copyright
-            MetadataIterItem::String("ME".to_string()),         // Album
-            MetadataIterItem::String("2021".to_string()),       // Year
-            MetadataIterItem::Chord(Note::A.into()),            // Key
-            MetadataIterItem::Chord(Note::D.into()),            // Original Key
-            MetadataIterItem::None,                             // Time
-            MetadataIterItem::None,                             // Tempo
-            MetadataIterItem::None,                             // Duration
-            MetadataIterItem::None,                             // Capo
-            MetadataIterItem::None,                             // Original Title
-            MetadataIterItem::None,                             // Alternative Title
-            MetadataIterItem::None,                             // CCLI Song ID
-            MetadataIterItem::BNotation(BNotation::H),          // B-Notation
+            MetadataIterItemValue::String("Great song".to_string()), // Title
+            MetadataIterItemValue::String("Not great".to_string()),  // Subtitle
+            MetadataIterItemValue::String("Me".to_string()),         // Artist
+            MetadataIterItemValue::String("I".to_string()),          // Composer
+            MetadataIterItemValue::String("Myself".to_string()),     // Lyricist
+            MetadataIterItemValue::String("Somebody".to_string()),   // Copyright
+            MetadataIterItemValue::String("ME".to_string()),         // Album
+            MetadataIterItemValue::String("2021".to_string()),       // Year
+            MetadataIterItemValue::Chord(Note::A.into()),            // Key
+            MetadataIterItemValue::Chord(Note::D.into()),            // Original Key
+            MetadataIterItemValue::None,                             // Time
+            MetadataIterItemValue::None,                             // Tempo
+            MetadataIterItemValue::None,                             // Duration
+            MetadataIterItemValue::None,                             // Capo
+            MetadataIterItemValue::None,                             // Original Title
+            MetadataIterItemValue::None,                             // Alternative Title
+            MetadataIterItemValue::None,                             // CCLI Song ID
+            MetadataIterItemValue::BNotation(BNotation::H),          // B-Notation
         ];
         for (actual, expected) in actual.zip(expected.clone().into_iter()) {
-            assert_eq!(actual, expected);
+            assert_eq!(actual.value, expected);
         }
 
         // `metadata` was only borrowed above. Here we consume it using `.into_iter()`
         for (actual, expected) in metadata.into_iter().zip(expected.into_iter()) {
-            assert_eq!(actual, expected);
+            assert_eq!(actual.value, expected);
         }
     }
 }
