@@ -3,13 +3,11 @@ use crate::models::metadata::Metadata;
 use crate::models::metadata::MetadataTrait;
 use crate::models::song_metadata::SongMetadata;
 
-/// Iterator for the consuming `MetaTrait` implementations
+/// Iterator for the owned `MetadataTrait` implementations
 pub struct MetadataIntoIterator<T: MetadataTrait> {
     metadata: T,
     fields_cursor: usize,
 }
-
-impl<T: MetadataTrait> MetadataIntoIterator<T> {}
 
 impl<T: MetadataTrait> Iterator for MetadataIntoIterator<T> {
     type Item = MetadataIterItem;
@@ -26,7 +24,7 @@ impl<T: MetadataTrait> Iterator for MetadataIntoIterator<T> {
     }
 }
 
-/// Implement `IntoIterator` for the consuming `MetaInformation`
+/// Implement `IntoIterator` for the owned `MetaInformation`
 impl IntoIterator for Metadata {
     type Item = MetadataIterItem;
     type IntoIter = MetadataIntoIterator<Metadata>;
@@ -39,7 +37,7 @@ impl IntoIterator for Metadata {
     }
 }
 
-/// Implement `IntoIterator` for the consuming `SongMeta`
+/// Implement `IntoIterator` for the owned `SongMeta`
 impl IntoIterator for SongMetadata {
     type Item = MetadataIterItem;
     type IntoIter = MetadataIntoIterator<SongMetadata>;
