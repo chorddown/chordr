@@ -1,10 +1,11 @@
-pub use crate::metadata::iterator::iter::MetadataIterator;
 use crate::metadata::keyword::MetadataKeyword;
 use crate::models::metadata::Metadata;
 use crate::models::song_meta_trait::MetadataTrait;
 use crate::models::song_metadata::SongMetadata;
 
+pub use self::iter::MetadataIterator;
 pub use self::iter_item::MetadataIterItem;
+pub use self::iter_item_value::MetadataIterItemValue;
 
 mod into_iter;
 mod iter;
@@ -14,6 +15,8 @@ mod iter_item_value;
 const FIELDS_LEN: usize = 18;
 const FIELDS: [MetadataKeyword; 18] = [
     MetadataKeyword::Title,
+    MetadataKeyword::OriginalTitle,
+    MetadataKeyword::AlternativeTitle,
     MetadataKeyword::Subtitle,
     MetadataKeyword::Artist,
     MetadataKeyword::Composer,
@@ -27,8 +30,6 @@ const FIELDS: [MetadataKeyword; 18] = [
     MetadataKeyword::Tempo,
     MetadataKeyword::Duration,
     MetadataKeyword::Capo,
-    MetadataKeyword::OriginalTitle,
-    MetadataKeyword::AlternativeTitle,
     MetadataKeyword::CCLISongId,
     MetadataKeyword::BNotation,
 ];
@@ -36,6 +37,8 @@ const FIELDS: [MetadataKeyword; 18] = [
 fn call_field_method<T: MetadataTrait>(metadata: &T, keyword: MetadataKeyword) -> MetadataIterItem {
     match keyword {
         MetadataKeyword::Title => (keyword, metadata.title()).into(),
+        MetadataKeyword::OriginalTitle => (keyword, metadata.original_title()).into(),
+        MetadataKeyword::AlternativeTitle => (keyword, metadata.alternative_title()).into(),
         MetadataKeyword::Subtitle => (keyword, metadata.subtitle()).into(),
         MetadataKeyword::Artist => (keyword, metadata.artist()).into(),
         MetadataKeyword::Composer => (keyword, metadata.composer()).into(),
@@ -49,8 +52,6 @@ fn call_field_method<T: MetadataTrait>(metadata: &T, keyword: MetadataKeyword) -
         MetadataKeyword::Tempo => (keyword, metadata.tempo()).into(),
         MetadataKeyword::Duration => (keyword, metadata.duration()).into(),
         MetadataKeyword::Capo => (keyword, metadata.capo()).into(),
-        MetadataKeyword::OriginalTitle => (keyword, metadata.original_title()).into(),
-        MetadataKeyword::AlternativeTitle => (keyword, metadata.alternative_title()).into(),
         MetadataKeyword::CCLISongId => (keyword, metadata.ccli_song_id()).into(),
         MetadataKeyword::BNotation => (keyword, metadata.b_notation()).into(),
     }
@@ -78,6 +79,8 @@ mod tests {
     fn iterate() {
         let metadata = Metadata {
             title: Some("Great song".to_string()),
+            original_title: None,
+            alternative_title: None,
             subtitle: Some("Not great".to_string()),
             artist: Some("Me".to_string()),
             composer: Some("I".to_string()),
@@ -91,14 +94,14 @@ mod tests {
             tempo: None,
             duration: None,
             capo: None,
-            original_title: None,
-            alternative_title: None,
             ccli_song_id: None,
             b_notation: BNotation::H,
         };
         let actual = metadata.iter();
         let expected = vec![
             MetadataIterItemValue::String("Great song".to_string()), // Title
+            MetadataIterItemValue::None,                             // Original Title
+            MetadataIterItemValue::None,                             // Alternative Title
             MetadataIterItemValue::String("Not great".to_string()),  // Subtitle
             MetadataIterItemValue::String("Me".to_string()),         // Artist
             MetadataIterItemValue::String("I".to_string()),          // Composer
@@ -112,8 +115,6 @@ mod tests {
             MetadataIterItemValue::None,                             // Tempo
             MetadataIterItemValue::None,                             // Duration
             MetadataIterItemValue::None,                             // Capo
-            MetadataIterItemValue::None,                             // Original Title
-            MetadataIterItemValue::None,                             // Alternative Title
             MetadataIterItemValue::None,                             // CCLI Song ID
             MetadataIterItemValue::BNotation(BNotation::H),          // B-Notation
         ];

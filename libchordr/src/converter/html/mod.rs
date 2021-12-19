@@ -1,8 +1,10 @@
 use tag_provider::TagProvider;
 
 use crate::converter::ConverterTrait;
+use crate::metadata::MetadataIterItemValue;
 use crate::models::chord::fmt::Formatting;
 use crate::models::chord::NoteDisplay;
+use crate::models::metadata::Metadata;
 use crate::prelude::*;
 
 mod tag_provider;
@@ -30,51 +32,25 @@ impl HtmlConverter {
     }
 
     fn format_meta(&self, metadata: &dyn MetadataTrait, formatting: Formatting) -> String {
-        let none_text = "None";
+        let metadata = Metadata::from(metadata);
+        let mut buffer = String::new();
+        for item in metadata {
+            let label = item.keyword.label().to_string() + ":";
+            let value = match item.value {
+                MetadataIterItemValue::Chord(c) => c.note_format(formatting),
+                MetadataIterItemValue::String(s) => s,
+                MetadataIterItemValue::BNotation(b) => b.to_string(),
+                MetadataIterItemValue::None => "None".to_string(),
+            };
+            buffer.push_str(&format!("{:<19} {}\n", label, value))
+        }
 
         format!(
             r"<!--
 Meta
 
-Title:              {}
-Original Title:     {}
-Alternative Title:  {}
-Subtitle:           {}
-Artist:             {}
-Composer:           {}
-Lyricist:           {}
-Copyright:          {}
-Album:              {}
-Year:               {}
-Key:                {}
-Original Key:       {}
-Time:               {}
-Tempo:              {}
-Duration:           {}
-Capo:               {}
-CCLI Song #:        {}
--->",
-            metadata.title().unwrap_or(none_text),
-            metadata.original_title().unwrap_or(none_text),
-            metadata.alternative_title().unwrap_or(none_text),
-            metadata.subtitle().unwrap_or(none_text),
-            metadata.artist().unwrap_or(none_text),
-            metadata.composer().unwrap_or(none_text),
-            metadata.lyricist().unwrap_or(none_text),
-            metadata.copyright().unwrap_or(none_text),
-            metadata.album().unwrap_or(none_text),
-            metadata.year().unwrap_or(none_text),
-            metadata
-                .key()
-                .map_or_else(|| none_text.to_owned(), |c| c.note_format(formatting)),
-            metadata
-                .original_key()
-                .map_or_else(|| none_text.to_owned(), |c| c.note_format(formatting)),
-            metadata.time().unwrap_or(none_text),
-            metadata.tempo().unwrap_or(none_text),
-            metadata.duration().unwrap_or(none_text),
-            metadata.capo().unwrap_or(none_text),
-            metadata.ccli_song_id().unwrap_or(none_text),
+{}-->",
+            buffer
         )
     }
 }
