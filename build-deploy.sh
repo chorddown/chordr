@@ -21,12 +21,16 @@ if pgrep trunk >/dev/null; then
   echo
 fi
 echo "[TASK] Build the catalog"
-cargo run --bin chordr -- build-catalog webchordr/app/static/songs webchordr/app/static/catalog.json -p
+cargo run --bin chordr -- build-catalog webchordr/app/static/songs webchordr/app/static/catalog.json
 
 echo "[TASK] Create deploy-build"
-pushd webchordr/app > /dev/null
+pushd webchordr/app || exit 1;
 
-trunk build
+if [[ $* == *--dev* ]]; then
+  trunk build
+else
+  trunk build --release
+fi
 
 if [[ $* == *--verbose* ]] && type twiggy &>/dev/null; then
   twiggy top -n 10 ./dist/*.wasm
