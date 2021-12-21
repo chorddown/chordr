@@ -1,6 +1,7 @@
+use std::slice::Iter;
+
 use crate::models::song_data::SongData;
 use crate::models::song_id::SongId;
-use std::slice::Iter;
 
 pub trait CatalogTrait<E: SongData> {
     /// Return the song with the given `SongId` from the `Catalog`
@@ -13,7 +14,7 @@ pub trait CatalogTrait<E: SongData> {
     fn is_empty(&self) -> bool;
 
     /// Return an iterator over the songs of the `Catalog`
-    fn iter(&self) -> Iter<E>;
+    fn iter(&self) -> Iter<'_, E>;
 
     /// Return the revision of the `Catalog`
     fn revision(&self) -> String;

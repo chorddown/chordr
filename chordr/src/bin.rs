@@ -1,6 +1,3 @@
-extern crate clap;
-extern crate libchordr;
-
 use std::convert::TryFrom;
 use std::error::Error as StdError;
 use std::fs;
@@ -89,7 +86,7 @@ fn main() {
     }
 }
 
-fn run(args: ArgMatches) -> Result<()> {
+fn run(args: ArgMatches<'_>) -> Result<()> {
     if let Some(matches) = args.subcommand_matches("convert") {
         configure_logging(matches)?;
         convert(matches)
@@ -102,7 +99,7 @@ fn run(args: ArgMatches) -> Result<()> {
     }
 }
 
-fn convert(args: &ArgMatches) -> Result<()> {
+fn convert(args: &ArgMatches<'_>) -> Result<()> {
     let input_file_path = args.value_of("input").unwrap();
     let output_file_path = args.value_of("output").unwrap();
 
@@ -193,7 +190,7 @@ fn get_valid_output_format_help() -> String {
         .join(", ")
 }
 
-fn get_output_format(args: &ArgMatches) -> Format {
+fn get_output_format(args: &ArgMatches<'_>) -> Format {
     if let Some(raw_format) = args.value_of("format") {
         match Format::try_from(raw_format) {
             Ok(f) => return f,
@@ -211,7 +208,7 @@ fn get_output_format(args: &ArgMatches) -> Format {
     Format::HTML
 }
 
-fn build_catalog(args: &ArgMatches) -> Result<()> {
+fn build_catalog(args: &ArgMatches<'_>) -> Result<()> {
     let dir_path = args.value_of("dir").unwrap();
     let pretty = args.is_present("pretty");
     let output_file_path = args.value_of("output").unwrap();
@@ -252,7 +249,7 @@ fn build_catalog(args: &ArgMatches) -> Result<()> {
     Ok(())
 }
 
-fn configure_logging(matches: &ArgMatches) -> Result<()> {
+fn configure_logging(matches: &ArgMatches<'_>) -> Result<()> {
     let level_filter = match matches.occurrences_of("verbosity") {
         0 => LevelFilter::Warn,
         1 => LevelFilter::Info,

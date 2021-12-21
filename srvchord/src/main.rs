@@ -1,15 +1,28 @@
 //noinspection RsMainFunctionNotFound
 #[macro_use]
-extern crate rocket;
-#[macro_use]
 extern crate diesel;
 #[macro_use]
 extern crate diesel_migrations;
 #[macro_use]
-extern crate log;
+extern crate rocket;
 #[macro_use]
 extern crate serde_derive;
-extern crate rocket_sync_db_pools;
+
+use std::io;
+use std::path::Path;
+
+use diesel::SqliteConnection;
+use rocket::fairing::AdHoc;
+use rocket::fs::{FileServer, NamedFile};
+use rocket::response::status;
+use rocket::serde::json::Json;
+use rocket::{http, Build, Rocket, State};
+use rocket_sync_db_pools::database;
+
+use libchordr::models::catalog::Catalog;
+use libchordr::prelude::{CatalogBuilder, FileType};
+
+use crate::config::Config;
 
 mod authentication;
 mod config;
@@ -21,19 +34,6 @@ mod schema;
 #[cfg(test)]
 mod test_helpers;
 mod traits;
-
-use crate::config::Config;
-use diesel::SqliteConnection;
-use libchordr::models::catalog::Catalog;
-use libchordr::prelude::{CatalogBuilder, FileType};
-use rocket::fairing::AdHoc;
-use rocket::fs::{FileServer, NamedFile};
-use rocket::response::status;
-use rocket::serde::json::Json;
-use rocket::{http, Build, Rocket, State};
-use rocket_sync_db_pools::database;
-use std::io;
-use std::path::Path;
 
 // This macro from `diesel_migrations` defines an `embedded_migrations` module
 // containing a function named `run`. This allows the example to be run and

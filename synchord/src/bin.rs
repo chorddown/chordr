@@ -1,18 +1,17 @@
-extern crate clap;
-extern crate log;
+use std::convert::TryFrom;
+use std::env;
+use std::path::PathBuf;
+
+use clap::{App, Arg, ArgMatches, SubCommand};
+use simplelog::TerminalMode;
+
+use crate::error::{Error, Result};
+use crate::prelude::*;
 
 mod error;
 mod helper;
 mod prelude;
 mod service;
-
-use crate::error::{Error, Result};
-use crate::prelude::*;
-use clap::{App, Arg, ArgMatches, SubCommand};
-use simplelog::TerminalMode;
-use std::convert::TryFrom;
-use std::env;
-use std::path::PathBuf;
 
 fn main() {
     let output_arg = Arg::with_name("OUTPUT")
@@ -76,7 +75,7 @@ fn main() {
     }
 }
 
-fn download(args: &ArgMatches) -> Result<()> {
+fn download(args: &ArgMatches<'_>) -> Result<()> {
     let service_config = build_service_config(args)?;
     let service = Services::new(service_config.clone())?;
 
@@ -84,7 +83,7 @@ fn download(args: &ArgMatches) -> Result<()> {
     Ok(())
 }
 
-fn get_api_key(args: &ArgMatches) -> Result<String> {
+fn get_api_key(args: &ArgMatches<'_>) -> Result<String> {
     if let Some(t) = args.value_of("API_TOKEN") {
         return Ok(t.to_owned());
     }
@@ -95,21 +94,21 @@ fn get_api_key(args: &ArgMatches) -> Result<String> {
     }
 }
 
-fn get_url(args: &ArgMatches) -> Result<String> {
+fn get_url(args: &ArgMatches<'_>) -> Result<String> {
     match args.value_of("URL") {
         Some(val) => Ok(val.to_owned()),
         None => Err(Error::missing_argument_error("No URL provided")),
     }
 }
 
-fn get_username(args: &ArgMatches) -> Result<String> {
+fn get_username(args: &ArgMatches<'_>) -> Result<String> {
     match args.value_of("USERNAME") {
         Some(val) => Ok(val.to_owned()),
         None => Err(Error::missing_argument_error("No username provided")),
     }
 }
 
-fn get_remote_directory(args: &ArgMatches) -> Result<String> {
+fn get_remote_directory(args: &ArgMatches<'_>) -> Result<String> {
     match args.value_of("REMOTE_DIRECTORY") {
         Some(val) => Ok(val.to_owned()),
         None => Err(Error::missing_argument_error(
@@ -118,7 +117,7 @@ fn get_remote_directory(args: &ArgMatches) -> Result<String> {
     }
 }
 
-fn get_password(args: &ArgMatches) -> Result<String> {
+fn get_password(args: &ArgMatches<'_>) -> Result<String> {
     if let Some(t) = args.value_of("PASSWORD") {
         return Ok(t.to_owned());
     }
@@ -129,7 +128,7 @@ fn get_password(args: &ArgMatches) -> Result<String> {
     }
 }
 
-fn build_service_config(args: &ArgMatches) -> Result<AbstractServiceConfig> {
+fn build_service_config(args: &ArgMatches<'_>) -> Result<AbstractServiceConfig> {
     let service_identifier = args.value_of("SERVICE").unwrap();
 
     Ok(AbstractServiceConfig::build(

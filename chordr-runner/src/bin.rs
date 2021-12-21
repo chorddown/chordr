@@ -1,8 +1,3 @@
-extern crate clap;
-extern crate libchordr;
-extern crate libsynchord;
-extern crate log;
-
 use std::env;
 use std::path::Path;
 use std::process::exit;
@@ -80,7 +75,7 @@ fn start_loop(configuration: &Configuration) -> Result<()> {
     }
 }
 
-fn read_configuration(args: &ArgMatches) -> Result<Configuration> {
+fn read_configuration(args: &ArgMatches<'_>) -> Result<Configuration> {
     Reader::read_configuration_from_file(Path::new(args.value_of("configuration").unwrap()))
 }
 

@@ -105,7 +105,7 @@ impl Chord {
                 return Err(Error::chord_error(format!(
                     "First character '{}' is not a note",
                     chars[0]
-                )))
+                )));
             }
         }
         let note_has_two_chars = matches!(chars[1], '♭' | 'b' | '♯' | '#');
@@ -157,6 +157,7 @@ impl NoteDisplay for Chord {
 fn get_serialization_b_notation() -> BNotation {
     BNotation::B
 }
+
 fn get_serialization_formatting() -> Formatting {
     Formatting {
         b_notation: get_serialization_b_notation(),
@@ -179,7 +180,7 @@ struct ChordVisitor;
 impl<'de> Visitor<'de> for ChordVisitor {
     type Value = Chord;
 
-    fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         formatter.write_str("a formatted chord")
     }
 
@@ -193,6 +194,7 @@ impl<'de> Visitor<'de> for ChordVisitor {
         }
     }
 }
+
 impl<'de> Deserialize<'de> for Chord {
     fn deserialize<D>(deserializer: D) -> Result<Chord, D::Error>
     where
@@ -219,6 +221,7 @@ mod tests {
             ("F#", BNotation::B, Note::Fis),
         ]
     }
+
     fn with_variant_cases() -> Vec<(&'static str, BNotation, Note, &'static str)> {
         vec![
             ("Am", BNotation::B, Note::A, "m"),
@@ -234,6 +237,7 @@ mod tests {
             ("D#9Daniel", BNotation::B, Note::Dis, "9Daniel"),
         ]
     }
+
     #[test]
     fn try_from_without_variant() {
         for case in without_variant_cases() {

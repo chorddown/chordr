@@ -54,7 +54,7 @@ impl Error {
 }
 
 impl Display for Error {
-    fn fmt(&self, f: &mut Formatter) -> Result<(), FmtError> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), FmtError> {
         write!(f, "{}", self.inner)
     }
 }
@@ -149,7 +149,7 @@ enum Kind {
 impl StdError for Kind {}
 
 impl Display for Kind {
-    fn fmt(&self, f: &mut Formatter) -> Result<(), FmtError> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), FmtError> {
         match self {
             Kind::DownloadError(s) => write!(f, "Download error: {}", s),
             Kind::SkipDownload(s) => write!(f, "{}", s),

@@ -1,12 +1,15 @@
-pub mod catalog_trait;
+use std::slice::Iter;
 
-pub use self::catalog_trait::CatalogTrait;
+use serde::{Deserialize, Serialize};
+
 use crate::models::list::ListEntryTrait;
 use crate::models::song::Song;
 use crate::models::song_id::SongId;
 use crate::prelude::RecordTrait;
-use serde::{Deserialize, Serialize};
-use std::slice::Iter;
+
+pub use self::catalog_trait::CatalogTrait;
+
+pub mod catalog_trait;
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
 pub struct Catalog {
@@ -37,7 +40,7 @@ impl CatalogTrait<Song> for Catalog {
         self.songs.is_empty()
     }
 
-    fn iter(&self) -> Iter<Song> {
+    fn iter(&self) -> Iter<'_, Song> {
         self.songs.iter()
     }
 

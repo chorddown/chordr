@@ -11,7 +11,7 @@ struct FileTypeVisitor;
 impl<'de> Visitor<'de> for FileTypeVisitor {
     type Value = FileType;
 
-    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+    fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         formatter.write_str("one of the strings \"chorddown\" or \"jpeg\"")
     }
 
