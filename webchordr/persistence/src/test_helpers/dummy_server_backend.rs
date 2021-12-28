@@ -4,6 +4,8 @@ use async_trait::async_trait;
 use log::debug;
 use serde::{Deserialize, Serialize};
 
+use webchordr_common::tri::Tri;
+
 use crate::backend::BackendTrait;
 use crate::browser_storage::*;
 use crate::errors::PersistenceError;
@@ -41,11 +43,7 @@ impl BackendTrait for DummyServerBackend {
         }
     }
 
-    async fn load<T, N: AsRef<str>, K: AsRef<str>>(
-        &self,
-        namespace: N,
-        key: K,
-    ) -> Result<Option<T>, WebError>
+    async fn load<T, N: AsRef<str>, K: AsRef<str>>(&self, namespace: N, key: K) -> Tri<T, WebError>
     where
         T: for<'a> Deserialize<'a>,
     {
@@ -56,10 +54,10 @@ impl BackendTrait for DummyServerBackend {
             .get_item(build_combined_key(&namespace, &key))
         {
             Some(v) => match serde_json::from_str(v.as_str()) {
-                Ok(serialized) => Ok(serialized),
-                Err(e) => Err(PersistenceError::deserialization_error(e, Some(v)).into()),
+                Ok(deserialized) => Tri::Some(deserialized),
+                Err(e) => Tri::Err(PersistenceError::deserialization_error(e, Some(v)).into()),
             },
-            None => Ok(None),
+            None => Tri::None,
         }
     }
 }

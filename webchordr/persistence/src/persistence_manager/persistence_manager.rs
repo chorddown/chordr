@@ -1,16 +1,21 @@
-use super::persistence_manager_trait::PersistenceManagerTrait;
+use std::sync::Arc;
+
+use async_trait::async_trait;
+use log::{error, warn};
+use serde::{Deserialize, Serialize};
+
+use libchordr::prelude::RecordTrait;
+use webchordr_common::session::Session;
+
 use crate::backend::BackendTrait;
 use crate::constants::{
     STORAGE_KEY_SETLIST, STORAGE_KEY_SETTINGS, STORAGE_NAMESPACE, TEST_STORAGE_NAMESPACE,
 };
 use crate::errors::WebError;
 use crate::lock::Stupex;
-use async_trait::async_trait;
-use libchordr::prelude::RecordTrait;
-use log::{error, warn};
-use serde::{Deserialize, Serialize};
-use std::sync::Arc;
-use webchordr_common::session::Session;
+use webchordr_common::tri::Tri;
+
+use super::persistence_manager_trait::PersistenceManagerTrait;
 
 type Lock<I> = Stupex<I>;
 
@@ -92,7 +97,7 @@ impl<CB: BackendTrait, SB: BackendTrait, TB: BackendTrait> PersistenceManager<CB
         }
     }
 
-    async fn load_from_server<T>(&self, namespace: &str, key: &str) -> Result<Option<T>, WebError>
+    async fn load_from_server<T>(&self, namespace: &str, key: &str) -> Tri<T, WebError>
     where
         T: for<'a> Deserialize<'a>,
     {
@@ -152,11 +157,7 @@ impl<CB: BackendTrait, SB: BackendTrait, TB: BackendTrait> BackendTrait
             .await
     }
 
-    async fn load<T, N: AsRef<str>, K: AsRef<str>>(
-        &self,
-        namespace: N,
-        key: K,
-    ) -> Result<Option<T>, WebError>
+    async fn load<T, N: AsRef<str>, K: AsRef<str>>(&self, namespace: N, key: K) -> Tri<T, WebError>
     where
         T: for<'a> Deserialize<'a>,
     {
@@ -164,10 +165,16 @@ impl<CB: BackendTrait, SB: BackendTrait, TB: BackendTrait> BackendTrait
             let server_result = self
                 .load_from_server(namespace.as_ref(), key.as_ref())
                 .await;
-            match server_result {
-                Ok(v) => return Ok(v),
-                Err(e) => warn!("{}", e),
+            if let Tri::Err(e) = server_result {
+                warn!("{}", e)
+            } else {
+                return server_result;
             }
+
+            // match server_result {
+            //     Ok(v) => return Tri::from_option(v),
+            //     Err(e) => warn!("{}", e),
+            // }
         }
         self.client_backend
             .lock()
@@ -186,15 +193,19 @@ impl<CB: BackendTrait, SB: BackendTrait, TB: BackendTrait> PersistenceManagerTra
 
 #[cfg(test)]
 mod test {
-    use super::*;
+    use wasm_bindgen_test::wasm_bindgen_test_configure;
+    use wasm_bindgen_test::*;
+
+    use libchordr::models::setlist::Setlist;
+
     use crate::backend::{BrowserStorageBackend, TransientBackend};
     use crate::browser_storage::HashMapBrowserStorage;
     use crate::prelude::BrowserStorage;
     use crate::test_helpers::{get_test_setlist, get_test_user, get_test_user_password_hidden};
     use crate::test_helpers::{DummyServerBackend, TestValue};
-    use libchordr::models::setlist::Setlist;
-    use wasm_bindgen_test::wasm_bindgen_test_configure;
-    use wasm_bindgen_test::*;
+
+    use super::*;
+
     wasm_bindgen_test_configure!(run_in_browser);
 
     fn build_hash_map_persistence_manager() -> PersistenceManager<
@@ -226,17 +237,11 @@ mod test {
         assert!(pm
             .load::<i32, _, _>(TEST_STORAGE_NAMESPACE, "key-1")
             .await
-            .is_ok());
-        assert!(pm
-            .load::<i32, _, _>(TEST_STORAGE_NAMESPACE, "key-1")
-            .await
-            .unwrap()
             .is_some());
         assert_eq!(
             value,
             pm.load::<i32, _, _>(TEST_STORAGE_NAMESPACE, "key-1")
                 .await
-                .unwrap()
                 .unwrap()
         );
     }
@@ -257,17 +262,15 @@ mod test {
         assert!(pm
             .load::<TestValue, _, _>(TEST_STORAGE_NAMESPACE, "key-1")
             .await
-            .is_ok());
+            .is_some());
         assert!(pm
             .load::<TestValue, _, _>(TEST_STORAGE_NAMESPACE, "key-1")
             .await
-            .unwrap()
             .is_some());
         assert_eq!(
             value,
             pm.load::<TestValue, _, _>(TEST_STORAGE_NAMESPACE, "key-1")
                 .await
-                .unwrap()
                 .unwrap()
         );
     }
@@ -296,17 +299,11 @@ mod test {
         assert!(pm
             .load::<TestValue, _, _>(TEST_STORAGE_NAMESPACE, "key-1")
             .await
-            .is_ok());
-        assert!(pm
-            .load::<TestValue, _, _>(TEST_STORAGE_NAMESPACE, "key-1")
-            .await
-            .unwrap()
             .is_some());
         assert_eq!(
             value,
             pm.load::<TestValue, _, _>(TEST_STORAGE_NAMESPACE, "key-1")
                 .await
-                .unwrap()
                 .unwrap()
         );
     }
@@ -326,17 +323,11 @@ mod test {
         assert!(pm
             .load::<Setlist, _, _>(TEST_STORAGE_NAMESPACE, "my-setlist")
             .await
-            .is_ok());
-        assert!(pm
-            .load::<Setlist, _, _>(TEST_STORAGE_NAMESPACE, "my-setlist")
-            .await
-            .unwrap()
             .is_some());
         assert_eq!(
             expected_value,
             pm.load::<Setlist, _, _>(TEST_STORAGE_NAMESPACE, "my-setlist")
                 .await
-                .unwrap()
                 .unwrap()
         );
     }

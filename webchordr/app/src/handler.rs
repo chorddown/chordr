@@ -10,6 +10,7 @@ use yew::{html, Component, ComponentLink, Html, ShouldRender};
 
 use libchordr::models::user::MainData;
 use libchordr::prelude::*;
+use webchordr_common::tri::Tri;
 use webchordr_events::{Event, SetlistEvent, SettingsEvent, SortingChange};
 use webchordr_persistence::persistence_manager::PMType;
 use webchordr_persistence::persistence_manager::PersistenceManagerFactory;
@@ -196,9 +197,9 @@ impl CatalogHandler for Handler {
             let result = Repository::new(&pm, browser_storage).load().await;
 
             match result {
-                Ok(Some(catalog)) => callback.emit(Ok(catalog)),
-                Ok(None) => { /* noop */ }
-                Err(e) => callback.emit(Err(e)),
+                Tri::Some(catalog) => callback.emit(Ok(catalog)),
+                Tri::None => { /* noop */ }
+                Tri::Err(e) => callback.emit(Err(e)),
             }
         });
     }
@@ -330,9 +331,9 @@ impl SetlistHandler for Handler {
             let result = Repository::new(&pm).load().await;
 
             match result {
-                Ok(Some(setlist)) => callback.emit(setlist),
-                Ok(None) => { /* noop */ }
-                Err(e) => error!("{}", e),
+                Tri::Some(setlist) => callback.emit(setlist),
+                Tri::None => { /* noop */ }
+                Tri::Err(e) => error!("{}", e),
             }
         });
     }
@@ -391,9 +392,9 @@ impl SettingsHandler for Handler {
             let result = Repository::new(&pm).load().await;
 
             match result {
-                Ok(Some(settings)) => callback.emit(settings),
-                Ok(None) => { /* noop */ }
-                Err(e) => error!("{}", e),
+                Tri::Some(settings) => callback.emit(settings),
+                Tri::None => { /* noop */ }
+                Tri::Err(e) => error!("{}", e),
             }
         });
     }

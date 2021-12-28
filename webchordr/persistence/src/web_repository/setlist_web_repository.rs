@@ -3,6 +3,7 @@ use crate::persistence_manager::PersistenceManagerTrait;
 use crate::WebError;
 use async_trait::async_trait;
 use libchordr::prelude::Setlist;
+use webchordr_common::tri::Tri;
 
 pub struct SetlistWebRepository<'a, P: PersistenceManagerTrait> {
     persistence_manager: &'a P,
@@ -40,7 +41,7 @@ where
             .await
     }
 
-    async fn load(&mut self) -> Result<Option<Self::ManagedType>, WebError> {
+    async fn load(&mut self) -> Tri<Self::ManagedType, WebError> {
         self.persistence_manager
             .load(Self::namespace(), Self::key())
             .await

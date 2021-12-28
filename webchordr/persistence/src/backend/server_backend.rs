@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use wasm_bindgen::JsValue;
 use web_sys::{RequestInit, RequestMode};
+use webchordr_common::tri::Tri;
 
 pub struct ServerBackend {
     host: String,
@@ -99,17 +100,15 @@ impl BackendTrait for ServerBackend {
         result.map(|_| ())
     }
 
-    async fn load<T, N: AsRef<str>, K: AsRef<str>>(
-        &self,
-        namespace: N,
-        key: K,
-    ) -> Result<Option<T>, WebError>
+    async fn load<T, N: AsRef<str>, K: AsRef<str>>(&self, namespace: N, key: K) -> Tri<T, WebError>
     where
         T: for<'a> Deserialize<'a>,
     {
         let headers = self.build_request_headers();
         let uri = self.build_request_uri(&namespace, &key, Some("latest"));
 
-        fetch_with_additional_headers(&uri, headers).await
+        fetch_with_additional_headers::<T, &str>(uri.as_str(), headers)
+            .await
+            .into()
     }
 }

@@ -1,10 +1,14 @@
-use crate::backend::BackendTrait;
-use crate::errors::{PersistenceError, WebError};
-use async_trait::async_trait;
-use libchordr::prelude::RecordTrait;
-use serde::{Deserialize, Serialize};
 use std::cell::RefCell;
 use std::collections::HashMap;
+
+use async_trait::async_trait;
+use serde::{Deserialize, Serialize};
+
+use libchordr::prelude::RecordTrait;
+
+use crate::backend::BackendTrait;
+use crate::errors::{PersistenceError, WebError};
+use webchordr_common::tri::Tri;
 
 pub struct TransientBackend {
     map: RefCell<HashMap<String, String>>,
@@ -39,11 +43,7 @@ impl BackendTrait for TransientBackend {
         Ok(())
     }
 
-    async fn load<T, N: AsRef<str>, K: AsRef<str>>(
-        &self,
-        namespace: N,
-        key: K,
-    ) -> Result<Option<T>, WebError>
+    async fn load<T, N: AsRef<str>, K: AsRef<str>>(&self, namespace: N, key: K) -> Tri<T, WebError>
     where
         T: for<'a> Deserialize<'a>,
     {
@@ -53,10 +53,12 @@ impl BackendTrait for TransientBackend {
             .get(&format!("{}/{}", namespace.as_ref(), key.as_ref()))
         {
             Some(v) => match serde_json::from_str(v.as_str()) {
-                Ok(serialized) => Ok(serialized),
-                Err(e) => Err(PersistenceError::deserialization_error(e, Some(v.clone())).into()),
+                Ok(deserialized) => Tri::from_option(deserialized),
+                Err(e) => {
+                    Tri::Err(PersistenceError::deserialization_error(e, Some(v.clone())).into())
+                }
             },
-            None => Ok(None),
+            None => Tri::None,
         }
     }
 }

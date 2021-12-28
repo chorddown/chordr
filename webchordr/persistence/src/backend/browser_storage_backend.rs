@@ -1,11 +1,15 @@
+use std::sync::{Arc, RwLock};
+
+use async_trait::async_trait;
+use serde::{Deserialize, Serialize};
+
+use webchordr_common::tri::Tri;
+
 use crate::backend::BackendTrait;
 use crate::browser_storage::*;
 use crate::errors::PersistenceError;
 use crate::errors::WebError;
 use crate::storage_key_utility::build_combined_key;
-use async_trait::async_trait;
-use serde::{Deserialize, Serialize};
-use std::sync::{Arc, RwLock};
 
 pub struct BrowserStorageBackend<B> {
     browser_storage: Arc<RwLock<B>>,
@@ -37,11 +41,7 @@ impl<B: BrowserStorageTrait> BackendTrait for BrowserStorageBackend<B> {
         }
     }
 
-    async fn load<T, N: AsRef<str>, K: AsRef<str>>(
-        &self,
-        namespace: N,
-        key: K,
-    ) -> Result<Option<T>, WebError>
+    async fn load<T, N: AsRef<str>, K: AsRef<str>>(&self, namespace: N, key: K) -> Tri<T, WebError>
     where
         T: for<'a> Deserialize<'a>,
     {
@@ -52,23 +52,27 @@ impl<B: BrowserStorageTrait> BackendTrait for BrowserStorageBackend<B> {
             .get_item(build_combined_key(&namespace, &key))
         {
             Some(v) => match serde_json::from_str(v.as_str()) {
-                Ok(serialized) => Ok(serialized),
-                Err(e) => Err(PersistenceError::deserialization_error(e, Some(v)).into()),
+                Ok(serialized) => Tri::from_option(serialized),
+                Err(e) => Tri::Err(PersistenceError::deserialization_error(e, Some(v)).into()),
             },
-            None => Ok(None),
+            None => Tri::None,
         }
     }
 }
 
 #[cfg(test)]
 mod test {
-    use super::*;
+    use wasm_bindgen_test::wasm_bindgen_test_configure;
+    use wasm_bindgen_test::*;
+
+    use libchordr::models::setlist::Setlist;
+
     use crate::test_helpers::{
         get_test_setlist, get_test_user, get_test_user_password_hidden, TestValue,
     };
-    use libchordr::models::setlist::Setlist;
-    use wasm_bindgen_test::wasm_bindgen_test_configure;
-    use wasm_bindgen_test::*;
+
+    use super::*;
+
     wasm_bindgen_test_configure!(run_in_browser);
 
     #[wasm_bindgen_test]
@@ -77,19 +81,8 @@ mod test {
         let value: i32 = 12;
         assert!(pm.store("test", "key-1", &value).await.is_ok());
 
-        assert!(pm.load::<i32, _, _>("test", "key-1").await.is_ok());
-        assert!(pm
-            .load::<i32, _, _>("test", "key-1")
-            .await
-            .unwrap()
-            .is_some());
-        assert_eq!(
-            value,
-            pm.load::<i32, _, _>("test", "key-1")
-                .await
-                .unwrap()
-                .unwrap()
-        );
+        assert!(pm.load::<i32, _, _>("test", "key-1").await.is_some());
+        assert_eq!(value, pm.load::<i32, _, _>("test", "key-1").await.unwrap());
     }
 
     #[wasm_bindgen_test]
@@ -102,18 +95,10 @@ mod test {
 
         assert!(pm.store("test", "key-1", &value).await.is_ok());
 
-        assert!(pm.load::<TestValue, _, _>("test", "key-1").await.is_ok());
-        assert!(pm
-            .load::<TestValue, _, _>("test", "key-1")
-            .await
-            .unwrap()
-            .is_some());
+        assert!(pm.load::<TestValue, _, _>("test", "key-1").await.is_some());
         assert_eq!(
             value,
-            pm.load::<TestValue, _, _>("test", "key-1")
-                .await
-                .unwrap()
-                .unwrap()
+            pm.load::<TestValue, _, _>("test", "key-1").await.unwrap()
         );
     }
 
@@ -129,18 +114,10 @@ mod test {
 
         assert!(pm.store("test", "key-1", &value).await.is_ok());
 
-        assert!(pm.load::<TestValue, _, _>("test", "key-1").await.is_ok());
-        assert!(pm
-            .load::<TestValue, _, _>("test", "key-1")
-            .await
-            .unwrap()
-            .is_some());
+        assert!(pm.load::<TestValue, _, _>("test", "key-1").await.is_some());
         assert_eq!(
             value,
-            pm.load::<TestValue, _, _>("test", "key-1")
-                .await
-                .unwrap()
-                .unwrap()
+            pm.load::<TestValue, _, _>("test", "key-1").await.unwrap()
         );
     }
 
@@ -156,17 +133,14 @@ mod test {
             .await
             .is_ok());
 
-        assert!(pm.load::<Setlist, _, _>("test", "my-setlist").await.is_ok());
         assert!(pm
             .load::<Setlist, _, _>("test", "my-setlist")
             .await
-            .unwrap()
             .is_some());
         assert_eq!(
             expected_value,
             pm.load::<Setlist, _, _>("test", "my-setlist")
                 .await
-                .unwrap()
                 .unwrap()
         );
     }

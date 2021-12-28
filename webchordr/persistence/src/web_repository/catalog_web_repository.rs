@@ -10,6 +10,7 @@ use crate::errors::PersistenceError;
 use crate::fetch_helper::fetch;
 use crate::persistence_manager::PersistenceManagerTrait;
 use crate::WebError;
+use webchordr_common::tri::Tri;
 
 use super::WebRepositoryTrait;
 
@@ -29,7 +30,7 @@ where
         }
     }
 
-    async fn fetch_catalog(&self, append_timestamp: bool) -> Result<Option<Catalog>, WebError> {
+    async fn fetch_catalog(&self, append_timestamp: bool) -> Tri<Catalog, WebError> {
         let base_uri = "/catalog.json";
         let uri = if append_timestamp {
             format!("{}?{}", base_uri, chrono::Local::now().timestamp())
@@ -37,8 +38,10 @@ where
             base_uri.to_string()
         };
 
-        let catalog = fetch::<Catalog>(&uri).await?;
-        Ok(Some(catalog))
+        match fetch::<Catalog>(&uri).await {
+            Ok(catalog) => Tri::Some(catalog),
+            Err(error) => Tri::Err(error),
+        }
     }
 }
 
@@ -61,19 +64,19 @@ where
         Err(PersistenceError::general_error("Changing the Catalog is not implement").into())
     }
 
-    async fn load(&mut self) -> Result<Option<Self::ManagedType>, WebError> {
+    async fn load(&mut self) -> Tri<Self::ManagedType, WebError> {
         match self.fetch_catalog(true).await {
-            Ok(Some(c)) => {
+            Tri::Some(c) => {
                 // Store/cache the loaded Catalog
                 let _ = self
                     .backend
                     .store(STORAGE_NAMESPACE, STORAGE_KEY_CATALOG, &c)
                     .await;
 
-                return Ok(Some(c));
+                return Tri::Some(c);
             }
-            Ok(None) => {}
-            Err(e) => log::error!("{}", e),
+            Tri::None => {}
+            Tri::Err(e) => log::error!("{}", e),
         }
 
         self.backend
