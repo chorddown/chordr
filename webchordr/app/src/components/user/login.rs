@@ -11,8 +11,8 @@ use webchordr_persistence::session::SessionService;
 use crate::components::detail_view::DetailView;
 use crate::config::Config;
 use crate::connection::{ConnectionService, ConnectionStatus};
-use crate::helpers::Tri;
 use crate::session::{Session, SessionUser};
+use webchordr_common::tri::Tri;
 
 type LoginStatus = Tri<Session, WebError>;
 
