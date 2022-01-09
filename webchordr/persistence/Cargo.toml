@@ -15,7 +15,7 @@ webchordr-common = { path = "../common" }
 yew = "0.18"
 js-sys = "0.3.44"
 wasm-bindgen-futures = "0.4.17"
-async-trait = "0.1.51"
+async-trait = "^0.1.52"
 chrono = { version = "*", features = ["serde", "wasmbind"] }
 base64 = "^0.13.0"
 

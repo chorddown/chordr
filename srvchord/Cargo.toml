@@ -24,7 +24,7 @@ libchordr = { path = "../libchordr" }
 tri = { path = "../tri" }
 cqrs = { path = "../cqrs" }
 chrono = { version = "*", features = ["serde"] }
-#rocket_cors = "0.5.2"
+async-trait = "^0.1.52"
 
 [dev-dependencies]
 parking_lot = "0.10"
