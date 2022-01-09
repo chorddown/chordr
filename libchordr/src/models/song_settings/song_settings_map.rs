@@ -31,7 +31,7 @@ impl Default for SongSettingsMap {
 impl RecordTrait for SongSettingsMap {
     type Id = &'static str;
 
-    fn id(self) -> Self::Id {
+    fn id(&self) -> Self::Id {
         "song-settings"
     }
 }

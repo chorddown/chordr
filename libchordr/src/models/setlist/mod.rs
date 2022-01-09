@@ -1,8 +1,9 @@
-mod setlist_collection;
-mod setlist_entry;
+use std::ops;
+use std::vec::IntoIter;
 
-pub use self::setlist_collection::SetlistCollection;
-pub use self::setlist_entry::SetlistEntry;
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
+
 use crate::error::Result;
 use crate::models::list::{List, ListEntryTrait, ListError, ListTrait};
 use crate::models::song_id::SongId;
@@ -10,10 +11,12 @@ use crate::models::song_list::{SongList, SongListTrait};
 use crate::models::team::Team;
 use crate::models::user::User;
 use crate::prelude::RecordTrait;
-use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
-use std::ops;
-use std::vec::IntoIter;
+
+pub use self::setlist_collection::SetlistCollection;
+pub use self::setlist_entry::SetlistEntry;
+
+mod setlist_collection;
+mod setlist_entry;
 
 /// A set of Songs organized by a User
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
@@ -186,16 +189,25 @@ impl AsRef<Setlist> for Setlist {
 impl RecordTrait for Setlist {
     type Id = i32;
 
-    fn id(self) -> Self::Id {
-        Setlist::id(&self)
+    fn id(&self) -> Self::Id {
+        Setlist::id(self)
+    }
+}
+
+impl RecordTrait for &Setlist {
+    type Id = i32;
+
+    fn id(&self) -> Self::Id {
+        Setlist::id(self)
     }
 }
 
 #[cfg(test)]
 mod test {
-    use super::*;
     use crate::prelude::FileType;
     use crate::test_helpers::get_test_user;
+
+    use super::*;
 
     fn entry<S: Into<SongId>>(id: S) -> SetlistEntry {
         let song_id = id.into();

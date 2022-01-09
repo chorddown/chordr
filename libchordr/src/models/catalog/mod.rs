@@ -52,7 +52,7 @@ impl CatalogTrait<Song> for Catalog {
 impl RecordTrait for Catalog {
     type Id = String;
 
-    fn id(self) -> Self::Id {
-        self.revision
+    fn id(&self) -> Self::Id {
+        self.revision.clone()
     }
 }
