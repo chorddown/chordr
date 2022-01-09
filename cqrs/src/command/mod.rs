@@ -1,5 +1,10 @@
-use crate::command_type::CommandType;
-use libchordr::prelude::RecordTrait;
+pub use command_executor::CommandExecutor;
+pub use command_type::CommandType;
+
+use crate::RecordTrait;
+
+mod command_executor;
+mod command_type;
 
 enum Subject<T: RecordTrait> {
     Record(T),
@@ -9,33 +14,37 @@ enum Subject<T: RecordTrait> {
 /// A `Command` defines an operation to mutate data in the system
 /// It is defined by a [`CommandType`] describing the action to perform and the subject of the
 /// operation
-pub struct Command<T: RecordTrait> {
+pub struct Command<T: RecordTrait, C> {
     command_type: CommandType,
     subject: Subject<T>,
+    context: C,
 }
 
-impl<T: RecordTrait> Command<T> {
+impl<T: RecordTrait, C> Command<T, C> {
     /// Create a new command to `Add` `record` to the system
-    pub fn add(record: T) -> Self {
+    pub fn add(record: T, context: C) -> Self {
         Self {
             command_type: CommandType::Add,
             subject: Subject::Record(record),
+            context,
         }
     }
 
     /// Create a new command to `Update` `record` in the system
-    pub fn update(record: T) -> Self {
+    pub fn update(record: T, context: C) -> Self {
         Self {
             command_type: CommandType::Update,
             subject: Subject::Record(record),
+            context,
         }
     }
 
     /// Create a new command to `Delete` the record with `id` from the system
-    pub fn delete(id: T::Id) -> Self {
+    pub fn delete(id: T::Id, context: C) -> Self {
         Self {
             command_type: CommandType::Delete,
             subject: Subject::Id(id),
+            context,
         }
     }
 
@@ -64,5 +73,10 @@ impl<T: RecordTrait> Command<T> {
             Subject::Record(_) => None,
             Subject::Id(ref r) => Some(r),
         }
+    }
+
+    /// Return the `Command`'s context
+    pub fn context(&self) -> &C {
+        &self.context
     }
 }
