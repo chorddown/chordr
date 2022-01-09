@@ -9,6 +9,7 @@ use crate::errors::WebError;
 use crate::lock::request_tick::{request_tick_after_timeout, ClosureHandle};
 
 /// Like a Mutex but not as smart
+#[derive(Debug)]
 pub struct Stupex<T: ?Sized> {
     locked: AtomicBool,
     max_tries: u32,
@@ -60,7 +61,7 @@ impl<T> Stupex<T> {
                 error!("{}", WebError::from(e));
             }
             if self.can_acquire_lock() {
-                return Ok(StupexGuard::with_closure_handle(self, closure_handle));
+                return Ok(StupexGuard::new_with_closure_handle(self, closure_handle));
             }
             i += 1;
         }
@@ -69,18 +70,6 @@ impl<T> Stupex<T> {
             "Could not acquire lock after {} tries",
             self.max_tries
         )))
-    }
-}
-
-impl<T: ?Sized> DerefMut for StupexGuard<'_, T> {
-    fn deref_mut(&mut self) -> &mut T {
-        unsafe { &mut *self.lock.data.get() }
-    }
-}
-
-impl<T: ?Sized + fmt::Display> fmt::Display for StupexGuard<'_, T> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        (**self).fmt(f)
     }
 }
 
@@ -105,7 +94,7 @@ impl<'a, T: ?Sized> StupexGuard<'a, T> {
         }
     }
 
-    fn with_closure_handle(lock: &'a Stupex<T>, closure_handle: Option<ClosureHandle>) -> Self {
+    fn new_with_closure_handle(lock: &'a Stupex<T>, closure_handle: Option<ClosureHandle>) -> Self {
         lock.locked.store(true, Ordering::Relaxed);
 
         Self {
@@ -120,6 +109,18 @@ impl<T: ?Sized> Deref for StupexGuard<'_, T> {
 
     fn deref(&self) -> &T {
         unsafe { &*self.lock.data.get() }
+    }
+}
+
+impl<T: ?Sized> DerefMut for StupexGuard<'_, T> {
+    fn deref_mut(&mut self) -> &mut T {
+        unsafe { &mut *self.lock.data.get() }
+    }
+}
+
+impl<T: ?Sized + fmt::Display> fmt::Display for StupexGuard<'_, T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        (**self).fmt(f)
     }
 }
 
