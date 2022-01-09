@@ -1,10 +1,12 @@
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
+use cqrs::prelude::{Command, CommandType, Query};
 use libchordr::prelude::RecordTrait;
 use webchordr_common::tri::Tri;
 
 use crate::errors::WebError;
+use crate::persistence_manager::CommandContext;
 
 /// Trait for a persistent data Backend.
 ///
@@ -26,19 +28,52 @@ pub trait BackendTrait {
     async fn load<T, N: AsRef<str>, K: AsRef<str>>(&self, namespace: N, key: K) -> Tri<T, WebError>
     where
         T: for<'a> Deserialize<'a>;
-
-    // /// Load the stored value with the given `key` in the `namespace`
-    // async fn find_by_identifier<T, I, ID, N: AsRef<str>, K: AsRef<str>>(
-    //     &self,
-    //     namespace: N,
-    //     key: K,
-    //     identifier: I,
-    // ) -> Result<Option<T>, WebError>
-    // where
-    //     I: Into<<T as RecordTrait>::Id>,
-    //     T: for<'a> Deserialize<'a> + RecordTrait,
-    // {
-    //     self.load(namespace, key).await
-    //     // Err(WebError::custom_error("f"))
-    // }
 }
+
+#[async_trait(? Send)]
+pub trait CommandBackendTrait {
+    async fn perform<T: Serialize + RecordTrait>(
+        &self,
+        command: &Command<T, CommandContext>,
+    ) -> Result<(), WebError> {
+        match command.command_type() {
+            CommandType::Add => self.add(command).await,
+            CommandType::Update => self.update(command).await,
+            CommandType::Delete => self.delete(command).await,
+        }
+    }
+
+    async fn add<T: Serialize + RecordTrait>(
+        &self,
+        command: &Command<T, CommandContext>,
+    ) -> Result<(), WebError>;
+
+    async fn update<T: Serialize + RecordTrait>(
+        &self,
+        command: &Command<T, CommandContext>,
+    ) -> Result<(), WebError>;
+
+    async fn delete<T: Serialize + RecordTrait>(
+        &self,
+        command: &Command<T, CommandContext>,
+    ) -> Result<(), WebError>;
+}
+
+#[async_trait(? Send)]
+pub trait QueryBackendTrait {
+    async fn find_all<T: RecordTrait>(
+        &self,
+        query: &Query<T, CommandContext>,
+    ) -> Result<Vec<T>, WebError>
+    where
+        T: for<'a> Deserialize<'a>;
+
+    async fn find_by_id<T: RecordTrait>(
+        &self,
+        query: &Query<T, CommandContext>,
+    ) -> Tri<T, WebError>
+    where
+        T: for<'a> Deserialize<'a>;
+}
+
+pub trait CommandQueryBackendTrait: BackendTrait + CommandBackendTrait + QueryBackendTrait {}

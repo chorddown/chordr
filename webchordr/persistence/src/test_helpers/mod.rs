@@ -1,10 +1,10 @@
-mod dummy_server_backend;
 mod test_value;
 
+use crate::persistence_manager::CommandContext;
 use chrono::prelude::*;
-pub use dummy_server_backend::DummyServerBackend;
 use libchordr::prelude::*;
 pub use test_value::TestValue;
+use webchordr_common::constants::{STORAGE_KEY_SETLIST, TEST_STORAGE_NAMESPACE};
 
 pub fn entry<S: Into<String>>(id: S) -> SetlistEntry {
     SetlistEntry::from_song_with_settings(&test_song(id), SongSettings::default())
@@ -66,4 +66,8 @@ pub(crate) fn get_test_setlist(user: User) -> Setlist {
         Utc.ymd(2020, 11, 01).and_hms(19, 17, 14),
         vec![entry("song-1"), entry("song-2"), entry("song-3")],
     )
+}
+
+pub(super) fn get_test_command_context() -> CommandContext {
+    CommandContext::new(TEST_STORAGE_NAMESPACE, STORAGE_KEY_SETLIST)
 }

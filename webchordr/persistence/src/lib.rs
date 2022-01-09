@@ -10,8 +10,8 @@ pub mod backend;
 pub mod browser_storage;
 pub mod persistence_manager;
 pub mod session;
+mod shared;
 pub mod storage_key_utility;
-
 #[doc(hidden)]
 #[cfg(test)]
 mod test_helpers;

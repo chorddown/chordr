@@ -4,6 +4,7 @@ use crate::errors::WebError;
 ///
 /// https://developer.mozilla.org/en-US/docs/Web/API/Storage
 pub trait BrowserStorageTrait {
+    fn keys(&self) -> Vec<String>;
     // /// When passed a number n, this method will return the name of the nth key in the storage
     // fn key(&self, index: usize) -> Option<String>;
 

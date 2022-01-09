@@ -1,19 +1,44 @@
 use std::collections::HashMap;
 
+use serde::Serialize;
+
+use cqrs::prelude::RecordTrait;
+
 use crate::errors::WebError;
+use crate::persistence_manager::CommandContext;
+use crate::shared::hash_map_from_context_and_slice;
 
 use super::browser_storage_trait::BrowserStorageTrait;
 
+type Data = HashMap<String, String>;
 pub struct HashMapBrowserStorage {
-    map: HashMap<String, String>,
+    map: Data,
 }
 
 impl HashMapBrowserStorage {
-    #[allow(unused)]
     pub fn new() -> Self {
         Self {
             map: HashMap::new(),
         }
+    }
+
+    pub fn new_with_hash_map(map: HashMap<String, String>) -> Self {
+        Self { map }
+    }
+
+    pub fn from_context_and_slice<T: Serialize + RecordTrait>(
+        context: &CommandContext,
+        entries: &[T],
+    ) -> Self {
+        Self {
+            map: hash_map_from_context_and_slice(context, entries),
+        }
+    }
+
+    /// Allow access to the data
+    #[cfg(test)]
+    pub(crate) fn data(&self) -> &Data {
+        &self.map
     }
 }
 
@@ -24,6 +49,10 @@ impl Default for HashMapBrowserStorage {
 }
 
 impl BrowserStorageTrait for HashMapBrowserStorage {
+    fn keys(&self) -> Vec<String> {
+        self.map.keys().cloned().into_iter().collect()
+    }
+
     fn get_item<S: AsRef<str>>(&self, key_name: S) -> Option<String> {
         self.map.get(key_name.as_ref()).cloned()
     }
@@ -100,5 +129,18 @@ mod test {
         assert_eq!(storage.len(), 2);
         assert!(storage.remove_item("A").is_ok());
         assert_eq!(storage.len(), 1);
+    }
+
+    #[test]
+    fn keys_test() {
+        let mut storage = HashMapBrowserStorage::new();
+        assert!(storage.set_item("A", "Apple").is_ok());
+        assert!(storage.set_item("B", "Banana").is_ok());
+        assert!(storage.set_item("C#", "C Sharp").is_ok());
+
+        let keys = storage.keys();
+        for key in ["A", "B", "C#"] {
+            assert!(keys.contains(&key.to_string()))
+        }
     }
 }

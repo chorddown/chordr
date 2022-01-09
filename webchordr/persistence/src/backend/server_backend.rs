@@ -1,15 +1,21 @@
-use crate::backend::BackendTrait;
+use std::collections::HashMap;
+
+use async_trait::async_trait;
+use serde::{Deserialize, Serialize};
+use wasm_bindgen::JsValue;
+use web_sys::{RequestInit, RequestMode};
+
+use cqrs::prelude::{Command, Query};
+use libchordr::prelude::{Credentials, RecordTrait};
+use webchordr_common::tri::Tri;
+
+use crate::backend::backend_trait::{CommandBackendTrait, QueryBackendTrait};
+use crate::backend::{BackendTrait, CommandQueryBackendTrait};
 use crate::errors::WebError;
 use crate::fetch_helper::{
     fetch_with_additional_headers, fetch_with_options_and_additional_headers,
 };
-use async_trait::async_trait;
-use libchordr::prelude::{Credentials, RecordTrait};
-use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-use wasm_bindgen::JsValue;
-use web_sys::{RequestInit, RequestMode};
-use webchordr_common::tri::Tri;
+use crate::persistence_manager::CommandContext;
 
 pub struct ServerBackend {
     host: String,
@@ -45,13 +51,6 @@ impl ServerBackend {
             None => format!("{}/{}", self.host, key.as_ref()),
             Some(c) => format!("{}/{}/{}", self.host, key.as_ref(), c.username()),
         }
-
-        // if namespace.as_ref().is_empty() {
-        //     key.as_ref().to_string()
-        // } else {
-        //     format!("{}/{}", self.host, key.as_ref())
-        //     // format!("{}/{}/{}", self.host, namespace.as_ref(), key.as_ref())
-        // }
     }
 
     fn build_request_headers(&self) -> HashMap<&str, String> {
@@ -112,3 +111,52 @@ impl BackendTrait for ServerBackend {
             .into()
     }
 }
+
+#[async_trait(? Send)]
+impl CommandBackendTrait for ServerBackend {
+    async fn add<T: Serialize + RecordTrait>(
+        &self,
+        _command: &Command<T, CommandContext>,
+    ) -> Result<(), WebError> {
+        todo!()
+    }
+
+    async fn update<T: Serialize + RecordTrait>(
+        &self,
+        _command: &Command<T, CommandContext>,
+    ) -> Result<(), WebError> {
+        todo!()
+    }
+
+    async fn delete<T: Serialize + RecordTrait>(
+        &self,
+        _command: &Command<T, CommandContext>,
+    ) -> Result<(), WebError> {
+        todo!()
+    }
+}
+
+#[async_trait(? Send)]
+impl QueryBackendTrait for ServerBackend {
+    async fn find_all<T: RecordTrait>(
+        &self,
+        _query: &Query<T, CommandContext>,
+    ) -> Result<Vec<T>, WebError>
+    where
+        T: for<'a> Deserialize<'a>,
+    {
+        todo!()
+    }
+
+    async fn find_by_id<T: RecordTrait>(
+        &self,
+        _query: &Query<T, CommandContext>,
+    ) -> Tri<T, WebError>
+    where
+        T: for<'a> Deserialize<'a>,
+    {
+        todo!()
+    }
+}
+
+impl CommandQueryBackendTrait for ServerBackend {}

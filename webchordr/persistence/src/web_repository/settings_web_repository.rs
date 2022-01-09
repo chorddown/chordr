@@ -1,4 +1,5 @@
 use super::WebRepositoryTrait;
+use crate::backend::BackendTrait;
 use crate::persistence_manager::PersistenceManagerTrait;
 use crate::WebError;
 use async_trait::async_trait;
@@ -23,7 +24,7 @@ where
 #[async_trait(? Send)]
 impl<'a, P> WebRepositoryTrait for SettingsWebRepository<'a, P>
 where
-    P: PersistenceManagerTrait,
+    P: PersistenceManagerTrait + BackendTrait,
 {
     type ManagedType = SongSettingsMap;
 

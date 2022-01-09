@@ -72,7 +72,7 @@ impl SessionService {
         let user = main_data.user.clone().with_password(password);
         log::info!("{:?}", user);
         Ok(SessionMainData {
-            session: Session::with_user(user.clone()),
+            session: Session::new_with_user(user.clone()),
             main_data: main_data.with_user(user),
         })
     }
@@ -85,7 +85,7 @@ impl SessionService {
 
         let user = user.with_password(credentials.password().clone());
         log::info!("{:?}", user);
-        Ok(Session::with_user(user))
+        Ok(Session::new_with_user(user))
     }
 
     fn get_password_from_session_storage(&self) -> Result<Password, WebError> {
