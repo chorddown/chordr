@@ -21,7 +21,7 @@ pub fn get_routes() -> Vec<rocket::Route> {
 
 #[get("/")]
 pub async fn setlist_index(conn: DbConn) -> Json<Vec<Setlist>> {
-    conn.run(move |conn| Json(SetlistRepository::new().find_all(conn).unwrap()))
+    conn.run(move |conn| Json(SetlistRepository::new(conn).find_all().unwrap()))
         .await
 }
 
@@ -36,15 +36,15 @@ pub async fn setlist_list(
         Err(_) => return None,
     };
 
-    conn.run(move |conn| {
-        match SetlistRepository::new().find_by_username(conn, &username_instance) {
+    conn.run(
+        move |conn| match SetlistRepository::new(conn).find_by_username(&username_instance) {
             Ok(setlists) => Some(Json(setlists)),
             Err(e) => {
                 warn!("No setlists for user {} found: {}", username, e);
                 None
             }
-        }
-    })
+        },
+    )
     .await
 }
 
@@ -61,11 +61,9 @@ pub async fn setlist_get(
     };
 
     conn.run(move |conn| {
-        match SetlistRepository::new().find_by_username_and_setlist_id(
-            conn,
-            &username_instance,
-            setlist,
-        ) {
+        match SetlistRepository::new(conn)
+            .find_by_username_and_setlist_id(&username_instance, setlist)
+        {
             Ok(setlist) => Some(Json(setlist)),
             Err(_) => {
                 warn!("Setlist {} for user {} not found", setlist, username);
@@ -87,8 +85,8 @@ pub async fn setlist_get_latest(
         Err(_) => return None,
     };
 
-    conn.run(move |conn| {
-        match SetlistRepository::new().find_by_username(conn, &username_instance) {
+    conn.run(
+        move |conn| match SetlistRepository::new(conn).find_by_username(&username_instance) {
             Ok(setlists) if setlists.is_empty() => {
                 warn!("No setlists for user {} found", username);
                 None
@@ -106,8 +104,8 @@ pub async fn setlist_get_latest(
                 warn!("No setlists for user {} found: {}", username, e);
                 None
             }
-        }
-    })
+        },
+    )
     .await
 }
 
@@ -123,10 +121,10 @@ pub async fn setlist_delete(
         Err(_) => return None,
     };
 
-    let repo = SetlistRepository::new();
     conn.run(move |conn| {
-        match repo.find_by_username_and_setlist_id(conn, &username_instance, setlist) {
-            Ok(setlist) => repo.delete(conn, setlist).ok(),
+        let repo = SetlistRepository::new(conn);
+        match repo.find_by_username_and_setlist_id(&username_instance, setlist) {
+            Ok(setlist) => repo.delete(setlist).ok(),
             Err(_) => {
                 warn!("Setlist {} for user {} not found", setlist, username);
                 None
@@ -152,12 +150,12 @@ pub async fn setlist_put(
     // Todo: Check if user did not change
     let setlist = setlist.into_inner();
 
-    let repo = SetlistRepository::new();
     conn.run(move |conn| {
-        match repo.find_by_username_and_setlist_id(conn, &username_instance, setlist.id()) {
+        let repo = SetlistRepository::new(conn);
+        match repo.find_by_username_and_setlist_id(&username_instance, setlist.id()) {
             Ok(_) => {
                 info!("Perform update setlist {} #{}", username, setlist.id());
-                match repo.update(conn, setlist.clone()) {
+                match repo.update(setlist.clone()) {
                     Ok(_) => Some(Json(setlist)),
                     Err(e) => {
                         error!("{}", e);
@@ -167,7 +165,7 @@ pub async fn setlist_put(
             }
             Err(_) => {
                 info!("Perform add setlist {} #{}", username, setlist.id());
-                match repo.add(conn, setlist.clone()) {
+                match repo.add(setlist.clone()) {
                     Ok(_) => Some(Json(setlist)),
                     Err(e) => {
                         error!("{}", e);
@@ -204,14 +202,14 @@ mod test {
     use rocket::http::Header;
     use rocket::http::Status;
 
+    // use crate::traits::RepositoryTrait;
+    use cqrs::prelude::RepositoryTrait;
     use libchordr::prelude::ListTrait;
 
     use crate::domain::setlist::repository::SetlistRepository;
     use crate::test_helpers::{
         create_random_user, create_setlist, json_format, run_test_fn, JsonTemplateValue,
     };
-    // use crate::traits::RepositoryTrait;
-    use cqrs::prelude::RepositoryTrait;
 
     #[test]
     fn test_get() {
@@ -257,8 +255,8 @@ mod test {
     fn test_insertion_deletion() {
         run_test_fn(|client, conn| {
             let mut rng = rand::thread_rng();
-            let user_setlist_repository = SetlistRepository::new();
-            let initial_count = user_setlist_repository.count_all(&conn.0).unwrap();
+            let user_setlist_repository = SetlistRepository::new(&conn.0);
+            let initial_count = user_setlist_repository.count_all().unwrap();
 
             let user = create_random_user(&conn.0);
             let username = user.username;
@@ -293,7 +291,7 @@ mod test {
 
             // Ensure we have one more setlist in the database
             assert_eq!(
-                user_setlist_repository.count_all(&conn.0).unwrap(),
+                user_setlist_repository.count_all().unwrap(),
                 initial_count + 1
             );
 
@@ -308,7 +306,7 @@ mod test {
 
             // Ensure the setlist is what we expect
             let setlist = user_setlist_repository
-                .find_by_id(&conn.0, random_id)
+                .find_by_id(random_id)
                 .expect_some("New setlist not found");
             assert_eq!(setlist.len(), 2);
             assert_eq!(setlist.owner().username().to_string(), username);
@@ -321,10 +319,7 @@ mod test {
             assert_eq!(delete_response.status(), Status::Ok);
 
             // Ensure it's gone
-            assert_eq!(
-                user_setlist_repository.count_all(&conn.0).unwrap(),
-                initial_count
-            );
+            assert_eq!(user_setlist_repository.count_all().unwrap(), initial_count);
             assert_eq!(
                 client
                     .get(format!("/setlist/{}/{}", username, random_id))
@@ -340,7 +335,7 @@ mod test {
     fn test_update() {
         run_test_fn(|client, conn| {
             let mut rng = rand::thread_rng();
-            let user_setlist_repository = SetlistRepository::new();
+            let user_setlist_repository = SetlistRepository::new(&conn.0);
 
             let user = create_random_user(&conn.0);
             let username = user.username;
@@ -348,7 +343,7 @@ mod test {
 
             let random_id = rng.gen_range(10000, i32::MAX);
             create_setlist(&conn.0, random_id, username.clone());
-            let initial_count = user_setlist_repository.count_all(&conn.0).unwrap();
+            let initial_count = user_setlist_repository.count_all().unwrap();
             let now = Utc::now();
 
             // Issue a request to insert a new setlist
@@ -376,14 +371,11 @@ mod test {
             assert_eq!(post_response.status(), Status::Ok);
 
             // Ensure we have the same number of setlists in the database
-            assert_eq!(
-                user_setlist_repository.count_all(&conn.0).unwrap(),
-                initial_count
-            );
+            assert_eq!(user_setlist_repository.count_all().unwrap(), initial_count);
 
             // Ensure the setlist is what we expect
             let setlist = user_setlist_repository
-                .find_by_id(&conn.0, random_id)
+                .find_by_id(random_id)
                 .expect_some("New setlist not found");
             assert_eq!(setlist.len(), 0);
             assert_eq!(setlist.owner().username().to_string().as_str(), username);

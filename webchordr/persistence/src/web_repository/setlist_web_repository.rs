@@ -40,6 +40,13 @@ where
         crate::constants::STORAGE_KEY_SETLIST
     }
 
+    fn build_context() -> CommandContext {
+        CommandContext::new(
+            crate::constants::STORAGE_NAMESPACE,
+            crate::constants::STORAGE_KEY_SETLIST,
+        )
+    }
+
     async fn store(&mut self, value: &Self::ManagedType) -> Result<(), WebError> {
         self.persistence_manager
             .store(Self::namespace(), Self::key(), value)
@@ -54,64 +61,50 @@ where
 }
 
 #[async_trait(? Send)]
-impl<'a, 'b, P> cqrs::prelude::AsyncRepositoryTrait for &'b SetlistWebRepository<'a, P>
+impl<'a, P> cqrs::prelude::AsyncRepositoryTrait for SetlistWebRepository<'a, P>
 where
-    P: PersistenceManagerTrait,
+    P: PersistenceManagerTrait + BackendTrait,
 {
     type ManagedType = Setlist;
     type Error = WebError;
-    type Context = CommandContext;
 
-    async fn find_all(
-        &self,
-        context: &Self::Context,
-    ) -> Result<Vec<Self::ManagedType>, Self::Error> {
+    async fn find_all(&self) -> Result<Vec<Self::ManagedType>, Self::Error> {
         self.persistence_manager
-            .find_all::<Self::ManagedType>(context.clone())
+            .find_all::<Self::ManagedType>(Self::build_context())
             .await
     }
 
-    async fn count_all(&self, context: &Self::Context) -> Result<Count, Self::Error> {
-        self.persistence_manager.count_all(context.clone()).await
+    async fn count_all(&self) -> Result<Count, Self::Error> {
+        self.persistence_manager
+            .count_all(Self::build_context())
+            .await
     }
 
     async fn find_by_id(
         &self,
-        context: &Self::Context,
+
         id: <Self::ManagedType as RecordTrait>::Id,
     ) -> Tri<Self::ManagedType, Self::Error> {
         self.persistence_manager
-            .find_by_id::<Self::ManagedType>(context.clone(), id)
+            .find_by_id::<Self::ManagedType>(Self::build_context(), id)
             .await
     }
 
-    async fn add(
-        &self,
-        context: &Self::Context,
-        instance: Self::ManagedType,
-    ) -> Result<(), Self::Error> {
+    async fn add(&self, instance: Self::ManagedType) -> Result<(), Self::Error> {
         self.persistence_manager
-            .add::<Self::ManagedType>(context.clone(), &instance)
+            .add::<Self::ManagedType>(Self::build_context(), &instance)
             .await
     }
 
-    async fn update(
-        &self,
-        context: &Self::Context,
-        instance: Self::ManagedType,
-    ) -> Result<(), Self::Error> {
+    async fn update(&self, instance: Self::ManagedType) -> Result<(), Self::Error> {
         self.persistence_manager
-            .update::<Self::ManagedType>(context.clone(), &instance)
+            .update::<Self::ManagedType>(Self::build_context(), &instance)
             .await
     }
 
-    async fn delete(
-        &self,
-        context: &Self::Context,
-        instance: Self::ManagedType,
-    ) -> Result<(), Self::Error> {
+    async fn delete(&self, instance: Self::ManagedType) -> Result<(), Self::Error> {
         self.persistence_manager
-            .delete::<Self::ManagedType>(context.clone(), &instance)
+            .delete::<Self::ManagedType>(Self::build_context(), &instance)
             .await
     }
 }

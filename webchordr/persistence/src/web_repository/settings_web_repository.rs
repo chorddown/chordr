@@ -1,6 +1,6 @@
 use super::WebRepositoryTrait;
 use crate::backend::BackendTrait;
-use crate::persistence_manager::PersistenceManagerTrait;
+use crate::persistence_manager::{CommandContext, PersistenceManagerTrait};
 use crate::WebError;
 use async_trait::async_trait;
 use libchordr::prelude::SongSettingsMap;
@@ -34,6 +34,13 @@ where
 
     fn key() -> &'static str {
         crate::constants::STORAGE_KEY_SETTINGS
+    }
+
+    fn build_context() -> CommandContext {
+        CommandContext::new(
+            crate::constants::STORAGE_NAMESPACE,
+            crate::constants::STORAGE_KEY_SETTINGS,
+        )
     }
 
     async fn store(&mut self, value: &Self::ManagedType) -> Result<(), WebError> {

@@ -2,6 +2,8 @@ use chrono::Utc;
 use diesel::{Connection, SqliteConnection};
 use parking_lot::{const_mutex, Mutex};
 use rand::{thread_rng, Rng};
+use rocket::local::blocking::Client;
+use rocket::{Build, Rocket};
 
 use cqrs::prelude::{Command, CommandExecutor, RepositoryTrait};
 use libchordr::models::user::User;
@@ -11,13 +13,9 @@ use crate::domain::setlist::command::SetlistCommandExecutor;
 use crate::domain::user::command::UserCommandExecutor;
 use crate::domain::user::repository::UserRepository;
 use crate::domain::user::UserDb;
-// use crate::traits::RepositoryTrait;
 use crate::ConnectionType;
 
 pub use self::json_formatting::*;
-// use crate::traits::RepositoryTrait;
-use rocket::local::blocking::Client;
-use rocket::{Build, Rocket};
 
 mod json_formatting;
 
@@ -128,7 +126,7 @@ pub fn create_random_user(conn: &ConnectionType) -> UserDb {
         password_hash: password.clone(),
     };
 
-    UserRepository::new().add(conn, user.clone()).unwrap();
+    UserRepository::new(conn).add(user.clone()).unwrap();
 
     user
 }

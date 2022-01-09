@@ -2,15 +2,15 @@ use async_trait::async_trait;
 use wasm_bindgen::__rt::core::marker::PhantomData;
 
 use libchordr::prelude::Catalog;
+use webchordr_common::tri::Tri;
 
 use crate::backend::{BackendTrait, BrowserStorageBackend};
 use crate::browser_storage::BrowserStorage;
 use crate::constants::{STORAGE_KEY_CATALOG, STORAGE_NAMESPACE};
 use crate::errors::PersistenceError;
 use crate::fetch_helper::fetch;
-use crate::persistence_manager::PersistenceManagerTrait;
+use crate::persistence_manager::{CommandContext, PersistenceManagerTrait};
 use crate::WebError;
-use webchordr_common::tri::Tri;
 
 use super::WebRepositoryTrait;
 
@@ -58,6 +58,10 @@ where
 
     fn key() -> &'static str {
         ""
+    }
+
+    fn build_context() -> CommandContext {
+        CommandContext::new("", "")
     }
 
     async fn store(&mut self, _value: &Self::ManagedType) -> Result<(), WebError> {

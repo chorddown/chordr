@@ -15,30 +15,28 @@ use crate::schema::setlist;
 use crate::schema::setlist::dsl::setlist as all_setlists;
 use crate::ConnectionType;
 
-pub struct SetlistRepository {}
+pub struct SetlistRepository<'a> {
+    connection: &'a ConnectionType,
+}
 
 type PopulateResult = (SetlistDb, Vec<SetlistDbEntry>);
 
-impl SetlistRepository {
-    pub fn new() -> Self {
-        Self {}
+impl<'a> SetlistRepository<'a> {
+    pub fn new(connection: &'a ConnectionType) -> Self {
+        Self { connection }
     }
 
     /// Return all [`Setlist`]'s for the given [`Username`]
-    pub fn find_by_username(
-        &self,
-        connection: &ConnectionType,
-        username: &Username,
-    ) -> Result<Vec<Setlist>, SrvError> {
+    pub fn find_by_username(&self, username: &Username) -> Result<Vec<Setlist>, SrvError> {
         let search = all_setlists
             .order(setlist::sorting.asc())
             .filter(crate::schema::setlist::owner.eq(&username.to_string()))
-            .load::<SetlistDb>(connection)?;
+            .load::<SetlistDb>(self.connection)?;
 
-        let owner = UserRepository::new()
-            .find_by_name(connection, username.to_string())?
+        let owner = UserRepository::new(self.connection)
+            .find_by_name(username.to_string())?
             .try_to_user()?;
-        let populated_entries = self.populate_entries(connection, search)?;
+        let populated_entries = self.populate_entries(search)?;
 
         self.build_setlist(populated_entries, owner)
     }
@@ -46,17 +44,16 @@ impl SetlistRepository {
     /// Return the [`Setlist`] with `setlist_id` for the given [`Username`]
     pub fn find_by_username_and_setlist_id(
         &self,
-        connection: &ConnectionType,
         username: &Username,
         setlist_id: i32,
     ) -> Result<Setlist, SrvError> {
         let sl = all_setlists
             .filter(crate::schema::setlist::owner.eq(&username.to_string()))
             .filter(crate::schema::setlist::id.eq(setlist_id))
-            .first::<SetlistDb>(connection)?;
+            .first::<SetlistDb>(self.connection)?;
 
-        let entries = SetlistDbEntry::find_by_setlist(connection, &sl)?;
-        let owner = self.get_user(connection, username)?;
+        let entries = SetlistDbEntry::find_by_setlist(self.connection, &sl)?;
+        let owner = self.get_user(username)?;
         // TODO: Add support for Teams
         let team: Option<Team> = None;
 
@@ -69,15 +66,15 @@ impl SetlistRepository {
     // /// Return all [`Setlist`]'s for the given [`User`]
     // pub fn find_by_user(
     //     &self,
-    //     connection: &ConnectionType,
+    //     _connection: &ConnectionType,
     //     owner: &User,
     // ) -> Result<Vec<Setlist>, SrvError> {
     //     let search = all_setlists
     //         .order(setlist::sorting.asc())
     //         .filter(crate::schema::setlist::owner.eq(&owner.username().to_string()))
-    //         .load::<SetlistDb>(connection)?;
+    //         .load::<SetlistDb>(self.connection)?;
     //
-    //     let populated_entries = self.populate_entries(connection, search)?;
+    //     let populated_entries = self.populate_entries(self.connection, search)?;
     //
     //     self.build_setlist(populated_entries, owner)
     // }
@@ -101,26 +98,22 @@ impl SetlistRepository {
             .collect::<Vec<Setlist>>())
     }
 
-    fn populate_entries(
-        &self,
-        connection: &ConnectionType,
-        setlists: Vec<SetlistDb>,
-    ) -> Result<Vec<PopulateResult>, SrvError> {
+    fn populate_entries(&self, setlists: Vec<SetlistDb>) -> Result<Vec<PopulateResult>, SrvError> {
         let entries: Vec<SetlistDbEntry> =
-            SetlistDbEntry::belonging_to(&setlists).load(connection)?;
+            SetlistDbEntry::belonging_to(&setlists).load(self.connection)?;
         let grouped_entries: Vec<Vec<SetlistDbEntry>> = entries.into_iter().grouped_by(&setlists);
 
         Ok(setlists.into_iter().zip(grouped_entries).collect())
     }
 
-    fn get_user(&self, connection: &ConnectionType, username: &Username) -> Result<User, SrvError> {
-        UserRepository::new()
-            .find_by_name(connection, username.to_string())?
+    fn get_user(&self, username: &Username) -> Result<User, SrvError> {
+        UserRepository::new(self.connection)
+            .find_by_name(username.to_string())?
             .try_to_user()
     }
 
-    fn get_users(&self, connection: &ConnectionType) -> Result<Vec<User>, SrvError> {
-        let raw_users = UserRepository::new().find_all(connection)?;
+    fn get_users(&self) -> Result<Vec<User>, SrvError> {
+        let raw_users = UserRepository::new(self.connection).find_all()?;
         let users = raw_users
             .into_iter()
             .filter_map(|u| u.try_to_user().ok())
@@ -128,26 +121,22 @@ impl SetlistRepository {
         Ok(users)
     }
 
-    fn get_command_executor<'a>(
-        &self,
-        connection: &'a ConnectionType,
-    ) -> SetlistCommandExecutor<'a> {
+    fn get_command_executor(&self, connection: &'a ConnectionType) -> SetlistCommandExecutor<'a> {
         SetlistCommandExecutor::new_with_connection(connection)
     }
 }
 
-impl cqrs::prelude::RepositoryTrait for SetlistRepository {
+impl<'a> cqrs::prelude::RepositoryTrait for SetlistRepository<'a> {
     type ManagedType = Setlist;
     type Error = SrvError;
-    type Context = ConnectionType;
 
-    fn find_all(&self, context: &ConnectionType) -> Result<Vec<Self::ManagedType>, Self::Error> {
+    fn find_all(&self) -> Result<Vec<Self::ManagedType>, Self::Error> {
         let search = all_setlists
             .order(setlist::sorting.asc())
-            .load::<SetlistDb>(context)?;
-        let populated_entries: Vec<PopulateResult> = self.populate_entries(context, search)?;
+            .load::<SetlistDb>(self.connection)?;
+        let populated_entries: Vec<PopulateResult> = self.populate_entries(search)?;
 
-        let users = self.get_users(context)?;
+        let users = self.get_users()?;
 
         Ok(populated_entries
             .into_iter()
@@ -155,19 +144,18 @@ impl cqrs::prelude::RepositoryTrait for SetlistRepository {
             .collect())
     }
 
-    fn count_all(&self, connection: &ConnectionType) -> Result<Count, Self::Error> {
-        Ok(all_setlists.count().get_result(connection)?)
+    fn count_all(&self) -> Result<Count, Self::Error> {
+        Ok(all_setlists.count().get_result(self.connection)?)
     }
 
-    fn find_by_id(
-        &self,
-        connection: &ConnectionType,
-        id: <Setlist as RecordTrait>::Id,
-    ) -> Tri<Self::ManagedType, Self::Error> {
-        match all_setlists.find(id).get_result::<SetlistDb>(connection) {
+    fn find_by_id(&self, id: <Setlist as RecordTrait>::Id) -> Tri<Self::ManagedType, Self::Error> {
+        match all_setlists
+            .find(id)
+            .get_result::<SetlistDb>(self.connection)
+        {
             Ok(setlist_db_instance) => {
-                let entries = setlist_db_instance.entries(connection);
-                let users = match self.get_users(connection) {
+                let entries = setlist_db_instance.entries(self.connection);
+                let users = match self.get_users() {
                     Ok(u) => u,
                     Err(e) => return Tri::Err(e),
                 };
@@ -181,30 +169,18 @@ impl cqrs::prelude::RepositoryTrait for SetlistRepository {
         }
     }
 
-    fn add(
-        &self,
-        connection: &ConnectionType,
-        instance: Self::ManagedType,
-    ) -> Result<(), Self::Error> {
-        self.get_command_executor(connection)
+    fn add(&self, instance: Self::ManagedType) -> Result<(), Self::Error> {
+        self.get_command_executor(self.connection)
             .perform(cqrs::prelude::Command::add(instance, ()))
     }
 
-    fn update(
-        &self,
-        connection: &ConnectionType,
-        instance: Self::ManagedType,
-    ) -> Result<(), Self::Error> {
-        self.get_command_executor(connection)
+    fn update(&self, instance: Self::ManagedType) -> Result<(), Self::Error> {
+        self.get_command_executor(self.connection)
             .perform(cqrs::prelude::Command::update(instance, ()))
     }
 
-    fn delete(
-        &self,
-        connection: &ConnectionType,
-        instance: Self::ManagedType,
-    ) -> Result<(), Self::Error> {
-        self.get_command_executor(connection)
+    fn delete(&self, instance: Self::ManagedType) -> Result<(), Self::Error> {
+        self.get_command_executor(self.connection)
             .perform(cqrs::prelude::Command::delete(instance.id(), ()))
     }
 }
@@ -246,6 +222,7 @@ fn assign_owner_to_populated_result(
 mod test {
     use chrono::Utc;
 
+    use cqrs::prelude::RepositoryTrait;
     use libchordr::models::file_type::FileType;
     use libchordr::prelude::{Setlist, SetlistEntry, User, Username};
 
@@ -254,15 +231,14 @@ mod test {
     use crate::test_helpers::*;
 
     use super::*;
-    use cqrs::prelude::RepositoryTrait;
 
     #[test]
     fn test_find_all() {
         run_database_test(|conn| {
             clear_database(&conn);
-            let repository = SetlistRepository::new();
-            assert_eq!(repository.count_all(&conn).unwrap(), 0);
-            assert_eq!(repository.find_all(&conn).unwrap(), vec![]);
+            let repository = SetlistRepository::new(&conn);
+            assert_eq!(repository.count_all().unwrap(), 0);
+            assert_eq!(repository.find_all().unwrap(), vec![]);
 
             insert_test_user(&conn, "user-819", "Saul", "Doe");
             let inserted_setlists = vec![
@@ -270,8 +246,8 @@ mod test {
                 create_setlist(&conn, 918, "user-819"),
             ];
 
-            assert_eq!(repository.count_all(&conn).unwrap(), 2);
-            assert_eq!(repository.find_all(&conn).unwrap(), inserted_setlists);
+            assert_eq!(repository.count_all().unwrap(), 2);
+            assert_eq!(repository.find_all().unwrap(), inserted_setlists);
         })
     }
 
@@ -284,11 +260,8 @@ mod test {
             insert_test_user(&conn, "user-819", "Saul", "Doe");
             create_setlist(&conn, random_id, "user-819");
 
-            let repository = SetlistRepository::new();
-            assert_eq!(
-                repository.find_by_id(&conn, random_id).unwrap().id(),
-                random_id
-            );
+            let repository = SetlistRepository::new(&conn);
+            assert_eq!(repository.find_by_id(random_id).unwrap().id(), random_id);
         })
     }
 
@@ -306,8 +279,8 @@ mod test {
             let sl1 = create_setlist(&conn, random_id + 100, &user_id_string);
             let sl2 = create_setlist(&conn, random_id + 200, &user_id_string);
 
-            let repository = SetlistRepository::new();
-            let setlists_result = repository.find_by_username(&conn, &user.username());
+            let repository = SetlistRepository::new(&conn);
+            let setlists_result = repository.find_by_username(&user.username());
             assert!(setlists_result.is_ok());
             let setlists = setlists_result.unwrap();
             assert_eq!(setlists.len(), 2);
@@ -328,9 +301,8 @@ mod test {
             let sl1 = create_setlist(&conn, random_id + 100, &user_id_string);
             let _sl2 = create_setlist(&conn, random_id + 200, &user_id_string);
 
-            let repository = SetlistRepository::new();
+            let repository = SetlistRepository::new(&conn);
             let setlist_result = repository.find_by_username_and_setlist_id(
-                &conn,
                 &Username::new(user_id_string).unwrap(),
                 Setlist::id(&sl1),
             );
@@ -344,8 +316,8 @@ mod test {
     fn test_count_all() {
         run_database_test(|conn| {
             clear_database(&conn);
-            let repository = SetlistRepository::new();
-            assert_eq!(repository.count_all(&conn).unwrap(), 0);
+            let repository = SetlistRepository::new(&conn);
+            assert_eq!(repository.count_all().unwrap(), 0);
             insert_test_user(&conn, "819", "Saul", "Doe");
 
             create_setlist(&conn, 1, "819");
@@ -353,7 +325,7 @@ mod test {
             create_setlist(&conn, 3, "819");
             create_setlist(&conn, 4, "819");
 
-            assert_eq!(repository.count_all(&conn).unwrap(), 4);
+            assert_eq!(repository.count_all().unwrap(), 4);
         })
     }
 
@@ -381,7 +353,7 @@ mod test {
                 vec![],
             );
 
-            SetlistRepository::new().add(&conn, new_setlist).unwrap();
+            SetlistRepository::new(&conn).add(new_setlist).unwrap();
 
             let new_setlists = SetlistDb::all(&conn);
             assert_eq!(new_setlists.len(), init_setlists.len() + 1);
@@ -421,7 +393,7 @@ mod test {
                 ],
             );
 
-            SetlistRepository::new().add(&conn, new_setlist).unwrap();
+            SetlistRepository::new(&conn).add(new_setlist).unwrap();
 
             let new_setlists = SetlistDb::all(&conn);
             assert_eq!(new_setlists.len(), init_setlists.len() + 1);
@@ -441,26 +413,23 @@ mod test {
 
             assert_eq!(SetlistDbEntry::count_all(&conn), 6);
 
-            SetlistRepository::new()
-                .update(
-                    &conn,
-                    Setlist::new(
-                        "My setlist #918",
-                        918, // Same ID
-                        // New User:
-                        User::new(
-                            Username::new("paul-8190").unwrap(),
-                            "Paul",
-                            "Doe",
-                            create_test_password(),
-                        ),
-                        None,
-                        None,
-                        Utc::now(),
-                        Utc::now(),
-                        vec![],
+            SetlistRepository::new(&conn)
+                .update(Setlist::new(
+                    "My setlist #918",
+                    918, // Same ID
+                    // New User:
+                    User::new(
+                        Username::new("paul-8190").unwrap(),
+                        "Paul",
+                        "Doe",
+                        create_test_password(),
                     ),
-                )
+                    None,
+                    None,
+                    Utc::now(),
+                    Utc::now(),
+                    vec![],
+                ))
                 .unwrap();
 
             assert_eq!(SetlistDb::count_all(&conn), 2);
@@ -477,31 +446,28 @@ mod test {
 
             assert_eq!(SetlistDbEntry::count_all(&conn), 6);
 
-            SetlistRepository::new()
-                .update(
-                    &conn,
-                    Setlist::new(
-                        "My setlist #918",
-                        918, // Same ID
-                        // New User:
-                        User::new(
-                            Username::new("paul-8190").unwrap(),
-                            "Paul",
-                            "Doe",
-                            create_test_password(),
-                        ),
-                        None,
-                        None,
-                        Utc::now(),
-                        Utc::now(),
-                        vec![SetlistEntry::new(
-                            "song-4",
-                            FileType::Chorddown,
-                            "Song 4",
-                            None,
-                        )],
+            SetlistRepository::new(&conn)
+                .update(Setlist::new(
+                    "My setlist #918",
+                    918, // Same ID
+                    // New User:
+                    User::new(
+                        Username::new("paul-8190").unwrap(),
+                        "Paul",
+                        "Doe",
+                        create_test_password(),
                     ),
-                )
+                    None,
+                    None,
+                    Utc::now(),
+                    Utc::now(),
+                    vec![SetlistEntry::new(
+                        "song-4",
+                        FileType::Chorddown,
+                        "Song 4",
+                        None,
+                    )],
+                ))
                 .unwrap();
 
             assert_eq!(SetlistDb::count_all(&conn), 2);
@@ -517,20 +483,17 @@ mod test {
             create_setlist(&conn, 918, "user-819");
             create_setlist(&conn, 1918, "user-1819");
 
-            SetlistRepository::new()
-                .delete(
-                    &conn,
-                    Setlist::new(
-                        "My setlist #918",
-                        918, // This is important
-                        User::unknown(),
-                        None,
-                        None,
-                        Utc::now(),
-                        Utc::now(),
-                        vec![],
-                    ),
-                )
+            SetlistRepository::new(&conn)
+                .delete(Setlist::new(
+                    "My setlist #918",
+                    918, // This is important
+                    User::unknown(),
+                    None,
+                    None,
+                    Utc::now(),
+                    Utc::now(),
+                    vec![],
+                ))
                 .unwrap();
 
             assert_eq!(SetlistDb::count_all(&conn), 1);

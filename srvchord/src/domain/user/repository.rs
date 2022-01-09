@@ -12,76 +12,59 @@ use crate::schema::user;
 use crate::schema::user::dsl::user as all_users;
 use crate::ConnectionType;
 
-pub struct UserRepository {}
+pub struct UserRepository<'a> {
+    connection: &'a ConnectionType,
+}
 
-impl UserRepository {
-    pub fn new() -> Self {
-        Self {}
+impl<'a> UserRepository<'a> {
+    pub fn new(connection: &'a ConnectionType) -> Self {
+        Self { connection }
     }
 
-    pub fn find_by_name<S: AsRef<str>>(
-        &self,
-        connection: &ConnectionType,
-        username: S,
-    ) -> Result<UserDb, SrvError> {
+    pub fn find_by_name<S: AsRef<str>>(&self, username: S) -> Result<UserDb, SrvError> {
         Ok(all_users
             .filter(crate::schema::user::username.eq(username.as_ref()))
-            .first(connection)?)
+            .first(self.connection)?)
     }
 
-    fn get_command_executor<'a>(&self, connection: &'a ConnectionType) -> UserCommandExecutor<'a> {
+    fn get_command_executor(&self, connection: &'a ConnectionType) -> UserCommandExecutor<'a> {
         UserCommandExecutor::new_with_connection(connection)
     }
 }
 
-impl cqrs::prelude::RepositoryTrait for UserRepository {
+impl<'a> cqrs::prelude::RepositoryTrait for UserRepository<'a> {
     type ManagedType = UserDb;
     type Error = SrvError;
-    type Context = ConnectionType;
 
-    fn find_all(&self, context: &ConnectionType) -> Result<Vec<Self::ManagedType>, Self::Error> {
-        Ok(all_users.order(user::username.desc()).load(context)?)
+    fn find_all(&self) -> Result<Vec<Self::ManagedType>, Self::Error> {
+        Ok(all_users
+            .order(user::username.desc())
+            .load(self.connection)?)
     }
 
-    fn count_all(&self, context: &ConnectionType) -> Result<Count, Self::Error> {
-        Ok(all_users.count().get_result(context)?)
+    fn count_all(&self) -> Result<Count, Self::Error> {
+        Ok(all_users.count().get_result(self.connection)?)
     }
 
-    fn find_by_id(
-        &self,
-        context: &ConnectionType,
-        id: <UserDb as RecordTrait>::Id,
-    ) -> Tri<Self::ManagedType, Self::Error> {
-        match all_users.find(id).get_result::<UserDb>(context) {
+    fn find_by_id(&self, id: <UserDb as RecordTrait>::Id) -> Tri<Self::ManagedType, Self::Error> {
+        match all_users.find(id).get_result::<UserDb>(self.connection) {
             Ok(o) => Tri::Some(o),
             Err(e) => Tri::Err(e.into()),
         }
     }
 
-    fn add(
-        &self,
-        context: &ConnectionType,
-        instance: Self::ManagedType,
-    ) -> Result<(), Self::Error> {
-        self.get_command_executor(context)
+    fn add(&self, instance: Self::ManagedType) -> Result<(), Self::Error> {
+        self.get_command_executor(self.connection)
             .perform(cqrs::prelude::Command::add(instance, ()))
     }
 
-    fn update(
-        &self,
-        context: &ConnectionType,
-        instance: Self::ManagedType,
-    ) -> Result<(), Self::Error> {
-        self.get_command_executor(context)
+    fn update(&self, instance: Self::ManagedType) -> Result<(), Self::Error> {
+        self.get_command_executor(self.connection)
             .perform(cqrs::prelude::Command::update(instance, ()))
     }
 
-    fn delete(
-        &self,
-        context: &ConnectionType,
-        instance: Self::ManagedType,
-    ) -> Result<(), Self::Error> {
-        self.get_command_executor(context)
+    fn delete(&self, instance: Self::ManagedType) -> Result<(), Self::Error> {
+        self.get_command_executor(self.connection)
             .perform(cqrs::prelude::Command::delete(
                 RecordTrait::id(&instance),
                 (),

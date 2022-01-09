@@ -97,7 +97,7 @@ impl<'r> FromRequest<'r> for UserDb {
                 };
 
                 conn.run(move |conn| {
-                    match UserRepository::new().find_by_name(conn, &credentials.username()) {
+                    match UserRepository::new(conn).find_by_name(&credentials.username()) {
                         Ok(user) if verify_password(&credentials, &user) => Outcome::Success(user),
                         Ok(_) => {
                             warn!("Wrong password");
