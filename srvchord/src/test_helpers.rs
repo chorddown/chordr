@@ -3,7 +3,7 @@ use diesel::{Connection, SqliteConnection};
 use parking_lot::{const_mutex, Mutex};
 use rand::{thread_rng, Rng};
 
-use cqrs::prelude::{Command, CommandExecutor};
+use cqrs::prelude::{Command, CommandExecutor, RepositoryTrait};
 use libchordr::models::user::User;
 use libchordr::prelude::{FileType, Password, Setlist, SetlistEntry, Username};
 
@@ -11,10 +11,11 @@ use crate::domain::setlist::command::SetlistCommandExecutor;
 use crate::domain::user::command::UserCommandExecutor;
 use crate::domain::user::repository::UserRepository;
 use crate::domain::user::UserDb;
-use crate::traits::RepositoryTrait;
+// use crate::traits::RepositoryTrait;
 use crate::ConnectionType;
 
 pub use self::json_formatting::*;
+// use crate::traits::RepositoryTrait;
 use rocket::local::blocking::Client;
 use rocket::{Build, Rocket};
 
@@ -149,8 +150,8 @@ pub fn insert_test_user<S1: Into<String>, S2: Into<String>, S3: Into<String>>(
     };
 
     CommandExecutor::perform(
-        &UserCommandExecutor::with_connection(conn),
-        Command::add(new_user.clone()),
+        &UserCommandExecutor::new_with_connection(conn),
+        Command::add(new_user.clone(), ()),
     )
     .unwrap();
 
@@ -181,8 +182,8 @@ pub fn create_setlist<S: AsRef<str>>(conn: &ConnectionType, id: i32, username: S
     );
 
     CommandExecutor::perform(
-        &SetlistCommandExecutor::with_connection(&conn),
-        Command::add(setlist.clone()),
+        &SetlistCommandExecutor::new_with_connection(&conn),
+        Command::add(setlist.clone(), ()),
     )
     .unwrap();
 

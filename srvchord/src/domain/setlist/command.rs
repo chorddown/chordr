@@ -1,12 +1,15 @@
+use diesel::{self, prelude::*};
+
+use cqrs::prelude::{Command, CommandExecutor};
+use libchordr::prelude::Setlist;
+
 use crate::diesel::QueryDsl;
+use crate::domain::cqs_context::CqsContext;
 use crate::domain::setlist::db::SetlistDb;
 use crate::domain::setlist_entry::db::SetlistDbEntry;
 use crate::error::SrvError;
 use crate::schema::setlist::dsl::setlist as all_setlists;
 use crate::ConnectionType;
-use cqrs::prelude::{Command, CommandExecutor};
-use diesel::{self, prelude::*};
-use libchordr::prelude::Setlist;
 
 fn as_setlist_db(setlist: &Setlist) -> SetlistDb {
     SetlistDb {
@@ -26,14 +29,14 @@ pub(crate) struct SetlistCommandExecutor<'a> {
 }
 
 impl<'a> SetlistCommandExecutor<'a> {
-    pub(crate) fn with_connection(connection: &'a ConnectionType) -> Self {
+    pub(crate) fn new_with_connection(connection: &'a ConnectionType) -> Self {
         Self { connection }
     }
 
     fn insert_setlist_db_entries(
         &self,
         setlist: &Setlist,
-        _command: &Command<Setlist>,
+        _command: &Command<Setlist, ()>,
     ) -> Result<(), SrvError> {
         fn get_setlist_db_entries(setlist: &Setlist) -> Vec<SetlistDbEntry> {
             let setlist_db = as_setlist_db(setlist);
@@ -54,10 +57,10 @@ impl<'a> SetlistCommandExecutor<'a> {
 
 impl<'a> CommandExecutor for SetlistCommandExecutor<'_> {
     type RecordType = Setlist;
-
     type Error = SrvError;
+    type Context = CqsContext;
 
-    fn add(&self, command: Command<Self::RecordType>) -> Result<(), Self::Error> {
+    fn add(&self, command: Command<Self::RecordType, Self::Context>) -> Result<(), Self::Error> {
         let setlist = command.record().unwrap();
         let setlist_db = as_setlist_db(setlist);
 
@@ -72,7 +75,7 @@ impl<'a> CommandExecutor for SetlistCommandExecutor<'_> {
         Ok(())
     }
 
-    fn update(&self, command: Command<Self::RecordType>) -> Result<(), Self::Error> {
+    fn update(&self, command: Command<Self::RecordType, Self::Context>) -> Result<(), Self::Error> {
         let setlist = command.record().unwrap();
         let setlist_db_query = all_setlists.find(setlist.id());
         let setlist_db_instance = match setlist_db_query.get_result::<SetlistDb>(self.connection) {
@@ -100,7 +103,7 @@ impl<'a> CommandExecutor for SetlistCommandExecutor<'_> {
         Ok(())
     }
 
-    fn delete(&self, command: Command<Self::RecordType>) -> Result<(), Self::Error> {
+    fn delete(&self, command: Command<Self::RecordType, Self::Context>) -> Result<(), Self::Error> {
         diesel::delete(all_setlists.find(command.id().unwrap())).execute(self.connection)?;
         Ok(())
     }
@@ -108,13 +111,16 @@ impl<'a> CommandExecutor for SetlistCommandExecutor<'_> {
 
 #[cfg(test)]
 mod test {
-    use super::*;
+    use chrono::Utc;
+
+    use libchordr::prelude::{FileType, SetlistEntry, User, Username};
+
     use crate::domain::setlist::db::SetlistDb;
     use crate::domain::setlist_entry::db::SetlistDbEntry;
     use crate::test_helpers::*;
     use crate::ConnectionType;
-    use chrono::Utc;
-    use libchordr::prelude::{FileType, SetlistEntry, User, Username};
+
+    use super::*;
 
     #[test]
     fn test_add_empty() {
@@ -141,8 +147,8 @@ mod test {
             );
 
             CommandExecutor::perform(
-                &SetlistCommandExecutor::with_connection(&conn),
-                Command::add(new_setlist),
+                &SetlistCommandExecutor::new_with_connection(&conn),
+                Command::add(new_setlist, ()),
             )
             .unwrap();
 
@@ -185,8 +191,8 @@ mod test {
             );
 
             CommandExecutor::perform(
-                &SetlistCommandExecutor::with_connection(&conn),
-                Command::add(new_setlist),
+                &SetlistCommandExecutor::new_with_connection(&conn),
+                Command::add(new_setlist, ()),
             )
             .unwrap();
 
@@ -211,23 +217,26 @@ mod test {
             assert_eq!(SetlistDbEntry::count_all(&conn), 6);
 
             CommandExecutor::perform(
-                &SetlistCommandExecutor::with_connection(&conn),
-                Command::update(Setlist::new(
-                    "My setlist #918",
-                    918, // Same ID
-                    // New User:
-                    User::new(
-                        Username::new("paul-8190").unwrap(),
-                        "Paul",
-                        "Doe",
-                        create_test_password(),
+                &SetlistCommandExecutor::new_with_connection(&conn),
+                Command::update(
+                    Setlist::new(
+                        "My setlist #918",
+                        918, // Same ID
+                        // New User:
+                        User::new(
+                            Username::new("paul-8190").unwrap(),
+                            "Paul",
+                            "Doe",
+                            create_test_password(),
+                        ),
+                        None,
+                        None,
+                        Utc::now(),
+                        Utc::now(),
+                        vec![],
                     ),
-                    None,
-                    None,
-                    Utc::now(),
-                    Utc::now(),
-                    vec![],
-                )),
+                    (),
+                ),
             )
             .unwrap();
 
@@ -248,28 +257,31 @@ mod test {
             assert_eq!(SetlistDbEntry::count_all(&conn), 6);
 
             CommandExecutor::perform(
-                &SetlistCommandExecutor::with_connection(&conn),
-                Command::update(Setlist::new(
-                    "My setlist #918",
-                    918, // Same ID
-                    // New User:
-                    User::new(
-                        Username::new("paul-8190").unwrap(),
-                        "Paul",
-                        "Doe",
-                        create_test_password(),
-                    ),
-                    None,
-                    None,
-                    Utc::now(),
-                    Utc::now(),
-                    vec![SetlistEntry::new(
-                        "song-4",
-                        FileType::Chorddown,
-                        "Song 4",
+                &SetlistCommandExecutor::new_with_connection(&conn),
+                Command::update(
+                    Setlist::new(
+                        "My setlist #918",
+                        918, // Same ID
+                        // New User:
+                        User::new(
+                            Username::new("paul-8190").unwrap(),
+                            "Paul",
+                            "Doe",
+                            create_test_password(),
+                        ),
                         None,
-                    )],
-                )),
+                        None,
+                        Utc::now(),
+                        Utc::now(),
+                        vec![SetlistEntry::new(
+                            "song-4",
+                            FileType::Chorddown,
+                            "Song 4",
+                            None,
+                        )],
+                    ),
+                    (),
+                ),
             )
             .unwrap();
 
@@ -283,22 +295,25 @@ mod test {
         run_database_test(|conn| {
             clear_database(&conn);
             let result = CommandExecutor::perform(
-                &SetlistCommandExecutor::with_connection(&conn),
-                Command::update(Setlist::new(
-                    "My setlist #918",
-                    10001,
-                    User::unknown(),
-                    None,
-                    None,
-                    Utc::now(),
-                    Utc::now(),
-                    vec![SetlistEntry::new(
-                        "song-4",
-                        FileType::Chorddown,
-                        "Song 4",
+                &SetlistCommandExecutor::new_with_connection(&conn),
+                Command::update(
+                    Setlist::new(
+                        "My setlist #918",
+                        10001,
+                        User::unknown(),
                         None,
-                    )],
-                )),
+                        None,
+                        Utc::now(),
+                        Utc::now(),
+                        vec![SetlistEntry::new(
+                            "song-4",
+                            FileType::Chorddown,
+                            "Song 4",
+                            None,
+                        )],
+                    ),
+                    (),
+                ),
             );
             assert_eq!(
                 result.unwrap_err().to_string(),
@@ -318,8 +333,8 @@ mod test {
             create_setlist(&conn, 1918, "1819");
 
             CommandExecutor::perform(
-                &SetlistCommandExecutor::with_connection(&conn),
-                Command::delete(918),
+                &SetlistCommandExecutor::new_with_connection(&conn),
+                Command::delete(918, ()),
             )
             .unwrap();
 

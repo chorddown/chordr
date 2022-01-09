@@ -1,6 +1,7 @@
 use diesel::{self, prelude::*};
 
 use crate::diesel::QueryDsl;
+use crate::domain::cqs_context::CqsContext;
 use crate::domain::user::UserDb;
 use crate::error::SrvError;
 use crate::schema::user::dsl::user as all_users;
@@ -11,7 +12,7 @@ pub(crate) struct UserCommandExecutor<'a> {
 }
 
 impl<'a> UserCommandExecutor<'a> {
-    pub(crate) fn with_connection(connection: &'a ConnectionType) -> Self {
+    pub(crate) fn new_with_connection(connection: &'a ConnectionType) -> Self {
         Self { connection }
     }
 }
@@ -19,21 +20,28 @@ impl<'a> UserCommandExecutor<'a> {
 impl<'a> cqrs::prelude::CommandExecutor for UserCommandExecutor<'_> {
     type RecordType = UserDb;
     type Error = SrvError;
+    type Context = CqsContext;
 
-    fn add(&self, command: cqrs::prelude::Command<Self::RecordType>) -> Result<(), Self::Error> {
+    fn add(
+        &self,
+        command: cqrs::prelude::Command<Self::RecordType, CqsContext>,
+    ) -> Result<(), Self::Error> {
         diesel::insert_into(crate::schema::user::table)
             .values(command.record().unwrap())
             .execute(self.connection)?;
         Ok(())
     }
 
-    fn update(&self, command: cqrs::prelude::Command<Self::RecordType>) -> Result<(), Self::Error> {
+    fn update(
+        &self,
+        command: cqrs::prelude::Command<Self::RecordType, CqsContext>,
+    ) -> Result<(), Self::Error> {
         let user = command.record().unwrap();
-        let user_query = all_users.find(user.id());
+        let user_query = all_users.find(diesel::Identifiable::id(user));
         if user_query.get_result::<UserDb>(self.connection).is_err() {
             return Err(SrvError::persistence_error(format!(
                 "Original object with ID '{}' could not be found",
-                user.id()
+                diesel::Identifiable::id(user)
             )));
         }
 
@@ -44,7 +52,10 @@ impl<'a> cqrs::prelude::CommandExecutor for UserCommandExecutor<'_> {
         Ok(())
     }
 
-    fn delete(&self, command: cqrs::prelude::Command<Self::RecordType>) -> Result<(), Self::Error> {
+    fn delete(
+        &self,
+        command: cqrs::prelude::Command<Self::RecordType, CqsContext>,
+    ) -> Result<(), Self::Error> {
         diesel::delete(all_users.find(&command.id().unwrap())).execute(self.connection)?;
         Ok(())
     }
@@ -52,11 +63,10 @@ impl<'a> cqrs::prelude::CommandExecutor for UserCommandExecutor<'_> {
 
 #[cfg(test)]
 mod test {
-    use cqrs::prelude::{Command, CommandExecutor};
+    use cqrs::prelude::{Command, CommandExecutor, Count};
 
     use crate::domain::user::UserDb;
     use crate::test_helpers::*;
-    use crate::traits::Count;
     use crate::ConnectionType;
 
     use super::*;
@@ -74,8 +84,8 @@ mod test {
             };
 
             CommandExecutor::perform(
-                &UserCommandExecutor::with_connection(&conn),
-                Command::add(new_user),
+                &UserCommandExecutor::new_with_connection(&conn),
+                Command::add(new_user, ()),
             )
             .unwrap();
 
@@ -92,13 +102,16 @@ mod test {
             assert_eq!(count_all_users(&conn), 2);
 
             CommandExecutor::perform(
-                &UserCommandExecutor::with_connection(&conn),
-                Command::update(UserDb {
-                    username: "saul-panther-918".to_string(), // Same username
-                    first_name: "Paul".to_string(),           // New name
-                    last_name: "Panther".to_string(),
-                    password_hash: "123456".to_string(),
-                }),
+                &UserCommandExecutor::new_with_connection(&conn),
+                Command::update(
+                    UserDb {
+                        username: "saul-panther-918".to_string(), // Same username
+                        first_name: "Paul".to_string(),           // New name
+                        last_name: "Panther".to_string(),
+                        password_hash: "123456".to_string(),
+                    },
+                    (),
+                ),
             )
             .unwrap();
 
@@ -116,8 +129,8 @@ mod test {
             assert_eq!(count_all_users(&conn), 2);
 
             CommandExecutor::perform(
-                &UserCommandExecutor::with_connection(&conn),
-                Command::delete("saul-panther-918".to_string()),
+                &UserCommandExecutor::new_with_connection(&conn),
+                Command::delete("saul-panther-918".to_string(), ()),
             )
             .unwrap();
 

@@ -54,8 +54,8 @@ impl TryInto<User> for UserDb {
 impl RecordTrait for UserDb {
     type Id = String;
 
-    fn id(self) -> Self::Id {
-        self.username
+    fn id(&self) -> Self::Id {
+        self.username.clone()
     }
 }
 

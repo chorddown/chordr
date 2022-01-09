@@ -1,3 +1,9 @@
+use diesel::{self, prelude::*};
+
+use cqrs::prelude::{CommandExecutor, Count, RepositoryTrait};
+use libchordr::prelude::{RecordTrait, Setlist, Team, User, Username};
+use tri::Tri;
+
 use crate::diesel::QueryDsl;
 use crate::domain::setlist::command::SetlistCommandExecutor;
 use crate::domain::setlist::db::SetlistDb;
@@ -7,11 +13,7 @@ use crate::domain::user::repository::UserRepository;
 use crate::error::SrvError;
 use crate::schema::setlist;
 use crate::schema::setlist::dsl::setlist as all_setlists;
-use crate::traits::*;
 use crate::ConnectionType;
-use cqrs::prelude::CommandExecutor;
-use diesel::{self, prelude::*};
-use libchordr::prelude::{RecordTrait, Setlist, Team, User, Username};
 
 pub struct SetlistRepository {}
 
@@ -130,21 +132,22 @@ impl SetlistRepository {
         &self,
         connection: &'a ConnectionType,
     ) -> SetlistCommandExecutor<'a> {
-        SetlistCommandExecutor::with_connection(connection)
+        SetlistCommandExecutor::new_with_connection(connection)
     }
 }
 
-impl RepositoryTrait for SetlistRepository {
+impl cqrs::prelude::RepositoryTrait for SetlistRepository {
     type ManagedType = Setlist;
     type Error = SrvError;
+    type Context = ConnectionType;
 
-    fn find_all(&self, connection: &ConnectionType) -> Result<Vec<Self::ManagedType>, Self::Error> {
+    fn find_all(&self, context: &ConnectionType) -> Result<Vec<Self::ManagedType>, Self::Error> {
         let search = all_setlists
             .order(setlist::sorting.asc())
-            .load::<SetlistDb>(connection)?;
-        let populated_entries: Vec<PopulateResult> = self.populate_entries(connection, search)?;
+            .load::<SetlistDb>(context)?;
+        let populated_entries: Vec<PopulateResult> = self.populate_entries(context, search)?;
 
-        let users = self.get_users(connection)?;
+        let users = self.get_users(context)?;
 
         Ok(populated_entries
             .into_iter()
@@ -160,15 +163,18 @@ impl RepositoryTrait for SetlistRepository {
         &self,
         connection: &ConnectionType,
         id: <Setlist as RecordTrait>::Id,
-    ) -> Result<Self::ManagedType, Self::Error> {
+    ) -> Tri<Self::ManagedType, Self::Error> {
         match all_setlists.find(id).get_result::<SetlistDb>(connection) {
             Ok(setlist_db_instance) => {
                 let entries = setlist_db_instance.entries(connection);
-                let users = self.get_users(connection)?;
+                let users = match self.get_users(connection) {
+                    Ok(u) => u,
+                    Err(e) => return Tri::Err(e),
+                };
 
-                assign_owner_to_populated_result((setlist_db_instance, entries), &users)
+                assign_owner_to_populated_result((setlist_db_instance, entries), &users).into()
             }
-            Err(_) => Err(SrvError::object_not_found_error(format!(
+            Err(_) => Tri::Err(SrvError::object_not_found_error(format!(
                 "Object with ID '{}' could not be found",
                 id
             ))),
@@ -181,7 +187,7 @@ impl RepositoryTrait for SetlistRepository {
         instance: Self::ManagedType,
     ) -> Result<(), Self::Error> {
         self.get_command_executor(connection)
-            .perform(cqrs::prelude::Command::add(instance))
+            .perform(cqrs::prelude::Command::add(instance, ()))
     }
 
     fn update(
@@ -190,7 +196,7 @@ impl RepositoryTrait for SetlistRepository {
         instance: Self::ManagedType,
     ) -> Result<(), Self::Error> {
         self.get_command_executor(connection)
-            .perform(cqrs::prelude::Command::update(instance))
+            .perform(cqrs::prelude::Command::update(instance, ()))
     }
 
     fn delete(
@@ -199,7 +205,7 @@ impl RepositoryTrait for SetlistRepository {
         instance: Self::ManagedType,
     ) -> Result<(), Self::Error> {
         self.get_command_executor(connection)
-            .perform(cqrs::prelude::Command::delete(instance.id()))
+            .perform(cqrs::prelude::Command::delete(instance.id(), ()))
     }
 }
 
@@ -238,13 +244,17 @@ fn assign_owner_to_populated_result(
 
 #[cfg(test)]
 mod test {
-    use super::*;
+    use chrono::Utc;
+
+    use libchordr::models::file_type::FileType;
+    use libchordr::prelude::{Setlist, SetlistEntry, User, Username};
+
     use crate::domain::setlist::db::SetlistDb;
     use crate::domain::setlist_entry::db::SetlistDbEntry;
     use crate::test_helpers::*;
-    use chrono::Utc;
-    use libchordr::models::file_type::FileType;
-    use libchordr::prelude::{Setlist, SetlistEntry, User, Username};
+
+    use super::*;
+    use cqrs::prelude::RepositoryTrait;
 
     #[test]
     fn test_find_all() {

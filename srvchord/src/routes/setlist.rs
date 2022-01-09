@@ -1,10 +1,12 @@
-use crate::domain::setlist::repository::SetlistRepository;
-use crate::domain::user::UserDb;
-use crate::traits::RepositoryTrait;
-use crate::DbConn;
-use libchordr::prelude::{Setlist, Username};
 use rocket::serde::json::Json;
 use rocket::{get, post};
+
+use cqrs::prelude::RepositoryTrait as CqrsRepositoryTrait;
+use libchordr::prelude::{Setlist, Username};
+
+use crate::domain::setlist::repository::SetlistRepository;
+use crate::domain::user::UserDb;
+use crate::DbConn;
 
 pub fn get_routes() -> Vec<rocket::Route> {
     routes![
@@ -196,17 +198,20 @@ fn check_username(username: &str, user: &UserDb) -> Result<Username, ()> {
 
 #[cfg(test)]
 mod test {
-    use crate::domain::setlist::repository::SetlistRepository;
-    use crate::test_helpers::{
-        create_random_user, create_setlist, json_format, run_test_fn, JsonTemplateValue,
-    };
-    use crate::traits::RepositoryTrait;
     use chrono::Utc;
-    use libchordr::prelude::ListTrait;
     use rand::Rng;
     use rocket::http::ContentType;
     use rocket::http::Header;
     use rocket::http::Status;
+
+    use libchordr::prelude::ListTrait;
+
+    use crate::domain::setlist::repository::SetlistRepository;
+    use crate::test_helpers::{
+        create_random_user, create_setlist, json_format, run_test_fn, JsonTemplateValue,
+    };
+    // use crate::traits::RepositoryTrait;
+    use cqrs::prelude::RepositoryTrait;
 
     #[test]
     fn test_get() {
@@ -304,7 +309,7 @@ mod test {
             // Ensure the setlist is what we expect
             let setlist = user_setlist_repository
                 .find_by_id(&conn.0, random_id)
-                .expect("New setlist not found");
+                .expect_some("New setlist not found");
             assert_eq!(setlist.len(), 2);
             assert_eq!(setlist.owner().username().to_string(), username);
 
@@ -379,7 +384,7 @@ mod test {
             // Ensure the setlist is what we expect
             let setlist = user_setlist_repository
                 .find_by_id(&conn.0, random_id)
-                .expect("New setlist not found");
+                .expect_some("New setlist not found");
             assert_eq!(setlist.len(), 0);
             assert_eq!(setlist.owner().username().to_string().as_str(), username);
         })
