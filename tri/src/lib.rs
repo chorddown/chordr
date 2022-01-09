@@ -51,6 +51,14 @@ impl<T, E> Tri<T, E> {
             Tri::Err(_) => panic!("called `Tri::unwrap()` on a `Err` value"),
         }
     }
+
+    pub fn expect_some(self, msg: &str) -> T {
+        match self {
+            Tri::Some(v) => v,
+            Tri::None => expect_failed(msg),
+            Tri::Err(_) => expect_failed(msg),
+        }
+    }
 }
 
 impl<T: Clone, E: Clone> Clone for Tri<T, E> {
@@ -134,6 +142,14 @@ impl<T, E> From<Result<T, E>> for Tri<T, E> {
             Err(e) => Self::Err(e),
         }
     }
+}
+
+// This is a separate function to reduce the code size (taken from `Option::expect()`).
+#[inline(never)]
+#[cold]
+#[track_caller]
+fn expect_failed(msg: &str) -> ! {
+    panic!("{}", msg)
 }
 
 #[cfg(test)]
