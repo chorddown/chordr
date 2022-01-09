@@ -10,7 +10,7 @@ use yew::{html, Component, ComponentLink, Html, ShouldRender};
 
 use libchordr::models::user::MainData;
 use libchordr::prelude::*;
-use webchordr_common::tri::Tri;
+use tri::Tri;
 use webchordr_events::{Event, SetlistEvent, SettingsEvent, SortingChange};
 use webchordr_persistence::persistence_manager::PMType;
 use webchordr_persistence::persistence_manager::PersistenceManagerFactory;
@@ -231,8 +231,8 @@ impl SetlistHandler for Handler {
     fn handle_setlist_event(&mut self, event: SetlistEvent) {
         match event {
             SetlistEvent::SortingChange(v) => self.setlist_sorting_changed(v),
-            SetlistEvent::Add(v) => self.setlist_add(v),
-            SetlistEvent::Remove(v) => self.setlist_remove(v),
+            SetlistEvent::AddEntry(v) => self.setlist_entry_add(v),
+            SetlistEvent::RemoveEntry(v) => self.setlist_entry_remove(v),
             SetlistEvent::SettingsChange(id, settings) => {
                 self.setlist_settings_changed(id, settings)
             }
@@ -240,7 +240,23 @@ impl SetlistHandler for Handler {
         }
     }
 
-    fn setlist_add(&mut self, song: SetlistEntry) {
+    fn add(&mut self, _setlist: Setlist) {
+        todo!()
+    }
+
+    fn delete(&mut self, _setlist: Setlist) {
+        todo!()
+    }
+
+    fn update(&mut self, _setlist: Setlist) {
+        todo!()
+    }
+
+    fn fetch_setlists(&mut self) {
+        todo!()
+    }
+
+    fn setlist_entry_add(&mut self, song: SetlistEntry) {
         let song_id = song.id();
         let current_setlist = self
             .state
@@ -252,10 +268,10 @@ impl SetlistHandler for Handler {
             Err(e) => error!("Could not add song to setlist: {:?}", e),
         }
         self.set_state(self.state.with_current_setlist(new_setlist), true);
-        <Handler as SetlistHandler>::commit_changes(self);
+        <Self as SetlistHandler>::commit_changes(self);
     }
 
-    fn setlist_remove(&mut self, song_id: SongId) {
+    fn setlist_entry_remove(&mut self, song_id: SongId) {
         let current_setlist = self
             .state
             .current_setlist()
@@ -266,7 +282,7 @@ impl SetlistHandler for Handler {
             Err(_) => warn!("Could not remove song {} from setlist", song_id),
         }
         self.set_state(self.state.with_current_setlist(new_setlist), true);
-        <Handler as SetlistHandler>::commit_changes(self);
+        <Self as SetlistHandler>::commit_changes(self);
     }
 
     fn setlist_settings_changed(&mut self, song_id: SongId, song_settings: SongSettings) {
@@ -295,14 +311,14 @@ impl SetlistHandler for Handler {
         }
 
         self.set_state(self.state.with_current_setlist(new_setlist), true);
-        <Handler as SetlistHandler>::commit_changes(self);
+        <Self as SetlistHandler>::commit_changes(self);
     }
 
     fn setlist_replace(&mut self, setlist: Setlist) {
         info!("Replace setlist");
         debug!("{:?} => {:?}", self.state.current_setlist(), setlist);
         self.set_state(self.state.with_current_setlist(setlist), true);
-        <Handler as SetlistHandler>::commit_changes(self);
+        <Self as SetlistHandler>::commit_changes(self);
     }
 
     fn setlist_sorting_changed(&mut self, sorting_change: SortingChange) {
@@ -314,7 +330,7 @@ impl SetlistHandler for Handler {
         match move_result {
             Ok(_) => {
                 self.set_state(self.state.with_current_setlist(new_setlist), true);
-                <Handler as SetlistHandler>::commit_changes(self)
+                <Self as SetlistHandler>::commit_changes(self)
             }
             Err(e) => error!("{}", e),
         }

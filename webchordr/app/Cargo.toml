@@ -19,6 +19,7 @@ serde = "1"
 serde_derive = "1"
 serde_json = "1.0.53"
 libchordr = { path = "../../libchordr" }
+tri = { path = "../../tri" }
 webchordr-common = { path = "../common" }
 webchordr-events = { path = "../events" }
 webchordr-song-list = { path = "../song-list" }

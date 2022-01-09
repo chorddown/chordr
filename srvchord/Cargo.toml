@@ -21,6 +21,7 @@ log = "0.4"
 base64 = "^0.12.1"
 rust-argon2 = "^0.8.2"
 libchordr = { path = "../libchordr" }
+tri = { path = "../tri" }
 cqrs = { path = "../cqrs" }
 chrono = { version = "*", features = ["serde"] }
 #rocket_cors = "0.5.2"
