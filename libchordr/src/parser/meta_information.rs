@@ -55,10 +55,10 @@ impl MetaInformation {
     /// Update the `key` and `original_key` fields with a new B-Notation
     pub(crate) fn reinterpret_keys_with_b_notation(&mut self, to_notation: BNotation) {
         if let Some(key) = &self.key_raw {
-            self.key = Chord::try_from(&key, to_notation).ok();
+            self.key = Chord::try_from(key, to_notation).ok();
         }
         if let Some(key) = &self.original_key_raw {
-            self.original_key = Chord::try_from(&key, to_notation).ok();
+            self.original_key = Chord::try_from(key, to_notation).ok();
         }
     }
 
