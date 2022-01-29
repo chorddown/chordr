@@ -135,7 +135,7 @@ impl<B: BrowserStorageTrait> CommandBackendTrait for BrowserStorageBackend<B> {
             None => return Err(missing_record_id_error()),
             Some(r) => r,
         };
-        let combined_id_key = build_combined_id_key::<T>(&command.context(), &id);
+        let combined_id_key = build_combined_id_key::<T>(command.context(), id);
         let entry_does_exist = self
             .lock_for_reading()?
             .get_item(&combined_id_key)
@@ -190,7 +190,7 @@ impl<B: BrowserStorageTrait> QueryBackendTrait for BrowserStorageBackend<B> {
             None => return Tri::Err(missing_record_id_error()),
             Some(r) => r,
         };
-        let combined_id_key = build_combined_id_key::<T>(&query.context(), &id);
+        let combined_id_key = build_combined_id_key::<T>(query.context(), id);
 
         let lock_guard = match self.lock_for_reading() {
             Ok(l) => l,

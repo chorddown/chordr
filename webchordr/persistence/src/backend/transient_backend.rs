@@ -127,7 +127,7 @@ impl CommandBackendTrait for TransientBackend {
             None => return Err(missing_record_id_error()),
             Some(r) => r,
         };
-        let combined_id_key = build_combined_id_key::<T>(&command.context(), &id);
+        let combined_id_key = build_combined_id_key::<T>(command.context(), id);
 
         let mut borrowed = self.data.borrow_mut();
         if borrowed.get(&combined_id_key).is_none() {
@@ -179,7 +179,7 @@ impl QueryBackendTrait for TransientBackend {
             None => return Tri::Err(missing_record_id_error()),
             Some(r) => r,
         };
-        let combined_id_key = build_combined_id_key::<T>(&query.context(), &id);
+        let combined_id_key = build_combined_id_key::<T>(query.context(), id);
 
         match self.data.borrow().get(&combined_id_key) {
             Some(v) => deserialize_value(v),

@@ -4,10 +4,10 @@ use serde::{Deserialize, Serialize};
 
 use cqrs::prelude::{Command, RecordTrait};
 use webchordr_common::errors::{PersistenceError, WebError};
+use webchordr_common::tri::Tri;
 
 use crate::persistence_manager::CommandContext;
 use crate::storage_key_utility::build_combined_id_key;
-use webchordr_common::tri::Tri;
 
 #[derive(Debug)]
 pub(crate) enum ExistenceCheck {
@@ -33,7 +33,7 @@ where
         None => return Err(PersistenceError::general_error("No command record given").into()),
         Some(r) => r,
     };
-    let combined_id_key = build_combined_id_key::<T>(&command.context(), &record.id());
+    let combined_id_key = build_combined_id_key::<T>(command.context(), &record.id());
     let serialized_value = serde_json::to_string(record)?;
     let entry_does_exist = exists_callback(&combined_id_key);
     match existence_check {
@@ -76,13 +76,13 @@ where
 }
 
 pub(crate) fn record_not_found_error() -> WebError {
-    return PersistenceError::general_error("A record with the given ID does not exist").into();
+    PersistenceError::general_error("A record with the given ID does not exist").into()
 }
 
 pub(crate) fn record_exists_error() -> WebError {
-    return PersistenceError::general_error("A record with the given ID already exists").into();
+    PersistenceError::general_error("A record with the given ID already exists").into()
 }
 
 pub(crate) fn missing_record_id_error() -> WebError {
-    return PersistenceError::general_error("No ID given").into();
+    PersistenceError::general_error("No ID given").into()
 }
