@@ -1,3 +1,4 @@
+use std::fmt::Display;
 use std::hash::Hash;
 
 /// Trait for structs that have a unique identifier
@@ -9,7 +10,7 @@ pub trait RecordTrait {
     /// For single-field primary keys, this is typically `&'a i32`, or `&'a String`
     /// For composite primary keys, this is typically `(&'a i32, &'a i32)`
     /// or `(&'a String, &'a String)`, etc.
-    type Id: Hash + Eq;
+    type Id: Hash + Eq + Display;
 
     /// Returns the identifier for this record.
     ///
