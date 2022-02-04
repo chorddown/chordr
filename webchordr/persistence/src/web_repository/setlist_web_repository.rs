@@ -43,7 +43,7 @@ where
     fn build_context() -> CommandContext {
         CommandContext::new(
             crate::constants::STORAGE_NAMESPACE,
-            crate::constants::STORAGE_KEY_SETLIST,
+            crate::constants::STORAGE_V2_KEY_SETLIST,
         )
     }
 

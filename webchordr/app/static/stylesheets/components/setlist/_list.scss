@@ -1,0 +1,18 @@
+@import "prelude";
+
+.setlist-list ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0 0 $std-half;
+}
+
+.setlist-list-item {
+    margin-bottom: $std-half;
+
+    .setlist-list-item-delete {
+        flex-shrink: 1;
+        flex-grow: 0;
+        width: auto;
+        //width: $button-line-height + (nth($button-padding, 1) * 2);
+    }
+}

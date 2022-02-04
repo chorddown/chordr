@@ -19,6 +19,8 @@ pub enum AppRoute {
 
 #[derive(Switch, Debug, Clone)]
 pub enum SetlistRoute {
+    #[to = "/list"]
+    List,
     #[to = "/load/{serialized_setlist}"]
     Load { serialized_setlist: String },
 }

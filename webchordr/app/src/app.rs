@@ -1,4 +1,5 @@
 use std::rc::Rc;
+use std::sync::Arc;
 
 use log::{debug, error, info};
 use percent_encoding::percent_decode_str;
@@ -10,10 +11,12 @@ use libchordr::prelude::*;
 use webchordr_common::config::Config;
 use webchordr_common::errors::WebError;
 use webchordr_events::{Event, SetlistEvent, SettingsEvent};
+use webchordr_persistence::persistence_manager::PMType;
 use webchordr_song_browser::SongBrowser;
 
 use crate::components::nav::Nav;
 use crate::components::reload_section::ReloadSection;
+use crate::components::setlist::List as SetlistList;
 use crate::components::setlist::SetlistLoad;
 use crate::components::song_search::SongSearch;
 use crate::components::song_view::SongView;
@@ -40,6 +43,7 @@ pub struct AppProperties {
     pub on_user_login_success: Callback<Session>,
     pub on_user_login_error: Callback<WebError>,
     pub state: Rc<State>,
+    pub persistence_manager: Arc<PMType>,
 }
 
 impl PartialEq for AppProperties {
@@ -106,11 +110,14 @@ impl App {
         }
 
         if let Some(song_info) = self.get_song_info(&song_id) {
-            let add = self.props.on_event.reform(|s| SetlistEvent::Add(s).into());
+            let add = self
+                .props
+                .on_event
+                .reform(|s| SetlistEvent::AddEntry(s).into());
             let remove = self
                 .props
                 .on_event
-                .reform(|s| SetlistEvent::Remove(s).into());
+                .reform(|s| SetlistEvent::RemoveEntry(s).into());
             let change = self
                 .props
                 .on_event
@@ -242,9 +249,9 @@ impl App {
     }
 
     fn view_setlist_route(&self, route: SetlistRoute) -> Html {
-        let state = self.props.state.clone();
+        let state = &self.props.state;
         match route {
-            SetlistRoute::Load { serialized_setlist } => match &state.catalog() {
+            SetlistRoute::Load { serialized_setlist } => match state.catalog() {
                 None => html! {},
                 Some(catalog) => {
                     let replace = self.props.on_event.reform(|e| e);
@@ -264,6 +271,24 @@ impl App {
                     )
                 }
             },
+            SetlistRoute::List => {
+                let on_event = self.props.on_event.reform(|e| e);
+                let setlist = state.current_setlist();
+                let persistence_manager = self.props.persistence_manager.clone();
+
+                self.compose(
+                    html! {
+                        <SetlistList
+                            current_setlist=setlist
+                            persistence_manager=persistence_manager
+                            on_event=on_event
+                            setlists=vec![]
+                            state=state
+                        />
+                    },
+                    self.view_nav(None),
+                )
+            }
         }
     }
 

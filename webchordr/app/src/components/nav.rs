@@ -81,6 +81,10 @@ impl Nav {
                         <i class="im im-home"></i>
                         <span>{ "Home" }</span>
                     </a>
+                    <a role="button" class="home" href="/#/setlist/list" title="List setlists">
+                        <i class="im im-data"></i>
+                        <span>{ "Setlist" }</span>
+                    </a>
                     <UserNavButton state=state session=session />
                 </footer>
             }

@@ -8,6 +8,7 @@ use yew::services::interval::IntervalTask;
 use yew::services::IntervalService;
 use yew::{html, Component, ComponentLink, Html, ShouldRender};
 
+use cqrs::prelude::AsyncRepositoryTrait;
 use libchordr::models::user::MainData;
 use libchordr::prelude::*;
 use tri::Tri;
@@ -237,6 +238,7 @@ impl SetlistHandler for Handler {
                 self.setlist_settings_changed(id, settings)
             }
             SetlistEvent::Replace(v) => self.setlist_replace(v),
+            SetlistEvent::SetCurrentSetlist(v) => self.set_current_setlist(v),
         }
     }
 
@@ -289,7 +291,7 @@ impl SetlistHandler for Handler {
         debug!(
             "Settings changed song {} {:#?}",
             song_id,
-            self.state.current_setlist().as_ref()
+            self.state.current_setlist()
         );
         let setlist = self
             .state
@@ -316,7 +318,14 @@ impl SetlistHandler for Handler {
 
     fn setlist_replace(&mut self, setlist: Setlist) {
         info!("Replace setlist");
-        debug!("{:?} => {:?}", self.state.current_setlist(), setlist);
+        debug!("{:?}\n=>\n{:?}", self.state.current_setlist(), setlist);
+        self.set_state(self.state.with_current_setlist(setlist), true);
+        <Self as SetlistHandler>::commit_changes(self);
+    }
+
+    fn set_current_setlist(&mut self, setlist: Setlist) {
+        info!("Set current setlist");
+        debug!("{:?}\n=>\n{:?}", self.state.current_setlist(), setlist);
         self.set_state(self.state.with_current_setlist(setlist), true);
         <Self as SetlistHandler>::commit_changes(self);
     }
@@ -359,10 +368,16 @@ impl SetlistHandler for Handler {
         match self.state.current_setlist() {
             Some(s) => spawn_local(async move {
                 type Repository<'a> = SetlistWebRepository<'a, PMType>;
-                let result = Repository::new(&pm).store(&s).await;
+                let mut repository = Repository::new(&pm);
 
+                let result = repository.store(&s).await;
                 if let Err(e) = result {
                     error!("Could not commit setlist changes: {}", e.to_string())
+                }
+
+                let result = repository.update((*s).clone()).await;
+                if let Err(e) = result {
+                    error!("Could not commit setlist changes (v2): {}", e.to_string())
                 }
             }),
             None => info!("Currently there is no setlist to commit"),
@@ -509,6 +524,7 @@ impl Component for Handler {
 
     fn view(&self) -> Html {
         let state = self.state.clone();
+        let persistence_manager = self.persistence_manager.clone();
         let on_event = self.link.callback(|e| Msg::Event(Box::new(e)));
         let on_setlist_change = self.link.callback(|e| Msg::Event(Box::new(e)));
         let on_user_login_success = self.link.callback(Msg::SessionChanged);
@@ -531,6 +547,7 @@ impl Component for Handler {
                     on_setlist_change=on_setlist_change
                     on_user_login_success=on_user_login_success
                     on_user_login_error=on_user_login_error
+                    persistence_manager=persistence_manager
                 />
             }) as Html
         } else {

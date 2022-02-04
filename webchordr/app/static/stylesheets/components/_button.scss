@@ -65,4 +65,14 @@ div.grid-button {
         margin-left: $std-half;
         margin-right: $std-half;
     }
+
+    &.-compact {
+        margin-left: 0;
+        margin-right: 0;
+
+        > button {
+            margin-left: 0;
+            margin-right: 0;
+        }
+    }
 }
