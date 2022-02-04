@@ -38,10 +38,10 @@ where
     let entry_does_exist = exists_callback(&combined_id_key);
     match existence_check {
         ExistenceCheck::MustExist if !entry_does_exist => {
-            return Err(record_not_found_error());
+            return Err(record_not_found_error::<T>(&record.id()));
         }
         ExistenceCheck::MustNotExist if entry_does_exist => {
-            return Err(record_exists_error());
+            return Err(record_exists_error::<T>(&record.id()));
         }
         _ => {}
     }
@@ -56,7 +56,7 @@ pub(crate) fn hash_map_from_context_and_slice<T: Serialize + RecordTrait>(
     let mut map = HashMap::with_capacity(entries.len());
     for entry in entries {
         map.insert(
-            build_combined_id_key::<T>(&context, &entry.id()),
+            build_combined_id_key::<T>(context, &entry.id()),
             serde_json::to_string(&entry).unwrap(),
         );
     }
@@ -75,14 +75,16 @@ where
     }
 }
 
-pub(crate) fn record_not_found_error() -> WebError {
-    PersistenceError::general_error("A record with the given ID does not exist").into()
+pub(crate) fn record_not_found_error<R: RecordTrait>(id: &R::Id) -> WebError {
+    PersistenceError::record_not_found_error(format!("A record with the ID {} does not exist", id))
+        .into()
 }
 
-pub(crate) fn record_exists_error() -> WebError {
-    PersistenceError::general_error("A record with the given ID already exists").into()
+pub(crate) fn record_exists_error<R: RecordTrait>(id: &R::Id) -> WebError {
+    PersistenceError::record_exists_error(format!("A record with the ID {} already exists", id))
+        .into()
 }
 
 pub(crate) fn missing_record_id_error() -> WebError {
-    PersistenceError::general_error("No ID given").into()
+    PersistenceError::missing_record_id_error("No ID given").into()
 }

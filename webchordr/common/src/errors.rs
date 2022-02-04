@@ -1,5 +1,6 @@
 use std::error::Error;
 use std::fmt::{Display, Formatter, Result};
+
 use wasm_bindgen::JsValue;
 use web_sys::Response;
 
@@ -90,6 +91,9 @@ pub enum PersistenceError {
     SerializationError(String),
     DeserializationError(String, Option<String>),
     StorageUnavailable(String),
+    RecordNotFoundError(String),
+    RecordExistsError(String),
+    MissingRecordIdError(String),
     GeneralError(String),
 }
 
@@ -109,6 +113,18 @@ impl PersistenceError {
     pub fn general_error<S: Display>(s: S) -> Self {
         Self::GeneralError(s.to_string())
     }
+
+    pub fn record_not_found_error<S: Display>(s: S) -> Self {
+        Self::RecordNotFoundError(s.to_string())
+    }
+
+    pub fn record_exists_error<S: Display>(s: S) -> Self {
+        Self::RecordExistsError(s.to_string())
+    }
+
+    pub fn missing_record_id_error<S: Display>(s: S) -> Self {
+        Self::MissingRecordIdError(s.to_string())
+    }
 }
 
 impl Display for PersistenceError {
@@ -116,8 +132,11 @@ impl Display for PersistenceError {
         match self {
             PersistenceError::SerializationError(s) => f.write_str(s),
             PersistenceError::DeserializationError(s, _) => f.write_str(s),
-            PersistenceError::GeneralError(s) => f.write_str(s),
             PersistenceError::StorageUnavailable(s) => f.write_str(s),
+            PersistenceError::RecordNotFoundError(s) => f.write_str(s),
+            PersistenceError::RecordExistsError(s) => f.write_str(s),
+            PersistenceError::MissingRecordIdError(s) => f.write_str(s),
+            PersistenceError::GeneralError(s) => f.write_str(s),
         }
     }
 }

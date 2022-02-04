@@ -131,7 +131,7 @@ impl CommandBackendTrait for TransientBackend {
 
         let mut borrowed = self.data.borrow_mut();
         if borrowed.get(&combined_id_key).is_none() {
-            return Err(record_not_found_error());
+            return Err(record_not_found_error::<T>(id));
         }
         borrowed.remove(&combined_id_key);
         Ok(())

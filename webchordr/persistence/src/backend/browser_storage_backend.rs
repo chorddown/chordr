@@ -141,7 +141,7 @@ impl<B: BrowserStorageTrait> CommandBackendTrait for BrowserStorageBackend<B> {
             .get_item(&combined_id_key)
             .is_some();
         if !entry_does_exist {
-            return Err(record_not_found_error());
+            return Err(record_not_found_error::<T>(id));
         }
 
         self.lock_for_writing()?.remove_item(combined_id_key)
