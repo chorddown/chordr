@@ -109,7 +109,20 @@ impl Component for List {
                 <ul>
                     {for entries.map(render)}
                 </ul>
-                <AddButton state=state on_click=on_add_button_click/>
+                <div class="button-group">
+                    <AddButton
+                        text="Create new setlist"
+                        state=state.clone()
+                        on_click=on_add_button_click.clone()
+                        clone_current=false
+                    />
+                    <AddButton
+                        text="Copy current setlist"
+                        state=state
+                        on_click=on_add_button_click
+                        clone_current=true
+                    />
+                </div>
             </div>
         }) as Html
     }
