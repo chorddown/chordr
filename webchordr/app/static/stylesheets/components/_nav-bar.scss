@@ -10,7 +10,7 @@ nav {
     right: 0;
     top: 0;
     bottom: 0;
-    padding-left: 2px;
+    padding-left: $song-item-space;
     @include print-hidden;
     //@include if-dark-mode {
     //    background: $dark-mode-nav-bg;
@@ -46,7 +46,7 @@ nav {
         display: flex;
         flex-flow: row nowrap;
         align-items: center;
-        margin-bottom: 2px;
+        margin-bottom: $song-item-space;
 
         &:focus {
             color: var(--button-color);

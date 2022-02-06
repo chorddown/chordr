@@ -9,7 +9,7 @@
     input[type=text],
     input[type=search],
     .song-item {
-        margin-bottom: 2px;
+        margin-bottom: $song-item-space;
 
         a {
             padding: $button-padding;

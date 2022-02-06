@@ -1,6 +1,14 @@
 @import "prelude";
 
 .song-notes {
+    padding: $song-item-space 0;
+    width: $nav-width-xs;
+    height: calc(50vh - #{3 * $nav-button-height + $nav-footer-border-width});
+    @include min-screen-tablet {
+        width: $nav-width;
+        height: calc(50vh - #{$nav-button-height + $nav-footer-border-width});
+    }
+
     textarea {
         resize: none;
         background: var(--background);
@@ -14,12 +22,8 @@
 
         -webkit-appearance: none;
         appearance: none;
-        width: $nav-width-xs;
-        height: calc(50vh - #{3 * $nav-button-height + $nav-footer-border-width});
-        @include min-screen-tablet {
-            width: $nav-width;
-            height: calc(50vh - #{$nav-button-height + $nav-footer-border-width});
-        }
+        width: 100%;
+        height: 100%;
         @include if-dark-mode {
             border-color: $gray-ultra-dark;
         }
