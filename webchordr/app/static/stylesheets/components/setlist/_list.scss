@@ -15,4 +15,11 @@
         width: auto;
         //width: $button-line-height + (nth($button-padding, 1) * 2);
     }
+
+    &.-highlight {
+        button.setlist-list-item-load {
+            color: var(--button-hover-color);
+            background: var(--button-hover-bg);
+        }
+    }
 }

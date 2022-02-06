@@ -2,10 +2,12 @@ use yew::prelude::*;
 use yew::Callback;
 
 use libchordr::prelude::Setlist;
+use webchordr_common::helpers::Class;
 
 #[derive(Properties, Clone)]
 pub struct ItemProps {
     pub setlist: Setlist,
+    pub highlight: bool,
     pub on_load_click: Callback<Setlist>,
     pub on_delete_click: Callback<Setlist>,
 }
@@ -27,7 +29,7 @@ impl Component for Item {
     }
 
     fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        if self.props.setlist != props.setlist {
+        if self.props.setlist != props.setlist || self.props.highlight != props.highlight {
             self.props = props;
             true
         } else {
@@ -39,12 +41,12 @@ impl Component for Item {
         let setlist = self.props.setlist.clone();
         let name = setlist.name();
         let key = setlist.id();
-
-        // let highlight = if let Some(highlighted_song_id) = highlighted_song_id {
-        //     &song.id() == highlighted_song_id
-        // } else {
-        //     false
-        // };
+        let base_class = Class::new("setlist-list-item");
+        let class = if self.props.highlight {
+            base_class.add("-highlight")
+        } else {
+            base_class
+        };
 
         let text = if !name.is_empty() {
             name.to_string()
@@ -60,7 +62,7 @@ impl Component for Item {
         let on_delete_click_prop = self.props.on_delete_click.reform(move |_| setlist.clone());
 
         html! {
-            <div class="setlist-list-item" key=key>
+            <div class={class} key=key>
                 <div class="button-group -compact">
                     <button class="setlist-list-item-load" data-v={key.to_string()} onclick=on_load_click_prop>{text}</button>
                     <button class="setlist-list-item-delete" data-v={key.to_string()} onclick=on_delete_click_prop title="Remove">

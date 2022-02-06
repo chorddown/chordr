@@ -37,7 +37,8 @@ pub struct Nav {
 
 impl Nav {
     fn view_song_list(&self) -> Html {
-        let songs = match &self.props.state.current_setlist() {
+        let current_setlist = self.props.state.current_setlist();
+        let songs = match &current_setlist {
             Some(setlist) => setlist.as_song_list(),
             None => SongListModel::new(),
         };
@@ -47,14 +48,23 @@ impl Nav {
             .current_song_info
             .as_ref()
             .map(|info| info.song.id());
+        let name_element = match current_setlist {
+            Some(s) if !s.name().is_empty() => {
+                html! {<header class="setlist-name">{s.name()}</header>}
+            }
+            _ => html! {},
+        };
 
         html! {
-            <SongListView
-                songs=songs
-                on_setlist_change=on_setlist_change
-                sortable=self.props.expand
-                highlighted_song_id=highlighted_song_id
-            />
+            <div class="song-list-container">
+                {name_element}
+                <SongListView
+                    songs=songs
+                    on_setlist_change=on_setlist_change
+                    sortable=self.props.expand
+                    highlighted_song_id=highlighted_song_id
+                />
+            </div>
         }
     }
 

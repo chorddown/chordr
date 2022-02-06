@@ -23,7 +23,6 @@ mod item;
 
 #[derive(Properties, Clone)]
 pub struct ListProps {
-    pub current_setlist: Option<Rc<Setlist>>,
     pub setlists: Vec<Setlist>,
     pub persistence_manager: Arc<PMType>,
     pub state: Rc<State>,
@@ -73,8 +72,7 @@ impl Component for List {
     }
 
     fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        if self.props.current_setlist != props.current_setlist
-            || self.props.setlists != props.setlists
+        if self.props.setlists != props.setlists
             || self.props.state != props.state
             || self.props.on_event != props.on_event
         {
@@ -91,16 +89,31 @@ impl Component for List {
 
             return html! {};
         }
+        let state = self.props.state.clone();
+        let current_setlist = state.current_setlist();
         let render = |setlist: &Setlist| {
             let key = setlist.id();
             let on_load_click = self.link.callback(|s| Msg::Load(s));
             let on_delete_click = self.link.callback(|s| Msg::Delete(s));
 
-            html! {<li key=key><Item on_load_click=on_load_click on_delete_click=on_delete_click setlist=setlist.clone() /></li>}
+            let highlight = match current_setlist {
+                Some(ref c) => c.id() == setlist.id(),
+                None => false,
+            };
+
+            html! {
+                <li key=key>
+                    <Item
+                        on_load_click=on_load_click
+                        on_delete_click=on_delete_click
+                        setlist=setlist.clone()
+                        highlight=highlight
+                    />
+                </li>
+            }
         };
 
         let entries = self.setlists.as_ref().unwrap().iter();
-        let state = self.props.state.clone();
         let on_add_button_click = self.link.callback(|s| Msg::Add(s));
         debug!("Redraw {} setlists", entries.len());
 

@@ -273,13 +273,11 @@ impl App {
             },
             SetlistRoute::List => {
                 let on_event = self.props.on_event.reform(|e| e);
-                let setlist = state.current_setlist();
                 let persistence_manager = self.props.persistence_manager.clone();
 
                 self.compose(
                     html! {
                         <SetlistList
-                            current_setlist=setlist
                             persistence_manager=persistence_manager
                             on_event=on_event
                             setlists=vec![]

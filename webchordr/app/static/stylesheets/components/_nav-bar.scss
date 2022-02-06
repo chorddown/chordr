@@ -27,17 +27,22 @@ nav {
         }
     }
 
+    .song-list-container {
+        height: 50vh;
+    }
     .song-list {
         display: flex;
         flex-flow: column;
         overflow: scroll;
-        height: 50vh;
+        height: 100%;
 
         &:focus,
         & > div:focus {
             outline: none;
         }
-
+    }
+    .setlist-name + .song-list{
+        height: calc(50vh - #{$setlist-name-height});
     }
 
     .song-item {

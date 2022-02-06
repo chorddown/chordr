@@ -7,3 +7,15 @@
         margin-right: $std-half;
     }
 }
+
+nav .setlist-name {
+    color: $gray-medium;
+    font-size: $font-size-small;
+    text-align: center;
+    height: $setlist-name-height;
+    padding: 0 ($std-half + 8px) 0 $std-half;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
