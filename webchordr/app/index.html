@@ -35,7 +35,6 @@
 </div>
 
 <script>
-    const CACHE_NAME = 'chordr';
     const initOutput = enable => {
         /* See also webchordr/app/static/service-worker.js:159 */
         const consoleStyles = {
@@ -74,7 +73,7 @@
         return output
     }
 
-    const output = initOutput();
+    const output = initOutput(true);
 
     const getReloadButtonFallback = function () {
         /** @type {HTMLLinkElement|HTMLElement} */
@@ -98,10 +97,8 @@
                 return;
             }
 
-            output.debug(message + ' Clearing caches and reload');
-            caches.delete(CACHE_NAME).then(() => setTimeout(() => {
-                window.location.reload()
-            }, 4000))
+            output.debug(message + ' Reload');
+            setTimeout(() => window.location.reload(), 4000)
         }, 10000);
     };
 
