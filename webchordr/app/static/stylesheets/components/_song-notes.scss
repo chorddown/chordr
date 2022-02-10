@@ -22,7 +22,7 @@
 
         -webkit-appearance: none;
         appearance: none;
-        width: 100%;
+        width: $nav-width;
         height: 100%;
         @include if-dark-mode {
             border-color: $gray-ultra-dark;
