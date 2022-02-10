@@ -19,3 +19,8 @@ nav .setlist-name {
     overflow: hidden;
 }
 
+nav.-hidden .setlist-name {
+    width: $nav-collapsed-width;
+    padding: 0 0 0 $song-item-space;
+}
+

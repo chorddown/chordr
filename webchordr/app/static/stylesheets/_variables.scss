@@ -271,6 +271,9 @@ $dark-mode-clipboard-input-color: $dark-mode-button-color !default;
 
 $song-item-space: 2px !default;
 
+$song-tools-style: 'navbar' !default; // 'navbar' or 'box'
+$song-tools-navbar-height: $button-line-height + 6px + $std-space !default;
+
 $song-search-line-height: $button-line-height !default;
 $song-search-padding: $button-padding !default;
 $song-search-border: $button-border !default;

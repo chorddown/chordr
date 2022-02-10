@@ -71,9 +71,11 @@
 
 /// Mixin for Song detail tools (like transpose and setlist tool)
 @mixin song-tool() {
+    @if $song-tools-style != 'navbar' {
     margin-bottom: $std-half;
     &:last-child {
         margin-bottom: 0;
+    }
     }
 }
 

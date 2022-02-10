@@ -75,6 +75,9 @@ main {
 
     #chordr {
         min-height: 100vh;
+        @if ($song-tools-style == 'navbar') {
+            margin-top: $song-tools-navbar-height;
+        }
     }
 }
 
