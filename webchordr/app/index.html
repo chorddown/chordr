@@ -12,10 +12,10 @@
     <link data-trunk rel="copy-file" href="/static/manifest.json">
     <link data-trunk rel="copy-file" href="/static/catalog.json">
     <link data-trunk rel="copy-file" href="/static/service-worker.js">
+    <link data-trunk rel="copy-dir" href="/static/javascripts">
     <link data-trunk rel="copy-dir" href="/static/assets">
     <link data-trunk rel="rust" data-cargo-features="trunk_build">
     <link data-trunk rel="scss" data-inline href="/static/stylesheets/chordr-app.scss"/>
-    <link data-trunk rel="inline" href="/static/javascripts/scroll-direction-helper.js"/>
 </head>
 <body>
 <div id="root">
@@ -122,6 +122,7 @@
         }
     </script>
 </div>
+<script src="/javascripts/scroll-direction-helper.js"></script>
 
 </body>
 </html>
