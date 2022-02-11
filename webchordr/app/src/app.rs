@@ -104,8 +104,7 @@ impl App {
     }
 
     fn view_song(&self, song_id: SongId) -> Html {
-        let state = self.props.state.clone();
-        if state.catalog().is_none() {
+        if self.props.state.catalog().is_none() {
             return html! {};
         }
 
