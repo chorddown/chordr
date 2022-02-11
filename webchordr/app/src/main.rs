@@ -9,6 +9,7 @@ use webchordr_common::errors;
 use webchordr_common::fetch_helper;
 use webchordr_common::helpers;
 use webchordr_common::session;
+use yew::utils::document;
 
 // Use `wee_alloc` as the global allocator.
 #[global_allocator]
@@ -24,5 +25,11 @@ mod state;
 
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
-    yew::start_app::<handler::Handler>();
+    yew::initialize();
+    let element = document()
+        .query_selector("#root")
+        .expect("can't get #root node for rendering")
+        .expect("can't unwrap #root node");
+    yew::App::<handler::Handler>::new().mount(element);
+    yew::run_loop();
 }
