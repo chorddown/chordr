@@ -6,6 +6,8 @@ use crate::prelude::{
 };
 
 type Storage = HashMap<SongId, String>;
+
+#[derive(Debug)]
 pub struct Index {
     map: Storage,
 }

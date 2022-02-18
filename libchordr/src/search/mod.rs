@@ -5,6 +5,7 @@ use crate::search::index::Index;
 
 mod index;
 
+#[derive(Debug)]
 pub struct SearchIndex {
     index: Index,
     catalog: Rc<Catalog>,
