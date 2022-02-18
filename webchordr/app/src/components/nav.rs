@@ -110,11 +110,6 @@ impl Nav {
     }
 
     fn view_notes_section(&self) -> Html {
-        // TODO: Check if the Song Notes should be hidden if the nav is collapsed
-        // if !self.props.expand {
-        //     return html! {};
-        // }
-
         (match &self.props.current_song_info {
             Some(i) => {
                 let on_settings_change = self.props.on_settings_change.reform(|e| e);
