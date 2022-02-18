@@ -38,6 +38,7 @@ chrono = { version = "*", features = ["serde", "wasmbind"] }
 base64 = "^0.13.0"
 unicode-segmentation = "1.8.0"
 gloo-dialogs = "^0.1.0"
+gloo-timers = "^0.2.3"
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3"

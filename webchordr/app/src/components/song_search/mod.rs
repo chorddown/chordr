@@ -1,6 +1,7 @@
 use std::rc::Rc;
 
-use log::info;
+use gloo_timers::callback::Timeout;
+use log::{debug, info};
 use yew::prelude::*;
 use yew::{Component, ComponentLink, ShouldRender};
 
@@ -19,6 +20,7 @@ pub struct SongSearch {
     /// Utility object
     link: ComponentLink<Self>,
     search_index: Option<SearchIndex>,
+    timeout: Option<Timeout>,
 }
 
 #[derive(Properties, PartialEq, Clone)]
@@ -30,10 +32,23 @@ pub struct SongSearchProps {
 impl SongSearch {
     /// Return the [Song]s from the [Catalog] filtered by [self.search]
     fn get_filtered_songs(&self) -> Vec<&Song> {
-        match self.search_index {
-            None => vec![],
-            Some(ref search_index) => search_index.search_by_term(&self.search).sort_by_title(),
+        if self.search.is_empty() {
+            self.props
+                .catalog
+                .iter()
+                .collect::<Vec<&Song>>()
+                .sort_by_title()
+        } else {
+            self.search_index
+                .as_ref()
+                .expect("Search index not built yet")
+                .search_by_term(&self.search)
+                .sort_by_title()
         }
+    }
+
+    fn needs_to_build_search_index(&self) -> bool {
+        !self.search.is_empty() && !self.search.trim().is_empty() && self.search_index.is_none()
     }
 
     fn get_back_link(&self) -> Html {
@@ -61,6 +76,8 @@ impl SongSearch {
 
 pub enum Msg {
     SearchChange(String),
+    Debounce(String),
+    BuildSearchIndex,
 }
 
 impl Component for SongSearch {
@@ -73,26 +90,49 @@ impl Component for SongSearch {
             link,
             search: String::new(),
             search_index: None,
+            timeout: None,
         }
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
             Msg::SearchChange(new_search) => {
+                // Clear the previous timer if one exists
+                if let Some(timeout) = self.timeout.take() {
+                    timeout.cancel();
+                }
+
+                // Debounce the handling of user input
+                let debounced = self.link.callback(|new_search| Msg::Debounce(new_search));
+                self.timeout = Some(Timeout::new(100, move || {
+                    debounced.emit(new_search);
+                }));
+
+                false
+            }
+
+            Msg::Debounce(new_search) => {
                 info!("New search {}", new_search);
                 self.search = new_search;
+
+                true
+            }
+
+            Msg::BuildSearchIndex => {
+                self.search_index = Some(build_search_index_from_props(&self.props));
+
+                true
             }
         }
-        true
     }
 
     fn change(&mut self, props: Self::Properties) -> ShouldRender {
         if self.props != props {
-            let catalog_changed = self.props.catalog != props.catalog;
-            self.props = props;
+            let catalog_changed = self.props.catalog.revision() != props.catalog.revision();
             if catalog_changed {
-                self.search_index = Some(SearchIndex::build_for_catalog(self.props.catalog.clone()))
+                self.search_index = None;
             }
+            self.props = props;
 
             true
         } else {
@@ -114,6 +154,12 @@ impl Component for SongSearch {
             }
         };
 
+        if self.needs_to_build_search_index() {
+            self.link.send_message(Msg::BuildSearchIndex);
+
+            return html! {};
+        }
+
         let songs = self.get_filtered_songs();
 
         let inner = if !songs.is_empty() {
@@ -129,4 +175,12 @@ impl Component for SongSearch {
             </div>
         }
     }
+}
+
+fn build_search_index_from_props(props: &SongSearchProps) -> SearchIndex {
+    debug!("Build search index");
+    let search_index = SearchIndex::build_for_catalog(props.catalog.clone());
+    debug!("Did build search index");
+
+    search_index
 }
