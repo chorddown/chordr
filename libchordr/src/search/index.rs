@@ -1,4 +1,3 @@
-use std::collections::hash_map::Iter;
 use std::collections::HashMap;
 
 use crate::format::Format;
@@ -6,8 +5,9 @@ use crate::prelude::{
     convert_to_format, Catalog, CatalogTrait, Formatting, ListEntryTrait, Result, Song, SongId,
 };
 
+type Storage = HashMap<SongId, String>;
 pub struct Index {
-    map: HashMap<SongId, String>,
+    map: Storage,
 }
 
 impl Index {
@@ -21,8 +21,17 @@ impl Index {
         index
     }
 
-    pub(super) fn iter(&self) -> Iter<'_, SongId, String> {
-        self.map.iter()
+    pub(super) fn search(&self, search: &str) -> Vec<&SongId> {
+        self.map
+            .iter()
+            .filter_map(|(song_id, text)| {
+                if text.contains(search) {
+                    Some(song_id)
+                } else {
+                    None
+                }
+            })
+            .collect()
     }
 
     fn with_capacity(capacity: usize) -> Self {

@@ -28,14 +28,8 @@ impl SearchIndex {
         let search_normalized = search.to_lowercase();
 
         self.index
-            .iter()
-            .filter_map(|(song_id, text)| {
-                if text.contains(&search_normalized) {
-                    Some(song_id)
-                } else {
-                    None
-                }
-            })
+            .search(&search_normalized)
+            .into_iter()
             .filter_map(|song_id| self.catalog.get(song_id))
             .collect()
     }
@@ -43,9 +37,10 @@ impl SearchIndex {
 
 #[cfg(test)]
 mod test {
+    use std::rc::Rc;
+
     use crate::search::SearchIndex;
     use crate::test_helpers::get_test_catalog;
-    use std::rc::Rc;
 
     #[test]
     fn test_search_by_term() {
