@@ -9,6 +9,7 @@ mod parser;
 #[cfg(feature = "pdf")]
 mod pdf;
 pub mod prelude;
+mod search;
 #[doc(hidden)]
 pub mod test_helpers;
 mod tokenizer;

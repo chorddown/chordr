@@ -18,6 +18,9 @@ pub use crate::parser::Parser;
 pub use crate::parser::ParserResult;
 pub use crate::parser::ParserTrait;
 
+/// Search
+pub use crate::search::SearchIndex;
+
 /// Data structures
 pub use crate::models::catalog::{Catalog, CatalogTrait};
 pub use crate::models::chord::fmt::Formatting;

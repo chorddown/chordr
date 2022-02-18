@@ -6,10 +6,8 @@ use yew::{Component, ComponentLink, ShouldRender};
 
 use libchordr::models::catalog::*;
 use libchordr::models::list::ListEntryTrait;
-use libchordr::prelude::{Song, SongData, SongSorting};
+use libchordr::prelude::{SearchIndex, Song, SongData, SongSorting};
 use webchordr_song_list::Item as SongItem;
-
-use crate::search::SearchUtility;
 
 use self::link::SongSearchLink;
 
@@ -20,6 +18,7 @@ pub struct SongSearch {
     props: SongSearchProps,
     /// Utility object
     link: ComponentLink<Self>,
+    search_index: Option<SearchIndex>,
 }
 
 #[derive(Properties, PartialEq, Clone)]
@@ -31,7 +30,10 @@ pub struct SongSearchProps {
 impl SongSearch {
     /// Return the [Song]s from the [Catalog] filtered by [self.search]
     fn get_filtered_songs(&self) -> Vec<&Song> {
-        SearchUtility::search_catalog_by_term(&self.props.catalog, &self.search).sort_by_title()
+        match self.search_index {
+            None => vec![],
+            Some(ref search_index) => search_index.search_by_term(&self.search).sort_by_title(),
+        }
     }
 
     fn get_back_link(&self) -> Html {
@@ -70,6 +72,7 @@ impl Component for SongSearch {
             props,
             link,
             search: String::new(),
+            search_index: None,
         }
     }
 
@@ -85,7 +88,12 @@ impl Component for SongSearch {
 
     fn change(&mut self, props: Self::Properties) -> ShouldRender {
         if self.props != props {
+            let catalog_changed = self.props.catalog != props.catalog;
             self.props = props;
+            if catalog_changed {
+                self.search_index = Some(SearchIndex::build_for_catalog(self.props.catalog.clone()))
+            }
+
             true
         } else {
             false

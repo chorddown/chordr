@@ -20,7 +20,6 @@ mod components;
 mod handler;
 mod handler_traits;
 mod route;
-mod search;
 mod state;
 
 fn main() {
