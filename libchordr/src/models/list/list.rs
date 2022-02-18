@@ -45,7 +45,7 @@ where
 {
     type Item = S;
 
-    fn get(&self, song_id: <<Self as ListTrait>::Item as ListEntryTrait>::Id) -> Option<&S> {
+    fn get(&self, song_id: <Self::Item as ListEntryTrait>::Id) -> Option<&S> {
         self.0.iter().find(|s| s.id() == song_id)
     }
 
@@ -106,7 +106,7 @@ where
         Ok(())
     }
 
-    fn position(&mut self, id: <<Self as ListTrait>::Item as ListEntryTrait>::Id) -> Option<usize> {
+    fn position(&mut self, id: <Self::Item as ListEntryTrait>::Id) -> Option<usize> {
         self.0.iter().position(|s| s.id() == id)
     }
 }

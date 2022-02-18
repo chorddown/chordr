@@ -131,17 +131,14 @@ impl ListTrait for Setlist {
         self.songs.replace(song)
     }
 
-    fn remove_by_id(
-        &mut self,
-        id: <<Self as ListTrait>::Item as ListEntryTrait>::Id,
-    ) -> Result<(), ListError> {
+    fn remove_by_id(&mut self, id: <Self::Item as ListEntryTrait>::Id) -> Result<(), ListError> {
         self.songs.remove_by_id(id)
     }
 
     // fn remove(&mut self, item: &Self::Item) -> Result<(), ListError> {
     //     self.remove_by_id(item.id())
     // }
-    fn remove(&mut self, item: &<Self as ListTrait>::Item) -> Result<(), ListError> {
+    fn remove(&mut self, item: &Self::Item) -> Result<(), ListError> {
         self.remove_by_id(item.id())
     }
 
@@ -149,10 +146,7 @@ impl ListTrait for Setlist {
         self.songs.move_entry(from, to)
     }
 
-    fn position(
-        &mut self,
-        song_id: <<Self as ListTrait>::Item as ListEntryTrait>::Id,
-    ) -> Option<usize> {
+    fn position(&mut self, song_id: <Self::Item as ListEntryTrait>::Id) -> Option<usize> {
         self.songs.position(song_id)
     }
 }

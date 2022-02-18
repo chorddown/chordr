@@ -59,7 +59,7 @@ where
 {
     type Item = S;
 
-    fn get(&self, id: <<Self as ListTrait>::Item as ListEntryTrait>::Id) -> Option<&Self::Item> {
+    fn get(&self, id: <Self::Item as ListEntryTrait>::Id) -> Option<&Self::Item> {
         self.0.get(id)
     }
 
@@ -84,7 +84,7 @@ where
     /// Remove the entry with the given [SongId] from the [SongList]
     fn remove_by_id(
         &mut self,
-        song_id: <<Self as ListTrait>::Item as ListEntryTrait>::Id,
+        song_id: <Self::Item as ListEntryTrait>::Id,
     ) -> Result<(), ListError> {
         self.0.remove_by_id(song_id)
     }
@@ -94,7 +94,7 @@ where
         self.0.move_entry(from, to)
     }
 
-    fn position(&mut self, id: <<Self as ListTrait>::Item as ListEntryTrait>::Id) -> Option<usize> {
+    fn position(&mut self, id: <Self::Item as ListEntryTrait>::Id) -> Option<usize> {
         self.0.position(id)
     }
 }
