@@ -164,8 +164,11 @@ mod tests {
     fn test_build_catalog_for_test_directory() {
         let songs_dir = format!("{}/tests/resources", env!("CARGO_MANIFEST_DIR"));
         let songs_dir = Path::new(&songs_dir);
-        let result =
-            CatalogBuilder::new().build_catalog_for_directory(songs_dir, FileType::Chorddown, true);
+        let result = CatalogBuilder::new().build_catalog_for_directory(
+            songs_dir,
+            FileType::Chorddown,
+            false,
+        );
         assert!(result.is_ok());
         let catalog_and_errors = result.unwrap();
         let catalog = catalog_and_errors.catalog;
@@ -176,6 +179,31 @@ mod tests {
         assert!(catalog.get(song_id).is_some());
         let song = catalog.get(song_id).unwrap();
         assert_eq!("Überschrift", song.title());
+        assert_eq!(SongId::new(song_id), song.id());
+
+        let song_id = "song-id-with-spaces.chorddown";
+        assert!(catalog.contains_id(song_id));
+        assert!(catalog.get(song_id).is_some());
+        let song = catalog.get(song_id).unwrap();
+        assert_eq!(SongId::new(song_id), song.id());
+    }
+
+    #[test]
+    fn test_build_catalog_for_test_directory_recursive() {
+        let songs_dir = format!("{}/tests/resources", env!("CARGO_MANIFEST_DIR"));
+        let songs_dir = Path::new(&songs_dir);
+        let result =
+            CatalogBuilder::new().build_catalog_for_directory(songs_dir, FileType::Chorddown, true);
+        assert!(result.is_ok());
+        let catalog_and_errors = result.unwrap();
+        let catalog = catalog_and_errors.catalog;
+        assert_eq!(6, catalog.len());
+
+        let song_id = "song-1.chorddown";
+        assert!(catalog.contains_id(song_id));
+        assert!(catalog.get(song_id).is_some());
+        let song = catalog.get(song_id).unwrap();
+        assert_eq!("Song 1", song.title());
         assert_eq!(SongId::new(song_id), song.id());
 
         let song_id = "song-id-with-spaces.chorddown";
