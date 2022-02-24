@@ -49,11 +49,13 @@
         color: var(--button-color);
     }
 
+    a[role=button].discreet,
     button.discreet {
         $button-size: 30px;
         display: inline-block;
         color: var(--button-color);
         height: $button-size;
+        line-height: $button-line-height;
         min-width: $button-size;
 
         @include if-hover-enabled {
@@ -71,6 +73,17 @@
             background: var(--button-bg);
             @include if-dark-mode {
                 background: var(--button-hover-bg);
+            }
+        }
+
+        &.home {
+            padding: 0 $std-half;
+            line-height: $button-size;
+            display: none;
+            @if ($song-tools-style == 'navbar') {
+                @include min-screen-tablet {
+                    display: block;
+                }
             }
         }
     }

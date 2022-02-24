@@ -12,10 +12,12 @@ use libchordr::prelude::*;
 use crate::components::song_view::semitone_notation_tool::SemitoneNotationTool;
 use crate::state::SongInfo;
 
+use self::home_tool::HomeTool;
 use self::setlist_tool::Setlist;
 pub use self::song_notes::SongNotes;
 use self::transpose_tool::TransposeTool;
 
+mod home_tool;
 mod semitone_notation_tool;
 mod setlist_tool;
 mod song_notes;
@@ -132,6 +134,7 @@ impl Component for SongView {
             <div>
                 {detail}
                 <div class="song-tools">
+                    <HomeTool/>
                     <TransposeTool
                         show_input_field=false
                         transpose_semitone=transpose_semitone
