@@ -32,12 +32,8 @@ pub struct SongSearchProps {
 impl SongSearch {
     /// Return the [Song]s from the [Catalog] filtered by [self.search]
     fn get_filtered_songs(&self) -> Vec<&Song> {
-        if self.search.is_empty() {
-            self.props
-                .catalog
-                .iter()
-                .collect::<Vec<&Song>>()
-                .sort_by_title()
+        if self.search.is_empty() || self.search_index.is_none() {
+            self.get_all_songs()
         } else {
             self.search_index
                 .as_ref()
@@ -45,6 +41,14 @@ impl SongSearch {
                 .search_by_term(&self.search)
                 .sort_by_title()
         }
+    }
+
+    fn get_all_songs(&self) -> Vec<&Song> {
+        self.props
+            .catalog
+            .iter()
+            .collect::<Vec<&Song>>()
+            .sort_by_title()
     }
 
     fn needs_to_build_search_index(&self) -> bool {
@@ -154,13 +158,13 @@ impl Component for SongSearch {
             }
         };
 
-        if self.needs_to_build_search_index() {
+        let songs = if self.needs_to_build_search_index() {
             self.link.send_message(Msg::BuildSearchIndex);
 
-            return html! {};
-        }
-
-        let songs = self.get_filtered_songs();
+            self.get_all_songs()
+        } else {
+            self.get_filtered_songs()
+        };
 
         let inner = if !songs.is_empty() {
             html! { <div class="song-search-results">{ for songs.into_iter().map(render_song_item) }</div>}
