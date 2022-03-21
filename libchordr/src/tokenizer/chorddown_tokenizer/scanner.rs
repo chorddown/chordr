@@ -15,7 +15,9 @@ pub struct Scanner {
 
 impl Scanner {
     pub fn new() -> Self {
-        Self { lexemes: vec![] }
+        Self {
+            lexemes: Vec::with_capacity(400),
+        }
     }
 
     pub fn scan<R: BufRead>(mut self, mut input: R) -> Result<Vec<Lexeme>, Error> {
@@ -28,14 +30,14 @@ impl Scanner {
 
             for current_character in chars {
                 match current_character {
-                    NEWLINE => self.push_n_drain(&mut literal_buffer, Lexeme::Newline),
-                    CHORD_START => self.push_n_drain(&mut literal_buffer, Lexeme::ChordStart),
-                    CHORD_END => self.push_n_drain(&mut literal_buffer, Lexeme::ChordEnd),
-                    HEADER_START => self.push_n_drain(&mut literal_buffer, Lexeme::HeaderStart),
-                    QUOTE_START => self.push_n_drain(&mut literal_buffer, Lexeme::QuoteStart),
-                    COLON => self.push_n_drain(&mut literal_buffer, Lexeme::Colon),
-                    CHORUS_MARK => self.push_n_drain(&mut literal_buffer, Lexeme::ChorusMark),
-                    BRIDGE_MARK => self.push_n_drain(&mut literal_buffer, Lexeme::BridgeMark),
+                    NEWLINE => self.build_n_push(&mut literal_buffer, Lexeme::Newline),
+                    CHORD_START => self.build_n_push(&mut literal_buffer, Lexeme::ChordStart),
+                    CHORD_END => self.build_n_push(&mut literal_buffer, Lexeme::ChordEnd),
+                    HEADER_START => self.build_n_push(&mut literal_buffer, Lexeme::HeaderStart),
+                    QUOTE_START => self.build_n_push(&mut literal_buffer, Lexeme::QuoteStart),
+                    COLON => self.build_n_push(&mut literal_buffer, Lexeme::Colon),
+                    CHORUS_MARK => self.build_n_push(&mut literal_buffer, Lexeme::ChorusMark),
+                    BRIDGE_MARK => self.build_n_push(&mut literal_buffer, Lexeme::BridgeMark),
                     _ => literal_buffer.push(current_character),
                 }
             }
@@ -43,18 +45,23 @@ impl Scanner {
             line.clear()
         }
 
-        self.push_n_drain(&mut literal_buffer, Lexeme::Eof);
+        self.build_n_push(&mut literal_buffer, Lexeme::Eof);
 
         Ok(self.lexemes)
     }
 
-    fn push_n_drain(&mut self, literal_buffer: &mut String, lexeme: Lexeme) {
-        self.build_literal(literal_buffer);
+    /// Call `build_n_drain()` with `literal_buffer` and append the given `lexeme` the collection
+    #[inline(always)]
+    fn build_n_push(&mut self, literal_buffer: &mut String, lexeme: Lexeme) {
+        self.build_n_drain(literal_buffer);
 
         self.lexemes.push(lexeme)
     }
 
-    fn build_literal(&mut self, literal_buffer: &mut String) {
+    /// Build a `Lexeme::Literal` from the current content of `literal_buffer`, push it to the
+    /// lexemes and replace the buffer with an empty string
+    #[inline(always)]
+    fn build_n_drain(&mut self, literal_buffer: &mut String) {
         if !literal_buffer.is_empty() {
             self.lexemes.push(Lexeme::Literal(std::mem::replace(
                 literal_buffer,
