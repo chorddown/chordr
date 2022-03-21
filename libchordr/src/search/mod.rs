@@ -14,7 +14,7 @@ pub struct SearchIndex {
 impl SearchIndex {
     pub fn build_for_catalog(catalog: Rc<Catalog>) -> Self {
         Self {
-            index: Index::build_index(&*catalog),
+            index: Index::build_index(&catalog),
             catalog,
         }
     }
