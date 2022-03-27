@@ -1,10 +1,11 @@
+use std::convert::TryFrom;
+
 use crate::error::Error;
 use crate::models::chord::Chords;
 use crate::models::meta::BNotation;
 use crate::modification::transposition::TransposableTrait;
 use crate::parser::section_type::SectionType;
 use crate::tokenizer::{Meta, Modifier, Token};
-use std::convert::TryFrom;
 
 #[derive(PartialOrd, PartialEq, Debug, Clone)]
 pub enum Node {
@@ -28,7 +29,6 @@ pub enum Node {
     Newline,
 }
 
-#[allow(dead_code)]
 impl Node {
     pub(crate) fn section<S: Into<String>, T: Into<SectionType> + Into<Modifier>>(
         level: u8,
@@ -49,6 +49,7 @@ impl Node {
         Node::Headline(Token::headline(level, value.into(), modifier))
     }
 
+    #[allow(unused)]
     pub(crate) fn chord_standalone<S: AsRef<str>>(value: S) -> Result<Self, Error> {
         Ok(Node::ChordStandalone(Chords::try_from(
             value.as_ref(),
@@ -143,48 +144,13 @@ impl TransposableTrait for Node {
 
 #[cfg(test)]
 mod tests {
+    use crate::test_helpers::get_test_ast_small;
+
     use super::*;
 
     #[test]
     fn transpose_test() {
-        let input = Node::Document(vec![
-            Node::section(
-                1,
-                "Swing Low Sweet Chariot",
-                Modifier::None,
-                vec![Node::newline()],
-            ),
-            Node::section(
-                2,
-                "Chorus",
-                Modifier::Chorus,
-                vec![
-                    Node::text("Swing "),
-                    Node::chord_text_pair("D", "low, sweet ").unwrap(),
-                    Node::chord_text_pair("G", "chari").unwrap(),
-                    Node::chord_text_pair("D", "ot,").unwrap(),
-                    Node::text("Comin’ for to carry me "),
-                    Node::chord_text_pair("A7", "home.").unwrap(),
-                    Node::text("Swing "),
-                    Node::chord_standalone("D7").unwrap(),
-                ],
-            ),
-            Node::section(
-                2,
-                "Verse",
-                Modifier::None,
-                vec![
-                    Node::chord_text_pair("E", "low, sweet ").unwrap(),
-                    Node::chord_text_pair("G", "chari").unwrap(),
-                    Node::chord_text_pair("D", "ot,").unwrap(),
-                    Node::chord_standalone("E").unwrap(),
-                    Node::chord_standalone("A").unwrap(),
-                    Node::newline(),
-                    Node::chord_standalone("A#").unwrap(),
-                    Node::chord_standalone("H").unwrap(),
-                ],
-            ),
-        ]);
+        let input = get_test_ast_small();
         let expected = Node::Document(vec![
             Node::section(
                 1,

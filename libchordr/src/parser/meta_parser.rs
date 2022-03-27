@@ -85,7 +85,7 @@ impl MetaParser {
 
 #[cfg(test)]
 mod tests {
-    use crate::test_helpers::get_test_parser_input;
+    use crate::test_helpers::get_test_tokens_small;
     use crate::tokenizer::Modifier;
 
     use super::*;
@@ -93,7 +93,7 @@ mod tests {
     #[test]
     fn test_parse() {
         let mut parser = MetaParser::new();
-        let result = parser.parse(get_test_parser_input());
+        let result = parser.parse(get_test_tokens_small());
 
         assert!(result.is_ok());
         assert_eq!(

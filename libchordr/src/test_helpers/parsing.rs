@@ -1,11 +1,12 @@
 use crate::models::meta::BNotation;
-use crate::models::user::{User, Username};
 use crate::parser::{MetaInformation, Node};
-use crate::prelude::{Catalog, FileType, Password, Song, SongMeta};
 use crate::tokenizer::{Modifier, Token};
 
+/// Return a small example set of Tokens
+///
+/// See also [get_test_ast_small()]
 #[cfg(test)]
-pub fn get_test_parser_input() -> Vec<Token> {
+pub fn get_test_tokens_small() -> Vec<Token> {
     vec![
         Token::headline(1, "Swing Low Sweet Chariot", Modifier::None),
         Token::newline(),
@@ -37,6 +38,56 @@ pub fn get_test_parser_input() -> Vec<Token> {
     ]
 }
 
+/// Return a short example AST
+/// This is also the excepted parsed AST for `get_test_parser_input()`
+///
+/// See also [get_test_tokens_small()]
+#[cfg(test)]
+pub fn get_test_ast_small() -> Node {
+    Node::Document(vec![
+        Node::section(
+            1,
+            "Swing Low Sweet Chariot",
+            Modifier::None,
+            vec![Node::newline()],
+        ),
+        Node::section(
+            2,
+            "Chorus",
+            Modifier::Chorus,
+            vec![
+                Node::text("Swing "),
+                Node::chord_text_pair("D", "low, sweet ").unwrap(),
+                Node::chord_text_pair("G", "chari").unwrap(),
+                Node::chord_text_pair("D", "ot,").unwrap(),
+                Node::text("Comin’ for to carry me "),
+                Node::chord_text_pair("A7", "home.").unwrap(),
+                Node::text("Swing "),
+                Node::chord_standalone("D7").unwrap(),
+            ],
+        ),
+        Node::section(
+            2,
+            "Verse",
+            Modifier::None,
+            vec![
+                Node::chord_text_pair("E", "low, sweet ").unwrap(),
+                Node::chord_text_pair("G", "chari").unwrap(),
+                Node::chord_text_pair("D", "ot,").unwrap(),
+                Node::chord_standalone("E").unwrap(),
+                Node::chord_standalone("A").unwrap(),
+                Node::newline(),
+                Node::chord_standalone("A#").unwrap(),
+                Node::chord_standalone("H").unwrap(),
+            ],
+        ),
+    ])
+}
+
+/// Return the complete set of Tokens for swing_low_sweet_chariot.chorddown
+///
+/// See [../tests/resources/swing_low_sweet_chariot.chorddown]
+/// See also [get_test_ast()]
 pub fn get_test_tokens() -> Vec<Token> {
     vec![
         Token::headline(1, "Swing Low Sweet Chariot", Modifier::None),
@@ -107,6 +158,10 @@ pub fn get_test_tokens() -> Vec<Token> {
     ]
 }
 
+/// Return the complete AST for swing_low_sweet_chariot.chorddown
+///
+/// See [../tests/resources/swing_low_sweet_chariot.chorddown]
+/// See also [get_test_tokens()]
 pub fn get_test_ast() -> Node {
     Node::Document(vec![
         Node::section(
@@ -245,39 +300,4 @@ pub fn get_test_metadata() -> MetaInformation {
         ccli_song_id: None,
         b_notation: BNotation::B,
     }
-}
-
-pub fn get_test_user() -> User {
-    User::new(
-        Username::new("my-username").unwrap(), // username
-        "Daniel".to_string(),                  // first_name
-        "Corn".to_string(),                    // last_name
-        Password::new("mypass123").unwrap(),   // password
-    )
-}
-
-pub fn get_test_catalog() -> Catalog {
-    let songs = vec![
-        Song::new(
-            SongMeta::new("song-1".into(), "Song 1".into(), FileType::Chorddown),
-            include_str!("../tests/resources/catalog/song-1.chorddown"),
-        ),
-        Song::new(
-            SongMeta::new("song-2".into(), "Song 2".into(), FileType::Chorddown),
-            include_str!("../tests/resources/catalog/song-2.chorddown"),
-        ),
-        Song::new(
-            SongMeta::new("song-3".into(), "Song 3".into(), FileType::Chorddown),
-            include_str!("../tests/resources/catalog/song-3.chorddown"),
-        ),
-        Song::new(
-            SongMeta::new("song-40".into(), "Song 40".into(), FileType::Chorddown),
-            include_str!("../tests/resources/swing_low_sweet_chariot.chorddown"),
-        ),
-        Song::new(
-            SongMeta::new("song-50".into(), "Song 50".into(), FileType::Chorddown),
-            include_str!("../tests/resources/german-test.chorddown"),
-        ),
-    ];
-    Catalog::new("test-catalog", songs)
 }
