@@ -1,3 +1,6 @@
+//! # Models
+//!
+//! This module contains the data models provided by `libchord`
 pub mod catalog;
 pub mod chord;
 pub mod file_type;
