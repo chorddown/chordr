@@ -52,15 +52,7 @@ impl NodeParser {
                 let head = Some(Box::new(Node::Headline(token)));
 
                 if tokens.peek().is_some() {
-                    // Collect children
-                    let mut children = vec![];
-                    while let Some(token) = tokens.peek() {
-                        if token_is_start_of_section(token) {
-                            break;
-                        }
-                        let result = self.visit(tokens.next().unwrap(), tokens)?;
-                        children.push(result);
-                    }
+                    let children = self.consume_children(tokens)?;
 
                     Ok(Node::Section {
                         head,
@@ -80,6 +72,23 @@ impl NodeParser {
             Token::Quote(_) => Ok(Node::Quote(token)),
             Token::Newline => Ok(Node::Newline),
         }
+    }
+
+    /// Collect children while there is an upcoming token and it isn't the start of a new section
+    fn consume_children(
+        &mut self,
+        tokens: &mut Peekable<IntoIter<Token>>,
+    ) -> Result<Vec<Node>, Error> {
+        let mut children = vec![];
+
+        while let Some(token) = tokens.peek() {
+            if token_is_start_of_section(token) {
+                break;
+            }
+            let result = self.visit(tokens.next().unwrap(), tokens)?;
+            children.push(result);
+        }
+        Ok(children)
     }
 
     fn visit_chord(
