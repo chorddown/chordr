@@ -169,19 +169,17 @@ impl SongBrowser {
             let key = song_id.as_str();
 
             html! {
-                <div class="col-xs-12 col-6">
-                    <SongItem<Song> class="song-item grid-button"
-                        key=key
-                        data_key=data_key
-                        song=song.clone()/>
-                </div>
+                <SongItem<Song> class="song-item grid-button"
+                    key=key
+                    data_key=data_key
+                    song=song.clone()/>
             }
         };
 
         html! {
             <div class="song-browser-song-list song-list">
                 {self.render_header()}
-                <div class="row grid">
+                <div class="columns-md-2">
                     { for songs.into_iter().map(render_song_item) }
                 </div>
                 {self.get_back_link()}

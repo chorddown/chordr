@@ -1,0 +1,26 @@
+@import "prelude";
+
+.columns-sm-2,
+.columns-md-2 {
+    column-gap: $grid-gutter-width * 2;
+    column-rule: solid 2px var(--control-bg);
+    > .grid-button {
+        display: inline-block;
+        width: 100%;
+    }
+}
+
+
+.columns-sm-2 {
+    @include min-screen(sm) {
+        column-count: 2;
+    }
+}
+
+.columns-md-2 {
+    @include min-screen(md) {
+        column-count: 2;
+    }
+}
+
+
