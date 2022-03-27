@@ -1,6 +1,7 @@
 use crate::error::Error;
-use crate::models::chord::{Chords, TransposableTrait};
+use crate::models::chord::Chords;
 use crate::models::meta::BNotation;
+use crate::modification::transposition::TransposableTrait;
 use crate::parser::section_type::SectionType;
 use crate::tokenizer::{Meta, Modifier, Token};
 use std::convert::TryFrom;

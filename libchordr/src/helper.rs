@@ -3,8 +3,8 @@ use std::io::BufRead;
 use crate::converter::{Converter, ConverterTrait};
 use crate::error::Result;
 use crate::models::chord::fmt::Formatting;
-use crate::models::chord::TransposableTrait;
 use crate::models::song_meta_trait::SongMetaTrait;
+use crate::modification::transposition::TransposableTrait;
 use crate::parser::{Parser, ParserResult, ParserTrait};
 use crate::tokenizer::{build_tokenizer, Token, Tokenizer};
 

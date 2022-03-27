@@ -6,17 +6,17 @@ use crate::error::Error;
 use crate::format::Format;
 use crate::models::chord::fmt::Formatting;
 use crate::models::meta::BNotation;
+#[deprecated(note = "Use ::modification::transposition::TransposableTrait")]
+pub use crate::modification::transposition::TransposableTrait;
 use crate::prelude::SemitoneNotation;
 
 pub use self::chords::Chords;
 pub use self::fmt::NoteDisplay;
 pub use self::note::Note;
-pub use self::transposition::TransposableTrait;
 
 mod chords;
 pub mod fmt;
 mod note;
-mod transposition;
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct Chord {

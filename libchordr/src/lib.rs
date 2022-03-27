@@ -5,6 +5,7 @@ mod format;
 mod helper;
 mod html;
 pub mod models;
+pub mod modification;
 mod parser;
 #[cfg(feature = "pdf")]
 mod pdf;

@@ -12,7 +12,7 @@ use log::LevelFilter;
 use simplelog::{ColorChoice, CombinedLogger, Config, TermLogger, TerminalMode};
 
 use libchordr::models::chord::fmt::Formatting;
-use libchordr::models::chord::TransposableTrait;
+use libchordr::modification::transposition::TransposableTrait;
 use libchordr::prelude::Error;
 use libchordr::prelude::Result;
 use libchordr::prelude::*;

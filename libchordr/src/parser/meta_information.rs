@@ -1,6 +1,7 @@
-use crate::models::chord::{Chord, TransposableTrait};
+use crate::models::chord::Chord;
 use crate::models::meta::b_notation::BNotation;
 use crate::models::meta::MetaTrait;
+use crate::modification::transposition::TransposableTrait;
 use crate::tokenizer::Meta;
 
 /// Meta Information for a parsed song
@@ -192,8 +193,9 @@ impl Default for MetaInformation {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::models::chord::Note;
+
+    use super::*;
 
     #[test]
     fn test_assign_from_token_key() {
