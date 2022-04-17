@@ -11,7 +11,7 @@ pub type Result<T, E = Error> = ::std::result::Result<T, E>;
 /// Error type for errors raised in the chord library
 #[derive(Debug)]
 pub struct Error {
-    inner: Box<dyn StdError>,
+    inner: Kind,
 }
 
 #[doc(hidden)]
@@ -67,20 +67,28 @@ impl Error {
         Error::new(Kind::InvalidTeamId(invalid_team_id.into(), message.into()))
     }
 
+    pub fn io_error(error: std::io::Error) -> Self {
+        Self::new(Kind::Io(error))
+    }
+
+    pub fn notation_error(error: NotationError) -> Self {
+        Self::new(Kind::Notation(error))
+    }
+
+    pub fn semitone_notation_error(error: SemitoneNotationError) -> Self {
+        Self::new(Kind::SemitoneNotation(error))
+    }
+
+    pub fn parse_int_error(error: std::num::ParseIntError) -> Self {
+        Self::new(Kind::ParseInt(error))
+    }
+
     pub fn unknown_error<S: Into<String>>(description: S) -> Self {
         Error::new(Kind::Unknown(description.into()))
     }
 
-    pub fn from_error<E: StdError + 'static>(error: E) -> Self {
-        Error {
-            inner: Box::new(error),
-        }
-    }
-
     fn new(kind: Kind) -> Self {
-        Error {
-            inner: Box::new(kind),
-        }
+        Error { inner: kind }
     }
 }
 
@@ -92,31 +100,31 @@ impl Display for Error {
 
 impl StdError for Error {
     fn source(&self) -> Option<&(dyn StdError + 'static)> {
-        Some(self.inner.as_ref())
+        Some(&self.inner)
     }
 }
 
 impl From<::std::io::Error> for Error {
     fn from(error: ::std::io::Error) -> Self {
-        Error::from_error(error)
+        Self::new(Kind::Io(error))
     }
 }
 
 impl From<NotationError> for Error {
     fn from(error: NotationError) -> Self {
-        Error::from_error(error)
+        Self::new(Kind::Notation(error))
     }
 }
 
 impl From<SemitoneNotationError> for Error {
     fn from(error: SemitoneNotationError) -> Self {
-        Error::from_error(error)
+        Self::new(Kind::SemitoneNotation(error))
     }
 }
 
 impl From<std::num::ParseIntError> for Error {
     fn from(error: std::num::ParseIntError) -> Self {
-        Error::from_error(error)
+        Self::new(Kind::ParseInt(error))
     }
 }
 
@@ -132,6 +140,10 @@ enum Kind {
     InvalidUsername(String, String),
     InvalidPassword(String, String),
     InvalidTeamId(String, String),
+    Io(std::io::Error),
+    Notation(NotationError),
+    SemitoneNotation(SemitoneNotationError),
+    ParseInt(std::num::ParseIntError),
 }
 
 impl StdError for Kind {}
@@ -139,20 +151,24 @@ impl StdError for Kind {}
 impl Display for Kind {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), FmtError> {
         match self {
-            Kind::Parser(s) => write!(f, "{}", s),
-            Kind::TagBuilder(s) => write!(f, "{}", s),
+            Kind::Parser(s) => f.write_str(&s),
+            Kind::TagBuilder(s) => f.write_str(&s),
             Kind::CatalogBuilderFatal(s, p) => {
                 write!(f, "Error while building catalog: {} for path {:?}", s, p)
             }
-            Kind::FileType(s) => write!(f, "{}", s),
-            Kind::Chord(s) => write!(f, "{}", s),
-            Kind::Setlist(s) => write!(f, "{}", s),
-            Kind::Unknown(s) => write!(f, "{}", s),
-            Kind::InvalidUsername(_name, message) => write!(f, "{}", message),
-            Kind::InvalidPassword(_password, message) => write!(f, "{}", message),
+            Kind::FileType(s) => f.write_str(&s),
+            Kind::Chord(s) => f.write_str(&s),
+            Kind::Setlist(s) => f.write_str(&s),
+            Kind::Unknown(s) => f.write_str(&s),
+            Kind::InvalidUsername(_name, message) => f.write_str(message),
+            Kind::InvalidPassword(_password, message) => f.write_str(message),
             Kind::InvalidTeamId(invalid_id, _message) => {
                 write!(f, "Team ID '{}' is not valid", invalid_id)
             }
+            Kind::Io(i) => write!(f, "{}", i),
+            Kind::Notation(i) => write!(f, "{}", i),
+            Kind::SemitoneNotation(i) => write!(f, "{}", i),
+            Kind::ParseInt(i) => write!(f, "{}", i),
         }
     }
 }
