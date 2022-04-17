@@ -1,6 +1,8 @@
 use std::convert::TryFrom;
+use std::fmt::Debug;
 use std::fs::{self, DirEntry};
 use std::path::Path;
+use std::path::PathBuf;
 
 use chrono::Local;
 
@@ -15,13 +17,13 @@ pub use self::catalog_build_error::CatalogBuildError;
 mod catalog_build_error;
 mod song_from_dir_entry;
 
-/// Catalog Builder provides functions to build a Song Catalog from a given directory
-pub struct CatalogBuilder;
-
 pub struct CatalogBuildResult {
     pub catalog: Catalog,
     pub errors: Vec<CatalogBuildError>,
 }
+
+/// Catalog Builder provides functions to build a Song Catalog from a given directory
+pub struct CatalogBuilder;
 
 impl CatalogBuilder {
     pub fn new() -> Self {
@@ -42,46 +44,67 @@ impl CatalogBuilder {
             ));
         }
 
-        let song_results = self.collect_songs(path_ref, file_type, recursive);
-        let (songs, errors) = self.partition_songs(song_results);
+        let song_files_r: Vec<Result<PathBuf, CatalogBuildError>> =
+            self.collect_song_files(path_ref, file_type, recursive);
+        let (song_file_results, io_errors): (Vec<_>, Vec<_>) = partition_results(song_files_r);
+        let song_results = self.build_songs_for_file_list(song_file_results);
+        let (songs, mut parse_errors) = self.partition_songs(song_results);
+
+        parse_errors.extend(io_errors.into_iter().map(|e| e.into()));
 
         Ok(CatalogBuildResult {
             catalog: Catalog::new(Local::now().to_rfc2822(), songs),
-            errors,
+            errors: parse_errors,
         })
+    }
+
+    #[cfg(not(feature = "parallel_catalog_builder"))]
+    fn build_songs_for_file_list(
+        &self,
+        song_file_results: Vec<PathBuf>,
+    ) -> Vec<Result<Song, CatalogBuildError>> {
+        song_file_results
+            .into_iter()
+            .map(|e| Song::try_from(e.as_path()))
+            .collect()
+    }
+
+    #[cfg(feature = "parallel_catalog_builder")]
+    fn build_songs_for_file_list(
+        &self,
+        song_file_results: Vec<PathBuf>,
+    ) -> Vec<Result<Song, CatalogBuildError>> {
+        use rayon::prelude::*;
+        song_file_results
+            .into_par_iter()
+            .map(|e| Song::try_from(e.as_path()))
+            .collect()
     }
 
     fn partition_songs(
         &self,
         song_results: Vec<Result<Song, CatalogBuildError>>,
     ) -> (Vec<Song>, Vec<CatalogBuildError>) {
-        let (songs, errors): (Vec<_>, Vec<_>) = song_results.into_iter().partition(Result::is_ok);
+        let (mut songs, errors) = partition_results(song_results);
 
-        let mut songs: Vec<Song> = songs.into_iter().map(Result::unwrap).collect();
         songs.sort_by_key(|a| a.id());
 
-        (
-            songs,
-            errors
-                .into_iter()
-                .map(Result::unwrap_err)
-                .collect::<Vec<CatalogBuildError>>(),
-        )
+        (songs, errors)
     }
 
-    fn collect_songs(
+    fn collect_song_files(
         &self,
         path: &Path,
         file_type: FileType,
         recursive: bool,
-    ) -> Vec<Result<Song, CatalogBuildError>> {
+    ) -> Vec<Result<PathBuf, CatalogBuildError>> {
         if !path.is_dir() {
             panic!("Given path is not a directory");
         }
 
         let entry_iterator = match fs::read_dir(path) {
             Ok(i) => i,
-            Err(e) => return vec![Err(CatalogBuildError::from_error(e, path))],
+            Err(e) => return vec![Err(CatalogBuildError::from_error(Error::io_error(e), path))],
         };
 
         let mut songs = vec![];
@@ -101,18 +124,18 @@ impl CatalogBuilder {
         entry: DirEntry,
         file_type: FileType,
         recursive: bool,
-    ) -> Vec<Result<Song, CatalogBuildError>> {
+    ) -> Vec<Result<PathBuf, CatalogBuildError>> {
         let path = entry.path();
         if path.is_file() {
             if file_type.dir_entry_matches(&entry) {
-                vec![Song::try_from(entry)]
+                vec![Ok(entry.path())]
             } else {
                 // This is **not** an error situation. If `entry` is not of `file_type` skip the entry
                 vec![]
             }
         } else if path.is_dir() {
             if recursive {
-                self.collect_songs(path.as_path(), file_type, recursive)
+                self.collect_song_files(path.as_path(), file_type, recursive)
             } else {
                 vec![]
             }
@@ -129,6 +152,18 @@ impl Default for CatalogBuilder {
     fn default() -> Self {
         Self {}
     }
+}
+
+pub fn partition_results<T: Debug, E: Debug>(results: Vec<Result<T, E>>) -> (Vec<T>, Vec<E>) {
+    let mut left: Vec<T> = Vec::with_capacity(results.len() / 2);
+    let mut right: Vec<E> = Vec::with_capacity(results.len() / 2);
+
+    results.into_iter().fold((), |(), x| match x {
+        Ok(o) => left.push(o),
+        Err(e) => right.push(e),
+    });
+
+    (left, right)
 }
 
 #[cfg(test)]

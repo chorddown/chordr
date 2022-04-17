@@ -16,6 +16,7 @@ name = "libchordr"
 path = "src/lib.rs"
 
 [features]
+parallel_catalog_builder = ["rayon"]
 pdf = ["printpdf"]
 internals = []
 
@@ -26,6 +27,7 @@ printpdf = { version = "0.2.8", optional = true }
 chrono = { version = "0.4", features = ["serde"] }
 log = "0.4"
 cqrs = { path = "../cqrs" }
+rayon = { version = "1.5.1", optional = true }
 
 [dev-dependencies]
 serde_json = "^1.0"
@@ -33,6 +35,10 @@ criterion = { version = "0.3", features = ["html_reports"] }
 
 [[bench]]
 name = "parse_benchmark"
+harness = false
+
+[[bench]]
+name = "catalog_builder_benchmark"
 harness = false
 
 [[bench]]
