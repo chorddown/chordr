@@ -49,18 +49,11 @@ impl ChorddownConverter {
                 head,
                 children,
                 section_type: _,
-            } => {
-                let inner = match head {
-                    Some(head) => format!(
-                        "{}{}",
-                        self.build_node(head, formatting)?,
-                        self.build_string_for_children(children, formatting)
-                    ),
-                    None => self.build_string_for_children(children, formatting),
-                };
-
-                Ok(format!("{}\n", inner))
-            }
+            } => Ok(format!(
+                "{}{}\n",
+                self.build_node(head, formatting)?,
+                self.build_string_for_children(children, formatting)
+            )),
         }
     }
 

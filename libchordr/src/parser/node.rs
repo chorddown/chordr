@@ -22,7 +22,7 @@ pub enum Node {
     Headline(Token),
     Quote(Token),
     Section {
-        head: Option<Box<Node>>,
+        head: Box<Node>,
         section_type: SectionType,
         children: Vec<Node>,
     },
@@ -39,7 +39,7 @@ impl Node {
         let section_type: SectionType = section_type.into();
 
         Node::Section {
-            head: Some(Box::new(Node::headline(level, value, section_type.into()))),
+            head: Box::new(Node::headline(level, value, section_type.into())),
             section_type,
             children,
         }

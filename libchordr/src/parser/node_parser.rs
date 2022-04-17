@@ -49,7 +49,7 @@ impl NodeParser {
                 modifier,
             } => {
                 if level == 1 {}
-                let head = Some(Box::new(Node::Headline(token)));
+                let head = Box::new(Node::Headline(token));
 
                 if tokens.peek().is_some() {
                     let children = self.consume_children(tokens)?;

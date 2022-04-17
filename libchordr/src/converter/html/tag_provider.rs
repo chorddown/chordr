@@ -77,7 +77,7 @@ impl TagProvider {
 
     fn build_tag_for_section(
         &self,
-        head: &Option<Box<Node>>,
+        head: &Node,
         children: &[Node],
         section_type: &SectionType,
         meta: &dyn MetaTrait,
@@ -88,18 +88,13 @@ impl TagProvider {
             gtb = gtb.set_class_name(class_name);
         }
 
-        if let Some(head) = head {
-            let inner = format!(
-                "{}{}",
-                self.build_tag_for_node(head, meta, formatting),
-                self.build_tag_for_children(children, meta, formatting)
-            );
+        let inner = format!(
+            "{}{}",
+            self.build_tag_for_node(head, meta, formatting),
+            self.build_tag_for_children(children, meta, formatting)
+        );
 
-            gtb.set_content(Content::Raw(inner)).build()
-        } else {
-            gtb.set_content_tag(self.build_tag_for_children(children, meta, formatting))
-                .build()
-        }
+        gtb.set_content(Content::Raw(inner)).build()
     }
 
     fn build_tag_for_token<'a>(&'a self, token: &'a Token, _formatting: Formatting) -> Tag {
