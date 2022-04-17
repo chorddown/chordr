@@ -6,7 +6,7 @@ use std::path::{Path, PathBuf};
 pub struct CatalogBuildError {
     message: String,
     path: PathBuf,
-    inner: Option<Box<dyn Error>>,
+    inner: Option<Box<dyn Error + Send>>,
 }
 
 impl CatalogBuildError {
@@ -17,7 +17,10 @@ impl CatalogBuildError {
             inner: None,
         }
     }
-    pub(super) fn from_error<E: Error + 'static, P: Into<PathBuf>>(error: E, path: P) -> Self {
+    pub(super) fn from_error<E: Error + Send + 'static, P: Into<PathBuf>>(
+        error: E,
+        path: P,
+    ) -> Self {
         Self {
             message: error.to_string(),
             path: path.into(),
