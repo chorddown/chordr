@@ -1,11 +1,14 @@
-use super::ConverterTrait;
 use crate::error::Result;
 use crate::models::chord::fmt::Formatting;
 use crate::models::meta::MetaTrait;
 use crate::parser::Node;
 use crate::tokenizer::Token;
 
+use super::ConverterTrait;
+
 pub struct SongBeamerConverter {}
+
+const BOM: &'static str = "\u{feff}";
 
 impl ConverterTrait for SongBeamerConverter {
     fn convert(
@@ -21,12 +24,7 @@ impl ConverterTrait for SongBeamerConverter {
             self.build_node(node)?
         );
 
-        // TODO: Encode for Windows usage
-        // use encoding::{Encoding, EncoderTrap};
-        // use encoding::all::ISO_8859_1;
-        // println!("{:?}", ISO_8859_1.encode(output.as_str(), EncoderTrap::Ignore));
-
-        Ok(cleanup_output(&output))
+        Ok(format!("{}{}", BOM, cleanup_output(&output)))
     }
 }
 
@@ -152,13 +150,14 @@ fn remove_blank_slides(input: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::format::Format;
     use crate::parser::MetaInformation;
     use crate::test_helpers::get_test_metadata;
     use crate::test_helpers::{
         get_test_ast, get_test_ast_w_inline_metadata, get_test_ast_with_quote,
     };
+
+    use super::*;
 
     #[test]
     fn test_convert() {
@@ -174,7 +173,8 @@ mod tests {
 
         assert_eq!(
             source,
-            r#"#LangCount=1
+            BOM.to_owned()
+                + r#"#LangCount=1
 #Editor=Chordr
 #Version=3
 ---
@@ -205,7 +205,8 @@ Comin’ for to carry me home.
 
         assert_eq!(
             source,
-            r#"#LangCount=1
+            BOM.to_owned()
+                + r#"#LangCount=1
 #Editor=Chordr
 #Version=3
 #OTitle=Great new song
@@ -240,7 +241,8 @@ Comin’ for to carry me home.
 
         assert_eq!(
             source,
-            r#"#LangCount=1
+            BOM.to_owned()
+                + r#"#LangCount=1
 #Editor=Chordr
 #Version=3
 #OTitle=Great new song
@@ -248,7 +250,7 @@ Comin’ for to carry me home.
 #Author=Wallace Willis
 ---
 Swing low, sweet chariot.
-"#
+"#,
         );
     }
 
@@ -267,7 +269,8 @@ Swing low, sweet chariot.
 
         assert_eq!(
             source,
-            r#"#LangCount=1
+            BOM.to_owned()
+                + r#"#LangCount=1
 #Editor=Chordr
 #Version=3
 ---
