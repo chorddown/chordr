@@ -210,8 +210,8 @@ fn get_song_metadata_content(
 
 fn class_name_for_type(section_type: &SectionType) -> Option<&'static str> {
     match section_type {
+        SectionType::Verse => None,
         SectionType::Chorus => Some("chorus"),
-        SectionType::Unknown => None,
         SectionType::Bridge => Some("bridge"),
     }
 }

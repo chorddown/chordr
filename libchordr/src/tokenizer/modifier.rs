@@ -71,15 +71,11 @@ impl From<SectionType> for Modifier {
 
 impl Display for Modifier {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
-        write!(
-            f,
-            "{}",
-            match self {
-                Self::Chorus => "!",
-                Self::Bridge => "-",
-                Self::None => "",
-            }
-        )
+        f.write_str(match self {
+            Self::Chorus => "!",
+            Self::Bridge => "-",
+            Self::None => "",
+        })
     }
 }
 
