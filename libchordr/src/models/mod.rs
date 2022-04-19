@@ -16,6 +16,7 @@ pub mod song_id;
 pub mod song_list;
 pub mod song_settings;
 pub mod song_sorting;
+pub mod structure;
 pub mod team;
 pub mod user;
 

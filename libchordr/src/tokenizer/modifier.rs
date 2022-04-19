@@ -1,5 +1,6 @@
-use crate::parser::SectionType;
 use std::fmt::{Display, Error, Formatter};
+
+use crate::parser::SectionType;
 
 #[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
 pub enum Modifier {
@@ -62,7 +63,7 @@ impl From<SectionType> for Modifier {
     fn from(t: SectionType) -> Self {
         match t {
             SectionType::Chorus => Modifier::Chorus,
-            SectionType::Unknown => Modifier::None,
+            SectionType::Verse => Modifier::None,
             SectionType::Bridge => Modifier::Bridge,
         }
     }
