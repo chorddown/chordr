@@ -213,5 +213,6 @@ fn class_name_for_type(section_type: &SectionType) -> Option<&'static str> {
         SectionType::Verse => None,
         SectionType::Chorus => Some("chorus"),
         SectionType::Bridge => Some("bridge"),
+        SectionType::Reference => Some("reference"),
     }
 }

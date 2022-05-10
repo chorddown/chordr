@@ -1,5 +1,5 @@
 use crate::models::meta::BNotation;
-use crate::parser::{MetaInformation, Node};
+use crate::parser::{MetaInformation, Node, SectionType};
 use crate::tokenizer::{Modifier, Token};
 
 /// Return a small example set of Tokens
@@ -220,7 +220,11 @@ pub fn get_test_ast() -> Node {
                 Node::newline(),
             ],
         ),
-        Node::quote("Chorus"),
+        Node::Section {
+            head: Box::new(Node::quote("Chorus")),
+            section_type: SectionType::Reference,
+            children: vec![],
+        },
         Node::newline(),
     ])
 }
@@ -233,7 +237,11 @@ pub fn get_test_ast_with_quote() -> Node {
             Modifier::None,
             vec![Node::newline()],
         ),
-        Node::quote("Play slowly"),
+        Node::Section {
+            head: Box::new(Node::quote("Chorus 2x")),
+            section_type: SectionType::Reference,
+            children: vec![],
+        },
         Node::newline(),
         Node::section(
             2,

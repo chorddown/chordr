@@ -3,6 +3,7 @@ use std::convert::TryFrom;
 use crate::error::Error;
 use crate::models::chord::Chords;
 use crate::models::meta::BNotation;
+use crate::models::structure::{Section, SectionProvider};
 use crate::modification::transposition::TransposableTrait;
 use crate::parser::section_type::SectionType;
 use crate::tokenizer::{Meta, Modifier, Token};
@@ -105,6 +106,10 @@ impl Node {
 
     pub(crate) fn quote<S: Into<String>>(value: S) -> Self {
         Node::Quote(Token::quote(value))
+    }
+
+    pub fn get_sections(&self) -> Vec<Section> {
+        SectionProvider::get_sections(self)
     }
 }
 

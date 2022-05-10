@@ -69,7 +69,11 @@ impl NodeParser {
             }
             Token::Meta(meta) => Ok(Node::Meta(meta)),
             Token::Literal(_) => Ok(Node::Text(token)),
-            Token::Quote(_) => Ok(Node::Quote(token)),
+            Token::Quote(_) => Ok(Node::Section {
+                head: Box::new(Node::Quote(token)),
+                children: vec![],
+                section_type: SectionType::Reference,
+            }),
             Token::Newline => Ok(Node::Newline),
         }
     }

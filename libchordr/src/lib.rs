@@ -10,6 +10,7 @@ mod parser;
 #[cfg(feature = "pdf")]
 mod pdf;
 pub mod prelude;
+mod repeat_detector;
 mod search;
 #[doc(hidden)]
 pub mod test_helpers;

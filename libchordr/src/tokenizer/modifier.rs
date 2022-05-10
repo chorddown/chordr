@@ -65,6 +65,7 @@ impl From<SectionType> for Modifier {
             SectionType::Chorus => Modifier::Chorus,
             SectionType::Verse => Modifier::None,
             SectionType::Bridge => Modifier::Bridge,
+            SectionType::Reference => unimplemented!(),
         }
     }
 }

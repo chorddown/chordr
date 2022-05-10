@@ -330,7 +330,7 @@ Swing [D]low, sweet [G]chari[D]ot.
 
         assert_eq!(
             source,
-            r#"> Play slowly
+            r#"> Chorus 2x
 
 ##! Chorus
 Swing [D]low, sweet [G]chari[D]ot.

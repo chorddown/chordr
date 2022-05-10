@@ -5,6 +5,8 @@ pub enum SectionType {
     Verse,
     Chorus,
     Bridge,
+    /// The section is a reference to another section in the song
+    Reference,
 }
 
 impl From<Modifier> for SectionType {
