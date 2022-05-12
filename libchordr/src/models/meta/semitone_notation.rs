@@ -44,14 +44,10 @@ impl TryFrom<&str> for SemitoneNotation {
 
 impl Display for SemitoneNotation {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
-        write!(
-            f,
-            "{}",
-            match self {
-                Self::Sharp => "♯",
-                Self::Flat => "♭",
-            }
-        )
+        match self {
+            Self::Sharp => f.write_str("♯"),
+            Self::Flat => f.write_str("♭"),
+        }
     }
 }
 
