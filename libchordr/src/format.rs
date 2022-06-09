@@ -1,5 +1,6 @@
 use std::convert::TryFrom;
 use std::fmt::{self, Display, Formatter};
+use std::str::FromStr;
 
 use serde::{Deserialize, Serialize};
 
@@ -43,6 +44,14 @@ impl TryFrom<&str> for Format {
     type Error = ();
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
+        Self::from_str(value)
+    }
+}
+
+impl FromStr for Format {
+    type Err = ();
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
         match value.to_lowercase().as_str() {
             "html" => Ok(Self::HTML),
             "chorddown" => Ok(Self::Chorddown),
