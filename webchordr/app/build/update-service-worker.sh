@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [[ -z ${TRUNK_STAGING_DIR+x} ]]; then
-  echo "[ERROR] $TRUNK_STAGING_DIR is not set"
+  echo "[ERROR] \$TRUNK_STAGING_DIR is not set"
   exit 1
 fi
 

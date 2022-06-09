@@ -2,6 +2,11 @@
 target = "index.html"
 
 [[hooks]]
+stage = "pre_build"
+command = "sh"
+command_arguments = ["-c", "$TRUNK_SOURCE_DIR/build/bundle-javascript-files.sh"]
+
+[[hooks]]
 stage = "post_build"
 command = "sh"
-command_arguments = ["-c", "$TRUNK_SOURCE_DIR/update-service-worker.sh"]
+command_arguments = ["-c", "$TRUNK_SOURCE_DIR/build/update-service-worker.sh"]

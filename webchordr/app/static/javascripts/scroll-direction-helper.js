@@ -1,4 +1,4 @@
-(function () {
+
     const threshold = 5;
     const detachThreshold = 50;
     const classList = document.documentElement.classList;
@@ -8,10 +8,12 @@
     let isAttached = false;
 
     /* Initialize */
-    document.addEventListener('DOMContentLoaded', function () {
-        addScrollClasses();
-        window.addEventListener("scroll", throttle(addScrollClasses), {passive: true});
-    });
+    export function initialize() {
+        document.addEventListener('DOMContentLoaded', function () {
+            addScrollClasses();
+            window.addEventListener("scroll", throttle(addScrollClasses), {passive: true});
+        });
+    }
 
     function addScrollClasses() {
         const currentScrollPosition = window.scrollY;
@@ -66,4 +68,3 @@
             }
         }
     }
-})()

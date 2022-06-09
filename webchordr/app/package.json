@@ -2,6 +2,7 @@
   "private": true,
   "scripts": {
     "build": "trunk build",
+    "build:javascript": "build/bundle-javascript-files.sh -v",
     "build:stylesheets": "sassc --style compressed --sourcemap=auto static/stylesheets/chordr-app.scss static/stylesheets/chordr-app.css"
   }
 }
