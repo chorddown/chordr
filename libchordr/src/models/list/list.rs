@@ -28,13 +28,21 @@ where
     }
 }
 
-impl<S> From<Vec<S>> for List<S>
-where
-    S: ListEntryTrait + Serialize + Debug + Clone,
-    S: for<'a> Deserialize<'a>,
-{
+impl<S: ListEntryTrait> From<Vec<S>> for List<S> {
     fn from(items: Vec<S>) -> Self {
         Self { 0: items }
+    }
+}
+
+impl<S: ListEntryTrait> FromIterator<S> for List<S> {
+    fn from_iter<I: IntoIterator<Item = S>>(iter: I) -> Self {
+        let mut c = Vec::new();
+
+        for i in iter {
+            c.push(i);
+        }
+
+        List::from(c)
     }
 }
 
