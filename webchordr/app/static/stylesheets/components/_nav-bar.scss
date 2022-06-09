@@ -7,10 +7,13 @@ nav {
     display: flex;
     flex-flow: column;
     position: fixed;
+    z-index: 20;
     right: 0;
     top: 0;
     bottom: 0;
     padding-left: $song-item-space;
+    //height: 100vh;
+    min-height: -webkit-fill-available;
     @include print-hidden;
     //@include if-dark-mode {
     //    background: $dark-mode-nav-bg;
@@ -28,7 +31,7 @@ nav {
     }
 
     .song-list-container {
-        height: 50vh;
+        height: 50%;
     }
     .song-list {
         display: flex;
@@ -42,7 +45,7 @@ nav {
         }
     }
     .setlist-name + .song-list{
-        height: calc(50vh - #{$setlist-name-height});
+        height: calc(100% - #{$setlist-name-height});
     }
 
     .song-item {
@@ -154,6 +157,12 @@ nav {
 
             &:only-child {
                 width: 100%;
+            }
+            > span {
+                font-size: 0;
+                position: absolute;
+                height: 0;
+                width: 0;
             }
         }
 
