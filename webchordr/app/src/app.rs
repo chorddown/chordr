@@ -253,6 +253,7 @@ impl App {
             SetlistRoute::Load { serialized_setlist } => match state.catalog() {
                 None => html! {},
                 Some(catalog) => {
+                    let persistence_manager = self.props.persistence_manager.clone();
                     let replace = self.props.on_event.reform(|e| e);
                     let catalog = catalog.clone();
                     let setlist = state.current_setlist();
@@ -261,6 +262,7 @@ impl App {
                         html! {
                             <SetlistLoad
                                 catalog=catalog
+                                persistence_manager=persistence_manager
                                 serialized_setlist=serialized_setlist
                                 on_load=replace
                                 current_setlist=setlist

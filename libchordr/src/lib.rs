@@ -1,5 +1,6 @@
 mod catalog_builder;
 mod converter;
+pub mod data_exchange;
 mod error;
 mod format;
 mod helper;

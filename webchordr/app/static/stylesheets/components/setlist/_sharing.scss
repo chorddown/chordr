@@ -16,6 +16,11 @@
     flex-flow: row nowrap;
     margin: 0 (-$std-half);
 
+    .setlist-load-preview {
+        width: 100%;
+        padding: 0 $std-half $std-half;
+    }
+
     .setlist-load-preview-col {
         flex: 0 0 50%;
         padding: 0 $std-half;

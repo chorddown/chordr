@@ -4,7 +4,7 @@ use crate::errors::WebError;
 use libchordr::models::setlist::Setlist;
 use log::debug;
 use std::rc::Rc;
-use web_sys::window;
+use webchordr_common::data_exchange::SETLIST_LOAD_URL_PREFIX;
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq, Clone)]
@@ -67,7 +67,12 @@ impl Component for SetlistShareButton {
 
     fn view(&self) -> Html {
         let handle_click = self.link.callback(|_| Msg::Toggle);
-        let button = html! { <button onclick=handle_click><i class="im im-share"></i></button> };
+        let button = html! {
+            <button onclick=handle_click title="Share">
+                <i class="im im-share"></i>
+                <span>{ "Share" }</span>
+            </button>
+        };
 
         (if !self.modal_visible {
             button
@@ -86,14 +91,13 @@ impl Component for SetlistShareButton {
 
 impl SetlistShareButton {
     fn build_share_url(&self) -> Result<String, WebError> {
-        let host = window().unwrap().location().host()?;
-        // let host = match window().unwrap().location() {
-        //     Some(location) => location.host()?,
-        //     None => return Err(WebError::js_error("Could not fetch current location")),
-        // };
+        let host = crate::helpers::window().location().host()?;
         let serialized = SetlistSerializeService::serialize(self.props.setlist.as_ref())?;
 
-        Ok(format!("{}/#/setlist/load/{}", host, serialized))
+        Ok(format!(
+            "{}/{}{}",
+            host, SETLIST_LOAD_URL_PREFIX, serialized
+        ))
     }
 
     fn build_modal(&self) -> Html {

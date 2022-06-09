@@ -17,6 +17,8 @@ pub use self::setlist_entry::SetlistEntry;
 
 mod setlist_collection;
 mod setlist_entry;
+pub mod sharing_setlist;
+pub mod sharing_setlist_entry;
 
 /// A set of Songs organized by a User
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
@@ -52,6 +54,17 @@ impl Setlist {
             creation_date,
             modification_date,
         }
+    }
+
+    pub fn with_name<S: Into<String>>(self, name: S) -> Self {
+        Self {
+            name: name.into(),
+            ..self
+        }
+    }
+
+    pub fn with_id(self, id: i32) -> Self {
+        Self { id, ..self }
     }
 
     pub fn name(&self) -> &str {

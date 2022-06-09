@@ -46,9 +46,9 @@
 
         .modal-close {
             @include button();
-            @include button-default($width: 40px);
+            @include button-default($width: 42px);
             height: auto;
-            border: none;
+            border-color: transparent;
         }
     }
 }

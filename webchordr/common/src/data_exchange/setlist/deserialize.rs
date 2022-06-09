@@ -1,8 +1,13 @@
+use crate::errors::SharingError;
 use crate::errors::WebError;
-use chrono::Utc;
+use libchordr::data_exchange::setlist::{
+    DeserializeService as LibChordrDeserializeService, SharingSetlist,
+};
+use libchordr::data_exchange::DxDeserializer;
+use libchordr::models::setlist::sharing_setlist_entry::SharingSetlistEntry;
 use libchordr::models::setlist::Setlist;
 use libchordr::models::user::User;
-use libchordr::prelude::{CatalogTrait, SetlistEntry, SongData};
+use libchordr::prelude::{CatalogTrait, Formatting, SetlistEntry, SongData, SongSettings};
 
 pub struct DeserializeResult {
     pub setlist: Setlist,
@@ -17,46 +22,68 @@ impl DeserializeService {
     pub fn deserialize<E: SongData, C: CatalogTrait<E>>(
         serialized_setlist: &str,
         catalog: &C,
-    ) -> DeserializeResult {
-        unimplemented!();
-        let (entries, errors) = Self::collect_setlist_entries(serialized_setlist, catalog);
-        let now = Utc::now();
+    ) -> Result<DeserializeResult, WebError> {
+        let sharing_setlist = LibChordrDeserializeService::deserialize(serialized_setlist)
+            .map_err(|e| SharingError::from(e))?;
+        let (entries, errors) = Self::collect_setlist_entries(&sharing_setlist, catalog);
 
-        DeserializeResult {
+        let SharingSetlist {
+            name,
+            id,
+            songs,
+            gig_date,
+            creation_date,
+            modification_date,
+        } = sharing_setlist;
+
+        Ok(DeserializeResult {
             setlist: Setlist::new(
-                "missing-setlist-name",
-                0,
+                name,
+                id,
                 User::unknown(),
                 None,
-                Some(now),
-                now,
-                now,
+                gig_date,
+                creation_date,
+                modification_date,
                 entries,
             ),
             errors,
-        }
+        })
     }
 
-    #[allow(unused, deprecated)]
     fn collect_setlist_entries<E: SongData, C: CatalogTrait<E>>(
-        serialized_setlist: &str,
+        sharing_setlist: &SharingSetlist,
         catalog: &C,
     ) -> (Vec<SetlistEntry>, Vec<WebError>) {
-        let (entries, errors): (Vec<_>, Vec<_>) = serialized_setlist
-            .split(',')
-            .map(|song_id| match catalog.get(song_id) {
-                Some(song) => Ok(SetlistEntry::from_song(song)),
-                None => Err(WebError::setlist_deserialize_error(format!(
-                    "Could not find song with ID '{}'",
-                    song_id
-                ))),
-            })
+        let (entries, errors): (Vec<_>, Vec<_>) = sharing_setlist
+            .songs
+            .iter()
+            .map(|entry: &SharingSetlistEntry| Self::build_entry(catalog, entry))
             .partition(Result::is_ok);
 
         (
             entries.into_iter().map(Result::unwrap).collect(),
             errors.into_iter().map(Result::unwrap_err).collect(),
         )
+    }
+
+    fn build_entry<E: SongData, C: CatalogTrait<E>>(
+        catalog: &C,
+        entry: &SharingSetlistEntry,
+    ) -> Result<SetlistEntry, WebError> {
+        match catalog.get(&entry.id) {
+            Some(song) => {
+                let settings = SongSettings::new(
+                    entry.transpose_semitone.unwrap_or_default(),
+                    Formatting::default(),
+                    entry.note.clone().unwrap_or_default(),
+                );
+                Ok(SetlistEntry::from_song_with_settings(song, settings))
+            }
+            None => Err(WebError::sharing_error(SharingError::SongNotFound(
+                format!("Could not find song with ID '{}'", entry.id),
+            ))),
+        }
     }
 }
 

@@ -1,6 +1,7 @@
 use std::error::Error;
 use std::fmt::{Display, Formatter, Result};
 
+use libchordr::data_exchange::{DeserializerError, SerializerError};
 use wasm_bindgen::JsValue;
 use web_sys::Response;
 
@@ -9,7 +10,7 @@ pub enum WebError {
     SortableError(String),
     JsError(String),
     CustomError(String),
-    SetlistDeserializeError(String),
+    SharingError(SharingError),
     PersistenceError(PersistenceError),
     ResponseError(String, Response),
     CredentialsError(String),
@@ -33,8 +34,8 @@ impl WebError {
         WebError::PersistenceError(s)
     }
 
-    pub fn setlist_deserialize_error<S: Into<String>>(s: S) -> Self {
-        WebError::SetlistDeserializeError(s.into())
+    pub fn sharing_error(e: SharingError) -> Self {
+        WebError::SharingError(e)
     }
 
     pub fn response_error<S: Into<String>>(url: S, response: Response) -> Self {
@@ -52,7 +53,7 @@ impl Display for WebError {
             WebError::SortableError(s) => f.write_str(s),
             WebError::JsError(s) => f.write_str(s),
             WebError::CustomError(s) => f.write_str(s),
-            WebError::SetlistDeserializeError(s) => f.write_str(s),
+            WebError::SharingError(s) => f.write_str(s.to_string().as_str()),
             WebError::PersistenceError(s) => f.write_str(s.to_string().as_str()),
             WebError::ResponseError(u, r) => write!(
                 f,
@@ -83,6 +84,12 @@ impl From<serde_json::error::Error> for WebError {
 impl From<PersistenceError> for WebError {
     fn from(e: PersistenceError) -> Self {
         WebError::PersistenceError(e)
+    }
+}
+
+impl From<SharingError> for WebError {
+    fn from(e: SharingError) -> Self {
+        WebError::SharingError(e)
     }
 }
 
@@ -142,3 +149,35 @@ impl Display for PersistenceError {
 }
 
 impl Error for PersistenceError {}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum SharingError {
+    Serialization(String),
+    SongNotFound(String),
+    Deserialization(String),
+}
+
+impl SharingError {}
+
+impl From<DeserializerError> for SharingError {
+    fn from(e: DeserializerError) -> Self {
+        SharingError::Deserialization(e.to_string())
+    }
+}
+impl From<SerializerError> for SharingError {
+    fn from(e: SerializerError) -> Self {
+        SharingError::Serialization(e.to_string())
+    }
+}
+
+impl Display for SharingError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        match self {
+            SharingError::Serialization(e) => write!(f, "Serialization error: {}", e),
+            SharingError::Deserialization(e) => write!(f, "Deserialization error: {}", e),
+            SharingError::SongNotFound(e) => write!(f, "Song Not Found: {}", e),
+        }
+    }
+}
+
+impl Error for SharingError {}

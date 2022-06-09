@@ -7,7 +7,7 @@ use libchordr::prelude::{ListEntryTrait, SongId, SongSettings};
 use webchordr_events::Event;
 use webchordr_song_list::SongList as SongListView;
 
-// use crate::components::setlist::SetlistShareButton;
+use crate::components::setlist::SetlistShareButton;
 use crate::components::song_view::SongNotes;
 use crate::components::user::NavItem as UserNavButton;
 use crate::state::{SongInfo, State};
@@ -71,14 +71,12 @@ impl Nav {
     fn view_nav_footer(&self) -> Html {
         let toggle_menu = self.props.on_toggle.reform(|_| ());
 
-        // TODO: Implement sharing support
-        // let setlist_share_button = match &self.props.songs {
-        //     Some(s) => html! { <SetlistShareButton setlist=s.clone()/>},
-        //     None => html! {},
-        // };
-        let setlist_share_button = html! {};
         let session = self.props.state.session();
         let state = self.props.state.clone();
+        let setlist_share_button = match &state.current_setlist().clone() {
+            Some(s) => html! { <SetlistShareButton setlist=s/>},
+            None => html! {},
+        };
 
         (if self.props.expand {
             html! {
