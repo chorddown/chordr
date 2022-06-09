@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 use std::fmt::{Display, Error, Formatter};
+use std::str::FromStr;
 
 /// Enum defining if `C#` or `Db` should be used
 #[derive(Deserialize, Serialize, PartialEq, PartialOrd, Clone, Copy, Debug)]
@@ -32,8 +33,15 @@ impl TryFrom<char> for SemitoneNotation {
 impl TryFrom<&str> for SemitoneNotation {
     type Error = SemitoneNotationError;
 
-    //noinspection RsTypeCheck
     fn try_from(value: &str) -> Result<Self, Self::Error> {
+        Self::from_str(value)
+    }
+}
+
+impl FromStr for SemitoneNotation {
+    type Err = SemitoneNotationError;
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
         match value {
             "#" | "♯" => Ok(Self::Sharp),
             "b" | "♭" => Ok(Self::Flat),

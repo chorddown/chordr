@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 use std::fmt;
 use std::fmt::{Display, Formatter};
+use std::str::FromStr;
 
 /// Enum defining how the `B` is defined
 ///
@@ -44,7 +45,6 @@ impl Display for BNotation {
 impl TryFrom<char> for BNotation {
     type Error = NotationError;
 
-    //noinspection RsTypeCheck
     fn try_from(value: char) -> Result<Self, Self::Error> {
         match value {
             'B' | 'b' => Ok(Self::B),
@@ -57,8 +57,15 @@ impl TryFrom<char> for BNotation {
 impl TryFrom<&str> for BNotation {
     type Error = NotationError;
 
-    //noinspection RsTypeCheck
     fn try_from(value: &str) -> Result<Self, Self::Error> {
+        Self::from_str(value)
+    }
+}
+
+impl FromStr for BNotation {
+    type Err = NotationError;
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
         match value {
             "B" | "b" => Ok(Self::B),
             "H" | "h" => Ok(Self::H),
