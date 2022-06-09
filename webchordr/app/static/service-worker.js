@@ -5,7 +5,7 @@ const ASSET_CACHE_NAME = 'chordr-assets';
 const output = initOutput(true);
 
 const handleInstall = event => {
-    output.debug('Install the service worker', event);
+    output.debug('Install the service worker v' + VERSION, event);
     self.skipWaiting();
 
     const assetUrlsToCache = [
@@ -58,7 +58,7 @@ const handleActivate = event => {
                 }
             })
         )).then(() => {
-            output.debug('Service worker is ready');
+            output.debug('Service worker v' + VERSION + 'is ready');
         })
     );
 }
