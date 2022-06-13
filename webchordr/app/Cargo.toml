@@ -13,6 +13,10 @@ Chorddown web application - Client side
 [features]
 trunk_build = []
 
+# Enabling `server_sync` shows the login button in the footer and enables
+# periodically checks for a connection to the server
+server_sync = []
+
 [dependencies]
 log = "0.4"
 serde = "1"

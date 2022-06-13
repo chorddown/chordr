@@ -34,6 +34,7 @@ type InitialDataResult = Result<Box<SessionMainData>, Option<WebError>>;
 
 const TICK_INTERVAL: u64 = 300;
 
+#[allow(unused)]
 pub struct Handler {
     persistence_manager: Arc<PMType>,
     /// Keep a reference to the IntervalTask so that it doesn't get dropped
@@ -56,6 +57,7 @@ pub enum Msg {
     Reload,
     Ignore,
     SessionChanged(Session),
+    #[cfg(feature = "server_sync")]
     ConnectionStatusChanged(ConnectionStatus),
     StateChanged(State),
     InitialDataLoaded(InitialDataResult),
@@ -136,13 +138,15 @@ impl Handler {
             }
             Err(_) => {
                 self.update_session(Session::default(), false);
-                self.check_connection_status();
                 self.fetch_setlist();
                 self.fetch_song_settings();
+                #[cfg(feature = "server_sync")]
+                self.check_connection_status();
             }
         }
     }
 
+    #[cfg(feature = "server_sync")]
     fn check_connection_status(&mut self) {
         let connection_service = self.connection_service.clone();
         let state_changed = self.link.callback(Msg::ConnectionStatusChanged);
@@ -155,6 +159,7 @@ impl Handler {
     fn run_scheduled_tasks(&mut self) {
         debug!("Run scheduled tasks");
 
+        #[cfg(feature = "server_sync")]
         self.check_connection_status();
     }
 
@@ -491,6 +496,7 @@ impl Component for Handler {
             }
             Msg::Ignore => return false,
             Msg::SessionChanged(session) => self.update_session(session, true),
+            #[cfg(feature = "server_sync")]
             Msg::ConnectionStatusChanged(connection_state) => {
                 if self.state.connection_status() != connection_state {
                     self.set_state(self.state.with_connection_status(connection_state), true)

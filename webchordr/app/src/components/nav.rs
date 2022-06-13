@@ -78,6 +78,12 @@ impl Nav {
             None => html! {},
         };
 
+        let user_nav_button = if cfg!(feature = "server_sync") {
+            html! {<UserNavButton state=state session=session />}
+        } else {
+            html! {}
+        };
+
         (if self.props.expand {
             html! {
                 <footer>
@@ -93,7 +99,7 @@ impl Nav {
                         <i class="im im-data"></i>
                         <span>{ "Setlist" }</span>
                     </a>
-                    <UserNavButton state=state session=session />
+                    {user_nav_button}
                 </footer>
             }
         } else {
