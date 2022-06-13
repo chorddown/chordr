@@ -150,30 +150,10 @@ const handleFetch = event => {
                         return response;
                     }
                 })
-//         fetch(event.request).catch(function () {
-//             return caches.match(event.request);
-//         })
         );
     } else {
         event.respondWith(fetchFromServer(event))
     }
-    // let catalogRequest = /\/catalog\.json/.test(event.request.url);
-    // if (catalogRequest) {
-    //     console.log('[SW] Try to fetch new catalog and fall back to cache', event.request.url);
-    //     event.respondWith(
-    //         fetch(event.request).catch(function () {
-    //             return caches.match(event.request);
-    //         })
-    //     );
-    // } else {
-    //     console.log('[SW] Query cache and fall back to fetch', event.request.url);
-    //
-    //     event.respondWith(
-    //         caches.match(event.request).then(function (response) {
-    //             return response || fetch(event.request);
-    //         })
-    //     );
-    // }
 }
 
 function initOutput(enable) {
