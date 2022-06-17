@@ -79,6 +79,12 @@
                     output.error('Service Worker could not be registered', error);
                 }
             );
+
+            navigator.serviceWorker.onmessage = (event) => {
+                if (event.data && event.data.type === 'VERSION_UPDATE') {
+                    output.info('New version available ' + event.data.version + ' (running version {RANDOM_ID})' );
+                }
+            };
         } else {
             output.error('Service Worker not supported');
         }
