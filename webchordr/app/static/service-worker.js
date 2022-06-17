@@ -2,7 +2,9 @@ const VERSION = '{RANDOM_ID}';
 const CACHE_NAME = 'chordr-' + VERSION;
 const ASSET_CACHE_NAME = 'chordr-assets';
 
-const output = initOutput(true);
+importScripts('javascripts/logger.js')
+
+const output = buildOutput(true, 'SW');
 
 const handleInstall = event => {
     output.debug('Install the service worker v' + VERSION, event);
@@ -173,50 +175,6 @@ const sendVersionInformationToClients = () => {
     });
 }
 
-function initOutput(enable) {
-    /* See also webchordr/app/index.html:41 */
-    const consoleStyles = {
-        normalStyle: "background: inherit; color: inherit",
-        pathStyle: "font-weight: bold; color: inherit",
-        label: {
-            info: {
-                text: "%cINFO%c webchordr SW%c ",
-                style: "color: white; padding: 0 3px; background: #029202;"
-            },
-            error: {
-                text: "%cERROR%c webchordr SW%c ",
-                style: "color: white; padding: 0 3px; background: #ff2863;"
-            },
-            warn: {
-                text: "%cWARN%c webchordr SW%c ",
-                style: "color: white; padding: 0 3px; background: #c18d12;"
-            },
-            debug: {
-                text: "%cDEBUG%c webchordr SW%c ",
-                style: "color: white; padding: 0 3px; background: #0066ff;"
-            },
-        }
-    }
-
-    const ef = () => {
-    };
-    const output = {
-        debug: ef,
-        info: ef,
-        warn: ef,
-        error: ef,
-    };
-    if (enable) {
-        output.debug = self.console.debug.bind(self.console, consoleStyles.label.debug.text + '%s', consoleStyles.label.debug.style, consoleStyles.pathStyle, consoleStyles.normalStyle);
-        output.info = self.console.info.bind(self.console, consoleStyles.label.info.text + '%s', consoleStyles.label.info.style, consoleStyles.pathStyle, consoleStyles.normalStyle);
-        output.warn = self.console.warn.bind(self.console, consoleStyles.label.warn.text + '%s', consoleStyles.label.warn.style, consoleStyles.pathStyle, consoleStyles.normalStyle);
-        output.error = self.console.error.bind(self.console, consoleStyles.label.error.text + '%s', consoleStyles.label.error.style, consoleStyles.pathStyle, consoleStyles.normalStyle);
-    }
-
-    return output
-}
-
 self.addEventListener('install', handleInstall);
 self.addEventListener('activate', handleActivate)
 self.addEventListener('fetch', handleFetch);
-
