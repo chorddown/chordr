@@ -26,3 +26,7 @@ perl -i -pe"s+//{WASM}+'/$WASM_FILE_NAME',+g" "$SERVICE_WORKER_FILE"
 SORTABLE_PATH=(snippets/webchordr-song-list-*/dist/sortable.js)
 SORTABLE_FILE_NAME="${SORTABLE_PATH[*]}"
 perl -i -pe"s+//{SORTABLE}+'/$SORTABLE_FILE_NAME',+g" "$SERVICE_WORKER_FILE"
+
+INDEX_FILE=$TRUNK_STAGING_DIR/index.html
+RANDOM_ID=$(openssl rand -hex 12)
+perl -i -pe"s+{RANDOM_ID}+$RANDOM_ID+g" "$INDEX_FILE"
