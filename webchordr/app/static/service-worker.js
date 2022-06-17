@@ -58,7 +58,8 @@ const handleActivate = event => {
                 }
             })
         )).then(() => {
-            output.debug('Service worker v' + VERSION + 'is ready');
+            output.debug('Service worker v' + VERSION + ' is ready');
+            sendVersionInformationToClients();
         })
     );
 }
@@ -154,6 +155,22 @@ const handleFetch = event => {
     } else {
         event.respondWith(fetchFromServer(event))
     }
+}
+
+const sendVersionInformationToClients = () => {
+    self.clients.matchAll({
+        includeUncontrolled: true,
+        type: 'window',
+    }).then((clients) => {
+        if (clients && clients.length) {
+            for (const client of clients) {
+                client.postMessage({
+                    type: 'VERSION_UPDATE',
+                    version: VERSION,
+                });
+            }
+        }
+    });
 }
 
 function initOutput(enable) {
