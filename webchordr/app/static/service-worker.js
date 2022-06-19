@@ -7,7 +7,7 @@ importScripts('javascripts/logger.js')
 const output = buildOutput(true, 'SW');
 
 const handleInstall = event => {
-    output.debug('Install the service worker v' + VERSION, event);
+    output.debug('Install the service worker version \'' + VERSION + '\'', event);
     self.skipWaiting();
 
     const assetUrlsToCache = [
@@ -26,6 +26,8 @@ const handleInstall = event => {
         //{JS} // This will be replaced with the WASM JavaScript file path
         //{WASM} // This will be replaced with the WASM file path
         //{SORTABLE} // This will be replaced with the sortable.js file path
+        '/javascripts/logger.js',
+        '/javascripts/bundle.js',
         '/catalog.json'
     ];
 
@@ -60,7 +62,7 @@ const handleActivate = event => {
                 }
             })
         )).then(() => {
-            output.debug('Service worker v' + VERSION + ' is ready');
+            output.debug('Service worker version \'' + VERSION + '\' is ready');
             sendVersionInformationToClients();
         })
     );
