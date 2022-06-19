@@ -19,6 +19,7 @@ mod app;
 mod components;
 mod handler;
 mod handler_traits;
+mod ipc;
 mod route;
 mod state;
 
