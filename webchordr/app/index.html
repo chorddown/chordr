@@ -35,7 +35,7 @@
         </div>
     </div>
 
-    <script>
+    <script>(() => {
         const output = buildOutput(true, 'UI');
 
         const getReloadButtonFallback = function () {
@@ -82,16 +82,14 @@
 
             navigator.serviceWorker.onmessage = (event) => {
                 if (event.data && event.data.type === 'VERSION_UPDATE') {
-                    output.info('New version available ' + event.data.version + ' (running version {RANDOM_ID})' );
+                    output.info('New version available ' + event.data.version + ' (running version {RANDOM_ID})');
                 }
             };
         } else {
             output.error('Service Worker not supported');
         }
-    </script>
+    })()</script>
 </div>
-<!--<script src="/javascripts/scroll-direction-helper.js"></script>-->
-<!--<script src="/javascripts/clipboard.js"></script>-->
 <script src="/javascripts/bundle.js"></script>
 
 </body>
