@@ -22,6 +22,7 @@ pub struct State {
     session: Rc<Session>,
     song_settings: Rc<SongSettingsMap>,
     error: Option<WebError>,
+    available_version: Option<String>,
 }
 
 #[allow(unused)]
@@ -33,6 +34,7 @@ impl State {
         connection_status: ConnectionStatus,
         session: Session,
         error: Option<WebError>,
+        available_version: Option<String>,
     ) -> Self {
         Self {
             catalog: catalog.map(Rc::new),
@@ -41,6 +43,7 @@ impl State {
             session: Rc::new(session),
             song_settings: Rc::new(song_settings),
             error,
+            available_version,
         }
     }
 
@@ -70,6 +73,21 @@ impl State {
     pub fn with_error(&self, error: Option<WebError>) -> Self {
         let mut clone = self.clone();
         clone.set_error(error);
+
+        clone
+    }
+
+    pub fn available_version(&self) -> &Option<String> {
+        &self.available_version
+    }
+
+    pub fn set_available_version(&mut self, version: String) {
+        self.available_version = Some(version);
+    }
+
+    pub fn with_available_version(&self, version: String) -> Self {
+        let mut clone = self.clone();
+        clone.set_available_version(version);
 
         clone
     }
@@ -146,6 +164,7 @@ impl Default for State {
             SongSettingsMap::new(),
             ConnectionStatus::OnLine,
             Session::default(),
+            None,
             None,
         )
     }

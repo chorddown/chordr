@@ -33,6 +33,7 @@ nav {
     .song-list-container {
         height: 50%;
     }
+
     .song-list {
         display: flex;
         flex-flow: column;
@@ -44,7 +45,8 @@ nav {
             outline: none;
         }
     }
-    .setlist-name + .song-list{
+
+    .setlist-name + .song-list {
         height: calc(100% - #{$setlist-name-height});
     }
 
@@ -158,6 +160,7 @@ nav {
             &:only-child {
                 width: 100%;
             }
+
             > span {
                 font-size: 0;
                 position: absolute;
@@ -176,6 +179,26 @@ nav {
                 line-height: 30px;
             }
         }
+
+        a.update {
+            .im {
+                @at-root {
+                    @keyframes rotate-mirrored {
+                        from {
+                            transform: rotate(0) scaleX(-1);
+                        }
+                        to {
+                            transform: rotate(360deg) scaleX(-1);
+                        }
+                    }
+                }
+                transform: scaleX(-1);
+                animation: rotate-mirrored 2s ease-in-out;
+                height: 14px;
+                width: 14px;
+                line-height: 17px;
+            }
+        }
     }
 
     &.-hidden footer button {
@@ -183,3 +206,4 @@ nav {
         width: $nav-collapsed-width;
     }
 }
+

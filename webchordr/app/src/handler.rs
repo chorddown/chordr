@@ -27,6 +27,8 @@ use crate::handler_traits::catalog_handler::CatalogHandler;
 use crate::handler_traits::setlist_handler::SetlistHandler;
 use crate::handler_traits::settings_handler::SettingsHandler;
 use crate::helpers::window;
+use crate::ipc::update_info::UpdateInfo;
+use crate::ipc::{register_ipc_handler, IpcMessage};
 use crate::session::{Session, SessionMainData};
 use crate::state::State;
 
@@ -39,6 +41,7 @@ pub struct Handler {
     persistence_manager: Arc<PMType>,
     /// Keep a reference to the IntervalTask so that it doesn't get dropped
     _clock_handle: IntervalTask,
+    message_listener: gloo_events::EventListener,
     link: ComponentLink<Handler>,
     #[allow(unused)]
     fetching: bool,
@@ -61,6 +64,7 @@ pub enum Msg {
     ConnectionStatusChanged(ConnectionStatus),
     StateChanged(State),
     InitialDataLoaded(InitialDataResult),
+    UpdateInfo(UpdateInfo),
 }
 
 impl Handler {
@@ -125,6 +129,7 @@ impl Handler {
                         song_settings.unwrap_or_else(SongSettingsMap::new),
                         ConnectionStatus::OnLine,
                         initial_data.session,
+                        None,
                         None,
                     ),
                     true,
@@ -466,11 +471,16 @@ impl Component for Handler {
         let state = Rc::new(State::default());
         let connection_service = ConnectionService::new(config.clone());
 
+        let message_listener = register_ipc_handler(link.callback(|m| match m {
+            IpcMessage::UpdateInfo(i) => Msg::UpdateInfo(i),
+        }));
+
         Self {
             persistence_manager,
             link,
             fetching: false,
             _clock_handle: clock_handle,
+            message_listener,
             config,
             session_service,
             connection_service,
@@ -519,6 +529,9 @@ impl Component for Handler {
             Msg::Tick => {
                 self.run_scheduled_tasks();
                 return false;
+            }
+            Msg::UpdateInfo(v) => {
+                self.set_state(self.state.with_available_version(v.version), true);
             }
         }
         true

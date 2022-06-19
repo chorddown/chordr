@@ -78,6 +78,21 @@ impl Nav {
             None => html! {},
         };
 
+        let home_button = match state.available_version() {
+            Some(_) => html! {
+                <a role="button" class="update" href="/" title="Update">
+                    <i class="im im-sync"></i>
+                    <span>{ "Update" }</span>
+                </a>
+            },
+            None => html! {
+                <a role="button" class="home" href="/#" title="Go to home screen">
+                    <i class="im im-home"></i>
+                    <span>{ "Home" }</span>
+                </a>
+            },
+        };
+
         let user_nav_button = if cfg!(feature = "server_sync") {
             html! {<UserNavButton state=state session=session />}
         } else {
@@ -91,11 +106,8 @@ impl Nav {
                         <i class="im im-angle-right"></i>
                     </button>
                     {setlist_share_button}
-                    <a role="button" class="home" href="/#" title="Go to home screen">
-                        <i class="im im-home"></i>
-                        <span>{ "Home" }</span>
-                    </a>
-                    <a role="button" class="home" href="/#/setlist/list" title="List setlists">
+                    {home_button}
+                    <a role="button" class="setlist" href="/#/setlist/list" title="List setlists">
                         <i class="im im-data"></i>
                         <span>{ "Setlist" }</span>
                     </a>
