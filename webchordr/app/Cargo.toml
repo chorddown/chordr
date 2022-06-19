@@ -1,6 +1,6 @@
 [package]
 name = "webchordr"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["Daniel Corn <info@cundd.net>"]
 edition = "2021"
 license = "MIT OR Apache-2.0"
@@ -43,6 +43,7 @@ base64 = "^0.13.0"
 unicode-segmentation = "1.8.0"
 gloo-dialogs = "^0.1.0"
 gloo-timers = "^0.2.3"
+gloo-events = "^0.1.2"
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3"
@@ -62,6 +63,7 @@ features = [
     'Document',
     'HtmlDocument',
     'Url',
+    'EventTarget',
     'DateTimeValue',
     'Window',
     'Location',
@@ -72,6 +74,8 @@ features = [
     'RequestCredentials',
     'Response',
     'Storage',
+    'ServiceWorker',
+    'ServiceWorkerContainer',
     'History',
     'Navigator',
 ]
