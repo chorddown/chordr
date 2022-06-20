@@ -73,16 +73,23 @@ impl SetlistLoad {
     }
 
     fn render_setlist(&self, setlist: &Setlist) -> Html {
-        let render = |song: SetlistEntry| {
-            let key = song.title();
+        let render = |song: &SetlistEntry| {
+            let title = song.title();
+            let transpose_semitone = song.settings().map_or(1, |s| s.transpose_semitone());
+            let text = if transpose_semitone == 0 || title.is_empty() {
+                title.to_string() // only the (possibly empty) title is used
+            } else {
+                let prefix = if transpose_semitone > 0 { "+" } else { "" };
+                format!("{} ({}{} ♬)", title, prefix, transpose_semitone)
+            };
 
-            html! { <li key=key.clone()>{key}</li> }
+            html! { <li key=title>{text}</li> }
         };
 
         (html! {
             <div class="setlist-load-preview-viewport">
                 <ul>
-                    {for setlist.clone().into_iter().map(&render)}
+                    {for setlist.iter().map(&render)}
                 </ul>
             </div>
         }) as Html
