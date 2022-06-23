@@ -385,7 +385,12 @@ impl SetlistHandler for Handler {
                     error!("Could not commit setlist changes: {}", e.to_string())
                 }
 
-                let result = repository.update((*s).clone()).await;
+                let result = if repository.find_by_id(s.id()).await.is_none() {
+                    repository.add((*s).clone()).await
+                } else {
+                    repository.update((*s).clone()).await
+                };
+
                 if let Err(e) = result {
                     error!("Could not commit setlist changes (v2): {}", e.to_string())
                 }
