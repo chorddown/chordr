@@ -124,7 +124,7 @@ impl Component for List {
                 </ul>
                 <div class="button-group">
                     <AddButton
-                        text="Create new setlist"
+                        text="Create empty setlist"
                         state=state.clone()
                         on_click=on_add_button_click.clone()
                         clone_current=false

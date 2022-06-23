@@ -12,13 +12,8 @@ use webchordr_common::session::SessionUser;
 
 use crate::state::State;
 
-fn default_text() -> String {
-    "Create new setlist".to_string()
-}
-
 #[derive(Properties, Clone, PartialEq)]
 pub struct AddButtonProps {
-    #[prop_or_else(default_text)]
     pub text: String,
     pub state: Rc<State>,
     pub on_click: Callback<Setlist>,
