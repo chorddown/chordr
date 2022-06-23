@@ -53,11 +53,7 @@ impl SetlistLoad {
             error!("{}", errors);
         }
 
-        let setlist = deserialize_result.setlist;
-        let original_name = setlist.name();
-        let new_name = format!("{} (imported & unsaved)", original_name);
-
-        Ok(setlist.with_name(new_name))
+        Ok(deserialize_result.setlist)
     }
 
     fn get_shared_data(&self) -> Result<String, WebError> {
@@ -94,6 +90,27 @@ impl SetlistLoad {
             </div>
         }) as Html
     }
+
+    /// Prepare the given Setlist to be stored in the system
+    fn prepare_setlist(&mut self, new_setlist: Setlist) {
+        let on_load_callback = self.link.callback(Msg::LoadSetlist);
+        let pm = self.props.persistence_manager.clone();
+        spawn_local(async move {
+            let result = SetlistWebRepository::new(&*pm).find_all().await;
+            let setlist = match result {
+                Ok(lists) => get_setlist_with_unique_id(new_setlist, &lists),
+                Err(_) => new_setlist,
+            };
+            let setlist = match gloo_dialogs::prompt(
+                "Enter the name of the new setlist:",
+                Some(setlist.name()),
+            ) {
+                Some(new_name) => setlist.with_name(new_name),
+                None => setlist,
+            };
+            on_load_callback.emit(setlist)
+        })
+    }
 }
 
 impl Component for SetlistLoad {
@@ -127,19 +144,7 @@ impl Component for SetlistLoad {
                     }
                 }
             }
-            Msg::PrepareSetlist(new_setlist) => {
-                let on_load_callback = self.link.callback(Msg::LoadSetlist);
-                let pm = self.props.persistence_manager.clone();
-                spawn_local(async move {
-                    let result = SetlistWebRepository::new(&*pm).find_all().await;
-                    let setlist_to_load = match result {
-                        Ok(lists) => get_setlist_with_unique_id(new_setlist, &lists),
-                        Err(_) => new_setlist,
-                    };
-
-                    on_load_callback.emit(setlist_to_load)
-                })
-            }
+            Msg::PrepareSetlist(new_setlist) => self.prepare_setlist(new_setlist),
             Msg::LoadSetlist(new_setlist) => {
                 self.visible = false;
                 self.props
