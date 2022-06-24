@@ -144,10 +144,15 @@ impl Component for List {
 impl List {
     fn find_all_setlists(&self) {
         let pm = self.props.persistence_manager.clone();
-        let finished = self.link.callback(|result: Result<_, _>| match result {
-            Ok(l) => Msg::SetlistsLoaded(l),
-            Err(e) => Msg::LoadError(e),
-        });
+        let finished = self
+            .link
+            .callback(|result: Result<Vec<Setlist>, _>| match result {
+                Ok(mut l) => {
+                    l.sort_by(|a, b| a.name().cmp(b.name()));
+                    Msg::SetlistsLoaded(l)
+                }
+                Err(e) => Msg::LoadError(e),
+            });
 
         spawn_local(async move {
             let result = SetlistWebRepository::new(&*pm).find_all().await;
