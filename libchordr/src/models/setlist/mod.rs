@@ -1,4 +1,5 @@
 use std::ops;
+use std::slice::Iter;
 use std::vec::IntoIter;
 
 use chrono::{DateTime, Utc};
@@ -102,6 +103,10 @@ impl Setlist {
                 .into_iter()
                 .collect::<Vec<SetlistEntry>>(),
         )
+    }
+
+    pub fn iter(&self) -> Iter<'_, SetlistEntry> {
+        self.songs.iter()
     }
 }
 
