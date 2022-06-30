@@ -118,21 +118,6 @@ const fetchFromServer = event => {
 };
 
 /**
- * @param {FetchEvent} event
- */
-const fetchInBackground = (event) => {
-    const url = event.request.url;
-
-    fetchFromServer(event)
-        .then(() => {
-            output.debug('Background load success ' + url)
-        })
-        .catch(_error => {
-            output.warn('Background load failed ' + url)
-        });
-}
-
-/**
  * Return if the given URL is a page
  *
  * @param {string} url
@@ -158,33 +143,20 @@ const handleFetch = event => {
             caches.match(event.request)
                 .then(response => {
                     const url = event.request.url;
-                    if (!response) {
-                        console.log(event.request.mode)
-
-                        if (isPageRequest(url)) {
-                            output.info('Serve index.html for ' + url);
-                            return caches.open(CACHE_NAME).then(cache => cache.match('/index.html'))
-                        }
-
-
-                        output.info('Live load ' + url + ' from server')
-
-                        return fetchFromServer(event)
-                            .then(r => r)
-                            .catch(() => output.warn('Failed to fetch ' + url));
-                    } else {
-                        /*
-                        "Fetch in background" is not necessary because on each build the service-worker will change
-                        This change will install the service-worker - which in turn pre-fetches the new resources
-                        */
-                        // /* If online try to fetch the latest version in the background */
-                        // if (navigator.onLine) {
-                        //     fetchInBackground(event);
-                        // }
-
+                    if (response) {
                         output.debug('Serve cached version for ' + url);
                         return response;
                     }
+
+                    if (isPageRequest(url)) {
+                        output.info('Serve index.html for ' + url);
+                        return caches.open(CACHE_NAME).then(cache => cache.match('/index.html'))
+                    }
+
+                    output.info('Live load ' + url + ' from server')
+                    return fetchFromServer(event)
+                        .then(r => r)
+                        .catch(() => output.warn('Failed to fetch ' + url));
                 })
         );
     } else {
