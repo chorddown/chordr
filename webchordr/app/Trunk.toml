@@ -1,6 +1,9 @@
 [build]
 target = "index.html"
 
+[watch]
+ignore = ["static/javascripts/bundle.js"]
+
 [[hooks]]
 stage = "pre_build"
 command = "sh"
