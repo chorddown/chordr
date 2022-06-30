@@ -1,5 +1,6 @@
 use std::rc::Rc;
 
+use webchordr_common::route::route;
 use yew::prelude::*;
 
 use crate::connection::ConnectionStatus;
@@ -70,7 +71,7 @@ impl Component for NavItem {
                 let class = class.add("logged-in");
 
                 (html! {
-                    <a role="button" class=class href="/#/user/info" title=user_description>
+                    <a role="button" class=class href={route("/user/info")} title=user_description>
                         <i class="im im-user-male"></i>
                         <i class="im im-check-mark"></i>
                     </a>
@@ -86,7 +87,7 @@ impl Component for NavItem {
                 let class = class.add("not-logged-in");
 
                 (html! {
-                    <a role="button" class=class href="/#/user/login" title=title>
+                    <a role="button" class=class href={route("/user/login")} title=title>
                         <i class="im im-user-male"></i>
                     </a>
                 }) as Html

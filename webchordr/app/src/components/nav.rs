@@ -4,6 +4,7 @@ use yew::prelude::*;
 
 use libchordr::models::song_list::SongList as SongListModel;
 use libchordr::prelude::{ListEntryTrait, SongId, SongSettings};
+use webchordr_common::route::route;
 use webchordr_events::Event;
 use webchordr_song_list::SongList as SongListView;
 
@@ -107,7 +108,7 @@ impl Nav {
                     </button>
                     {setlist_share_button}
                     {home_button}
-                    <a role="button" class="setlist" href="/#/setlist/list" title="List setlists">
+                    <a role="button" class="setlist" href={route("/setlist/list")} title="List setlists">
                         <i class="im im-data"></i>
                         <span>{ "Setlist" }</span>
                     </a>

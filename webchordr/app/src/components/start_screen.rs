@@ -1,5 +1,4 @@
-use yew::virtual_dom::VNode;
-use yew::{html, ShouldRender};
+use yew::{html, Html, ShouldRender};
 use yew::{Component, ComponentLink};
 
 pub(crate) struct StartScreen {}
@@ -20,13 +19,13 @@ impl Component for StartScreen {
         true
     }
 
-    fn view(&self) -> VNode {
-        html! {
+    fn view(&self) -> Html {
+        (html! {
             <div class="start-screen">
                 <div class="logo">
-                    <img src="assets/images/logo-512-light.png" alt="chordr" />
+                    <img src="/assets/images/logo-512-light.png" alt="chordr" />
                 </div>
             </div>
-        }
+        }) as Html
     }
 }

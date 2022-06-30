@@ -6,6 +6,9 @@ importScripts('javascripts/logger.js')
 
 const output = buildOutput(true, 'SW');
 
+/**
+ * @param {ExtendableEvent} event
+ */
 const handleInstall = event => {
     output.debug('Install the service worker version \'' + VERSION + '\'', event);
     self.skipWaiting();
@@ -21,8 +24,8 @@ const handleInstall = event => {
     ];
     const appUrlsToCache = [
         '/',
+        '/index.html',
         '/manifest.json',
-        // '/stylesheets/chordr-app.css',
         //{JS} // This will be replaced with the WASM JavaScript file path
         //{WASM} // This will be replaced with the WASM file path
         //{SORTABLE} // This will be replaced with the sortable.js file path
@@ -49,8 +52,11 @@ const handleInstall = event => {
     );
 };
 
+/**
+ * @param {ExtendableEvent} event
+ */
 const handleActivate = event => {
-    clients.claim();
+    self.clients.claim();
     /* Delete caches of old versions */
     event.waitUntil(
         caches.keys().then(keys => Promise.all(
@@ -127,6 +133,22 @@ const fetchInBackground = (event) => {
 }
 
 /**
+ * Return if the given URL is a page
+ *
+ * @param {string} url
+ * @returns {boolean}
+ */
+const isPageRequest = url => {
+    return false === (
+        url.endsWith('.json')
+        || url.endsWith('.js')
+        || url.endsWith('.woff2') || url.endsWith('.woff2?v=1.3.0')
+        || url.endsWith('.wasm')
+        || url.endsWith('.png')
+    )
+}
+
+/**
  * @param {FetchEvent} event
  */
 const handleFetch = event => {
@@ -135,12 +157,21 @@ const handleFetch = event => {
             /* Check if there is a cached entry for the request */
             caches.match(event.request)
                 .then(response => {
+                    const url = event.request.url;
                     if (!response) {
-                        output.info('Live load ' + event.request.url + ' from server')
+                        console.log(event.request.mode)
+
+                        if (isPageRequest(url)) {
+                            output.info('Serve index.html for ' + url);
+                            return caches.open(CACHE_NAME).then(cache => cache.match('/index.html'))
+                        }
+
+
+                        output.info('Live load ' + url + ' from server')
 
                         return fetchFromServer(event)
                             .then(r => r)
-                            .catch(() => output.warn('Failed to fetch ' + event.request.url));
+                            .catch(() => output.warn('Failed to fetch ' + url));
                     } else {
                         /*
                         "Fetch in background" is not necessary because on each build the service-worker will change
@@ -151,7 +182,7 @@ const handleFetch = event => {
                         //     fetchInBackground(event);
                         // }
 
-                        output.debug('Serve cached version for ' + event.request.url);
+                        output.debug('Serve cached version for ' + url);
                         return response;
                     }
                 })

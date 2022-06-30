@@ -5,6 +5,7 @@ use yew::{Component, ComponentLink};
 use libchordr::prelude::*;
 
 use webchordr_common::helpers::Class;
+use webchordr_common::route::route;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct SongListItemProps<S: SongData + Clone> {
@@ -70,7 +71,7 @@ impl<S: SongData + PartialEq + 'static + Clone> Component for Item<S> {
     fn view(&self) -> VNode {
         let title = &self.props.song.title();
         let key = &self.props.data_key;
-        let href = format!("#/song/{}", self.props.song.id());
+        let href = route(&format!("song/{}", self.props.song.id()));
         let class = self.get_class();
 
         let link =

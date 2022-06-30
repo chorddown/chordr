@@ -1,5 +1,6 @@
 use super::index::Index;
 use webchordr_common::helpers::Class;
+use webchordr_common::route::route;
 use yew::prelude::*;
 use yew::virtual_dom::VNode;
 use yew::{Component, ComponentLink};
@@ -38,7 +39,7 @@ impl Component for IndexItem {
 
     fn view(&self) -> VNode {
         let index = &self.props.index;
-        let href = format!("#/song-browser/{}", index.chars);
+        let href = route(format!("song-browser/{}", index.chars));
         let class = self.props.class.or("song-browser-index-item");
 
         html! {

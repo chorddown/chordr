@@ -6,5 +6,6 @@ pub mod errors;
 pub mod fetch_helper;
 pub mod helpers;
 pub mod lock;
+pub mod route;
 pub mod session;
 pub mod tri;

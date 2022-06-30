@@ -7,8 +7,10 @@ use log::{error, info};
 use std::rc::Rc;
 use std::sync::Arc;
 use wasm_bindgen_futures::spawn_local;
+use web_sys::Location;
 use webchordr_common::data_exchange::SETLIST_LOAD_URL_PREFIX;
 use webchordr_common::errors::{SharingError, WebError};
+use webchordr_common::route::route;
 use webchordr_events::Event;
 use webchordr_events::SetlistEvent;
 use webchordr_persistence::persistence_manager::PMType;
@@ -57,10 +59,15 @@ impl SetlistLoad {
     }
 
     fn get_shared_data(&self) -> Result<String, WebError> {
-        let hash: String = window().location().hash()?;
-        let share_url_prefix = SETLIST_LOAD_URL_PREFIX;
-        if hash.starts_with(share_url_prefix) {
-            Ok(hash.trim_start_matches(share_url_prefix).to_string())
+        let location: Location = window().location();
+        let search: String = location.search()?;
+        if !search.is_empty() {
+            return Ok(search.trim_start_matches('?').to_string());
+        }
+
+        let hash: String = location.hash()?;
+        if hash.starts_with(SETLIST_LOAD_URL_PREFIX) {
+            Ok(hash.trim_start_matches(SETLIST_LOAD_URL_PREFIX).to_string())
         } else {
             Err(WebError::sharing_error(SharingError::Deserialization(
                 format!("Could not fetch shared data from URL {}", hash),
@@ -132,7 +139,7 @@ impl Component for SetlistLoad {
                 self.visible = false;
                 window()
                     .location()
-                    .set_href("#/")
+                    .set_href(&route("/"))
                     .expect("Could not change the location href");
             }
             Msg::ChooseYes => {

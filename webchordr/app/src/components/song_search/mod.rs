@@ -8,6 +8,7 @@ use yew::{Component, ComponentLink, ShouldRender};
 use libchordr::models::catalog::*;
 use libchordr::models::list::ListEntryTrait;
 use libchordr::prelude::{SearchIndex, Song, SongData, SongSorting};
+use webchordr_common::route::route;
 use webchordr_song_list::Item as SongItem;
 
 use self::link::SongSearchLink;
@@ -57,7 +58,7 @@ impl SongSearch {
 
     fn get_back_link(&self) -> Html {
         (if self.props.show_back_button {
-            let href = "#/";
+            let href = route("/");
 
             html! { <a class="song-search-back back-link -inline" href=href><i class="im im-angle-left"></i>{ "Back" }</a> }
         } else {
@@ -66,7 +67,7 @@ impl SongSearch {
     }
 
     fn render_filter(&self) -> Html {
-        html! {
+        (html! {
             <>
                 <h1><SongSearchLink />{"Search Songs"}</h1>
                 <input type="search"
@@ -74,7 +75,7 @@ impl SongSearch {
                        oninput=self.link.callback(|e: InputData| Msg::SearchChange(e.value))
                        placeholder="Search"/>
             </>
-        }
+        }) as Html
     }
 }
 

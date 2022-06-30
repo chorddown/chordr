@@ -7,6 +7,7 @@ use libchordr::models::catalog::*;
 use libchordr::models::song_data::SongData;
 use libchordr::prelude::SongSorting;
 use libchordr::prelude::{ListEntryTrait, Song};
+use webchordr_common::route::route;
 use webchordr_song_list::Item as SongItem;
 
 use self::index::*;
@@ -67,7 +68,7 @@ impl SongBrowser {
             let chars = &self.props.chars;
             let parameter = self.get_back_link_parameter(chars);
 
-            let href = format!("#/song-browser/{}", parameter);
+            let href = route(format!("song-browser/{}", parameter));
 
             html! { <a class="song-browser-back back-link -inline" href=href><i class="im im-angle-left"></i>{ "Back" }</a> }
         } else {

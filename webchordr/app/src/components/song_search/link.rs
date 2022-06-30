@@ -1,3 +1,4 @@
+use webchordr_common::route::route;
 use yew::prelude::*;
 
 pub struct SongSearchLink {}
@@ -19,7 +20,7 @@ impl Component for SongSearchLink {
     }
 
     fn view(&self) -> Html {
-        let href = "#/song-search/";
+        let href = route("song-search/");
 
         html! { <a class="song-search-home" href=href><i class="im im-magnifier"></i></a> }
     }
