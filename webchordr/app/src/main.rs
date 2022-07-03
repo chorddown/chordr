@@ -21,6 +21,7 @@ mod handler;
 mod handler_traits;
 mod ipc;
 mod route;
+mod service;
 mod state;
 
 fn main() {
