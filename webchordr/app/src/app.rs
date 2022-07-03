@@ -24,6 +24,7 @@ use crate::components::start_screen::StartScreen;
 use crate::components::user::Info as UserInfo;
 use crate::components::user::Login as UserLogin;
 use crate::route::{AppRoute, SetlistRoute, UserRoute};
+use crate::service::song_info_service::SongInfoService;
 use crate::session::Session;
 use crate::state::{SongInfo, State};
 
@@ -159,56 +160,7 @@ impl App {
     }
 
     fn get_song_info(&self, song_id: &SongId) -> Option<SongInfo> {
-        let is_on_setlist = if let Some(ref setlist) = self.props.state.current_setlist() {
-            setlist.contains_id(song_id.clone())
-        } else {
-            false
-        };
-
-        Some(SongInfo {
-            song: self.get_song(song_id)?,
-            song_settings: self.get_settings_for_song(song_id),
-            is_on_setlist,
-        })
-    }
-
-    fn get_song(&self, song_id: &SongId) -> Option<Song> {
-        let state = self.props.state.clone();
-
-        let catalog = state.catalog()?;
-        catalog.get(song_id).cloned()
-    }
-
-    fn get_settings_for_song(&self, song_id: &SongId) -> SongSettings {
-        // Look if there are settings for the `SongId` in the `Setlist`
-        if let Some(settings) = self.get_settings_from_setlist(song_id) {
-            debug!(
-                "Found settings for song in Setlist {}: {:?}",
-                song_id, settings
-            );
-
-            return settings;
-        }
-
-        match self.props.state.song_settings().get(song_id) {
-            Some(s) => {
-                debug!("Found settings for song {}: {:?}", song_id, s);
-                s.clone()
-            }
-            None => {
-                debug!("No settings for song {} found in setlist", song_id);
-                SongSettings::default()
-            }
-        }
-    }
-
-    fn get_settings_from_setlist(&self, song_id: &SongId) -> Option<SongSettings> {
-        match &self.props.state.current_setlist() {
-            None => None,
-            Some(setlist) => setlist
-                .get(song_id.clone())
-                .and_then(|entry| entry.settings()),
-        }
+        SongInfoService::new().get_song_info_from_state(song_id, &self.props.state)
     }
 
     fn view_song_browser<S: Into<String>>(&self, chars: S) -> Html {
