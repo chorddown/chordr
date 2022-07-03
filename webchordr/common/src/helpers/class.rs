@@ -74,6 +74,12 @@ impl From<Class> for Classes {
     }
 }
 
+impl From<&Class> for Classes {
+    fn from(c: &Class) -> Self {
+        Classes::from(c.0.clone())
+    }
+}
+
 impl IntoPropValue<Class> for &str {
     fn into_prop_value(self) -> Class {
         Class::from(self)
