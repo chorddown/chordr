@@ -1,3 +1,4 @@
+use gloo_events::EventListener;
 use std::rc::Rc;
 use std::sync::Arc;
 use std::time::Duration;
@@ -41,7 +42,7 @@ pub struct Handler {
     persistence_manager: Arc<PMType>,
     /// Keep a reference to the IntervalTask so that it doesn't get dropped
     _clock_handle: IntervalTask,
-    message_listener: gloo_events::EventListener,
+    message_listener: Option<EventListener>,
     link: ComponentLink<Handler>,
     #[allow(unused)]
     fetching: bool,
