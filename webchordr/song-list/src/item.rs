@@ -16,6 +16,9 @@ pub struct SongListItemProps<S: SongData + Clone> {
     pub sortable: bool,
 
     #[prop_or_default]
+    pub draggable: bool,
+
+    #[prop_or_default]
     pub highlight: bool,
 
     #[prop_or_default]
@@ -39,8 +42,14 @@ impl<S: SongData + PartialEq + 'static + Clone> Item<S> {
             base_class
         };
 
-        if self.props.sortable {
+        let class = if self.props.sortable {
             class.add("-sortable")
+        } else {
+            class
+        };
+
+        if self.props.draggable {
+            class.add("-draggable")
         } else {
             class
         }
@@ -71,16 +80,21 @@ impl<S: SongData + PartialEq + 'static + Clone> Component for Item<S> {
     fn view(&self) -> VNode {
         let title = &self.props.song.title();
         let key = &self.props.data_key;
-        let href = route(&format!("song/{}", self.props.song.id()));
+        let id = self.props.song.id().to_string();
+        let href = route(&format!("song/{}", id));
         let class = self.get_class();
-
+        let draggable = if self.props.draggable {
+            "true"
+        } else {
+            "false"
+        };
         let link =
             html! { <a role="button" class="discreet" data-key=key.clone() href=href>{title}</a> };
 
         (if self.props.sortable {
-            html! { <div class=class>{link}<span class="sortable-handle">{"::"}</span></div> }
+            html! { <div class=class data-song-id=id draggable=draggable>{link}<span class="sortable-handle">{"::"}</span></div> }
         } else {
-            html! { <div class=class>{link}</div> }
+            html! { <div class=class data-song-id=id draggable=draggable>{link}</div> }
         }) as Html
     }
 }
