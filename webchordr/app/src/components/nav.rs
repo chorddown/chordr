@@ -1,17 +1,17 @@
-use std::rc::Rc;
-
-use yew::prelude::*;
-
-use libchordr::models::song_list::SongList as SongListModel;
-use libchordr::prelude::{ListEntryTrait, SongId, SongSettings};
-use webchordr_common::route::route;
-use webchordr_events::Event;
-use webchordr_song_list::SongList as SongListView;
-
 use crate::components::setlist::SetlistShareButton;
 use crate::components::song_view::SongNotes;
 use crate::components::user::NavItem as UserNavButton;
+use crate::service::song_info_service::SongInfoService;
 use crate::state::{SongInfo, State};
+use libchordr::models::song_list::SongList as SongListModel;
+use libchordr::prelude::{ListEntryTrait, SongId, SongSettings};
+use std::rc::Rc;
+use webchordr_common::route::route;
+use webchordr_drag_n_drop::{Dropzone, OnDropArgument};
+use webchordr_events::Event;
+use webchordr_events::SetlistEvent;
+use webchordr_song_list::SongList as SongListView;
+use yew::prelude::*;
 
 #[derive(Properties, Clone)]
 pub struct NavProps {
@@ -38,7 +38,8 @@ pub struct Nav {
 
 impl Nav {
     fn view_song_list(&self) -> Html {
-        let current_setlist = self.props.state.current_setlist();
+        let state = self.props.state.clone();
+        let current_setlist = state.current_setlist();
         let songs = match &current_setlist {
             Some(setlist) => setlist.as_song_list(),
             None => SongListModel::new(),
@@ -56,8 +57,21 @@ impl Nav {
             _ => html! {},
         };
 
+        let on_setlist_change_after_drop = on_setlist_change.clone();
+        let on_drop = Callback::from(move |drop_arguments: OnDropArgument| {
+            if let Some(song_id) = drop_arguments.dataset.get("songId") {
+                let song_info_service = SongInfoService::new();
+                let id = SongId::from(song_id);
+                if let Some(song_info) = song_info_service.get_song_info_from_state(&id, &state) {
+                    on_setlist_change_after_drop
+                        .emit(SetlistEvent::AddEntry(song_info.into()).into())
+                }
+            }
+        });
+        let item_selector = ".song-browser-song-list.song-list .grid-button".to_string();
+
         html! {
-            <div class="song-list-container">
+            <Dropzone class="song-list-container" on_drop=on_drop item_selector=item_selector>
                 {name_element}
                 <SongListView
                     songs=songs
@@ -65,7 +79,7 @@ impl Nav {
                     sortable=self.props.expand
                     highlighted_song_id=highlighted_song_id
                 />
-            </div>
+            </Dropzone>
         }
     }
 
@@ -166,6 +180,9 @@ impl Component for Nav {
         } else {
             menu_classes.push("-hidden");
         };
+        if self.props.current_song_info.is_some() {
+            menu_classes.push("-w-notes");
+        }
 
         (html! {
             <nav class=menu_classes>

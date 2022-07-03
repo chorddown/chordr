@@ -24,6 +24,8 @@ $grid-breakpoints: (
         xxl: 1400px
 ) !default;
 
+$std-transition-duration: 300ms !default;
+
 $background: white !default;
 $dark-mode-background: $gray-ultra-dark !default;
 $text-color: $gray-ultra-dark !default;

@@ -31,6 +31,15 @@ nav {
     }
 
     .song-list-container {
+        height: calc(100% - #{$nav-button-height});
+        transition: transform $std-transition-duration;
+
+        &.-touch-hover {
+            transform: scale(1.02);
+        }
+    }
+
+    &.-w-notes .song-list-container {
         height: 50%;
     }
 

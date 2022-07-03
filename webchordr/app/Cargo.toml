@@ -26,6 +26,7 @@ libchordr = { path = "../../libchordr" }
 tri = { path = "../../tri" }
 cqrs = { path = "../../cqrs" }
 webchordr-common = { path = "../common" }
+webchordr-drag-n-drop = { path = "../drag-n-drop" }
 webchordr-events = { path = "../events" }
 webchordr-song-list = { path = "../song-list" }
 webchordr-song-browser = { path = "../song-browser" }
@@ -61,6 +62,7 @@ features = [
     'KeyboardEvent',
     'HtmlElement',
     'Document',
+    'DomStringMap',
     'HtmlDocument',
     'Url',
     'EventTarget',

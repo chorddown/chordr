@@ -16,7 +16,7 @@
             left: 0;
             display: flex;
             justify-content: space-between;
-            transition: top 300ms;
+            transition: top $std-transition-duration;
             top: -($song-tools-navbar-height);
             @at-root html.direction-up #{&} {
                 top: 0;
