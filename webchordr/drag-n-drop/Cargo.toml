@@ -1,0 +1,26 @@
+[package]
+name = "webchordr-drag-n-drop"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde = "1"
+webchordr-common = { path = "../common" }
+yew = "0.18"
+js-sys = "0.3.44"
+wasm-bindgen-futures = "0.4.17"
+
+[dependencies.wasm-bindgen]
+version = "0.2.67"
+features = ["serde-serialize"]
+
+[dependencies.web-sys]
+version = "0.3.44"
+features = [
+    'HtmlElement',
+    'Document',
+    'HtmlDocument',
+    'EventTarget',
+    'DateTimeValue',
+    'Window',
+]

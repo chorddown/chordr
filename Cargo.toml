@@ -6,6 +6,7 @@ members = [
     "tri",
     "webchordr/app",
     "webchordr/common",
+    "webchordr/drag-n-drop",
     "webchordr/events",
     "webchordr/persistence",
     "webchordr/song-browser",

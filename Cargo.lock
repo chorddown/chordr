@@ -4217,6 +4217,7 @@ dependencies = [
  "wasm-logger",
  "web-sys",
  "webchordr-common",
+ "webchordr-drag-n-drop",
  "webchordr-events",
  "webchordr-persistence",
  "webchordr-song-browser",
@@ -4250,6 +4251,19 @@ dependencies = [
  "wee_alloc",
  "yew",
  "yew-router",
+]
+
+[[package]]
+name = "webchordr-drag-n-drop"
+version = "0.1.0"
+dependencies = [
+ "js-sys",
+ "serde",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
+ "webchordr-common",
+ "yew",
 ]
 
 [[package]]
