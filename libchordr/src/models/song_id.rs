@@ -77,6 +77,18 @@ impl From<&str> for SongId {
     }
 }
 
+impl From<String> for SongId {
+    fn from(input: String) -> Self {
+        SongId::new(input)
+    }
+}
+
+impl From<&String> for SongId {
+    fn from(input: &String) -> Self {
+        SongId::new(input)
+    }
+}
+
 impl ::std::convert::AsRef<str> for SongId {
     fn as_ref(&self) -> &str {
         self.as_str()
