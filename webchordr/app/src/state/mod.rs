@@ -4,7 +4,7 @@ use chrono::Utc;
 
 use libchordr::models::catalog::Catalog;
 use libchordr::models::setlist::Setlist;
-use libchordr::prelude::{SongSettingsMap, User};
+use libchordr::prelude::{SongId, SongSettingsMap, User};
 pub use song_info::SongInfo;
 use webchordr_common::errors::WebError;
 
@@ -18,6 +18,7 @@ mod song_info;
 pub struct State {
     catalog: Option<Rc<Catalog>>,
     connection_status: ConnectionStatus,
+    current_song_id: Option<SongId>,
     current_setlist: Option<Rc<Setlist>>,
     session: Rc<Session>,
     song_settings: Rc<SongSettingsMap>,
@@ -25,11 +26,12 @@ pub struct State {
     available_version: Option<String>,
 }
 
-#[allow(unused)]
+// #[allow(unused)]
 impl State {
     pub fn new(
         catalog: Option<Catalog>,
         setlist: Option<Setlist>,
+        current_song_id: Option<SongId>,
         song_settings: SongSettingsMap,
         connection_status: ConnectionStatus,
         session: Session,
@@ -39,6 +41,7 @@ impl State {
         Self {
             catalog: catalog.map(Rc::new),
             connection_status,
+            current_song_id,
             current_setlist: setlist.map(Rc::new),
             session: Rc::new(session),
             song_settings: Rc::new(song_settings),
@@ -122,6 +125,24 @@ impl State {
         clone
     }
 
+    pub fn current_song_id(&self) -> Option<&SongId> {
+        self.current_song_id.as_ref()
+    }
+
+    pub fn with_current_song_id(&self, song_id: SongId) -> Self {
+        let mut clone = self.clone();
+        clone.current_song_id = Some(song_id);
+
+        clone
+    }
+
+    pub fn without_current_song_id(&self) -> Self {
+        let mut clone = self.clone();
+        clone.current_song_id = None;
+
+        clone
+    }
+
     pub fn session(&self) -> Rc<Session> {
         self.session.clone()
     }
@@ -161,6 +182,7 @@ impl Default for State {
         Self::new(
             None,
             Some(Setlist::new("", 0, user, None, Some(now), now, now, vec![])),
+            None,
             SongSettingsMap::new(),
             ConnectionStatus::OnLine,
             Session::default(),

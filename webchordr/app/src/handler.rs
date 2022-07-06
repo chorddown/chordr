@@ -127,6 +127,7 @@ impl Handler {
                     State::new(
                         self.state.catalog().map(|c| (*c).clone()),
                         latest_setlist,
+                        None,
                         song_settings.unwrap_or_else(SongSettingsMap::new),
                         ConnectionStatus::OnLine,
                         initial_data.session,
