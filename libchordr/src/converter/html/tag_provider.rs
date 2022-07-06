@@ -64,13 +64,13 @@ impl TagProvider {
             "{} {}",
             Tag::span(
                 Content::from_string(format!("{}:", metadata_token.keyword())),
-                Some("meta-keyword"),
+                Some(class_name_for_metadata_keyword(metadata_token)),
             ),
             Tag::span(
                 Content::from_string(
                     content.unwrap_or_else(|| metadata_token.content().to_string())
                 ),
-                Some("meta-value")
+                Some(class_name_for_metadata_value(metadata_token))
             ),
         ))
     }
@@ -214,5 +214,49 @@ fn class_name_for_type(section_type: &SectionType) -> Option<&'static str> {
         SectionType::Chorus => Some("chorus"),
         SectionType::Bridge => Some("bridge"),
         SectionType::Reference => Some("reference"),
+    }
+}
+
+const fn class_name_for_metadata_keyword(metadata_token: &Meta) -> &'static str {
+    match metadata_token {
+        Meta::Artist(_) => "meta-keyword -artist",
+        Meta::Composer(_) => "meta-keyword -composer",
+        Meta::Lyricist(_) => "meta-keyword -lyricist",
+        Meta::Copyright(_) => "meta-keyword -copyright",
+        Meta::Album(_) => "meta-keyword -album",
+        Meta::Year(_) => "meta-keyword -year",
+        Meta::Key(_) => "meta-keyword -key",
+        Meta::OriginalKey(_) => "meta-keyword -original-key",
+        Meta::Time(_) => "meta-keyword -time",
+        Meta::Tempo(_) => "meta-keyword -tempo",
+        Meta::Duration(_) => "meta-keyword -duration",
+        Meta::Subtitle(_) => "meta-keyword -subtitle",
+        Meta::Capo(_) => "meta-keyword -capo",
+        Meta::OriginalTitle(_) => "meta-keyword -original-title",
+        Meta::AlternativeTitle(_) => "meta-keyword -alternative-title",
+        Meta::CCLISongId(_) => "meta-keyword -ccli-song-id",
+        Meta::BNotation(_) => "meta-keyword -b-notation",
+    }
+}
+
+const fn class_name_for_metadata_value(metadata_token: &Meta) -> &'static str {
+    match metadata_token {
+        Meta::Artist(_) => "meta-value -artist",
+        Meta::Composer(_) => "meta-value -composer",
+        Meta::Lyricist(_) => "meta-value -lyricist",
+        Meta::Copyright(_) => "meta-value -copyright",
+        Meta::Album(_) => "meta-value -album",
+        Meta::Year(_) => "meta-value -year",
+        Meta::Key(_) => "meta-value -key",
+        Meta::OriginalKey(_) => "meta-value -original-key",
+        Meta::Time(_) => "meta-value -time",
+        Meta::Tempo(_) => "meta-value -tempo",
+        Meta::Duration(_) => "meta-value -duration",
+        Meta::Subtitle(_) => "meta-value -subtitle",
+        Meta::Capo(_) => "meta-value -capo",
+        Meta::OriginalTitle(_) => "meta-value -original-title",
+        Meta::AlternativeTitle(_) => "meta-value -alternative-title",
+        Meta::CCLISongId(_) => "meta-value -ccli-song-id",
+        Meta::BNotation(_) => "meta-value -b-notation",
     }
 }
