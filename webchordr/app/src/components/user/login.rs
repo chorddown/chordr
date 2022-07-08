@@ -2,6 +2,7 @@ use std::convert::TryFrom;
 
 use log::info;
 use wasm_bindgen_futures::spawn_local;
+use web_sys::{EventTarget, HtmlInputElement};
 use yew::prelude::*;
 
 use libchordr::prelude::{Credentials, Error, Password, Username};
@@ -34,8 +35,6 @@ pub enum Msg {
 }
 
 pub struct Login {
-    props: LoginProps,
-    link: ComponentLink<Self>,
     username_raw: String,
     password_raw: String,
     username: Tri<Username, Error>,
@@ -48,10 +47,8 @@ impl Component for Login {
     type Message = Msg;
     type Properties = LoginProps;
 
-    fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         Self {
-            props,
-            link,
             username_raw: "".to_string(),
             password_raw: "".to_string(),
             username: Tri::None,
@@ -61,7 +58,7 @@ impl Component for Login {
         }
     }
 
-    fn update(&mut self, msg: Self::Message) -> ShouldRender {
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::UsernameChange(value) => {
                 self.username = Username::try_from(&value).into();
@@ -73,7 +70,7 @@ impl Component for Login {
             }
             Msg::Clicked => info!("Clicked"),
             Msg::Submit => {
-                let mut session_service = SessionService::new(self.props.config.clone());
+                let mut session_service = SessionService::new(ctx.props().config.clone());
                 if self.username.is_some() && self.password.is_some() {
                     let username = match self.username {
                         Tri::Some(ref u) => u.clone(),
@@ -83,7 +80,7 @@ impl Component for Login {
                         Tri::Some(ref u) => u.clone(),
                         _ => unreachable!(),
                     };
-                    let change_login_status = self.link.callback(Msg::ChangeLoginStatus);
+                    let change_login_status = ctx.link().callback(Msg::ChangeLoginStatus);
 
                     spawn_local(async move {
                         let credentials = Credentials::new(username, password);
@@ -106,9 +103,9 @@ impl Component for Login {
             Msg::ChangeLoginStatus(status) => {
                 self.login_status = status.clone();
                 match status {
-                    Tri::Some(u) => self.props.on_success.emit(u),
+                    Tri::Some(u) => ctx.props().on_success.emit(u),
                     Tri::None => {}
-                    Tri::Err(e) => self.props.on_error.emit(e),
+                    Tri::Err(e) => ctx.props().on_error.emit(e),
                 }
             }
 
@@ -119,17 +116,7 @@ impl Component for Login {
         true
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        if self.props != props {
-            self.props = props;
-
-            true
-        } else {
-            false
-        }
-    }
-
-    fn view(&self) -> Html {
+    fn view(&self, ctx: &Context<Self>) -> Html {
         // If the user has just logged in
         if let Tri::Some(session) = &self.login_status {
             let session: &Session = session;
@@ -143,7 +130,7 @@ impl Component for Login {
         }
 
         // If the user is already logged in
-        if let SessionUser::LoggedIn(user) = &self.props.user {
+        if let SessionUser::LoggedIn(user) = &ctx.props().user {
             return (html! {
                 <DetailView close_uri="#">
                     {format!("Already logged in as {}", user.username())}
@@ -167,7 +154,7 @@ impl Component for Login {
             _ => html! {},
         };
 
-        let submit = self.link.callback(|e: FocusEvent| {
+        let submit = ctx.link().callback(|e: FocusEvent| {
             e.prevent_default();
             Msg::Submit
         });
@@ -188,42 +175,50 @@ impl Component for Login {
             }
         };
 
+        let link = ctx.link();
+        let on_username_change = link.callback(|e: InputEvent| {
+            Msg::UsernameChange(e.target_unchecked_into::<HtmlInputElement>().value())
+        });
+        let on_password_change = link.callback(|e: InputEvent| {
+            Msg::PasswordChange(e.target_unchecked_into::<HtmlInputElement>().value())
+        });
+
         (html! {
             <DetailView close_uri="#">
-                <form onsubmit=submit>
+                <form onsubmit={submit}>
                     <div class="user-login">
                         <div class="form-group user-login-username">
                             <label for="user-login-username">{"Username"}</label>
                             <input type="text"
                                    id="user-login-username"
-                                   value=self.username_raw.clone()
-                                   oninput=self.link.callback(|e: InputData|Msg::UsernameChange(e.value))/>
+                                   value={self.username_raw.clone()}
+                                   oninput={on_username_change}/>
                             {username_error}
                         </div>
                         <div class="form-group user-login-password">
                             <label for="user-login-password">{"Password"}</label>
                             <input type="password"
                                    id="user-login-password"
-                                   value=self.password_raw.clone()
-                                   oninput=self.link.callback(|e: InputData|Msg::PasswordChange(e.value))
+                                   value={self.password_raw.clone()}
+                                   oninput={on_password_change}
                             />
                             {password_error}
                         </div>
                         {login_error}
                         {connection_warning}
-                        <button onclick=self.link.callback(|_|Msg::Clicked)>{"Submit"}</button>
+                        <button onclick={ctx.link().callback(|_|Msg::Clicked)}>{"Submit"}</button>
                     </div>
                 </form>
             </DetailView>
         }) as Html
     }
 
-    fn rendered(&mut self, first_render: bool) {
+    fn rendered(&mut self, ctx: &Context<Self>, first_render: bool) {
         if first_render {
-            let session_service = SessionService::new(self.props.config.clone());
-            let change_login_status = self.link.callback(Msg::ChangeLoginStatus);
-            let change_connection_status = self.link.callback(Msg::ChangeConnectionStatus);
-            let connection_service = ConnectionService::new(self.props.config.clone());
+            let session_service = SessionService::new(ctx.props().config.clone());
+            let change_login_status = ctx.link().callback(Msg::ChangeLoginStatus);
+            let change_connection_status = ctx.link().callback(Msg::ChangeConnectionStatus);
+            let connection_service = ConnectionService::new(ctx.props().config.clone());
 
             spawn_local(async move {
                 if let Ok(u) = session_service.try_from_browser_storage().await {

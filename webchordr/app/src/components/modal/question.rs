@@ -26,8 +26,6 @@ pub struct QuestionProps {
 
 pub struct Question {
     visible: bool,
-    props: QuestionProps,
-    link: ComponentLink<Self>,
 }
 
 pub enum Msg {
@@ -39,39 +37,32 @@ impl Component for Question {
     type Message = Msg;
     type Properties = QuestionProps;
 
-    fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
+    fn create(ctx: &Context<Self>) -> Self {
         Self {
-            visible: props.visible,
-            props,
-            link,
+            visible: ctx.props().visible,
         }
     }
 
-    fn update(&mut self, msg: Self::Message) -> ShouldRender {
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            Msg::Choose1 => self.props.on_answer_1.emit(()),
-            Msg::Choose2 => self.props.on_answer_2.emit(()),
+            Msg::Choose1 => ctx.props().on_answer_1.emit(()),
+            Msg::Choose2 => ctx.props().on_answer_2.emit(()),
         }
         self.visible = false;
         true
     }
 
-    fn change(&mut self, props: Self::Properties) -> bool {
-        if props != self.props {
-            self.visible = props.visible;
-            self.props = props;
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        self.visible = ctx.props().visible;
 
-            true
-        } else {
-            false
-        }
+        true
     }
 
-    fn view(&self) -> Html {
-        let props = &self.props;
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let props = &ctx.props();
 
-        let on_answer_1 = self.link.callback(|_| Msg::Choose1);
-        let on_answer_2 = self.link.callback(|_| Msg::Choose2);
+        let on_answer_1 = ctx.link().callback(|_| Msg::Choose1);
+        let on_answer_2 = ctx.link().callback(|_| Msg::Choose2);
 
         let answer_1_class = props.answer_1_class.or("model-answer answer-1");
         let answer_2_class = props.answer_2_class.or("model-answer answer-2");
@@ -79,18 +70,18 @@ impl Component for Question {
 
         (if self.visible {
             html! {
-                <ModalSkeleton class=class>
+                <ModalSkeleton class={class}>
                     <div class="modal-header modal-question">
                         <div class="modal-header-text">
                             {&props.question_text}
                         </div>
                     </div>
-                    {{ self.props.children.iter().collect::<Html>() }}
+                    { ctx.props().children.iter().collect::<Html>() }
                     <div class="modal-buttons button-group">
-                        <button class=answer_1_class onclick=on_answer_1>
+                        <button class={answer_1_class} onclick={on_answer_1}>
                             {&props.answer_1_text}
                         </button>
-                        <button class=answer_2_class onclick=on_answer_2>
+                        <button class={answer_2_class} onclick={on_answer_2}>
                             {&props.answer_2_text}
                         </button>
                     </div>

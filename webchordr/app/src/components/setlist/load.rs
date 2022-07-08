@@ -26,10 +26,17 @@ pub struct SetlistProps {
     pub on_load: Callback<Event>,
 }
 
+impl PartialEq for SetlistProps {
+    fn eq(&self, other: &Self) -> bool {
+        self.catalog == other.catalog
+            && self.serialized_setlist == other.serialized_setlist
+            && self.current_setlist == other.current_setlist
+            && self.on_load == other.on_load
+    }
+}
+
 pub struct SetlistLoad {
     visible: bool,
-    props: SetlistProps,
-    link: ComponentLink<Self>,
 }
 
 pub enum Msg {
@@ -40,10 +47,10 @@ pub enum Msg {
 }
 
 impl SetlistLoad {
-    fn build_setlist(&self) -> Result<Setlist, WebError> {
+    fn build_setlist(&self, ctx: &Context<Self>) -> Result<Setlist, WebError> {
         let serialized_setlist = self.get_shared_data()?;
         let deserialize_result =
-            SetlistDeserializeService::deserialize(&serialized_setlist, &*self.props.catalog)?;
+            SetlistDeserializeService::deserialize(&serialized_setlist, &*ctx.props().catalog)?;
 
         if !deserialize_result.errors.is_empty() {
             let errors = deserialize_result
@@ -86,7 +93,7 @@ impl SetlistLoad {
                 format!("{} ({}{} ♬)", title, prefix, transpose_semitone)
             };
 
-            html! { <li key=title>{text}</li> }
+            html! { <li key={title}>{text}</li> }
         };
 
         (html! {
@@ -99,9 +106,9 @@ impl SetlistLoad {
     }
 
     /// Prepare the given Setlist to be stored in the system
-    fn prepare_setlist(&mut self, new_setlist: Setlist) {
-        let on_load_callback = self.link.callback(Msg::LoadSetlist);
-        let pm = self.props.persistence_manager.clone();
+    fn prepare_setlist(&mut self, ctx: &Context<Self>, new_setlist: Setlist) {
+        let on_load_callback = ctx.link().callback(Msg::LoadSetlist);
+        let pm = ctx.props().persistence_manager.clone();
         spawn_local(async move {
             let result = SetlistWebRepository::new(&*pm).find_all().await;
             let setlist = match result {
@@ -124,15 +131,11 @@ impl Component for SetlistLoad {
     type Message = Msg;
     type Properties = SetlistProps;
 
-    fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        Self {
-            visible: true,
-            props,
-            link,
-        }
+    fn create(ctx: &Context<Self>) -> Self {
+        Self { visible: true }
     }
 
-    fn update(&mut self, msg: Self::Message) -> ShouldRender {
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::ChooseNo => {
                 info!("User canceled Setlist import");
@@ -143,18 +146,18 @@ impl Component for SetlistLoad {
                     .expect("Could not change the location href");
             }
             Msg::ChooseYes => {
-                let new_setlist = self.build_setlist();
+                let new_setlist = self.build_setlist(ctx);
                 match new_setlist {
-                    Ok(s) => self.link.send_message(Msg::PrepareSetlist(s)),
+                    Ok(s) => ctx.link().send_message(Msg::PrepareSetlist(s)),
                     Err(e) => {
                         let _ = window().alert_with_message(&e.to_string());
                     }
                 }
             }
-            Msg::PrepareSetlist(new_setlist) => self.prepare_setlist(new_setlist),
+            Msg::PrepareSetlist(new_setlist) => self.prepare_setlist(ctx, new_setlist),
             Msg::LoadSetlist(new_setlist) => {
                 self.visible = false;
-                self.props
+                ctx.props()
                     .on_load
                     .emit(Event::SetlistEvent(SetlistEvent::Replace(new_setlist)))
             }
@@ -163,25 +166,12 @@ impl Component for SetlistLoad {
         true
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        if self.props.catalog != props.catalog
-            && self.props.serialized_setlist != props.serialized_setlist
-            && self.props.current_setlist != props.current_setlist
-            && self.props.on_load != props.on_load
-        {
-            self.props = props;
-            true
-        } else {
-            false
-        }
-    }
-
-    fn view(&self) -> Html {
-        let new_setlist_result = self.build_setlist();
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let new_setlist_result = self.build_setlist(ctx);
         (match new_setlist_result {
             Ok(new_setlist) => {
-                let on_answer_1 = self.link.callback(|_| Msg::ChooseNo);
-                let on_answer_2 = self.link.callback(|_| Msg::ChooseYes);
+                let on_answer_1 = ctx.link().callback(|_| Msg::ChooseNo);
+                let on_answer_2 = ctx.link().callback(|_| Msg::ChooseYes);
 
                 let rendered_setlist = self.render_setlist(&new_setlist);
                 html! {
@@ -189,9 +179,9 @@ impl Component for SetlistLoad {
                         question_text="Do you want to load the Setlist?"
                         answer_1_text="No"
                         answer_2_text="Yes"
-                        on_answer_1=on_answer_1
-                        on_answer_2=on_answer_2
-                        visible=self.visible
+                        on_answer_1={on_answer_1}
+                        on_answer_2={on_answer_2}
+                        visible={self.visible}
                         class="setlist-load-preview-modal"
                     >
                         <div class="setlist-load-preview-container">

@@ -10,35 +10,18 @@ pub struct InfoProps {
 
 pub enum Msg {}
 
-pub struct Info {
-    props: InfoProps,
-    _link: ComponentLink<Self>,
-}
+pub struct Info {}
 
 impl Component for Info {
     type Message = Msg;
     type Properties = InfoProps;
 
-    fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        Self { props, _link: link }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _msg: Self::Message) -> ShouldRender {
-        true
-    }
-
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        if self.props != props {
-            self.props = props;
-
-            true
-        } else {
-            false
-        }
-    }
-
-    fn view(&self) -> Html {
-        let user = &self.props.user;
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let user = &ctx.props().user;
 
         fn row(caption: &str, value: impl Display) -> Html {
             html! { <tr><th>{caption}</th><td>{value.to_string()}</td></tr> }

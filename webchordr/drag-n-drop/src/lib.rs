@@ -33,7 +33,6 @@ pub struct DropzoneProps {
 }
 
 pub struct Dropzone {
-    props: DropzoneProps,
     drag_n_drop_handle: Option<DropzoneHandle>,
     node_ref: NodeRef,
 }
@@ -42,39 +41,30 @@ impl Component for Dropzone {
     type Message = ();
     type Properties = DropzoneProps;
 
-    fn create(props: Self::Properties, _link: ComponentLink<Self>) -> Self {
+    fn create(ctx: &Context<Self>) -> Self {
         Self {
-            props,
             node_ref: NodeRef::default(),
             drag_n_drop_handle: None,
         }
     }
 
-    fn update(&mut self, _msg: Self::Message) -> ShouldRender {
-        true
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let class = &ctx.props().class;
+        let children = &ctx.props().children;
+
+        return html! {<div {class} ref={self.node_ref.clone()}>{{ children.iter().collect::<Html>() }}</div>};
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        if self.props != props {
-            self.props = props;
-            true
-        } else {
-            false
-        }
-    }
-
-    fn view(&self) -> Html {
-        return html! {<div class=&self.props.class ref=self.node_ref.clone()>{{ self.props.children.iter().collect::<Html>() }}</div>};
-    }
-
-    fn rendered(&mut self, _first_render: bool) {
+    fn rendered(&mut self, ctx: &Context<Self>, _first_render: bool) {
         if self.drag_n_drop_handle.is_none() {
-            let _ =
-                self.make_dropzone(self.props.item_selector.clone(), self.props.on_drop.clone());
+            let _ = self.make_dropzone(
+                ctx.props().item_selector.clone(),
+                ctx.props().on_drop.clone(),
+            );
         }
     }
 
-    fn destroy(&mut self) {
+    fn destroy(&mut self, ctx: &Context<Self>) {
         if let Some(mut handle) = self.drag_n_drop_handle.take() {
             handle.destroy()
         };

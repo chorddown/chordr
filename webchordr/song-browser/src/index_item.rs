@@ -1,9 +1,10 @@
 use super::index::Index;
+use webchordr_common::components::link::Link;
 use webchordr_common::helpers::Class;
-use webchordr_common::route::route;
+use webchordr_common::route::{route, AppRoute};
 use yew::prelude::*;
 use yew::virtual_dom::VNode;
-use yew::{Component, ComponentLink};
+use yew::Component;
 
 #[derive(Properties, PartialEq, Debug, Clone)]
 pub struct SongBrowserIndexItemProps {
@@ -12,41 +13,30 @@ pub struct SongBrowserIndexItemProps {
 }
 
 #[allow(dead_code)]
-pub struct IndexItem {
-    /// State from the parent
-    props: SongBrowserIndexItemProps,
-    /// Utility object
-    link: ComponentLink<Self>,
-}
+pub struct IndexItem {}
 
 impl Component for IndexItem {
     type Message = ();
     type Properties = SongBrowserIndexItemProps;
 
-    fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        Self { link, props }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _msg: Self::Message) -> bool {
-        true
-    }
-
-    fn change(&mut self, props: Self::Properties) -> bool {
-        // info!("Change the Song Browser Item props: {:?}", props);
-        self.props = props;
-        true
-    }
-
-    fn view(&self) -> VNode {
-        let index = &self.props.index;
+    fn view(&self, ctx: &Context<Self>) -> VNode {
+        let index = &ctx.props().index;
         let href = route(format!("song-browser/{}", index.chars));
-        let class = self.props.class.or("song-browser-index-item");
+        let class = ctx.props().class.or("song-browser-index-item").to_classes();
+
+        let to = AppRoute::SongBrowser {
+            chars: index.chars.to_string(),
+        };
 
         html! {
-            <a class=class role="button" href=href>
+            <Link class={class} role="button" {to}>
                 <span class="index-item-chars">{ &index.chars }</span>
                 <span class="index-item-count">{ format!("({})", index.count) }</span>
-            </a>
+            </Link>
         }
     }
 }

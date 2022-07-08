@@ -6,7 +6,8 @@ use crate::state::{SongInfo, State};
 use libchordr::models::song_list::SongList as SongListModel;
 use libchordr::prelude::{ListEntryTrait, SongId, SongSettings};
 use std::rc::Rc;
-use webchordr_common::route::route;
+use webchordr_common::components::link::Link;
+use webchordr_common::route::{route, AppRoute};
 use webchordr_drag_n_drop::{Dropzone, OnDropArgument};
 use webchordr_events::Event;
 use webchordr_events::SetlistEvent;
@@ -32,21 +33,19 @@ impl PartialEq for NavProps {
 }
 
 #[allow(dead_code)]
-pub struct Nav {
-    props: NavProps,
-}
+pub struct Nav {}
 
 impl Nav {
-    fn view_song_list(&self) -> Html {
-        let state = self.props.state.clone();
+    fn view_song_list(&self, ctx: &Context<Self>) -> Html {
+        let state = ctx.props().state.clone();
         let current_setlist = state.current_setlist();
         let songs = match &current_setlist {
             Some(setlist) => setlist.as_song_list(),
             None => SongListModel::new(),
         };
-        let on_setlist_change = self.props.on_setlist_change.reform(|e| e);
-        let highlighted_song_id = self
-            .props
+        let on_setlist_change = ctx.props().on_setlist_change.reform(|e| e);
+        let highlighted_song_id = ctx
+            .props()
             .current_song_info
             .as_ref()
             .map(|info| info.song.id());
@@ -71,68 +70,68 @@ impl Nav {
         let item_selector = ".song-browser-song-list.song-list .grid-button".to_string();
 
         html! {
-            <Dropzone class="song-list-container" on_drop=on_drop item_selector=item_selector>
+            <Dropzone class="song-list-container" {on_drop} {item_selector}>
                 {name_element}
                 <SongListView
-                    songs=songs
-                    on_setlist_change=on_setlist_change
-                    sortable=self.props.expand
-                    highlighted_song_id=highlighted_song_id
+                    {songs}
+                    {on_setlist_change}
+                    sortable={ctx.props().expand}
+                    {highlighted_song_id}
                 />
             </Dropzone>
         }
     }
 
-    fn view_nav_footer(&self) -> Html {
-        let toggle_menu = self.props.on_toggle.reform(|_| ());
+    fn view_nav_footer(&self, ctx: &Context<Self>) -> Html {
+        let toggle_menu = ctx.props().on_toggle.reform(|_| ());
 
-        let session = self.props.state.session();
-        let state = self.props.state.clone();
+        let session = ctx.props().state.session();
+        let state = ctx.props().state.clone();
         let setlist_share_button = match &state.current_setlist().clone() {
-            Some(s) => html! { <SetlistShareButton setlist=s/>},
+            Some(s) => html! { <SetlistShareButton setlist={s}/>},
             None => html! {},
         };
 
         let home_button = match state.available_version() {
             Some(_) => html! {
-                <a role="button" class="update" href="/" title="Update">
+                <Link role="button" class="update" to={AppRoute::Index} title="Update">
                     <i class="im im-sync"></i>
                     <span>{ "Update" }</span>
-                </a>
+                </Link>
             },
             None => html! {
-                <a role="button" class="home" href="/#" title="Go to home screen">
+                <Link role="button" class="home" to={AppRoute::Index} title="Go to home screen">
                     <i class="im im-home"></i>
                     <span>{ "Home" }</span>
-                </a>
+                </Link>
             },
         };
 
         let user_nav_button = if cfg!(feature = "server_sync") {
-            html! {<UserNavButton state=state session=session />}
+            html! {<UserNavButton {state} {session} />}
         } else {
             html! {}
         };
 
-        (if self.props.expand {
+        (if ctx.props().expand {
             html! {
                 <footer>
-                    <button class="toggle-menu" onclick=toggle_menu>
+                    <button class="toggle-menu" onclick={toggle_menu}>
                         <i class="im im-angle-right"></i>
                     </button>
                     {setlist_share_button}
                     {home_button}
-                    <a role="button" class="setlist" href={route("/setlist/list")} title="List setlists">
+                    <Link role="button" class="setlist" to={AppRoute::SetlistList} title="List setlists">
                         <i class="im im-data"></i>
                         <span>{ "Setlist" }</span>
-                    </a>
+                    </Link>
                     {user_nav_button}
                 </footer>
             }
         } else {
             html! {
                 <footer>
-                    <button class="toggle-menu" onclick=toggle_menu>
+                    <button class="toggle-menu" onclick={toggle_menu}>
                         <i class="im im-angle-left"></i>
                     </button>
                 </footer>
@@ -140,12 +139,12 @@ impl Nav {
         }) as Html
     }
 
-    fn view_notes_section(&self) -> Html {
-        (match &self.props.current_song_info {
+    fn view_notes_section(&self, ctx: &Context<Self>) -> Html {
+        (match &ctx.props().current_song_info {
             Some(i) => {
-                let on_settings_change = self.props.on_settings_change.reform(|e| e);
+                let on_settings_change = ctx.props().on_settings_change.reform(|e| e);
 
-                html! {<SongNotes song_info=i.clone() on_change=on_settings_change/>}
+                html! {<SongNotes song_info={i.clone()} on_change={on_settings_change}/>}
             }
             None => html! {},
         }) as Html
@@ -156,39 +155,26 @@ impl Component for Nav {
     type Message = ();
     type Properties = NavProps;
 
-    fn create(props: Self::Properties, _link: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _msg: Self::Message) -> ShouldRender {
-        true
-    }
-
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        if self.props != props {
-            self.props = props;
-            true
-        } else {
-            false
-        }
-    }
-
-    fn view(&self) -> Html {
+    fn view(&self, ctx: &Context<Self>) -> Html {
         let mut menu_classes = vec!["menu"];
-        if self.props.expand {
+        if ctx.props().expand {
             menu_classes.push("-visible");
         } else {
             menu_classes.push("-hidden");
         };
-        if self.props.current_song_info.is_some() {
+        if ctx.props().current_song_info.is_some() {
             menu_classes.push("-w-notes");
         }
 
         (html! {
-            <nav class=menu_classes>
-                { self.view_song_list() }
-                { self.view_notes_section() }
-                { self.view_nav_footer() }
+            <nav class={menu_classes}>
+                { self.view_song_list(ctx) }
+                { self.view_notes_section(ctx) }
+                { self.view_nav_footer(ctx) }
             </nav>
         }) as Html
     }

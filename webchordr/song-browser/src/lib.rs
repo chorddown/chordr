@@ -1,13 +1,14 @@
 use std::rc::Rc;
 
 use yew::prelude::*;
-use yew::{Component, ComponentLink, ShouldRender};
+use yew::Component;
 
 use libchordr::models::catalog::*;
 use libchordr::models::song_data::SongData;
 use libchordr::prelude::SongSorting;
 use libchordr::prelude::{ListEntryTrait, Song};
-use webchordr_common::route::route;
+use webchordr_common::components::link::Link;
+use webchordr_common::route::{route, AppRoute};
 use webchordr_song_list::Item as SongItem;
 
 use self::index::*;
@@ -18,9 +19,7 @@ mod index;
 mod index_item;
 mod link;
 
-pub struct SongBrowser {
-    props: SongBrowserProps,
-}
+pub struct SongBrowser {}
 
 const SONG_BROWSER_PLACEHOLDER: &str = "_";
 
@@ -32,52 +31,52 @@ pub struct SongBrowserProps {
 
 impl SongBrowser {
     /// Return the [Song]s from the [Catalog] filtered by [props.chars]
-    fn get_filtered_songs(&self) -> Vec<&Song> {
-        let songs: Vec<&Song> = if self.has_chars() {
-            let chars = &self.props.chars;
-            self.props
+    fn get_filtered_songs<'a, 'b>(&'a self, ctx: &'b Context<Self>) -> Vec<&'b Song> {
+        let songs: Vec<&Song> = if self.has_chars(ctx) {
+            let chars = &ctx.props().chars;
+            ctx.props()
                 .catalog
                 .iter()
                 .filter(|s| str::starts_with(&s.title().to_lowercase(), chars))
                 .collect()
         } else {
-            self.props.catalog.iter().collect()
+            ctx.props().catalog.iter().collect()
         };
 
         songs.sort_by_title()
     }
 
     /// Return the indexes for the filtered [Song]s
-    fn get_indexes_for_filtered_songs(&self) -> Vec<Index> {
-        let root_chars = if self.has_chars() {
-            &self.props.chars
+    fn get_indexes_for_filtered_songs(&self, ctx: &Context<Self>) -> Vec<Index> {
+        let root_chars = if self.has_chars(ctx) {
+            &ctx.props().chars
         } else {
             ""
         };
-        build_indexes(self.get_filtered_songs(), root_chars)
+        build_indexes(self.get_filtered_songs(ctx), root_chars)
     }
 
-    fn has_chars(&self) -> bool {
-        let chars = &self.props.chars;
+    fn has_chars(&self, ctx: &Context<Self>) -> bool {
+        let chars = &ctx.props().chars;
 
         !chars.is_empty() && chars != SONG_BROWSER_PLACEHOLDER
     }
 
-    fn get_back_link(&self) -> Html {
-        (if self.has_chars() {
-            let chars = &self.props.chars;
-            let parameter = self.get_back_link_parameter(chars);
+    fn get_back_link(&self, ctx: &Context<Self>) -> Html {
+        (if self.has_chars(ctx) {
+            let chars = &ctx.props().chars;
+            let parameter = self.get_back_link_parameter(ctx, chars);
 
-            let href = route(format!("song-browser/{}", parameter));
+            let to = AppRoute::SongBrowser { chars: parameter };
 
-            html! { <a class="song-browser-back back-link -inline" href=href><i class="im im-angle-left"></i>{ "Back" }</a> }
+            html! { <Link class="song-browser-back back-link -inline" {to}><i class="im im-angle-left"></i>{ "Back" }</Link> }
         } else {
             html! {}
         }) as Html
     }
 
-    fn get_back_link_parameter(&self, chars: &str) -> String {
-        if !self.has_chars() {
+    fn get_back_link_parameter(&self, ctx: &Context<Self>, chars: &str) -> String {
+        if !self.has_chars(ctx) {
             return SONG_BROWSER_PLACEHOLDER.to_owned();
         }
 
@@ -93,9 +92,9 @@ impl SongBrowser {
         }
     }
 
-    fn render_header(&self) -> Html {
-        let header_suffix = if self.has_chars() {
-            html! { <>{":"} <span class="song-browser-header-suffix">{&self.props.chars}</span></> }
+    fn render_header(&self, ctx: &Context<Self>) -> Html {
+        let header_suffix = if self.has_chars(ctx) {
+            html! { <>{":"} <span class="song-browser-header-suffix">{&ctx.props().chars}</span></> }
         } else {
             html! {}
         };
@@ -108,62 +107,49 @@ impl Component for SongBrowser {
     type Message = ();
     type Properties = SongBrowserProps;
 
-    fn create(props: Self::Properties, _link: ComponentLink<Self>) -> Self {
-        SongBrowser { props }
+    fn create(ctx: &Context<Self>) -> Self {
+        SongBrowser {}
     }
 
-    fn update(&mut self, _msg: Self::Message) -> ShouldRender {
-        true
-    }
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let songs = self.get_filtered_songs(ctx);
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        if self.props != props {
-            self.props = props;
-            true
+        if songs.len() > 24 || !self.has_chars(ctx) {
+            self.render_index(ctx)
         } else {
-            false
-        }
-    }
-
-    fn view(&self) -> Html {
-        let songs = self.get_filtered_songs();
-
-        if songs.len() > 24 || !self.has_chars() {
-            self.render_index()
-        } else {
-            self.render_songs(songs)
+            self.render_songs(ctx, songs)
         }
     }
 }
 
 impl SongBrowser {
-    fn render_index(&self) -> Html {
+    fn render_index(&self, ctx: &Context<Self>) -> Html {
         let render_index_item = |index: Index| {
             let key = index.chars.clone();
 
             html! {
                 <div class="col-xs-12 col-sm-6 col-3">
                     <IndexItem class="song-browser-index-item grid-button"
-                        key=key
-                        index=index/>
+                        key={key}
+                        index={index}/>
                 </div>
             }
         };
 
-        let indexes_for_filtered_songs = self.get_indexes_for_filtered_songs();
+        let indexes_for_filtered_songs = self.get_indexes_for_filtered_songs(ctx);
 
         html! {
             <div class="song-browser-index-list">
-                {self.render_header()}
+                {self.render_header(ctx)}
                 <div class="row grid">
                     { for indexes_for_filtered_songs.into_iter().map(render_index_item) }
                 </div>
-                {self.get_back_link()}
+                {self.get_back_link(ctx)}
             </div>
         }
     }
 
-    fn render_songs(&self, songs: Vec<&Song>) -> Html {
+    fn render_songs(&self, ctx: &Context<Self>, songs: Vec<&Song>) -> Html {
         let render_song_item = |song: &Song| {
             let data_key = song.title();
             let song_id = song.id();
@@ -171,19 +157,19 @@ impl SongBrowser {
 
             html! {
                 <SongItem<Song> class="song-item grid-button"
-                    key=key
-                    data_key=data_key
-                    song=song.clone()/>
+                    key={key}
+                    data_key={data_key}
+                    song={song.clone()}/>
             }
         };
 
         html! {
             <div class="song-browser-song-list song-list">
-                {self.render_header()}
+                {self.render_header(ctx)}
                 <div class="columns-md-2">
                     { for songs.into_iter().map(render_song_item) }
                 </div>
-                {self.get_back_link()}
+                {self.get_back_link(ctx)}
             </div>
         }
     }

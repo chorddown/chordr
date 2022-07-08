@@ -11,7 +11,7 @@ pub enum BrowserStorageType {
     SessionStorage,
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub struct BrowserStorage {
     storage: Storage,
 }

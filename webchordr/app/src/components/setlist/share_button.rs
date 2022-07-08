@@ -14,8 +14,6 @@ pub struct SetlistProps {
 
 pub struct SetlistShareButton {
     modal_visible: bool,
-    props: SetlistProps,
-    link: ComponentLink<Self>,
 }
 
 #[derive(Debug)]
@@ -30,15 +28,13 @@ impl Component for SetlistShareButton {
     type Message = Msg;
     type Properties = SetlistProps;
 
-    fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
+    fn create(ctx: &Context<Self>) -> Self {
         Self {
             modal_visible: false,
-            props,
-            link,
         }
     }
 
-    fn update(&mut self, msg: Self::Message) -> ShouldRender {
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::Show => {
                 debug!("{:?}", msg);
@@ -56,19 +52,10 @@ impl Component for SetlistShareButton {
         true
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        if self.props != props {
-            self.props = props;
-            true
-        } else {
-            false
-        }
-    }
-
-    fn view(&self) -> Html {
-        let handle_click = self.link.callback(|_| Msg::Toggle);
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let handle_click = ctx.link().callback(|_| Msg::Toggle);
         let button = html! {
-            <button onclick=handle_click title="Share">
+            <button onclick={handle_click} title="Share">
                 <i class="im im-share"></i>
                 <span>{ "Share" }</span>
             </button>
@@ -77,7 +64,7 @@ impl Component for SetlistShareButton {
         (if !self.modal_visible {
             button
         } else {
-            let modal = self.build_modal();
+            let modal = self.build_modal(ctx);
 
             html! {
                 <>
@@ -90,9 +77,9 @@ impl Component for SetlistShareButton {
 }
 
 impl SetlistShareButton {
-    fn build_share_url(&self) -> Result<String, WebError> {
+    fn build_share_url(&self, ctx: &Context<Self>) -> Result<String, WebError> {
         let host = crate::helpers::window().location().host()?;
-        let serialized = SetlistSerializeService::serialize(self.props.setlist.as_ref())?;
+        let serialized = SetlistSerializeService::serialize(ctx.props().setlist.as_ref())?;
 
         Ok(format!(
             "{}/{}{}",
@@ -100,20 +87,20 @@ impl SetlistShareButton {
         ))
     }
 
-    fn build_modal(&self) -> Html {
-        (match self.build_share_url() {
+    fn build_modal(&self, ctx: &Context<Self>) -> Html {
+        (match self.build_share_url(ctx) {
             Ok(share_url) => {
-                let handle_modal_close = self.link.callback(|_| Msg::Hide);
+                let handle_modal_close = ctx.link().callback(|_| Msg::Hide);
 
                 html! {
                     <Modal
-                        visible=true
+                        visible={true}
                         header_text="Share your Setlist"
                         class="setlist-share"
-                        on_close=handle_modal_close
+                        on_close={handle_modal_close}
                         >
                         <div class="clipboard-widget setlist-share">
-                            <input type="text" id="setlist-share" readonly=true value=share_url/>
+                            <input type="text" id="setlist-share" readonly={true} value={share_url}/>
                             <button class="btn" data-clipboard-target="#setlist-share">
                                 <i class="im im-copy"></i>
                             </button>
@@ -124,7 +111,7 @@ impl SetlistShareButton {
             Err(e) => {
                 html! {
                     <Modal
-                        visible=true
+                        visible={true}
                         header_text="Error building Share-URL"
                         class="setlist-share">
                         {e}

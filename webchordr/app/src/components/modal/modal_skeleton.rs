@@ -7,39 +7,23 @@ pub struct ModalProps {
     pub class: Class,
 }
 
-pub struct ModalSkeleton {
-    props: ModalProps,
-}
+pub struct ModalSkeleton {}
 
 impl Component for ModalSkeleton {
     type Message = ();
     type Properties = ModalProps;
 
-    fn create(props: Self::Properties, _link: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _msg: Self::Message) -> ShouldRender {
-        true
-    }
-
-    fn change(&mut self, props: Self::Properties) -> bool {
-        if props != self.props {
-            self.props = props;
-
-            true
-        } else {
-            false
-        }
-    }
-
-    fn view(&self) -> Html {
-        let class = self.props.class.add("modal");
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let class = ctx.props().class.add("modal");
 
         html! {
             <div class="modal-outer">
-                <div class=class>
-                    {{ self.props.children.iter().collect::<Html>() }}
+                <div class={class}>
+                    {{ ctx.props().children.iter().collect::<Html>() }}
                 </div>
             </div>
         }

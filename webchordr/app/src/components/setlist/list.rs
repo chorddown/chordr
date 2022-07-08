@@ -29,9 +29,14 @@ pub struct ListProps {
     pub on_event: Callback<Event>,
 }
 
+impl PartialEq for ListProps {
+    fn eq(&self, other: &Self) -> bool {
+        self.setlists == other.setlists
+            && self.state == other.state
+            && self.on_event == other.on_event
+    }
+}
 pub struct List {
-    props: ListProps,
-    link: ComponentLink<Self>,
     setlists: Option<Vec<Setlist>>,
     error: Option<WebError>,
 }
@@ -50,51 +55,37 @@ impl Component for List {
     type Message = Msg;
     type Properties = ListProps;
 
-    fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         Self {
-            props,
-            link,
             setlists: None,
             error: None,
         }
     }
 
-    fn update(&mut self, msg: Self::Message) -> ShouldRender {
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            Msg::FindAll => self.find_all_setlists(),
-            Msg::Add(setlist) => self.persist_new_setlist(setlist),
-            Msg::Load(setlist) => self.load_setlist(setlist),
-            Msg::Delete(setlist) => self.delete_setlist(setlist),
+            Msg::FindAll => self.find_all_setlists(ctx),
+            Msg::Add(setlist) => self.persist_new_setlist(ctx, setlist),
+            Msg::Load(setlist) => self.load_setlist(ctx, setlist),
+            Msg::Delete(setlist) => self.delete_setlist(ctx, setlist),
             Msg::SetlistsLoaded(v) => self.setlists = Some(v),
             Msg::LoadError(e) => self.error = Some(e),
         }
         true
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        if self.props.setlists != props.setlists
-            || self.props.state != props.state
-            || self.props.on_event != props.on_event
-        {
-            self.props = props;
-            true
-        } else {
-            false
-        }
-    }
-
-    fn view(&self) -> Html {
+    fn view(&self, ctx: &Context<Self>) -> Html {
         if self.setlists.is_none() {
-            self.find_all_setlists();
+            self.find_all_setlists(ctx);
 
             return html! {};
         }
-        let state = self.props.state.clone();
+        let state = ctx.props().state.clone();
         let current_setlist = state.current_setlist();
         let render = |setlist: &Setlist| {
             let key = setlist.id();
-            let on_load_click = self.link.callback(|s| Msg::Load(s));
-            let on_delete_click = self.link.callback(|s| Msg::Delete(s));
+            let on_load_click = ctx.link().callback(|s| Msg::Load(s));
+            let on_delete_click = ctx.link().callback(|s| Msg::Delete(s));
 
             let highlight = match current_setlist {
                 Some(ref c) => c.id() == setlist.id(),
@@ -102,19 +93,19 @@ impl Component for List {
             };
 
             html! {
-                <li key=key>
+                <li key={key}>
                     <Item
-                        on_load_click=on_load_click
-                        on_delete_click=on_delete_click
-                        setlist=setlist.clone()
-                        highlight=highlight
+                        {on_load_click}
+                        {on_delete_click}
+                        setlist={setlist.clone()}
+                        {highlight}
                     />
                 </li>
             }
         };
 
         let entries = self.setlists.as_ref().unwrap().iter();
-        let on_add_button_click = self.link.callback(|s| Msg::Add(s));
+        let on_add_button_click = ctx.link().callback(|s| Msg::Add(s));
         debug!("Redraw {} setlists", entries.len());
 
         (html! {
@@ -125,15 +116,15 @@ impl Component for List {
                 <div class="button-group">
                     <AddButton
                         text="Create empty setlist"
-                        state=state.clone()
-                        on_click=on_add_button_click.clone()
-                        clone_current=false
+                        state={state.clone()}
+                        on_click={on_add_button_click.clone()}
+                        clone_current={false}
                     />
                     <AddButton
                         text="Copy current setlist"
-                        state=state
-                        on_click=on_add_button_click
-                        clone_current=true
+                        {state}
+                        on_click={on_add_button_click}
+                        clone_current={true}
                     />
                 </div>
             </div>
@@ -142,10 +133,10 @@ impl Component for List {
 }
 
 impl List {
-    fn find_all_setlists(&self) {
-        let pm = self.props.persistence_manager.clone();
-        let finished = self
-            .link
+    fn find_all_setlists(&self, ctx: &Context<Self>) {
+        let pm = ctx.props().persistence_manager.clone();
+        let finished = ctx
+            .link()
             .callback(|result: Result<Vec<Setlist>, _>| match result {
                 Ok(mut l) => {
                     l.sort_by(|a, b| a.name().cmp(b.name()));
@@ -161,10 +152,10 @@ impl List {
         });
     }
 
-    fn persist_new_setlist(&mut self, setlist: Setlist) {
-        let pm = self.props.persistence_manager.clone();
-        let on_ok = self
-            .link
+    fn persist_new_setlist(&mut self, ctx: &Context<Self>, setlist: Setlist) {
+        let pm = ctx.props().persistence_manager.clone();
+        let on_ok = ctx
+            .link()
             .batch_callback(|s| vec![Msg::FindAll, Msg::Load(s)]);
 
         spawn_local(async move {
@@ -177,19 +168,19 @@ impl List {
         });
     }
 
-    fn load_setlist(&self, setlist: Setlist) {
-        self.props
+    fn load_setlist(&self, ctx: &Context<Self>, setlist: Setlist) {
+        ctx.props()
             .on_event
             .emit(SetlistEvent::SetCurrentSetlist(setlist).into())
     }
 
-    fn delete_setlist(&self, setlist: Setlist) {
+    fn delete_setlist(&self, ctx: &Context<Self>, setlist: Setlist) {
         if !confirm(&format!("Delete setlist '{}'?", setlist.name())) {
             return;
         }
 
-        let send_reload = self.link.callback(|_| Msg::FindAll);
-        let pm = self.props.persistence_manager.clone();
+        let send_reload = ctx.link().callback(|_| Msg::FindAll);
+        let pm = ctx.props().persistence_manager.clone();
 
         spawn_local(async move {
             let result = SetlistWebRepository::new(&*pm)

@@ -7,19 +7,11 @@ impl Component for Nbsp {
     type Message = ();
     type Properties = ();
 
-    fn create(_props: Self::Properties, _link: ComponentLink<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         Self {}
     }
 
-    fn change(&mut self, _: Self::Properties) -> ShouldRender {
-        false
-    }
-
-    fn update(&mut self, _msg: Self::Message) -> bool {
-        true
-    }
-
-    fn view(&self) -> VNode {
+    fn view(&self, ctx: &Context<Self>) -> VNode {
         html! { "\u{00a0}" }
     }
 }

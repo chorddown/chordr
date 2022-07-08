@@ -39,8 +39,7 @@ pub enum Msg {
 }
 
 pub struct SongList {
-    props: SongListProps,
-    link: ComponentLink<Self>,
+    clear: bool,
     node_ref: NodeRef,
     sortable_service: SortableService,
     sortable_handle: Option<SortableHandle>,
@@ -50,25 +49,25 @@ impl Component for SongList {
     type Message = Msg;
     type Properties = SongListProps;
 
-    fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
+    fn create(ctx: &Context<Self>) -> Self {
         Self {
-            props,
-            link,
+            clear: false,
             node_ref: NodeRef::default(),
             sortable_service: SortableService::new(),
             sortable_handle: None,
         }
     }
 
-    fn update(&mut self, msg: Self::Message) -> ShouldRender {
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::SetlistChangeSorting(e) => {
-                let sorting_change = self.patch_sorting_change(e);
+                let sorting_change = self.patch_sorting_change(ctx, e);
                 if sorting_change.new_index() != sorting_change.old_index() {
-                    self.props.on_setlist_change.emit(Event::SetlistEvent(
+                    ctx.props().on_setlist_change.emit(Event::SetlistEvent(
                         SetlistEvent::SortingChange(sorting_change),
                     ));
-                    self.props.songs = SongListModel::new();
+                    self.clear = true;
+                    // ctx.props().songs = SongListModel::new();
                     true
                 } else {
                     false
@@ -77,25 +76,24 @@ impl Component for SongList {
         }
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        if self.props != props {
-            self.props = props;
-
-            if self.props.sortable {
-                self.make_sortable();
-            } else {
-                self.make_unsortable();
-            }
-            true
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        if ctx.props().sortable {
+            self.make_sortable(ctx);
         } else {
-            false
+            self.make_unsortable();
         }
+        true
     }
 
-    fn view(&self) -> Html {
-        let songs = &self.props.songs;
-        let sortable = self.props.sortable;
-        let highlighted_song_id = &self.props.highlighted_song_id;
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let empty_list = SongListModel::new();
+        let songs = if self.clear {
+            &empty_list
+        } else {
+            &ctx.props().songs
+        };
+        let sortable = ctx.props().sortable;
+        let highlighted_song_id = &ctx.props().highlighted_song_id;
         let render = |song: SetlistEntry| {
             let data_key = song.title();
             let song_id = song.id();
@@ -107,7 +105,7 @@ impl Component for SongList {
                 false
             };
 
-            html! { <Item<SetlistEntry> key=key data_key=data_key song=song sortable=sortable highlight=highlight /> }
+            html! { <Item<SetlistEntry> key={key} data_key={data_key} song={song} sortable={sortable} highlight={highlight} /> }
         };
 
         let entries = songs.clone().into_iter();
@@ -116,21 +114,21 @@ impl Component for SongList {
         info!("Redraw song list {:?}", songs);
 
         (html! {
-            <div class="song-list" ref=self.node_ref.clone()>
+            <div class="song-list" ref={self.node_ref.clone()}>
                 {for entries.map(render)}
             </div>
         }) as Html
     }
 
-    fn rendered(&mut self, _: bool) {
-        if self.props.sortable {
-            self.make_sortable();
+    fn rendered(&mut self, ctx: &Context<Self>, _: bool) {
+        if ctx.props().sortable {
+            self.make_sortable(ctx);
         }
     }
 }
 
 impl SongList {
-    fn make_sortable(&mut self) {
+    fn make_sortable(&mut self, ctx: &Context<Self>) {
         match self.sortable_handle {
             None => {
                 if let Some(element) = self.node_ref.cast::<HtmlElement>() {
@@ -143,7 +141,7 @@ impl SongList {
                         .sortable_service
                         .make_sortable(
                             element,
-                            self.link.callback(Msg::SetlistChangeSorting),
+                            ctx.link().callback(Msg::SetlistChangeSorting),
                             options,
                         )
                         .ok();
@@ -161,10 +159,10 @@ impl SongList {
 
     /// Patch the Sorting Change value
     ///
-    /// The JS library may report that the element was moved to index `self.props.songs.len()`. If
+    /// The JS library may report that the element was moved to index `ctx.props().songs.len()`. If
     /// that's the case, patch the value
-    fn patch_sorting_change(&self, e: SortingChange) -> SortingChange {
-        let song_count = self.props.songs.len();
+    fn patch_sorting_change(&self, ctx: &Context<Self>, e: SortingChange) -> SortingChange {
+        let song_count = ctx.props().songs.len();
         if e.new_index() == song_count {
             let last_index = song_count - 1;
             info!(

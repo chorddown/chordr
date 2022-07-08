@@ -2,13 +2,15 @@ use std::rc::Rc;
 
 use gloo_timers::callback::Timeout;
 use log::{debug, info};
+use web_sys::HtmlInputElement;
 use yew::prelude::*;
-use yew::{Component, ComponentLink, ShouldRender};
+use yew::Component;
 
 use libchordr::models::catalog::*;
 use libchordr::models::list::ListEntryTrait;
 use libchordr::prelude::{SearchIndex, Song, SongData, SongSorting};
-use webchordr_common::route::route;
+use webchordr_common::components::link::Link;
+use webchordr_common::route::{route, AppRoute};
 use webchordr_song_list::Item as SongItem;
 
 use self::link::SongSearchLink;
@@ -17,9 +19,7 @@ mod link;
 
 pub struct SongSearch {
     search: String,
-    props: SongSearchProps,
-    /// Utility object
-    link: ComponentLink<Self>,
+    catalog_revision: String,
     search_index: Option<SearchIndex>,
     timeout: Option<Timeout>,
 }
@@ -32,9 +32,9 @@ pub struct SongSearchProps {
 
 impl SongSearch {
     /// Return the [Song]s from the [Catalog] filtered by [self.search]
-    fn get_filtered_songs(&self) -> Vec<&Song> {
+    fn get_filtered_songs<'b>(&'b self, ctx: &'b Context<Self>) -> Vec<&'b Song> {
         if self.search.is_empty() || self.search_index.is_none() {
-            self.get_all_songs()
+            self.get_all_songs(ctx)
         } else {
             self.search_index
                 .as_ref()
@@ -44,8 +44,8 @@ impl SongSearch {
         }
     }
 
-    fn get_all_songs(&self) -> Vec<&Song> {
-        self.props
+    fn get_all_songs<'b>(&self, ctx: &'b Context<Self>) -> Vec<&'b Song> {
+        ctx.props()
             .catalog
             .iter()
             .collect::<Vec<&Song>>()
@@ -56,23 +56,27 @@ impl SongSearch {
         !self.search.is_empty() && !self.search.trim().is_empty() && self.search_index.is_none()
     }
 
-    fn get_back_link(&self) -> Html {
-        (if self.props.show_back_button {
-            let href = route("/");
-
-            html! { <a class="song-search-back back-link -inline" href=href><i class="im im-angle-left"></i>{ "Back" }</a> }
+    fn get_back_link(&self, ctx: &Context<Self>) -> Html {
+        (if ctx.props().show_back_button {
+            html! { <Link class="song-search-back back-link -inline" to={AppRoute::Index}><i class="im im-angle-left"></i>{ "Back" }</Link> }
         } else {
             html! {}
         }) as Html
     }
 
-    fn render_filter(&self) -> Html {
+    fn render_filter(&self, ctx: &Context<Self>) -> Html {
+        let oninput = ctx.link().callback(|e: InputEvent| {
+            // You must KNOW target is a HtmlInputElement, otherwise
+            // the call to value would be Undefined Behaviour (UB).
+            Msg::SearchChange(e.target_unchecked_into::<HtmlInputElement>().value())
+        });
+
         (html! {
             <>
                 <h1><SongSearchLink />{"Search Songs"}</h1>
                 <input type="search"
-                       value=self.search.clone()
-                       oninput=self.link.callback(|e: InputData| Msg::SearchChange(e.value))
+                       value={self.search.clone()}
+                       {oninput}
                        placeholder="Search"/>
             </>
         }) as Html
@@ -89,17 +93,16 @@ impl Component for SongSearch {
     type Message = Msg;
     type Properties = SongSearchProps;
 
-    fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
+    fn create(ctx: &Context<Self>) -> Self {
         SongSearch {
-            props,
-            link,
             search: String::new(),
+            catalog_revision: ctx.props().catalog.revision().clone(),
             search_index: None,
             timeout: None,
         }
     }
 
-    fn update(&mut self, msg: Self::Message) -> ShouldRender {
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::SearchChange(new_search) => {
                 // Clear the previous timer if one exists
@@ -108,7 +111,7 @@ impl Component for SongSearch {
                 }
 
                 // Debounce the handling of user input
-                let debounced = self.link.callback(|new_search| Msg::Debounce(new_search));
+                let debounced = ctx.link().callback(|new_search| Msg::Debounce(new_search));
                 self.timeout = Some(Timeout::new(100, move || {
                     debounced.emit(new_search);
                 }));
@@ -124,28 +127,23 @@ impl Component for SongSearch {
             }
 
             Msg::BuildSearchIndex => {
-                self.search_index = Some(build_search_index_from_props(&self.props));
+                self.search_index = Some(build_search_index_from_props(&ctx.props()));
 
                 true
             }
         }
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        if self.props != props {
-            let catalog_changed = self.props.catalog.revision() != props.catalog.revision();
-            if catalog_changed {
-                self.search_index = None;
-            }
-            self.props = props;
-
-            true
-        } else {
-            false
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        let catalog_changed = ctx.props().catalog.revision() != self.catalog_revision;
+        if catalog_changed {
+            self.search_index = None;
+            self.catalog_revision = ctx.props().catalog.revision();
         }
+        true
     }
 
-    fn view(&self) -> Html {
+    fn view(&self, ctx: &Context<Self>) -> Html {
         let render_song_item = |song: &Song| {
             let data_key = song.title();
             let song_id = song.id();
@@ -153,18 +151,18 @@ impl Component for SongSearch {
 
             html! {
                 <SongItem<Song> class="song-item button"
-                    key=key
-                    data_key=data_key
-                    song=song.clone()/>
+                    {key}
+                    {data_key}
+                    song={song.clone()}/>
             }
         };
 
         let songs = if self.needs_to_build_search_index() {
-            self.link.send_message(Msg::BuildSearchIndex);
+            ctx.link().send_message(Msg::BuildSearchIndex);
 
-            self.get_all_songs()
+            self.get_all_songs(ctx)
         } else {
-            self.get_filtered_songs()
+            self.get_filtered_songs(ctx)
         };
 
         let inner = if !songs.is_empty() {
@@ -174,9 +172,9 @@ impl Component for SongSearch {
         };
         html! {
             <div class="song-search-song-list song-list">
-                {self.render_filter()}
+                {self.render_filter(ctx)}
                 {inner}
-                {self.get_back_link()}
+                {self.get_back_link(ctx)}
             </div>
         }
     }

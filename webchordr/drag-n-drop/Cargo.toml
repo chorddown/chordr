@@ -6,7 +6,7 @@ edition = "2021"
 [dependencies]
 serde = "1"
 webchordr-common = { path = "../common" }
-yew = "0.18"
+yew = "0.19"
 js-sys = "0.3.44"
 wasm-bindgen-futures = "0.4.17"
 

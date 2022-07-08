@@ -13,7 +13,7 @@ libchordr = { path = "../../libchordr" }
 webchordr-events = { path = "../events" }
 webchordr-song-list = { path = "../song-list" }
 webchordr-common = { path = "../common" }
-yew = "0.18"
+yew = "0.19"
 js-sys = "0.3.44"
 wasm-bindgen-futures = "0.4.17"
 chrono = { version = "*", features = ["serde", "wasmbind"] }

@@ -1,14 +1,15 @@
+use std::marker::PhantomData;
 use yew::prelude::*;
 use yew::virtual_dom::VNode;
-use yew::{Component, ComponentLink};
+use yew::Component;
 
 use libchordr::prelude::*;
-
+use webchordr_common::components::link::Link;
 use webchordr_common::helpers::Class;
-use webchordr_common::route::route;
+use webchordr_common::route::{route, AppRoute};
 
 #[derive(Properties, PartialEq, Clone)]
-pub struct SongListItemProps<S: SongData + Clone> {
+pub struct SongListItemProps<S: SongData + Clone + PartialEq> {
     pub song: S,
     pub data_key: String,
 
@@ -27,28 +28,25 @@ pub struct SongListItemProps<S: SongData + Clone> {
 
 #[allow(dead_code)]
 pub struct Item<S: SongData + PartialEq + 'static + Clone> {
-    /// State from the parent
-    props: SongListItemProps<S>,
-    /// Utility object
-    link: ComponentLink<Self>,
+    _ph: PhantomData<S>,
 }
 
 impl<S: SongData + PartialEq + 'static + Clone> Item<S> {
-    fn get_class(&self) -> Class {
-        let base_class = self.props.class.or("song-item");
-        let class = if self.props.highlight {
+    fn get_class(&self, ctx: &Context<Self>) -> Class {
+        let base_class = ctx.props().class.or("song-item");
+        let class = if ctx.props().highlight {
             base_class.add("-highlight")
         } else {
             base_class
         };
 
-        let class = if self.props.sortable {
+        let class = if ctx.props().sortable {
             class.add("-sortable")
         } else {
             class
         };
 
-        if self.props.draggable {
+        if ctx.props().draggable {
             class.add("-draggable")
         } else {
             class
@@ -60,41 +58,38 @@ impl<S: SongData + PartialEq + 'static + Clone> Component for Item<S> {
     type Message = ();
     type Properties = SongListItemProps<S>;
 
-    fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        Self { link, props }
-    }
-
-    fn update(&mut self, _msg: Self::Message) -> bool {
-        true
-    }
-
-    fn change(&mut self, props: Self::Properties) -> bool {
-        if self.props != props {
-            self.props = props;
-            true
-        } else {
-            false
+    fn create(ctx: &Context<Self>) -> Self {
+        Self {
+            _ph: PhantomData::default(),
         }
     }
 
-    fn view(&self) -> VNode {
-        let title = &self.props.song.title();
-        let key = &self.props.data_key;
-        let id = self.props.song.id().to_string();
+    fn update(&mut self, ctx: &Context<Self>, _msg: Self::Message) -> bool {
+        true
+    }
+
+    fn view(&self, ctx: &Context<Self>) -> VNode {
+        let title = &ctx.props().song.title();
+        let key = &ctx.props().data_key;
+        let id = ctx.props().song.id().to_string();
         let href = route(&format!("song/{}", id));
-        let class = self.get_class();
-        let draggable = if self.props.draggable {
+        let class = self.get_class(ctx);
+        let draggable = if ctx.props().draggable {
             "true"
         } else {
             "false"
         };
-        let link =
-            html! { <a role="button" class="discreet" data-key=key.clone() href=href>{title}</a> };
 
-        (if self.props.sortable {
-            html! { <div class=class data-song-id=id draggable=draggable>{link}<span class="sortable-handle">{"::"}</span></div> }
+        let to = AppRoute::Song {
+            id: ctx.props().song.id(),
+        };
+        let link = html! { <Link role="button" class="discreet" data_key={key.clone()} to={to}>{title}</Link> };
+        // let link = html! { <a role="button" class="discreet" data-key={key.clone()} href={href}>{title}</a> };
+
+        (if ctx.props().sortable {
+            html! { <div class={class} data-song-id={id} draggable={draggable}>{link}<span class="sortable-handle">{"::"}</span></div> }
         } else {
-            html! { <div class=class data-song-id=id draggable=draggable>{link}</div> }
+            html! { <div class={class} data-song-id={id} draggable={draggable}>{link}</div> }
         }) as Html
     }
 }

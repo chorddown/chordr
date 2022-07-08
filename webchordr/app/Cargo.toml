@@ -31,8 +31,8 @@ webchordr-events = { path = "../events" }
 webchordr-song-list = { path = "../song-list" }
 webchordr-song-browser = { path = "../song-browser" }
 webchordr-persistence = { path = "../persistence" }
-yew = "0.18"
-yew-router = "0.15"
+yew = "0.19"
+yew-router = "0.16"
 percent-encoding = "2.1.0"
 wee_alloc = "0.4.5"
 wasm-logger = "0.2"

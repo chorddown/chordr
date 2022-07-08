@@ -32,6 +32,10 @@ impl Class {
         self.0.push(' ');
         self.0.push_str(class);
     }
+
+    pub fn to_classes(&self) -> Classes {
+        Classes::from(self.to_string())
+    }
 }
 
 impl Default for Class {

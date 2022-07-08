@@ -20,38 +20,22 @@ pub struct AddButtonProps {
     /// Define if the entries of the currently loaded Setlist should be copied to the new Setlist
     pub clone_current: bool,
 }
-pub struct AddButton {
-    props: AddButtonProps,
-    link: ComponentLink<Self>,
-}
+pub struct AddButton {}
 
 impl Component for AddButton {
     type Message = ();
     type Properties = AddButtonProps;
 
-    fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        Self { props, link }
+    fn create(ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _msg: Self::Message) -> ShouldRender {
-        true
-    }
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let state = ctx.props().state.clone();
+        let clone_current = ctx.props().clone_current;
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        if self.props != props {
-            self.props = props;
-            true
-        } else {
-            false
-        }
-    }
-
-    fn view(&self) -> Html {
-        let state = self.props.state.clone();
-        let clone_current = self.props.clone_current;
-
-        let on_click_parent = self.props.on_click.reform(|i| i);
-        let on_click = self.link.callback_once(move |_| {
+        let on_click_parent = ctx.props().on_click.reform(|i| i);
+        let on_click = ctx.link().callback(move |_| {
             if let Some(setlist) = AddButton::build_new_setlist(&state, clone_current) {
                 on_click_parent.emit(setlist)
             }
@@ -64,9 +48,9 @@ impl Component for AddButton {
         };
 
         html! {
-            <button class="setlist-add-button" onclick=on_click>
-                <i class=icon></i>
-                {&self.props.text}
+            <button class="setlist-add-button" onclick={on_click}>
+                <i class={icon}></i>
+                {&ctx.props().text}
             </button>
         }
     }

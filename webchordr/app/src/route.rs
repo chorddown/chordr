@@ -1,34 +1,42 @@
 use libchordr::models::song_id::SongId;
 use yew_router::prelude::*;
-
-#[derive(Switch, Debug, Clone)]
-pub enum AppRoute {
-    #[to = "/#/song/{id}"]
-    Song(SongId),
-    #[to = "/#/song-browser/{id}"]
-    SongBrowser(String),
-    #[to = "/#/song-search"]
-    SongSearch,
-    #[to = "/#/setlist{*:rest}"]
-    Setlist(SetlistRoute),
-    #[to = "/#/user{*:rest}"]
-    User(UserRoute),
-    #[to = "/index"]
-    Index,
-}
-
-#[derive(Switch, Debug, Clone)]
-pub enum SetlistRoute {
-    #[to = "/list"]
-    List,
-    #[to = "/load/{serialized_setlist}"]
-    Load { serialized_setlist: String },
-}
-
-#[derive(Switch, Debug, Clone)]
-pub enum UserRoute {
-    #[to = "/info"]
-    Info,
-    #[to = "/login"]
-    Login,
-}
+//
+// #[derive(Routable, Debug, Clone, PartialEq)]
+// pub enum AppRoute {
+//     #[at("/song/:id")]
+//     Song { id: SongId },
+//     #[at("/song-browser/:chars")]
+//     SongBrowser { chars: String },
+//     #[at("/song-search")]
+//     SongSearch,
+//     #[at("/setlist/list")]
+//     SetlistList,
+//     #[at("/setlist/load/:serialized_setlist")]
+//     SetlistLoad { serialized_setlist: String },
+//     #[at("/setlist/:r")]
+//     Setlist,
+//     #[at("/user/info")]
+//     UserInfo,
+//     #[at("/user/login")]
+//     UserLogin,
+//     #[at("/user/:r")]
+//     User,
+//     #[at("/")]
+//     Index,
+// }
+//
+// #[derive(Routable, Debug, Clone, PartialEq)]
+// pub enum SetlistRoute {
+//     #[at("/setlist/list")]
+//     List,
+//     #[at("/setlist/load/:serialized_setlist")]
+//     Load { serialized_setlist: String },
+// }
+//
+// #[derive(Routable, Debug, Clone, PartialEq)]
+// pub enum UserRoute {
+//     #[at("/user/info")]
+//     Info,
+//     #[at("/user/login")]
+//     Login,
+// }

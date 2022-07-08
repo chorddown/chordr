@@ -1,4 +1,6 @@
 use log::{debug, error};
+use wasm_bindgen::JsCast;
+use web_sys::{EventTarget, HtmlInputElement, HtmlTextAreaElement};
 use yew::prelude::*;
 
 use libchordr::prelude::{ListEntryTrait, SongId, SongSettings};
@@ -18,56 +20,59 @@ impl PartialEq for SongNotesProps {
 }
 
 pub enum Msg {
-    InputChange(ChangeData),
+    InputChange(String),
 }
 
-pub struct SongNotes {
-    props: SongNotesProps,
-    link: ComponentLink<Self>,
-}
+pub struct SongNotes {}
 
 impl Component for SongNotes {
     type Message = Msg;
     type Properties = SongNotesProps;
 
-    fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        Self { props, link }
+    fn create(ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, msg: Self::Message) -> ShouldRender {
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            Msg::InputChange(ChangeData::Value(v)) => {
-                let settings = self.props.song_info.song_settings.with_note(v);
+            Msg::InputChange(v) => {
+                let settings = ctx.props().song_info.song_settings.with_note(v);
 
-                self.props
+                ctx.props()
                     .on_change
-                    .emit((self.props.song_info.song.id(), settings));
-            }
-            Msg::InputChange(change_data) => error!("Invalid change data {:?}", change_data),
+                    .emit((ctx.props().song_info.song.id(), settings));
+            } // Msg::InputChange(change_data) => error!("Invalid change data {:?}", change_data),
         }
         true
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        if self.props != props {
-            self.props = props;
-            true
-        } else {
-            false
-        }
-    }
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let link = ctx.link();
 
-    fn view(&self) -> Html {
-        let onchange = self.link.callback(Msg::InputChange);
-        let notes = self.props.song_info.song_settings.note().to_owned();
+        // Use batch_callback so if something unexpected happens we can return
+        // None and do nothing
+        let onchange = link.batch_callback(|e: Event| {
+            // When events are created the target is undefined, it's only
+            // when dispatched does the target get added.
+            let target: Option<EventTarget> = e.target();
+            // Events can bubble so this listener might catch events from child
+            // elements which are not of type HtmlInputElement
+            let input = target.and_then(|t| t.dyn_into::<HtmlTextAreaElement>().ok());
+
+            input.map(|input| Msg::InputChange(input.value()))
+        });
+
+        // let onchange = ctx.link().callback(Msg::InputChange);
+        let notes = ctx.props().song_info.song_settings.note().to_owned();
         debug!(
             "Show notes: '{}' from Song Settings {:?}",
-            notes, self.props.song_info.song_settings
+            notes,
+            ctx.props().song_info.song_settings
         );
 
         (html! {
             <div class="song-notes">
-                <textarea placeholder={"Notes"} onchange=onchange value=notes />
+                <textarea placeholder={"Notes"} onchange={onchange} value={notes} />
             </div>
         }) as Html
     }

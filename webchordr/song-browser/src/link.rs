@@ -1,5 +1,6 @@
 use super::SONG_BROWSER_PLACEHOLDER;
-use webchordr_common::route::route;
+use webchordr_common::components::link::Link;
+use webchordr_common::route::{route, AppRoute};
 use yew::prelude::*;
 
 pub struct SongBrowserLink {}
@@ -8,21 +9,16 @@ impl Component for SongBrowserLink {
     type Message = ();
     type Properties = ();
 
-    fn create(_props: Self::Properties, _link: ComponentLink<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         SongBrowserLink {}
     }
 
-    fn update(&mut self, _msg: Self::Message) -> ShouldRender {
-        true
-    }
-
-    fn change(&mut self, _props: Self::Properties) -> ShouldRender {
-        false
-    }
-
-    fn view(&self) -> Html {
+    fn view(&self, ctx: &Context<Self>) -> Html {
         let href = route(format!("song-browser/{}", SONG_BROWSER_PLACEHOLDER));
 
-        html! { <a class="song-browser-home" href=href><i class="im im-home"></i></a> }
+        let to = AppRoute::SongBrowser {
+            chars: SONG_BROWSER_PLACEHOLDER.to_string(),
+        };
+        html! { <Link class="song-browser-home" {to}><i class="im im-home"></i></Link> }
     }
 }

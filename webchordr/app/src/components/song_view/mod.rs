@@ -4,7 +4,7 @@ use web_sys::window;
 use web_sys::Document;
 use yew::prelude::*;
 use yew::virtual_dom::VNode;
-use yew::{Component, ComponentLink};
+use yew::Component;
 
 use libchordr::models::song_settings::SongSettings;
 use libchordr::prelude::*;
@@ -54,38 +54,35 @@ pub enum Msg {
 }
 
 #[allow(dead_code)]
-pub struct SongView {
-    /// State from the parent
-    props: SongViewProps,
-    /// Utility object
-    link: ComponentLink<Self>,
-}
+pub struct SongView {}
 
 impl Component for SongView {
     type Message = Msg;
     type Properties = SongViewProps;
 
-    fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        Self { link, props }
+    fn create(ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, msg: Self::Message) -> ShouldRender {
-        let song_settings = self.props.song_info.song_settings.clone();
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+        let song_settings = ctx.props().song_info.song_settings.clone();
 
         match msg {
-            Msg::TransposeUp => self.change_transpose(song_settings.transpose_semitone() + 1),
-            Msg::TransposeDown => self.change_transpose(song_settings.transpose_semitone() - 1),
-            Msg::TransposeSet(v) => self.change_transpose(v),
-            Msg::SemitoneNotationChange(s) => self.change_semitone_notation(s),
+            Msg::TransposeUp => self.change_transpose(ctx, song_settings.transpose_semitone() + 1),
+            Msg::TransposeDown => {
+                self.change_transpose(ctx, song_settings.transpose_semitone() - 1)
+            }
+            Msg::TransposeSet(v) => self.change_transpose(ctx, v),
+            Msg::SemitoneNotationChange(s) => self.change_semitone_notation(ctx, s),
             Msg::SetlistChange(flag) => {
-                let song = &self.props.song_info.song;
+                let song = &ctx.props().song_info.song;
                 info!("Set Song {} on setlist: {:?}", song.id(), flag);
                 if flag {
-                    self.props
+                    ctx.props()
                         .on_setlist_add
                         .emit(SetlistEntry::from_song_with_settings(song, song_settings))
                 } else {
-                    self.props.on_setlist_remove.emit(song.id())
+                    ctx.props().on_setlist_remove.emit(song.id())
                 }
             }
         };
@@ -93,38 +90,29 @@ impl Component for SongView {
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        if self.props != props {
-            self.props = props;
-            true
-        } else {
-            false
-        }
-    }
-
-    fn view(&self) -> Html {
+    fn view(&self, ctx: &Context<Self>) -> Html {
         info!(
             "View song {} (transpose {}, in setlist: {})",
-            self.props.song_info.song.id(),
-            self.props.song_info.song_settings.transpose_semitone(),
-            self.props.song_info.is_on_setlist
+            ctx.props().song_info.song.id(),
+            ctx.props().song_info.song_settings.transpose_semitone(),
+            ctx.props().song_info.is_on_setlist
         );
 
-        let semitone_notation = self.props.song_info.song_settings.semitone_notation();
-        let transpose_semitone = self.props.song_info.song_settings.transpose_semitone();
+        let semitone_notation = ctx.props().song_info.song_settings.semitone_notation();
+        let transpose_semitone = ctx.props().song_info.song_settings.transpose_semitone();
 
-        let detail = self.convert_song_to_html_node();
-        let transpose_up = self.link.callback(|_| Msg::TransposeUp);
-        let transpose_down = self.link.callback(|_| Msg::TransposeDown);
-        let transpose_set = self.link.callback(Msg::TransposeSet);
-        let setlist_change = self.link.callback(Msg::SetlistChange);
-        let semitone_notation_set = self.link.callback(Msg::SemitoneNotationChange);
+        let detail = self.convert_song_to_html_node(ctx);
+        let transpose_up = ctx.link().callback(|_| Msg::TransposeUp);
+        let transpose_down = ctx.link().callback(|_| Msg::TransposeDown);
+        let transpose_set = ctx.link().callback(Msg::TransposeSet);
+        let setlist_change = ctx.link().callback(Msg::SetlistChange);
+        let semitone_notation_set = ctx.link().callback(Msg::SemitoneNotationChange);
 
-        let setlist_tool = if self.props.enable_setlists {
+        let setlist_tool = if ctx.props().enable_setlists {
             html! {
                 <Setlist
-                    on_click=setlist_change
-                    is_on_setlist=self.props.song_info.is_on_setlist
+                    on_click={setlist_change}
+                    is_on_setlist={ctx.props().song_info.is_on_setlist}
                 />
             }
         } else {
@@ -136,16 +124,16 @@ impl Component for SongView {
                 <div class="song-tools">
                     <HomeTool/>
                     <TransposeTool
-                        show_input_field=false
-                        transpose_semitone=transpose_semitone
-                        on_click_up=transpose_up
-                        on_click_down=transpose_down
-                        on_set=transpose_set
+                        show_input_field={false}
+                        transpose_semitone={transpose_semitone}
+                        on_click_up={transpose_up}
+                        on_click_down={transpose_down}
+                        on_set={transpose_set}
                     />
                     {setlist_tool}
                     <SemitoneNotationTool
-                        semitone_notation=semitone_notation
-                        on_change=semitone_notation_set
+                        semitone_notation={semitone_notation}
+                        on_change={semitone_notation_set}
                     />
                 </div>
             </div>
@@ -154,16 +142,16 @@ impl Component for SongView {
 }
 
 impl SongView {
-    fn send_change(&self, song_settings: SongSettings) {
-        self.props
+    fn send_change(&self, ctx: &Context<Self>, song_settings: SongSettings) {
+        ctx.props()
             .on_settings_change
-            .emit((self.props.song_info.song.id(), song_settings))
+            .emit((ctx.props().song_info.song.id(), song_settings))
     }
 
-    fn convert_song_to_html_string(&self) -> String {
+    fn convert_song_to_html_string(&self, ctx: &Context<Self>) -> String {
         use chrono::Utc;
 
-        let props = &self.props;
+        let props = &ctx.props();
         let transpose_semitone = props.song_info.song_settings.transpose_semitone();
         let formatting = props.song_info.song_settings.formatting();
 
@@ -197,8 +185,8 @@ impl SongView {
         }
     }
 
-    fn convert_song_to_html_node(&self) -> VNode {
-        let html = self.convert_song_to_html_string();
+    fn convert_song_to_html_node(&self, ctx: &Context<Self>) -> VNode {
+        let html = self.convert_song_to_html_string(ctx);
 
         // Use `web_sys`'s global `window` function to get a handle on the global
         let window = window().expect("Could not detect the JS window object");
@@ -216,25 +204,27 @@ impl SongView {
         }
     }
 
-    fn change_transpose(&mut self, transpose_semitone: isize) {
+    fn change_transpose(&mut self, ctx: &Context<Self>, transpose_semitone: isize) {
         info!("Change transpose semitone to {}", transpose_semitone);
         self.send_change(
-            self.props
+            ctx,
+            ctx.props()
                 .song_info
                 .song_settings
                 .with_transpose_semitone(transpose_semitone),
         );
     }
 
-    fn change_semitone_notation(&mut self, s: SemitoneNotation) {
+    fn change_semitone_notation(&mut self, ctx: &Context<Self>, s: SemitoneNotation) {
         let formatting = Formatting {
             semitone_notation: s,
-            ..self.props.song_info.song_settings.formatting()
+            ..ctx.props().song_info.song_settings.formatting()
         };
 
         info!("Change formatting to {:?}", formatting);
         self.send_change(
-            self.props
+            ctx,
+            ctx.props()
                 .song_info
                 .song_settings
                 .with_formatting(formatting),

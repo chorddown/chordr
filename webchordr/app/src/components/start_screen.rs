@@ -1,5 +1,4 @@
-use yew::{html, Html, ShouldRender};
-use yew::{Component, ComponentLink};
+use yew::{html, Component, Context, Html};
 
 pub(crate) struct StartScreen {}
 
@@ -7,19 +6,11 @@ impl Component for StartScreen {
     type Message = ();
     type Properties = ();
 
-    fn create(_props: Self::Properties, _link: ComponentLink<Self>) -> Self {
+    fn create(ctx: &Context<Self>) -> Self {
         Self {}
     }
 
-    fn update(&mut self, _msg: Self::Message) -> ShouldRender {
-        true
-    }
-
-    fn change(&mut self, _: Self::Properties) -> ShouldRender {
-        true
-    }
-
-    fn view(&self) -> Html {
+    fn view(&self, ctx: &Context<Self>) -> Html {
         (html! {
             <div class="start-screen">
                 <div class="logo">

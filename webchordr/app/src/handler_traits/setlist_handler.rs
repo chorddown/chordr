@@ -1,7 +1,8 @@
 use libchordr::prelude::{Setlist, SetlistEntry, SongId, SongSettings};
 use webchordr_events::{SetlistEvent, SortingChange};
+use yew::Component;
 
-pub trait SetlistHandler {
+pub trait SetlistHandler: Component {
     /// Handle the given [`Setlist`] related event
     fn handle_setlist_event(&mut self, event: SetlistEvent);
 
@@ -36,7 +37,7 @@ pub trait SetlistHandler {
     fn setlist_sorting_changed(&mut self, sorting_change: SortingChange);
 
     /// Load the [`Setlist`] from the persistent storage
-    fn fetch_setlist(&mut self);
+    fn fetch_setlist(&mut self, ctx: &yew::Context<Self>);
 
     /// Commit the [`Setlist`] to the persistent storage
     fn commit_changes(&mut self);

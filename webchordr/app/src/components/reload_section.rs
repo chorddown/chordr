@@ -12,33 +12,18 @@ pub struct ReloadSectionProps {
     pub catalog: Option<Rc<Catalog>>,
 }
 
-pub struct ReloadSection {
-    props: ReloadSectionProps,
-}
+pub struct ReloadSection {}
 
 impl Component for ReloadSection {
     type Message = ();
     type Properties = ReloadSectionProps;
 
-    fn create(props: Self::Properties, _link: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _msg: Self::Message) -> ShouldRender {
-        true
-    }
-
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        if props != self.props {
-            self.props = props;
-            true
-        } else {
-            false
-        }
-    }
-
-    fn view(&self) -> Html {
-        let revision = match &self.props.catalog {
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let revision = match &ctx.props().catalog {
             None => "n/a".to_string(),
             Some(c) => match DateTime::parse_from_rfc2822(&c.revision()) {
                 Ok(d) => d.format("%a %d.%m.%y %H:%I").to_string(),

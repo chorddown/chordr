@@ -22,34 +22,22 @@ impl PartialEq for NavItemProps {
 
 pub enum Msg {}
 
-pub struct NavItem {
-    props: NavItemProps,
-}
+pub struct NavItem {}
 
 impl Component for NavItem {
     type Message = Msg;
     type Properties = NavItemProps;
 
-    fn create(props: Self::Properties, _link: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _msg: Self::Message) -> ShouldRender {
+    fn update(&mut self, ctx: &Context<Self>, _msg: Self::Message) -> bool {
         true
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        if self.props != props {
-            self.props = props;
-
-            true
-        } else {
-            false
-        }
-    }
-
-    fn view(&self) -> Html {
-        let state = &self.props.state;
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let state = &ctx.props().state;
         let session = state.session();
         let user = session.user();
 
@@ -71,7 +59,7 @@ impl Component for NavItem {
                 let class = class.add("logged-in");
 
                 (html! {
-                    <a role="button" class=class href={route("/user/info")} title=user_description>
+                    <a role="button" class={class} href={route("/user/info")} title={user_description}>
                         <i class="im im-user-male"></i>
                         <i class="im im-check-mark"></i>
                     </a>
@@ -87,7 +75,7 @@ impl Component for NavItem {
                 let class = class.add("not-logged-in");
 
                 (html! {
-                    <a role="button" class=class href={route("/user/login")} title=title>
+                    <a role="button" class={class} href={route("/user/login")} title={title}>
                         <i class="im im-user-male"></i>
                     </a>
                 }) as Html

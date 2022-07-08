@@ -1,18 +1,18 @@
 use gloo_events::EventListener;
+use gloo_timers::callback::Interval;
 use std::rc::Rc;
 use std::sync::Arc;
 use std::time::Duration;
 
 use log::{debug, error, info, warn};
 use wasm_bindgen_futures::spawn_local;
-use yew::services::interval::IntervalTask;
-use yew::services::IntervalService;
-use yew::{html, Component, ComponentLink, Html, ShouldRender};
+use yew::prelude::*;
 
 use cqrs::prelude::AsyncRepositoryTrait;
 use libchordr::models::user::MainData;
 use libchordr::prelude::*;
 use tri::Tri;
+use webchordr_common::route::AppRoute;
 use webchordr_events::{Event, SetlistEvent, SettingsEvent, SortingChange};
 use webchordr_persistence::persistence_manager::PMType;
 use webchordr_persistence::persistence_manager::PersistenceManagerFactory;
@@ -35,15 +35,14 @@ use crate::state::State;
 
 type InitialDataResult = Result<Box<SessionMainData>, Option<WebError>>;
 
-const TICK_INTERVAL: u64 = 300;
+const TICK_INTERVAL: u32 = 300;
 
 #[allow(unused)]
 pub struct Handler {
     persistence_manager: Arc<PMType>,
     /// Keep a reference to the IntervalTask so that it doesn't get dropped
-    _clock_handle: IntervalTask,
+    _clock_handle: gloo_timers::callback::Interval,
     message_listener: Option<EventListener>,
-    link: ComponentLink<Handler>,
     #[allow(unused)]
     fetching: bool,
     config: Config,
@@ -87,11 +86,11 @@ impl Handler {
         Arc::new(persistence_manager_factory.build(config, session))
     }
 
-    fn load_initial_data(&mut self) {
+    fn load_initial_data(&mut self, ctx: &Context<Self>) {
         let session_service = self.session_service.clone();
         match session_service.get_credentials_from_session_storage() {
             Ok(credentials) => {
-                let on_load = self.link.callback(Msg::InitialDataLoaded);
+                let on_load = ctx.link().callback(Msg::InitialDataLoaded);
                 debug!("Try to login with credentials from Session Storage");
                 spawn_local(async move {
                     match session_service.get_main_data(&credentials).await {
@@ -106,14 +105,16 @@ impl Handler {
                     }
                 });
             }
-            Err(e) => self.link.send_message(Msg::InitialDataLoaded(Err(Some(e)))),
+            Err(e) => ctx
+                .link()
+                .send_message(Msg::InitialDataLoaded(Err(Some(e)))),
         }
     }
 
-    fn handle_initial_data(&mut self, r: InitialDataResult) {
+    fn handle_initial_data(&mut self, ctx: &Context<Self>, r: InitialDataResult) {
         match r {
             Ok(initial_data) => {
-                self.update_session(initial_data.session.clone(), false);
+                self.update_session(ctx, initial_data.session.clone(), false);
                 let MainData {
                     song_settings,
                     latest_setlist,
@@ -124,6 +125,7 @@ impl Handler {
                 let did_fetch_song_settings = song_settings.is_some();
 
                 self.set_state(
+                    None,
                     State::new(
                         self.state.catalog().map(|c| (*c).clone()),
                         latest_setlist,
@@ -137,26 +139,26 @@ impl Handler {
                     true,
                 );
                 if !did_fetch_setlist {
-                    self.fetch_setlist();
+                    self.fetch_setlist(ctx);
                 }
                 if !did_fetch_song_settings {
-                    self.fetch_song_settings();
+                    self.fetch_song_settings(ctx);
                 }
             }
             Err(_) => {
-                self.update_session(Session::default(), false);
-                self.fetch_setlist();
-                self.fetch_song_settings();
+                self.update_session(ctx, Session::default(), false);
+                self.fetch_setlist(ctx);
+                self.fetch_song_settings(ctx);
                 #[cfg(feature = "server_sync")]
-                self.check_connection_status();
+                self.check_connection_status(ctx);
             }
         }
     }
 
     #[cfg(feature = "server_sync")]
-    fn check_connection_status(&mut self) {
+    fn check_connection_status(&mut self, ctx: &Context<Self>) {
         let connection_service = self.connection_service.clone();
-        let state_changed = self.link.callback(Msg::ConnectionStatusChanged);
+        let state_changed = ctx.link().callback(Msg::ConnectionStatusChanged);
         spawn_local(async move {
             let connection_status = connection_service.get_connection_status().await;
             state_changed.emit(connection_status)
@@ -170,32 +172,34 @@ impl Handler {
         self.check_connection_status();
     }
 
-    fn update_session(&mut self, session: Session, reload_data: bool) {
-        self.set_state(self.state.with_session(session), true);
+    fn update_session(&mut self, ctx: &Context<Self>, session: Session, reload_data: bool) {
+        self.set_state(None, self.state.with_session(session), true);
         self.persistence_manager =
             Self::build_persistence_manager(&self.config, (*self.state.session()).clone());
 
         if reload_data {
             // Fetch/reload the Setlist and Song Settings
-            self.fetch_setlist();
-            self.fetch_song_settings();
+            self.fetch_setlist(ctx);
+            self.fetch_song_settings(ctx);
         }
     }
 
-    fn set_state(&mut self, state: State, sync: bool) {
+    fn set_state(&mut self, ctx: Option<&Context<Self>>, state: State, sync: bool) {
         debug!("Change state ({})", if sync { "sync" } else { "async" });
         if sync {
             self.state = Rc::new(state)
         } else {
-            self.link.send_message(Msg::StateChanged(state))
+            ctx.expect("Expected ctx to be a context")
+                .link()
+                .send_message(Msg::StateChanged(state))
         }
     }
 }
 
 impl CatalogHandler for Handler {
-    fn fetch_catalog(&mut self) {
+    fn fetch_catalog(&mut self, ctx: &Context<Self>) {
         let pm = self.persistence_manager.clone();
-        let callback = self.link.callback(Msg::FetchCatalogReady);
+        let callback = ctx.link().callback(Msg::FetchCatalogReady);
 
         spawn_local(async move {
             type Repository<'a> = CatalogWebRepository<'a, PMType>;
@@ -281,7 +285,7 @@ impl SetlistHandler for Handler {
             Ok(_) => debug!("Did add song to setlist {}", song_id),
             Err(e) => error!("Could not add song to setlist: {:?}", e),
         }
-        self.set_state(self.state.with_current_setlist(new_setlist), true);
+        self.set_state(None, self.state.with_current_setlist(new_setlist), true);
         <Self as SetlistHandler>::commit_changes(self);
     }
 
@@ -295,7 +299,7 @@ impl SetlistHandler for Handler {
             Ok(_) => info!("Removed song {} from setlist", song_id),
             Err(_) => warn!("Could not remove song {} from setlist", song_id),
         }
-        self.set_state(self.state.with_current_setlist(new_setlist), true);
+        self.set_state(None, self.state.with_current_setlist(new_setlist), true);
         <Self as SetlistHandler>::commit_changes(self);
     }
 
@@ -324,21 +328,21 @@ impl SetlistHandler for Handler {
             return;
         }
 
-        self.set_state(self.state.with_current_setlist(new_setlist), true);
+        self.set_state(None, self.state.with_current_setlist(new_setlist), true);
         <Self as SetlistHandler>::commit_changes(self);
     }
 
     fn setlist_replace(&mut self, setlist: Setlist) {
         info!("Replace setlist");
         debug!("{:?}\n=>\n{:?}", self.state.current_setlist(), setlist);
-        self.set_state(self.state.with_current_setlist(setlist), true);
+        self.set_state(None, self.state.with_current_setlist(setlist), true);
         <Self as SetlistHandler>::commit_changes(self);
     }
 
     fn set_current_setlist(&mut self, setlist: Setlist) {
         info!("Set current setlist");
         debug!("{:?}\n=>\n{:?}", self.state.current_setlist(), setlist);
-        self.set_state(self.state.with_current_setlist(setlist), true);
+        self.set_state(None, self.state.with_current_setlist(setlist), true);
         <Self as SetlistHandler>::commit_changes(self);
     }
 
@@ -350,17 +354,17 @@ impl SetlistHandler for Handler {
 
         match move_result {
             Ok(_) => {
-                self.set_state(self.state.with_current_setlist(new_setlist), true);
+                self.set_state(None, self.state.with_current_setlist(new_setlist), true);
                 <Self as SetlistHandler>::commit_changes(self)
             }
             Err(e) => error!("{}", e),
         }
     }
 
-    fn fetch_setlist(&mut self) {
+    fn fetch_setlist(&mut self, ctx: &Context<Self>) {
         let pm = self.persistence_manager.clone();
-        let callback = self
-            .link
+        let callback = ctx
+            .link()
             .callback(move |setlist| Msg::Event(Box::new(SetlistEvent::Replace(setlist).into())));
 
         spawn_local(async move {
@@ -415,7 +419,7 @@ impl SettingsHandler for Handler {
     fn song_settings_change(&mut self, song_id: SongId, settings: SongSettings) {
         let mut song_settings = (*self.state.song_settings()).clone();
         song_settings.store(song_id, settings);
-        self.set_state(self.state.with_song_settings(song_settings), true);
+        self.set_state(None, self.state.with_song_settings(song_settings), true);
         <Handler as SettingsHandler>::commit_changes(self);
     }
 
@@ -425,13 +429,13 @@ impl SettingsHandler for Handler {
             self.state.song_settings(),
             settings
         );
-        self.set_state(self.state.with_song_settings(settings), true);
+        self.set_state(None, self.state.with_song_settings(settings), true);
         <Handler as SettingsHandler>::commit_changes(self);
     }
 
-    fn fetch_song_settings(&mut self) {
+    fn fetch_song_settings(&mut self, ctx: &Context<Self>) {
         let pm = self.persistence_manager.clone();
-        let callback = self.link.callback(move |settings_map| {
+        let callback = ctx.link().callback(move |settings_map| {
             Msg::Event(Box::new(SettingsEvent::Replace(settings_map).into()))
         });
 
@@ -461,15 +465,18 @@ impl SettingsHandler for Handler {
     }
 }
 
+#[derive(Properties, Clone, PartialEq)]
+pub struct HandlerProps {
+    pub route: AppRoute,
+}
+
 impl Component for Handler {
     type Message = Msg;
-    type Properties = ();
+    type Properties = HandlerProps;
 
-    fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
-        let clock_handle = IntervalService::spawn(
-            Duration::from_secs(TICK_INTERVAL),
-            link.callback(|_| Msg::Tick),
-        );
+    fn create(ctx: &Context<Self>) -> Self {
+        let on_tick = ctx.link().callback(|_| Msg::Tick);
+        let clock_handle = Interval::new(TICK_INTERVAL * 1000, move || on_tick.emit(()));
 
         let config = Config::default();
         let session_service = Rc::new(SessionService::new(config.clone()));
@@ -478,13 +485,12 @@ impl Component for Handler {
         let state = Rc::new(State::default());
         let connection_service = ConnectionService::new(config.clone());
 
-        let message_listener = register_ipc_handler(link.callback(|m| match m {
+        let message_listener = register_ipc_handler(ctx.link().callback(|m| match m {
             IpcMessage::UpdateInfo(i) => Msg::UpdateInfo(i),
         }));
 
         Self {
             persistence_manager,
-            link,
             fetching: false,
             _clock_handle: clock_handle,
             message_listener,
@@ -495,7 +501,7 @@ impl Component for Handler {
         }
     }
 
-    fn update(&mut self, msg: Self::Message) -> ShouldRender {
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::FetchCatalogReady(response) => {
                 self.fetching = false;
@@ -503,20 +509,24 @@ impl Component for Handler {
                 match response {
                     Ok(catalog) => {
                         debug!("Catalog fetched with revision: {:?}", catalog.revision());
-                        self.set_state(self.state.with_catalog(Some(catalog)), true);
+                        self.set_state(None, self.state.with_catalog(Some(catalog)), true);
                     }
                     Err(error) => {
                         debug!("Catalog fetched with error {}", error);
-                        self.set_state(self.state.with_error(Some(error)), true);
+                        self.set_state(None, self.state.with_error(Some(error)), true);
                     }
                 }
             }
             Msg::Ignore => return false,
-            Msg::SessionChanged(session) => self.update_session(session, true),
+            Msg::SessionChanged(session) => self.update_session(ctx, session, true),
             #[cfg(feature = "server_sync")]
             Msg::ConnectionStatusChanged(connection_state) => {
                 if self.state.connection_status() != connection_state {
-                    self.set_state(self.state.with_connection_status(connection_state), true)
+                    self.set_state(
+                        ctx,
+                        self.state.with_connection_status(connection_state),
+                        true,
+                    )
                 } else {
                     return false;
                 }
@@ -532,29 +542,25 @@ impl Component for Handler {
             }
             Msg::Event(e) => self.handle_event(*e),
             Msg::StateChanged(_state) => unreachable!(), //self.state = Rc::new(state),
-            Msg::InitialDataLoaded(r) => self.handle_initial_data(r),
+            Msg::InitialDataLoaded(r) => self.handle_initial_data(ctx, r),
             Msg::Tick => {
                 self.run_scheduled_tasks();
                 return false;
             }
             Msg::UpdateInfo(v) => {
-                self.set_state(self.state.with_available_version(v.version), true);
+                self.set_state(None, self.state.with_available_version(v.version), true);
             }
         }
         true
     }
 
-    fn change(&mut self, _: Self::Properties) -> ShouldRender {
-        false
-    }
-
-    fn view(&self) -> Html {
+    fn view(&self, ctx: &Context<Self>) -> Html {
         let state = self.state.clone();
         let persistence_manager = self.persistence_manager.clone();
-        let on_event = self.link.callback(|e| Msg::Event(Box::new(e)));
-        let on_setlist_change = self.link.callback(|e| Msg::Event(Box::new(e)));
-        let on_user_login_success = self.link.callback(Msg::SessionChanged);
-        let on_user_login_error = self.link.callback(|e| {
+        let on_event = ctx.link().callback(|e| Msg::Event(Box::new(e)));
+        let on_setlist_change = ctx.link().callback(|e| Msg::Event(Box::new(e)));
+        let on_user_login_success = ctx.link().callback(Msg::SessionChanged);
+        let on_user_login_error = ctx.link().callback(|e| {
             error!("{}", e);
             Msg::Ignore
         });
@@ -568,12 +574,12 @@ impl Component for Handler {
 
         if state.catalog().is_some() {
             (html! {
-                <App state=state
-                    on_event=on_event
-                    on_setlist_change=on_setlist_change
-                    on_user_login_success=on_user_login_success
-                    on_user_login_error=on_user_login_error
-                    persistence_manager=persistence_manager
+                 <App {state}
+                    {on_event}
+                    {on_setlist_change}
+                    {on_user_login_success}
+                    {on_user_login_error}
+                    {persistence_manager}
                 />
             }) as Html
         } else {
@@ -587,10 +593,10 @@ impl Component for Handler {
         }
     }
 
-    fn rendered(&mut self, first_render: bool) {
+    fn rendered(&mut self, ctx: &Context<Self>, first_render: bool) {
         if first_render {
-            self.fetch_catalog();
-            self.load_initial_data();
+            self.fetch_catalog(ctx);
+            self.load_initial_data(ctx);
         }
     }
 }

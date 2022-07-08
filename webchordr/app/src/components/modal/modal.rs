@@ -17,8 +17,6 @@ pub struct ModalProps {
 
 pub struct Modal {
     visible: bool,
-    props: ModalProps,
-    link: ComponentLink<Self>,
 }
 
 pub enum Msg {
@@ -29,52 +27,44 @@ impl Component for Modal {
     type Message = Msg;
     type Properties = ModalProps;
 
-    fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
+    fn create(ctx: &Context<Self>) -> Self {
         Self {
-            visible: props.visible,
-            props,
-            link,
+            visible: ctx.props().visible,
         }
     }
 
-    fn update(&mut self, msg: Self::Message) -> ShouldRender {
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::Close => {
                 self.visible = false;
-                self.props.on_close.emit(())
+                ctx.props().on_close.emit(())
             }
         }
         true
     }
 
-    fn change(&mut self, props: Self::Properties) -> bool {
-        if props != self.props {
-            self.visible = props.visible;
-            self.props = props;
-
-            true
-        } else {
-            false
-        }
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        self.visible = ctx.props().visible;
+        true
     }
 
-    fn view(&self) -> Html {
+    fn view(&self, ctx: &Context<Self>) -> Html {
         (if self.visible {
-            let handle_close_click = self.link.callback(|_| Msg::Close);
-            let class = self.props.class.clone();
+            let handle_close_click = ctx.link().callback(|_| Msg::Close);
+            let class = ctx.props().class.clone();
 
             html! {
-                <ModalSkeleton class=class>
+                <ModalSkeleton {class}>
                     <div class="modal-header">
                         <div class="modal-header-text">
-                            {&self.props.header_text}
+                            {&ctx.props().header_text}
                         </div>
-                        <button class="modal-close" onclick=handle_close_click>
+                        <button class="modal-close" onclick={handle_close_click}>
                             <i class="im im-x-mark"></i>
                         </button>
                     </div>
                     <div class="modal-body">
-                        {{ self.props.children.iter().collect::<Html>() }}
+                        {{ ctx.props().children.iter().collect::<Html>() }}
                     </div>
                 </ModalSkeleton>
             }

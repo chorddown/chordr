@@ -1,5 +1,6 @@
 use log::error;
 use log::info;
+use web_sys::HtmlInputElement;
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq, Clone)]
@@ -13,62 +14,53 @@ pub struct TransposeToolProps {
 }
 
 pub enum Msg {
-    InputChange(ChangeData),
+    InputChange(String),
 }
 
-pub struct TransposeTool {
-    /// State from the parent
-    props: TransposeToolProps,
-    /// Utility object
-    link: ComponentLink<Self>,
-}
+pub struct TransposeTool {}
 
 impl Component for TransposeTool {
     type Message = Msg;
     type Properties = TransposeToolProps;
 
-    fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        Self { link, props }
+    fn create(ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, msg: Self::Message) -> ShouldRender {
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            Msg::InputChange(ChangeData::Value(v)) => {
+            Msg::InputChange(v) => {
                 info!("{:?}", v);
 
                 match v.parse::<isize>() {
                     Ok(v) => {
-                        self.props.on_set.emit(v);
+                        ctx.props().on_set.emit(v);
                     }
                     Err(_) => {
                         error!("Invalid change data {:?}", v);
                     }
                 };
-            }
-            Msg::InputChange(change_data) => error!("Invalid change data {:?}", change_data),
+            } // Msg::InputChange(change_data) => error!("Invalid change data {:?}", change_data),
         };
 
         true
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        if self.props != props {
-            self.props = props;
-            true
-        } else {
-            false
-        }
-    }
-
-    fn view(&self) -> Html {
-        let transpose_semitone = self.props.transpose_semitone;
-        let transpose_up = self.props.on_click_up.reform(|_| ());
-        let transpose_down = self.props.on_click_down.reform(|_| ());
-        let show_input_field = self.props.show_input_field;
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let transpose_semitone = ctx.props().transpose_semitone;
+        let transpose_up = ctx.props().on_click_up.reform(|_| ());
+        let transpose_down = ctx.props().on_click_down.reform(|_| ());
+        let show_input_field = ctx.props().show_input_field;
 
         let number_output = if show_input_field {
-            let onchange = self.link.callback(Msg::InputChange);
-            html! {<input type="number" min="-11" max="11" onchange=onchange value=transpose_semitone.to_string()/>}
+            let onchange = ctx.link().batch_callback(|e: Event| {
+                let input = e.target_dyn_into::<HtmlInputElement>();
+
+                input.map(|input| Msg::InputChange(input.value()))
+            });
+
+            // let onchange = ctx.link().callback(Msg::InputChange);
+            html! {<input type="number" min="-11" max="11" onchange={onchange} value={transpose_semitone.to_string()}/>}
         } else {
             html! {<span class="value">{transpose_semitone}</span>}
         };
@@ -79,9 +71,9 @@ impl Component for TransposeTool {
         let inner = html! {
             <>
                 <span class="icon">{"♬"}</span>
-                <button class="discreet" disabled=disable_down onclick=transpose_down><i class="im im-angle-left"></i></button>
+                <button class="discreet" disabled={disable_down} onclick={transpose_down}><i class="im im-angle-left"></i></button>
                 {number_output}
-                <button class="discreet" disabled=disable_up onclick=transpose_up><i class="im im-angle-right"></i></button>
+                <button class="discreet" disabled={disable_up} onclick={transpose_up}><i class="im im-angle-right"></i></button>
                 <span class="sr-only">{"Transpose song"}</span>
             </>
         };
