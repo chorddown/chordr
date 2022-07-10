@@ -72,7 +72,7 @@ impl Component for Dropzone {
 }
 
 impl Dropzone {
-    pub fn make_dropzone(&mut self, item_selector: String, callback: OnDropPropCallback) -> () {
+    pub fn make_dropzone(&mut self, item_selector: String, callback: OnDropPropCallback) {
         if let Some(element) = self.node_ref.cast::<HtmlElement>() {
             let handler = Box::new(move |val: &JsValue| {
                 if let Ok(argument) = val.into_serde::<OnDropArgument>() {
