@@ -15,7 +15,7 @@ impl Component for Setlist {
     type Message = ();
     type Properties = SetlistProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         Self {}
     }
 

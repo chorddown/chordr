@@ -1,19 +1,16 @@
-use std::rc::Rc;
-
-use yew::prelude::*;
-use yew::Component;
-
+use self::index::*;
+use self::index_item::IndexItem;
+use self::link::SongBrowserLink;
 use libchordr::models::catalog::*;
 use libchordr::models::song_data::SongData;
 use libchordr::prelude::SongSorting;
 use libchordr::prelude::{ListEntryTrait, Song};
+use std::rc::Rc;
 use webchordr_common::components::link::Link;
-use webchordr_common::route::{route, AppRoute};
+use webchordr_common::route::AppRoute;
 use webchordr_song_list::Item as SongItem;
-
-use self::index::*;
-use self::index_item::IndexItem;
-use self::link::SongBrowserLink;
+use yew::prelude::*;
+use yew::Component;
 
 mod index;
 mod index_item;
@@ -107,7 +104,7 @@ impl Component for SongBrowser {
     type Message = ();
     type Properties = SongBrowserProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         SongBrowser {}
     }
 

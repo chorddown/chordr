@@ -1,17 +1,13 @@
+use cqrs::prelude::AsyncRepositoryTrait;
 use gloo_events::EventListener;
 use gloo_timers::callback::Interval;
-use std::rc::Rc;
-use std::sync::Arc;
-use std::time::Duration;
-
-use log::{debug, error, info, warn};
-use wasm_bindgen_futures::spawn_local;
-use yew::prelude::*;
-
-use cqrs::prelude::AsyncRepositoryTrait;
 use libchordr::models::user::MainData;
 use libchordr::prelude::*;
+use log::{debug, error, info, warn};
+use std::rc::Rc;
+use std::sync::Arc;
 use tri::Tri;
+use wasm_bindgen_futures::spawn_local;
 use webchordr_common::route::AppRoute;
 use webchordr_events::{Event, SetlistEvent, SettingsEvent, SortingChange};
 use webchordr_persistence::persistence_manager::PMType;
@@ -19,6 +15,7 @@ use webchordr_persistence::persistence_manager::PersistenceManagerFactory;
 use webchordr_persistence::prelude::*;
 use webchordr_persistence::session::SessionService;
 use webchordr_persistence::web_repository::{CatalogWebRepository, SettingsWebRepository};
+use yew::prelude::*;
 
 use crate::app::App;
 use crate::config::Config;

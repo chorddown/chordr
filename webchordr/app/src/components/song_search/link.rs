@@ -1,19 +1,10 @@
-use webchordr_common::route::route;
+use webchordr_common::components::link::Link;
+use webchordr_common::route::AppRoute;
 use yew::prelude::*;
 
-pub struct SongSearchLink {}
+#[function_component(SongSearchLink)]
+pub(crate) fn song_search_link() -> Html {
+    let to = AppRoute::SongSearch;
 
-impl Component for SongSearchLink {
-    type Message = ();
-    type Properties = ();
-
-    fn create(ctx: &Context<Self>) -> Self {
-        Self {}
-    }
-
-    fn view(&self, ctx: &Context<Self>) -> Html {
-        let href = route("song-search/");
-
-        html! { <a class="song-search-home" href={href}><i class="im im-magnifier"></i></a> }
-    }
+    html! { <Link class="song-search-home" {to}><i class="im im-magnifier"></i></Link> }
 }

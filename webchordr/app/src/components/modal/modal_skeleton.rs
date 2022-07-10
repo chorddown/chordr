@@ -13,7 +13,7 @@ impl Component for ModalSkeleton {
     type Message = ();
     type Properties = ModalProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         Self {}
     }
 

@@ -1,3 +1,4 @@
+use std::rc::Rc;
 use yew::prelude::*;
 use yew::Callback;
 
@@ -6,10 +7,10 @@ use webchordr_common::helpers::Class;
 
 #[derive(Properties, Clone, PartialEq)]
 pub struct ItemProps {
-    pub setlist: Setlist,
+    pub setlist: Rc<Setlist>,
     pub highlight: bool,
-    pub on_load_click: Callback<Setlist>,
-    pub on_delete_click: Callback<Setlist>,
+    pub on_load_click: Callback<Rc<Setlist>>,
+    pub on_delete_click: Callback<Rc<Setlist>>,
 }
 
 pub struct Item {}
@@ -18,12 +19,12 @@ impl Component for Item {
     type Message = ();
     type Properties = ItemProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         Self {}
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let setlist = ctx.props().setlist.clone();
+        let setlist = &ctx.props().setlist;
         let name = setlist.name();
         let key = setlist.id();
         let base_class = Class::new("setlist-list-item");
@@ -44,7 +45,12 @@ impl Component for Item {
             .props()
             .on_load_click
             .reform(move |_| setlist_for_loading.clone());
-        let on_delete_click_prop = ctx.props().on_delete_click.reform(move |_| setlist.clone());
+
+        let setlist_for_deleting = setlist.clone();
+        let on_delete_click_prop = ctx
+            .props()
+            .on_delete_click
+            .reform(move |_| setlist_for_deleting.clone());
 
         html! {
             <div class={class} key={key}>

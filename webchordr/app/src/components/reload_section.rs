@@ -18,7 +18,7 @@ impl Component for ReloadSection {
     type Message = ();
     type Properties = ReloadSectionProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         Self {}
     }
 

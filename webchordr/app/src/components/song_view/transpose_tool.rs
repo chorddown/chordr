@@ -23,7 +23,7 @@ impl Component for TransposeTool {
     type Message = Msg;
     type Properties = TransposeToolProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         Self {}
     }
 
@@ -40,7 +40,7 @@ impl Component for TransposeTool {
                         error!("Invalid change data {:?}", v);
                     }
                 };
-            } // Msg::InputChange(change_data) => error!("Invalid change data {:?}", change_data),
+            }
         };
 
         true
@@ -59,7 +59,6 @@ impl Component for TransposeTool {
                 input.map(|input| Msg::InputChange(input.value()))
             });
 
-            // let onchange = ctx.link().callback(Msg::InputChange);
             html! {<input type="number" min="-11" max="11" onchange={onchange} value={transpose_semitone.to_string()}/>}
         } else {
             html! {<span class="value">{transpose_semitone}</span>}

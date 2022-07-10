@@ -20,20 +20,14 @@ impl PartialEq for NavItemProps {
     }
 }
 
-pub enum Msg {}
-
 pub struct NavItem {}
 
 impl Component for NavItem {
-    type Message = Msg;
+    type Message = ();
     type Properties = NavItemProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         Self {}
-    }
-
-    fn update(&mut self, ctx: &Context<Self>, _msg: Self::Message) -> bool {
-        true
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {

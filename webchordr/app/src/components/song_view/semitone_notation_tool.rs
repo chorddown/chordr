@@ -13,7 +13,7 @@ impl Component for SemitoneNotationTool {
     type Message = ();
     type Properties = SemitoneNotationToolProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         Self {}
     }
 

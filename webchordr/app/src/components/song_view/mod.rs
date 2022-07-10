@@ -60,7 +60,7 @@ impl Component for SongView {
     type Message = Msg;
     type Properties = SongViewProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         Self {}
     }
 

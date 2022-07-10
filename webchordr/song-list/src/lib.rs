@@ -49,7 +49,7 @@ impl Component for SongList {
     type Message = Msg;
     type Properties = SongListProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         Self {
             clear: false,
             node_ref: NodeRef::default(),
@@ -78,7 +78,7 @@ impl Component for SongList {
 
     fn changed(&mut self, ctx: &Context<Self>) -> bool {
         if ctx.props().sortable {
-            self.make_sortable(ctx);
+            self.make_sortable(ctx.link().callback(Msg::SetlistChangeSorting));
         } else {
             self.make_unsortable();
         }
@@ -122,13 +122,13 @@ impl Component for SongList {
 
     fn rendered(&mut self, ctx: &Context<Self>, _: bool) {
         if ctx.props().sortable {
-            self.make_sortable(ctx);
+            self.make_sortable(ctx.link().callback(Msg::SetlistChangeSorting));
         }
     }
 }
 
 impl SongList {
-    fn make_sortable(&mut self, ctx: &Context<Self>) {
+    fn make_sortable(&mut self, callback: Callback<SortingChange>) {
         match self.sortable_handle {
             None => {
                 if let Some(element) = self.node_ref.cast::<HtmlElement>() {
@@ -139,11 +139,7 @@ impl SongList {
                     };
                     self.sortable_handle = self
                         .sortable_service
-                        .make_sortable(
-                            element,
-                            ctx.link().callback(Msg::SetlistChangeSorting),
-                            options,
-                        )
+                        .make_sortable(element, callback, options)
                         .ok();
                 }
             }

@@ -20,13 +20,14 @@ pub struct AddButtonProps {
     /// Define if the entries of the currently loaded Setlist should be copied to the new Setlist
     pub clone_current: bool,
 }
+
 pub struct AddButton {}
 
 impl Component for AddButton {
     type Message = ();
     type Properties = AddButtonProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         Self {}
     }
 

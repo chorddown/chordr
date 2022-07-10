@@ -1,12 +1,11 @@
+use libchordr::prelude::*;
 use std::marker::PhantomData;
+use webchordr_common::components::link::Link;
+use webchordr_common::helpers::Class;
+use webchordr_common::route::AppRoute;
 use yew::prelude::*;
 use yew::virtual_dom::VNode;
 use yew::Component;
-
-use libchordr::prelude::*;
-use webchordr_common::components::link::Link;
-use webchordr_common::helpers::Class;
-use webchordr_common::route::{route, AppRoute};
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct SongListItemProps<S: SongData + Clone + PartialEq> {
@@ -58,21 +57,16 @@ impl<S: SongData + PartialEq + 'static + Clone> Component for Item<S> {
     type Message = ();
     type Properties = SongListItemProps<S>;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         Self {
             _ph: PhantomData::default(),
         }
-    }
-
-    fn update(&mut self, ctx: &Context<Self>, _msg: Self::Message) -> bool {
-        true
     }
 
     fn view(&self, ctx: &Context<Self>) -> VNode {
         let title = &ctx.props().song.title();
         let key = &ctx.props().data_key;
         let id = ctx.props().song.id().to_string();
-        let href = route(&format!("song/{}", id));
         let class = self.get_class(ctx);
         let draggable = if ctx.props().draggable {
             "true"

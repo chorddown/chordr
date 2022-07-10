@@ -7,7 +7,7 @@ use libchordr::models::song_list::SongList as SongListModel;
 use libchordr::prelude::{ListEntryTrait, SongId, SongSettings};
 use std::rc::Rc;
 use webchordr_common::components::link::Link;
-use webchordr_common::route::{route, AppRoute};
+use webchordr_common::route::AppRoute;
 use webchordr_drag_n_drop::{Dropzone, OnDropArgument};
 use webchordr_events::Event;
 use webchordr_events::SetlistEvent;
@@ -155,7 +155,7 @@ impl Component for Nav {
     type Message = ();
     type Properties = NavProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         Self {}
     }
 

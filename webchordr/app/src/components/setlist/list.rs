@@ -43,9 +43,9 @@ pub struct List {
 
 pub enum Msg {
     FindAll,
-    Load(Setlist),
+    Load(Rc<Setlist>),
     Add(Setlist),
-    Delete(Setlist),
+    Delete(Rc<Setlist>),
 
     SetlistsLoaded(Vec<Setlist>),
     LoadError(WebError),
@@ -66,8 +66,8 @@ impl Component for List {
         match msg {
             Msg::FindAll => self.find_all_setlists(ctx),
             Msg::Add(setlist) => self.persist_new_setlist(ctx, setlist),
-            Msg::Load(setlist) => self.load_setlist(ctx, setlist),
-            Msg::Delete(setlist) => self.delete_setlist(ctx, setlist),
+            Msg::Load(setlist) => self.load_setlist(ctx, (*setlist).clone()),
+            Msg::Delete(setlist) => self.delete_setlist(ctx, (*setlist).clone()),
             Msg::SetlistsLoaded(v) => self.setlists = Some(v),
             Msg::LoadError(e) => self.error = Some(e),
         }
@@ -92,12 +92,14 @@ impl Component for List {
                 None => false,
             };
 
+            let setlist_prop = Rc::new(setlist.clone());
+
             html! {
                 <li key={key}>
                     <Item
                         {on_load_click}
                         {on_delete_click}
-                        setlist={setlist.clone()}
+                        setlist={setlist_prop}
                         {highlight}
                     />
                 </li>
@@ -162,7 +164,7 @@ impl List {
             let result = SetlistWebRepository::new(&*pm).add(setlist.clone()).await;
 
             match result {
-                Ok(_) => on_ok.emit(setlist),
+                Ok(_) => on_ok.emit(Rc::new(setlist)),
                 Err(e) => error!("Failed to add the new setlist {:?}: {}", setlist, e),
             }
         });

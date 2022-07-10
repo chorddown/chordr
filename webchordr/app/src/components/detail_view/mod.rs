@@ -16,7 +16,7 @@ impl Component for DetailView {
     type Message = ();
     type Properties = DetailViewProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         Self {}
     }
 

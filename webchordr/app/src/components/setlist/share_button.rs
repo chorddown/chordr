@@ -28,13 +28,13 @@ impl Component for SetlistShareButton {
     type Message = Msg;
     type Properties = SetlistProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         Self {
             modal_visible: false,
         }
     }
 
-    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::Show => {
                 debug!("{:?}", msg);
@@ -77,9 +77,9 @@ impl Component for SetlistShareButton {
 }
 
 impl SetlistShareButton {
-    fn build_share_url(&self, ctx: &Context<Self>) -> Result<String, WebError> {
+    fn build_share_url(&self, setlist: &Setlist) -> Result<String, WebError> {
         let host = crate::helpers::window().location().host()?;
-        let serialized = SetlistSerializeService::serialize(ctx.props().setlist.as_ref())?;
+        let serialized = SetlistSerializeService::serialize(setlist)?;
 
         Ok(format!(
             "{}/{}{}",
@@ -88,7 +88,7 @@ impl SetlistShareButton {
     }
 
     fn build_modal(&self, ctx: &Context<Self>) -> Html {
-        (match self.build_share_url(ctx) {
+        (match self.build_share_url(ctx.props().setlist.as_ref()) {
             Ok(share_url) => {
                 let handle_modal_close = ctx.link().callback(|_| Msg::Hide);
 

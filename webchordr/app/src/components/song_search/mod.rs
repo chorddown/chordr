@@ -10,7 +10,7 @@ use libchordr::models::catalog::*;
 use libchordr::models::list::ListEntryTrait;
 use libchordr::prelude::{SearchIndex, Song, SongData, SongSorting};
 use webchordr_common::components::link::Link;
-use webchordr_common::route::{route, AppRoute};
+use webchordr_common::route::AppRoute;
 use webchordr_song_list::Item as SongItem;
 
 use self::link::SongSearchLink;

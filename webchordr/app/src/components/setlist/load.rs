@@ -47,10 +47,10 @@ pub enum Msg {
 }
 
 impl SetlistLoad {
-    fn build_setlist(&self, ctx: &Context<Self>) -> Result<Setlist, WebError> {
+    fn build_setlist(&self, catalog: Rc<Catalog>) -> Result<Setlist, WebError> {
         let serialized_setlist = self.get_shared_data()?;
         let deserialize_result =
-            SetlistDeserializeService::deserialize(&serialized_setlist, &*ctx.props().catalog)?;
+            SetlistDeserializeService::deserialize(&serialized_setlist, &*catalog)?;
 
         if !deserialize_result.errors.is_empty() {
             let errors = deserialize_result
@@ -131,7 +131,7 @@ impl Component for SetlistLoad {
     type Message = Msg;
     type Properties = SetlistProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         Self { visible: true }
     }
 
@@ -146,7 +146,7 @@ impl Component for SetlistLoad {
                     .expect("Could not change the location href");
             }
             Msg::ChooseYes => {
-                let new_setlist = self.build_setlist(ctx);
+                let new_setlist = self.build_setlist(ctx.props().catalog.clone());
                 match new_setlist {
                     Ok(s) => ctx.link().send_message(Msg::PrepareSetlist(s)),
                     Err(e) => {
@@ -167,11 +167,12 @@ impl Component for SetlistLoad {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let new_setlist_result = self.build_setlist(ctx);
+        let new_setlist_result = self.build_setlist(ctx.props().catalog.clone());
         (match new_setlist_result {
             Ok(new_setlist) => {
-                let on_answer_1 = ctx.link().callback(|_| Msg::ChooseNo);
-                let on_answer_2 = ctx.link().callback(|_| Msg::ChooseYes);
+                let link = ctx.link();
+                let on_answer_1 = link.callback(|_| Msg::ChooseNo);
+                let on_answer_2 = link.callback(|_| Msg::ChooseYes);
 
                 let rendered_setlist = self.render_setlist(&new_setlist);
                 html! {

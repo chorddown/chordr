@@ -68,7 +68,6 @@ pub struct App {
 #[derive(Debug)]
 pub enum Msg {
     ToggleMenu,
-    RouteChanged, /*(Route<AppRouteState>)*/
 }
 
 impl App {
@@ -320,25 +319,17 @@ impl Component for App {
     type Message = Msg;
     type Properties = AppProperties;
 
-    fn create(ctx: &Context<Self>) -> Self {
-        // let mut route_service: RouteService<AppRouteState> = RouteService::new();
-        // let route = route_service.get_route();
-        // route_service.register_callback(ctx.link().callback(Msg::RouteChanged));
-
+    fn create(_ctx: &Context<Self>) -> Self {
         let config = Config::default();
 
         Self {
-            // _route_service: route_service,
             expand: true,
-            // route,
             config,
         }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            // Msg::RouteChanged(route) => self.route = route,
-            Msg::RouteChanged => {}
             Msg::ToggleMenu => self.expand = !self.expand,
         }
         true

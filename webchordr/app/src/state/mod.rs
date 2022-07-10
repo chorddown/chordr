@@ -26,7 +26,7 @@ pub struct State {
     available_version: Option<String>,
 }
 
-// #[allow(unused)]
+#[allow(unused)]
 impl State {
     pub fn new(
         catalog: Option<Catalog>,

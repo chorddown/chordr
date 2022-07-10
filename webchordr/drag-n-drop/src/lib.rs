@@ -41,7 +41,7 @@ impl Component for Dropzone {
     type Message = ();
     type Properties = DropzoneProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         Self {
             node_ref: NodeRef::default(),
             drag_n_drop_handle: None,
@@ -64,7 +64,7 @@ impl Component for Dropzone {
         }
     }
 
-    fn destroy(&mut self, ctx: &Context<Self>) {
+    fn destroy(&mut self, _ctx: &Context<Self>) {
         if let Some(mut handle) = self.drag_n_drop_handle.take() {
             handle.destroy()
         };

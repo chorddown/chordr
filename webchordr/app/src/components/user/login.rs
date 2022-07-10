@@ -1,19 +1,16 @@
-use std::convert::TryFrom;
-
-use log::info;
-use wasm_bindgen_futures::spawn_local;
-use web_sys::{EventTarget, HtmlInputElement};
-use yew::prelude::*;
-
-use libchordr::prelude::{Credentials, Error, Password, Username};
-use webchordr_common::errors::WebError;
-use webchordr_persistence::session::SessionService;
-
 use crate::components::detail_view::DetailView;
 use crate::config::Config;
 use crate::connection::{ConnectionService, ConnectionStatus};
 use crate::session::{Session, SessionUser};
+use libchordr::prelude::{Credentials, Error, Password, Username};
+use log::info;
+use std::convert::TryFrom;
+use wasm_bindgen_futures::spawn_local;
+use web_sys::HtmlInputElement;
+use webchordr_common::errors::WebError;
 use webchordr_common::tri::Tri;
+use webchordr_persistence::session::SessionService;
+use yew::prelude::*;
 
 type LoginStatus = Tri<Session, WebError>;
 
@@ -149,7 +146,6 @@ impl Component for Login {
         };
 
         let login_error = match &self.login_status {
-            // Tri::Err(e) => html! { <div class="message error">{format!("{}",e)}</div> },
             Tri::Err(_e) => html! { <div class="message error">{"Login incorrect"}</div> },
             _ => html! {},
         };
@@ -164,14 +160,10 @@ impl Component for Login {
                 html! {}
             }
             ConnectionStatus::ServerNotReachable => {
-                html! {
-                    <div class="message warn">{"The server is not reachable"}</div>
-                }
+                html! { <div class="message warn">{"The server is not reachable"}</div> }
             }
             ConnectionStatus::Offline => {
-                html! {
-                    <div class="message warn">{"The browser appears to be offline"}</div>
-                }
+                html! { <div class="message warn">{"The browser appears to be offline"}</div> }
             }
         };
 
@@ -215,9 +207,10 @@ impl Component for Login {
 
     fn rendered(&mut self, ctx: &Context<Self>, first_render: bool) {
         if first_render {
+            let link = ctx.link();
             let session_service = SessionService::new(ctx.props().config.clone());
-            let change_login_status = ctx.link().callback(Msg::ChangeLoginStatus);
-            let change_connection_status = ctx.link().callback(Msg::ChangeConnectionStatus);
+            let change_login_status = link.callback(Msg::ChangeLoginStatus);
+            let change_connection_status = link.callback(Msg::ChangeConnectionStatus);
             let connection_service = ConnectionService::new(ctx.props().config.clone());
 
             spawn_local(async move {
