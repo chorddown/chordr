@@ -162,11 +162,11 @@ impl Handler {
         });
     }
 
-    fn run_scheduled_tasks(&mut self) {
+    fn run_scheduled_tasks(&mut self, ctx: &Context<Self>) {
         debug!("Run scheduled tasks");
 
         #[cfg(feature = "server_sync")]
-        self.check_connection_status();
+        self.check_connection_status(ctx);
     }
 
     fn update_session(&mut self, ctx: &Context<Self>, session: Session, reload_data: bool) {
@@ -520,7 +520,7 @@ impl Component for Handler {
             Msg::ConnectionStatusChanged(connection_state) => {
                 if self.state.connection_status() != connection_state {
                     self.set_state(
-                        ctx,
+                        None,
                         self.state.with_connection_status(connection_state),
                         true,
                     )
@@ -541,7 +541,7 @@ impl Component for Handler {
             Msg::StateChanged(_state) => unreachable!(), //self.state = Rc::new(state),
             Msg::InitialDataLoaded(r) => self.handle_initial_data(ctx, r),
             Msg::Tick => {
-                self.run_scheduled_tasks();
+                self.run_scheduled_tasks(ctx);
                 return false;
             }
             Msg::UpdateInfo(v) => {
