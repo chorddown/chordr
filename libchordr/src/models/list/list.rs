@@ -20,7 +20,7 @@ where
     S: for<'a> Deserialize<'a>,
 {
     pub fn new() -> Self {
-        Self { 0: Vec::new() }
+        Self(Vec::new())
     }
 
     pub fn iter(&self) -> Iter<'_, S> {
@@ -30,7 +30,7 @@ where
 
 impl<S: ListEntryTrait> From<Vec<S>> for List<S> {
     fn from(items: Vec<S>) -> Self {
-        Self { 0: items }
+        Self(items)
     }
 }
 

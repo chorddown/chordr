@@ -17,9 +17,7 @@ pub struct SongId(String);
 impl SongId {
     /// Build a new identifier from the given input
     pub fn new<S: Into<String>>(input: S) -> Self {
-        Self {
-            0: input.into().replace(" ", "-"),
-        }
+        Self(input.into().replace(' ', "-"))
     }
 
     pub fn as_str(&self) -> &str {
@@ -54,7 +52,7 @@ impl Hash for SongId {
 }
 
 impl Display for SongId {
-    fn fmt(&self, f: &mut Formatter<'_>) -> ::std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.0)
     }
 }
@@ -89,13 +87,13 @@ impl From<&String> for SongId {
     }
 }
 
-impl ::std::convert::AsRef<str> for SongId {
+impl AsRef<str> for SongId {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl ::std::str::FromStr for SongId {
+impl std::str::FromStr for SongId {
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {

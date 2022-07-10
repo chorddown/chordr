@@ -60,7 +60,7 @@ impl ChorddownConverter {
     fn build_token<'a>(&'a self, token: &'a Token) -> String {
         match token {
             Token::Literal(c) => c.to_owned(),
-            Token::Quote(c) => format!("> {}\n", c.to_owned()),
+            Token::Quote(c) => format!("> {}\n", c),
             Token::Headline {
                 level,
                 text,

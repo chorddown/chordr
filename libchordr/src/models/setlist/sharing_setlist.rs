@@ -29,7 +29,7 @@ impl From<Setlist> for SharingSetlist {
             songs: s
                 .songs
                 .iter()
-                .map(|e| SharingSetlistEntry::from(e))
+                .map(SharingSetlistEntry::from)
                 .collect::<List<SharingSetlistEntry>>(),
             gig_date: s.gig_date,
             creation_date: s.creation_date,
@@ -46,7 +46,7 @@ impl From<&Setlist> for SharingSetlist {
             songs: s
                 .songs
                 .iter()
-                .map(|e| SharingSetlistEntry::from(e))
+                .map(SharingSetlistEntry::from)
                 .collect::<List<SharingSetlistEntry>>(),
             gig_date: s.gig_date,
             creation_date: s.creation_date,

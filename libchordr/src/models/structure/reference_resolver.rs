@@ -1,6 +1,7 @@
 use crate::models::structure::Section;
 use crate::repeat_detector::RepeatDetector;
 
+#[derive(Default)]
 pub(crate) struct ReferenceResolver {}
 
 impl ReferenceResolver {
@@ -19,19 +20,16 @@ impl ReferenceResolver {
         }
 
         let result = sections
-            .into_iter()
-            .find(|section| section != &reference && section.identifier == reference.identifier)
-            // .cloned()
-            ;
+            .iter()
+            .find(|section| section != &reference && section.identifier == reference.identifier);
         if result.is_some() {
             return result;
         }
 
         let section_to_repeat = RepeatDetector::new().detect(&reference.title).ok()?;
         sections
-            .into_iter()
+            .iter()
             .find(|section| section.identifier == section_to_repeat.identifier)
-        // .cloned()
     }
 
     // /// Search the sections for a Section matching (but not equal to) the [reference]
@@ -47,12 +45,6 @@ impl ReferenceResolver {
     //         .find(|section| section != &reference && section.identifier == reference.identifier)
     //         .cloned()
     // }
-}
-
-impl Default for ReferenceResolver {
-    fn default() -> Self {
-        Self {}
-    }
 }
 
 #[cfg(test)]

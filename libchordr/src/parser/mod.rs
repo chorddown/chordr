@@ -23,16 +23,11 @@ pub trait ParserTrait {
     fn parse(&mut self, tokens: Vec<Token>) -> Result<Self::OkType, Error>;
 }
 
+#[derive(Default)]
 pub struct Parser {}
 
 impl Parser {
     pub fn new() -> Self {
-        Self {}
-    }
-}
-
-impl Default for Parser {
-    fn default() -> Self {
         Self {}
     }
 }

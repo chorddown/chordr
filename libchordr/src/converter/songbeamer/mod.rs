@@ -13,7 +13,7 @@ use super::ConverterTrait;
 /// For an unofficial specification see https://gitlab.com/openlp/wiki/-/wikis/Development/SongBeamer_-_Song_Data_Format
 pub struct SongBeamerConverter {}
 
-const BOM: &'static str = "\u{feff}";
+const BOM: &str = "\u{feff}";
 
 impl ConverterTrait for SongBeamerConverter {
     fn convert(&self, node: &Node, meta: &dyn MetaTrait, formatting: Formatting) -> Result<String> {
@@ -47,11 +47,7 @@ impl SongBeamerConverter {
                 let head =
                     SectionProvider::get_section(node).map_or("".to_string(), |s| s.title + "\n");
                 let content = self.build_content_for_children(children);
-                if let Some(content) = content {
-                    Some(format!("---\n{}{}\n", head, content.trim()))
-                } else {
-                    None
-                }
+                content.map(|content| format!("---\n{}{}\n", head, content.trim()))
             }
 
             Node::Headline(_) => None,
@@ -143,7 +139,7 @@ impl SongBeamerConverter {
             .to_string();
 
         if !trimmed.is_empty() {
-            Some(trimmed.to_string())
+            Some(trimmed)
         } else {
             None
         }
@@ -154,7 +150,7 @@ impl SongBeamerConverter {
         let sections = node.get_sections();
         let get_section_title = |section: &Section| {
             if section.is_reference {
-                let resolve_result = reference_resolver.resolve_reference(&section, &sections);
+                let resolve_result = reference_resolver.resolve_reference(section, &sections);
                 if let Some(referenced_section) = resolve_result {
                     return referenced_section.title.clone();
                 }

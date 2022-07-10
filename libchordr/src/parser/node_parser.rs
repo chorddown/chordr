@@ -156,6 +156,7 @@ mod tests {
     use crate::test_helpers::{get_test_ast, get_test_tokens};
 
     use super::*;
+    use pretty_assertions::assert_eq;
 
     #[test]
     fn test_parse() {

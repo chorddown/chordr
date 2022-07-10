@@ -6,7 +6,7 @@ use crate::models::meta::b_notation::NotationError;
 use crate::models::meta::semitone_notation::SemitoneNotationError;
 
 /// Shorthand for chord library results
-pub type Result<T, E = Error> = ::std::result::Result<T, E>;
+pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 /// Error type for errors raised in the chord library
 #[derive(Debug)]
@@ -104,8 +104,8 @@ impl StdError for Error {
     }
 }
 
-impl From<::std::io::Error> for Error {
-    fn from(error: ::std::io::Error) -> Self {
+impl From<std::io::Error> for Error {
+    fn from(error: std::io::Error) -> Self {
         Self::new(Kind::Io(error))
     }
 }
@@ -151,15 +151,15 @@ impl StdError for Kind {}
 impl Display for Kind {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), FmtError> {
         match self {
-            Kind::Parser(s) => f.write_str(&s),
-            Kind::TagBuilder(s) => f.write_str(&s),
+            Kind::Parser(s) => f.write_str(s),
+            Kind::TagBuilder(s) => f.write_str(s),
             Kind::CatalogBuilderFatal(s, p) => {
                 write!(f, "Error while building catalog: {} for path {:?}", s, p)
             }
-            Kind::FileType(s) => f.write_str(&s),
-            Kind::Chord(s) => f.write_str(&s),
-            Kind::Setlist(s) => f.write_str(&s),
-            Kind::Unknown(s) => f.write_str(&s),
+            Kind::FileType(s) => f.write_str(s),
+            Kind::Chord(s) => f.write_str(s),
+            Kind::Setlist(s) => f.write_str(s),
+            Kind::Unknown(s) => f.write_str(s),
             Kind::InvalidUsername(_name, message) => f.write_str(message),
             Kind::InvalidPassword(_password, message) => f.write_str(message),
             Kind::InvalidTeamId(invalid_id, _message) => {

@@ -22,12 +22,10 @@ where
     S: for<'a> Deserialize<'a>,
 {
     pub fn new() -> Self {
-        Self { 0: List::new() }
+        Self(List::new())
     }
     pub fn with_entries(entries: Vec<S>) -> Self {
-        Self {
-            0: List::from(entries),
-        }
+        Self(List::from(entries))
     }
 
     pub fn iter(&self) -> Iter<'_, S> {
@@ -41,7 +39,7 @@ where
     S: for<'a> Deserialize<'a>,
 {
     fn from(list: Vec<S>) -> Self {
-        SongList { 0: list.into() }
+        SongList(list.into())
     }
 }
 

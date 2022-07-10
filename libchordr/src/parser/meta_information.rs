@@ -5,7 +5,7 @@ use crate::modification::transposition::TransposableTrait;
 use crate::tokenizer::Meta;
 
 /// Meta Information for a parsed song
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct MetaInformation {
     pub(crate) title: Option<String>,
     pub(crate) subtitle: Option<String>,
@@ -161,32 +161,6 @@ impl TransposableTrait for MetaInformation {
             transposed_meta
         } else {
             self
-        }
-    }
-}
-impl Default for MetaInformation {
-    fn default() -> Self {
-        Self {
-            title: None,
-            subtitle: None,
-            artist: None,
-            composer: None,
-            lyricist: None,
-            copyright: None,
-            album: None,
-            year: None,
-            key: None,
-            key_raw: None,
-            original_key: None,
-            original_key_raw: None,
-            time: None,
-            tempo: None,
-            duration: None,
-            capo: None,
-            original_title: None,
-            alternative_title: None,
-            ccli_song_id: None,
-            b_notation: Default::default(),
         }
     }
 }

@@ -10,4 +10,4 @@ pub use deserializer_trait::DxDeserializer;
 pub use serializer_error::SerializerError;
 pub use serializer_trait::DxSerializer;
 
-const VERSION: &'static str = "2";
+const VERSION: &str = "2";

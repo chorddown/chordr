@@ -23,6 +23,7 @@ pub struct CatalogBuildResult {
 }
 
 /// Catalog Builder provides functions to build a Song Catalog from a given directory
+#[derive(Default)]
 pub struct CatalogBuilder;
 
 impl CatalogBuilder {
@@ -50,7 +51,7 @@ impl CatalogBuilder {
         let song_results = self.build_songs_for_file_list(song_file_results);
         let (songs, mut parse_errors) = self.partition_songs(song_results);
 
-        parse_errors.extend(io_errors.into_iter().map(|e| e.into()));
+        parse_errors.extend(io_errors.into_iter());
 
         Ok(CatalogBuildResult {
             catalog: Catalog::new(Local::now().to_rfc2822(), songs),
@@ -145,12 +146,6 @@ impl CatalogBuilder {
                 path,
             ))]
         }
-    }
-}
-
-impl Default for CatalogBuilder {
-    fn default() -> Self {
-        Self {}
     }
 }
 

@@ -55,7 +55,7 @@ impl RepeatDetector {
         match SectionIdentifier::try_from(self.get_substring_for_identifier(
             value,
             capture_start,
-            &capture,
+            capture,
         )) {
             Ok(i) => Ok(i),
             Err(e) => Err(e.to_string()),

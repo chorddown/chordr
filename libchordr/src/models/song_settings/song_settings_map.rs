@@ -10,7 +10,7 @@ pub struct SongSettingsMap(HashMap<SongId, SongSettings>);
 
 impl SongSettingsMap {
     pub fn new() -> Self {
-        SongSettingsMap { 0: HashMap::new() }
+        SongSettingsMap(HashMap::new())
     }
 
     pub fn store(&mut self, song_id: SongId, settings: SongSettings) -> Option<SongSettings> {
