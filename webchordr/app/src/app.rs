@@ -28,14 +28,8 @@ use crate::session::Session;
 use crate::state::{SongInfo, State};
 use webchordr_common::route::{AppRoute, SetlistRoute, UserRoute};
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Default)]
 pub struct AppRouteState {}
-
-impl Default for AppRouteState {
-    fn default() -> Self {
-        Self {}
-    }
-}
 
 #[derive(Properties, Clone)]
 pub struct AppProperties {
@@ -77,7 +71,7 @@ impl App {
         debug!("Render Route: {:?}", app_route);
 
         (match app_route {
-            Some(AppRoute::Song { id }) => self.view_song(ctx, id.clone()),
+            Some(AppRoute::Song { id }) => self.view_song(ctx, id),
             Some(AppRoute::SongBrowser { chars }) => self.view_song_browser(ctx, chars),
             Some(AppRoute::SongSearch) => self.view_song_search(ctx, true),
             Some(AppRoute::SetlistList) => self.view_setlist_route(ctx, SetlistRoute::List),
@@ -221,7 +215,6 @@ impl App {
                 Some(catalog) => {
                     let persistence_manager = ctx.props().persistence_manager.clone();
                     let replace = ctx.props().on_event.reform(|e| e);
-                    let catalog = catalog.clone();
                     let setlist = state.current_setlist();
 
                     self.compose(

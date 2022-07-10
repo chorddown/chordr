@@ -7,6 +7,6 @@ pub struct SerializeService {}
 
 impl SerializeService {
     pub fn serialize(setlist: &Setlist) -> Result<String, WebError> {
-        Ok(LibChordrSerializeService::serialize(setlist).map_err(|e| SharingError::from(e))?)
+        Ok(LibChordrSerializeService::serialize(setlist).map_err(SharingError::from)?)
     }
 }

@@ -96,7 +96,7 @@ impl Component for SongSearch {
     fn create(ctx: &Context<Self>) -> Self {
         SongSearch {
             search: String::new(),
-            catalog_revision: ctx.props().catalog.revision().clone(),
+            catalog_revision: ctx.props().catalog.revision(),
             search_index: None,
             timeout: None,
         }
@@ -111,7 +111,7 @@ impl Component for SongSearch {
                 }
 
                 // Debounce the handling of user input
-                let debounced = ctx.link().callback(|new_search| Msg::Debounce(new_search));
+                let debounced = ctx.link().callback(Msg::Debounce);
                 self.timeout = Some(Timeout::new(100, move || {
                     debounced.emit(new_search);
                 }));
@@ -127,7 +127,7 @@ impl Component for SongSearch {
             }
 
             Msg::BuildSearchIndex => {
-                self.search_index = Some(build_search_index_from_props(&ctx.props()));
+                self.search_index = Some(build_search_index_from_props(ctx.props()));
 
                 true
             }

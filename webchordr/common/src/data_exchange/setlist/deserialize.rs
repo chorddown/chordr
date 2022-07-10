@@ -24,7 +24,7 @@ impl DeserializeService {
         catalog: &C,
     ) -> Result<DeserializeResult, WebError> {
         let sharing_setlist = LibChordrDeserializeService::deserialize(serialized_setlist)
-            .map_err(|e| SharingError::from(e))?;
+            .map_err(SharingError::from)?;
         let (entries, errors) = Self::collect_setlist_entries(&sharing_setlist, catalog);
 
         let SharingSetlist {

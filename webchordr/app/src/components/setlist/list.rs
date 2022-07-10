@@ -84,8 +84,8 @@ impl Component for List {
         let current_setlist = state.current_setlist();
         let render = |setlist: &Setlist| {
             let key = setlist.id();
-            let on_load_click = ctx.link().callback(|s| Msg::Load(s));
-            let on_delete_click = ctx.link().callback(|s| Msg::Delete(s));
+            let on_load_click = ctx.link().callback(Msg::Load);
+            let on_delete_click = ctx.link().callback(Msg::Delete);
 
             let highlight = match current_setlist {
                 Some(ref c) => c.id() == setlist.id(),
@@ -107,7 +107,7 @@ impl Component for List {
         };
 
         let entries = self.setlists.as_ref().unwrap().iter();
-        let on_add_button_click = ctx.link().callback(|s| Msg::Add(s));
+        let on_add_button_click = ctx.link().callback(Msg::Add);
         debug!("Redraw {} setlists", entries.len());
 
         (html! {

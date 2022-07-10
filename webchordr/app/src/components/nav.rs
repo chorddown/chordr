@@ -87,7 +87,7 @@ impl Nav {
 
         let session = ctx.props().state.session();
         let state = ctx.props().state.clone();
-        let setlist_share_button = match &state.current_setlist().clone() {
+        let setlist_share_button = match &state.current_setlist() {
             Some(s) => html! { <SetlistShareButton setlist={s}/>},
             None => html! {},
         };

@@ -68,19 +68,9 @@ impl SortableService {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Default)]
 pub struct SortableOptions {
     pub delay: i32,
     pub handle: Option<String>,
     pub force_fallback: bool,
-}
-
-impl Default for SortableOptions {
-    fn default() -> Self {
-        SortableOptions {
-            delay: 0,
-            handle: None,
-            force_fallback: false,
-        }
-    }
 }
