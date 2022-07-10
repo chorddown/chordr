@@ -3,7 +3,7 @@ use gloo_events::EventListener;
 use gloo_timers::callback::Interval;
 use libchordr::models::user::MainData;
 use libchordr::prelude::*;
-use log::{debug, error, info, warn};
+use log::{debug, error, info, trace, warn};
 use std::rc::Rc;
 use std::sync::Arc;
 use tri::Tri;
@@ -169,20 +169,30 @@ impl Handler {
         self.check_connection_status(ctx);
     }
 
-    fn update_session(&mut self, ctx: &Context<Self>, session: Session, reload_data: bool) {
-        self.set_state(None, self.state.with_session(session), true);
-        self.persistence_manager =
-            Self::build_persistence_manager(&self.config, (*self.state.session()).clone());
+    fn update_session(&mut self, ctx: &Context<Self>, session: Session, reload_data: bool) -> bool {
+        let session_changed = &*self.state.session() != &session;
+        if session_changed {
+            self.set_state(None, self.state.with_session(session), true);
+            self.persistence_manager =
+                Self::build_persistence_manager(&self.config, (*self.state.session()).clone());
+        }
 
         if reload_data {
             // Fetch/reload the Setlist and Song Settings
             self.fetch_setlist(ctx);
             self.fetch_song_settings(ctx);
+
+            return true;
         }
+
+        session_changed
     }
 
     fn set_state(&mut self, ctx: Option<&Context<Self>>, state: State, sync: bool) {
         debug!("Change state ({})", if sync { "sync" } else { "async" });
+        #[cfg(debug_assertions)]
+        trace!("State diff: {}", self.state.diff(&state));
+
         if sync {
             self.state = Rc::new(state)
         } else {
@@ -515,7 +525,7 @@ impl Component for Handler {
                 }
             }
             Msg::Ignore => return false,
-            Msg::SessionChanged(session) => self.update_session(ctx, session, true),
+            Msg::SessionChanged(session) => return self.update_session(ctx, session, true),
             #[cfg(feature = "server_sync")]
             Msg::ConnectionStatusChanged(connection_state) => {
                 if self.state.connection_status() != connection_state {

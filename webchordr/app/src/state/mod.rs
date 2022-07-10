@@ -1,15 +1,12 @@
-use std::rc::Rc;
-
-use chrono::Utc;
-
-use libchordr::models::catalog::Catalog;
-use libchordr::models::setlist::Setlist;
-use libchordr::prelude::{SongId, SongSettingsMap, User};
-pub use song_info::SongInfo;
-use webchordr_common::errors::WebError;
-
 use crate::connection::ConnectionStatus;
 use crate::session::Session;
+use chrono::Utc;
+use libchordr::models::catalog::Catalog;
+use libchordr::models::setlist::Setlist;
+use libchordr::prelude::{CatalogTrait, SongId, SongSettingsMap, User};
+pub use song_info::SongInfo;
+use std::rc::Rc;
+use webchordr_common::errors::WebError;
 
 mod song_info;
 
@@ -171,6 +168,67 @@ impl State {
         clone.set_song_settings(song_settings_map);
 
         clone
+    }
+
+    pub(crate) fn diff(&self, other: &Self) -> String {
+        let mut output = String::new();
+        if self.catalog != other.catalog {
+            let default = "No Catalog";
+            output.push_str(&format!(
+                "Catalog {} vs {}\n",
+                self.catalog
+                    .as_ref()
+                    .map_or(default.to_owned(), |c| c.revision()),
+                other
+                    .catalog
+                    .as_ref()
+                    .map_or(default.to_owned(), |c| c.revision())
+            ));
+        }
+        if self.connection_status != other.connection_status {
+            let default = "No Catalog";
+            output.push_str(&format!(
+                "Connection status {:?} vs {:?}\n",
+                self.connection_status, other.connection_status,
+            ));
+        }
+        if self.current_song_id != other.current_song_id {
+            output.push_str(&format!(
+                "Current Song ID {:?} vs {:?}\n",
+                self.current_song_id, other.current_song_id,
+            ));
+        }
+        if self.current_setlist != other.current_setlist {
+            let default = "No Setlist";
+            output.push_str(&format!(
+                "Current Setlist {:?} vs {:?}\n",
+                self.current_setlist
+                    .as_ref()
+                    .map_or(default.to_owned(), |s| s.name().to_string()),
+                other
+                    .current_setlist
+                    .as_ref()
+                    .map_or(default.to_owned(), |s| s.name().to_string()),
+            ));
+        }
+        if !Rc::ptr_eq(&self.session, &other.session) {
+            output.push_str(&format!("{:?} vs {:?}\n", self.session, other.session));
+        }
+
+        if !Rc::ptr_eq(&self.song_settings, &other.song_settings) {
+            output.push_str(&format!(
+                "Song Settings {:?} vs {:?}\n",
+                self.song_settings, other.song_settings
+            ));
+        }
+        if self.available_version != other.available_version {
+            output.push_str(&format!(
+                "App version {:?} vs {:?}\n",
+                self.available_version, other.available_version
+            ));
+        }
+
+        output
     }
 }
 
