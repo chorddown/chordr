@@ -78,17 +78,11 @@ impl App {
             Some(AppRoute::SetlistLoad { serialized_setlist }) => {
                 self.view_setlist_route(ctx, SetlistRoute::Load { serialized_setlist })
             }
-            Some(AppRoute::Setlist) => {
-                todo!("route");
-                // self.view_setlist_route(ctx, route)
-            }
+            Some(AppRoute::Setlist) => self.view_setlist_route(ctx, SetlistRoute::List),
 
             Some(AppRoute::UserInfo) => self.view_user_route(ctx, UserRoute::Info),
             Some(AppRoute::UserLogin) => self.view_user_route(ctx, UserRoute::Login),
-            Some(AppRoute::User) => {
-                todo!("route");
-                // self.view_user_route(ctx, route)
-            }
+            Some(AppRoute::User) => self.view_user_route(ctx, UserRoute::Info),
 
             Some(AppRoute::Index) => self.view_index(ctx),
             None => self.view_index(ctx),
@@ -251,9 +245,10 @@ impl App {
     }
 
     fn view_user_route(&self, ctx: &Context<Self>, route: UserRoute) -> Html {
-        let user = ctx.props().state.session().user().clone();
-        let on_login_success = ctx.props().on_user_login_success.reform(|i| i);
-        let on_login_error = ctx.props().on_user_login_error.reform(|i| i);
+        let props = ctx.props();
+        let user = props.state.session().user().clone();
+        let on_login_success = props.on_user_login_success.reform(|i| i);
+        let on_login_error = props.on_user_login_error.reform(|i| i);
 
         match route {
             UserRoute::Info => html! { <UserInfo user={user} /> },
