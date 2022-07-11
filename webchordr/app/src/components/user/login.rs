@@ -5,10 +5,10 @@ use crate::session::{Session, SessionUser};
 use libchordr::prelude::{Credentials, Error, Password, Username};
 use log::info;
 use std::convert::TryFrom;
+use tri::Tri;
 use wasm_bindgen_futures::spawn_local;
 use web_sys::HtmlInputElement;
-use webchordr_common::errors::WebError;
-use webchordr_common::tri::Tri;
+use webchordr_common::prelude::*;
 use webchordr_persistence::session::SessionService;
 use yew::prelude::*;
 
@@ -119,7 +119,7 @@ impl Component for Login {
             let session: &Session = session;
             if let SessionUser::LoggedIn(user) = session.user() {
                 return (html! {
-                    <DetailView close_uri="#">
+                    <DetailView close_route={AppRoute::Index}>
                         {format!("Successfully logged in as {}", user.username())}
                     </DetailView>
                 }) as Html;
@@ -129,7 +129,7 @@ impl Component for Login {
         // If the user is already logged in
         if let SessionUser::LoggedIn(user) = &ctx.props().user {
             return (html! {
-                <DetailView close_uri="#">
+                <DetailView close_route={AppRoute::Index}>
                     {format!("Already logged in as {}", user.username())}
                 </DetailView>
             }) as Html;
@@ -176,7 +176,7 @@ impl Component for Login {
         });
 
         (html! {
-            <DetailView close_uri="#">
+            <DetailView close_route={AppRoute::Index}>
                 <form onsubmit={submit}>
                     <div class="user-login">
                         <div class="form-group user-login-username">

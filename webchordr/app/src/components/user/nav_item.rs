@@ -1,12 +1,10 @@
-use std::rc::Rc;
-
-use webchordr_common::route::route;
-use yew::prelude::*;
-
 use crate::connection::ConnectionStatus;
 use crate::helpers::Class;
 use crate::session::{Session, SessionUser};
 use crate::state::State;
+use std::rc::Rc;
+use webchordr_common::prelude::*;
+use yew::prelude::*;
 
 #[derive(Properties, Clone)]
 pub struct NavItemProps {
@@ -50,13 +48,14 @@ impl Component for NavItem {
                     user.last_name(),
                     user.username()
                 );
-                let class = class.add("logged-in");
+                let class = class.add("logged-in").to_classes();
+                let to = AppRoute::UserInfo;
 
                 (html! {
-                    <a role="button" class={class} href={route("/user/info")} title={user_description}>
+                    <Link role="button" {class} {to} title={user_description}>
                         <i class="im im-user-male"></i>
                         <i class="im im-check-mark"></i>
-                    </a>
+                    </Link>
                 }) as Html
             }
             SessionUser::Unauthenticated => {
@@ -66,12 +65,13 @@ impl Component for NavItem {
                     ConnectionStatus::Offline => "Device offline",
                 };
 
-                let class = class.add("not-logged-in");
+                let class = class.add("not-logged-in").to_classes();
+                let to = AppRoute::UserLogin;
 
                 (html! {
-                    <a role="button" class={class} href={route("/user/login")} title={title}>
+                    <Link role="button" {class} {to} title={title}>
                         <i class="im im-user-male"></i>
-                    </a>
+                    </Link>
                 }) as Html
             }
         }

@@ -1,4 +1,5 @@
 use log::error;
+use webchordr_common::prelude::*;
 use yew::prelude::*;
 
 use crate::helpers::window;
@@ -7,7 +8,7 @@ use crate::helpers::window;
 pub struct DetailViewProps {
     pub children: Children,
     #[prop_or_default]
-    pub close_uri: Option<&'static str>,
+    pub close_route: Option<AppRoute>,
 }
 
 pub struct DetailView {}
@@ -21,7 +22,7 @@ impl Component for DetailView {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        html! {
+        (html! {
             <div class="detail-view">
                 <header class="detail-view-header">
                     { self.render_close_button(ctx) }
@@ -30,17 +31,17 @@ impl Component for DetailView {
                     { ctx.props().children.clone() }
                 </div>
             </div>
-        }
+        }) as Html
     }
 }
 
 impl DetailView {
     fn render_close_button(&self, ctx: &Context<Self>) -> Html {
-        if let Some(href) = ctx.props().close_uri {
+        if let Some(to) = &ctx.props().close_route {
             return html! {
-                <a role="button" class="close-button discreet" {href}>
+                <Link role="button" class="close-button discreet" to={to.clone()}>
                     <i class="im im-x-mark"></i>
-                </a>
+                </Link>
             };
         }
 
@@ -61,10 +62,4 @@ impl DetailView {
             </button>
         }
     }
-}
-#[cfg(test)]
-mod tests {
-
-    #[test]
-    fn dv_test() {}
 }
