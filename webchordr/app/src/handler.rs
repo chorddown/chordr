@@ -162,6 +162,7 @@ impl Handler {
         });
     }
 
+    #[allow(unused)]
     fn run_scheduled_tasks(&mut self, ctx: &Context<Self>) {
         debug!("Run scheduled tasks");
 
