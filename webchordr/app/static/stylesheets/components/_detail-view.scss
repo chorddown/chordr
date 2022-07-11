@@ -11,7 +11,8 @@
         .close-button {
             margin-left: auto;
 
-            @include button-default($border: none, $width: 42px);
+            @include button-default($border: auto, $width: 42px);
+            border-color: transparent;
         }
     }
 
