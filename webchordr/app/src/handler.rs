@@ -27,6 +27,7 @@ use crate::handler_traits::settings_handler::SettingsHandler;
 use crate::helpers::window;
 use crate::ipc::update_info::UpdateInfo;
 use crate::ipc::{register_ipc_handler, IpcMessage};
+use crate::service::song_id_service::SongIdService;
 use crate::session::{Session, SessionMainData};
 use crate::state::State;
 
@@ -200,6 +201,18 @@ impl Handler {
             ctx.expect("Expected ctx to be a context")
                 .link()
                 .send_message(Msg::StateChanged(state))
+        }
+    }
+
+    fn update_state_with_route(state: &State, ctx: &Context<Self>) -> State {
+        if let AppRoute::Song { id } = &ctx.props().route {
+            let song_id_service = SongIdService::new();
+            let song_id = song_id_service
+                .prepare_song_id(id.clone(), state.catalog().as_deref())
+                .unwrap_or(id.clone()); // If no correct `SongId` was found, just forward the wrong one
+            state.with_current_song_id(song_id)
+        } else {
+            state.without_current_song_id()
         }
     }
 }
@@ -490,7 +503,7 @@ impl Component for Handler {
         let session_service = Rc::new(SessionService::new(config.clone()));
         let persistence_manager = Handler::build_persistence_manager(&config, Session::default());
 
-        let state = Rc::new(State::default());
+        let state = Rc::new(Self::update_state_with_route(&State::default(), ctx));
         let connection_service = ConnectionService::new(config.clone());
 
         let message_listener = register_ipc_handler(ctx.link().callback(|m| match m {
@@ -559,6 +572,12 @@ impl Component for Handler {
                 self.set_state(None, self.state.with_available_version(v.version), true);
             }
         }
+        true
+    }
+
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        self.set_state(None, Self::update_state_with_route(&self.state, ctx), true);
+
         true
     }
 
