@@ -175,7 +175,7 @@ impl State {
         if self.catalog != other.catalog {
             let default = "No Catalog";
             output.push_str(&format!(
-                "Catalog {} vs {}\n",
+                "Catalog \n  {}\n vs \n  {}\n",
                 self.catalog
                     .as_ref()
                     .map_or(default.to_owned(), |c| c.revision()),
@@ -188,20 +188,20 @@ impl State {
         if self.connection_status != other.connection_status {
             let default = "No Catalog";
             output.push_str(&format!(
-                "Connection status {:?} vs {:?}\n",
+                "Connection status \n  {:?}\n vs \n  {:?}\n",
                 self.connection_status, other.connection_status,
             ));
         }
         if self.current_song_id != other.current_song_id {
             output.push_str(&format!(
-                "Current Song ID {:?} vs {:?}\n",
+                "Current Song ID \n  {:?}\n vs \n  {:?}\n",
                 self.current_song_id, other.current_song_id,
             ));
         }
         if self.current_setlist != other.current_setlist {
             let default = "No Setlist";
             output.push_str(&format!(
-                "Current Setlist {:?} vs {:?}\n",
+                "Current Setlist \n  {:?}\n vs \n  {:?}\n",
                 self.current_setlist
                     .as_ref()
                     .map_or(default.to_owned(), |s| s.name().to_string()),
@@ -212,18 +212,21 @@ impl State {
             ));
         }
         if !Rc::ptr_eq(&self.session, &other.session) {
-            output.push_str(&format!("{:?} vs {:?}\n", self.session, other.session));
+            output.push_str(&format!(
+                "{:?}\n vs \n  {:?}\n",
+                self.session, other.session
+            ));
         }
 
         if !Rc::ptr_eq(&self.song_settings, &other.song_settings) {
             output.push_str(&format!(
-                "Song Settings {:?} vs {:?}\n",
+                "Song Settings \n  {:?}\n vs \n  {:?}\n",
                 self.song_settings, other.song_settings
             ));
         }
         if self.available_version != other.available_version {
             output.push_str(&format!(
-                "App version {:?} vs {:?}\n",
+                "App version \n  {:?}\n vs \n  {:?}\n",
                 self.available_version, other.available_version
             ));
         }
