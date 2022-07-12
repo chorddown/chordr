@@ -16,10 +16,13 @@ use webchordr_persistence::prelude::*;
 use webchordr_persistence::session::SessionService;
 use webchordr_persistence::web_repository::{CatalogWebRepository, SettingsWebRepository};
 use yew::prelude::*;
+use yew_router::prelude::*;
 
 use crate::app::App;
 use crate::config::Config;
 use crate::connection::{ConnectionService, ConnectionStatus};
+use crate::control::navigate::SongNavigator;
+use crate::control::{Control, KeyboardControl};
 use crate::errors::WebError;
 use crate::handler_traits::catalog_handler::CatalogHandler;
 use crate::handler_traits::setlist_handler::SetlistHandler;
@@ -41,6 +44,7 @@ pub struct Handler {
     /// Keep a reference to the IntervalTask so that it doesn't get dropped
     _clock_handle: gloo_timers::callback::Interval,
     message_listener: Option<EventListener>,
+    keyboard_control: KeyboardControl,
     #[allow(unused)]
     fetching: bool,
     config: Config,
@@ -63,6 +67,7 @@ pub enum Msg {
     StateChanged(State),
     InitialDataLoaded(InitialDataResult),
     UpdateInfo(UpdateInfo),
+    Control(Control),
 }
 
 impl Handler {
@@ -163,7 +168,7 @@ impl Handler {
         });
     }
 
-    #[allow(unused)]
+    #[allow(unused_variables)]
     fn run_scheduled_tasks(&mut self, ctx: &Context<Self>) {
         debug!("Run scheduled tasks");
 
@@ -192,7 +197,6 @@ impl Handler {
 
     fn set_state(&mut self, ctx: Option<&Context<Self>>, state: State, sync: bool) {
         debug!("Change state ({})", if sync { "sync" } else { "async" });
-        #[cfg(debug_assertions)]
         trace!("State diff: {}", self.state.diff(&state));
 
         if sync {
@@ -510,6 +514,9 @@ impl Component for Handler {
             IpcMessage::UpdateInfo(i) => Msg::UpdateInfo(i),
         }));
 
+        let keyboard_control =
+            KeyboardControl::new(ctx.link().callback(|control| Msg::Control(control)));
+
         Self {
             persistence_manager,
             fetching: false,
@@ -519,10 +526,13 @@ impl Component for Handler {
             session_service,
             connection_service,
             state,
+            keyboard_control,
         }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+        trace!("Received Message {:?}", msg);
+
         match msg {
             Msg::FetchCatalogReady(response) => {
                 self.fetching = false;
@@ -571,6 +581,15 @@ impl Component for Handler {
             Msg::UpdateInfo(v) => {
                 self.set_state(None, self.state.with_available_version(v.version), true);
             }
+            Msg::Control(control) => match control {
+                Control::Navigate(navigate) => {
+                    let navigate_result = SongNavigator::new().navigate(navigate, &self.state);
+                    match navigate_result {
+                        Some(route) => BrowserHistory::default().push(route),
+                        None => return false,
+                    }
+                }
+            },
         }
         true
     }
@@ -582,6 +601,7 @@ impl Component for Handler {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
+        debug!("Redraw the handler");
         let state = self.state.clone();
         let persistence_manager = self.persistence_manager.clone();
         let on_event = ctx.link().callback(|e| Msg::Event(Box::new(e)));
