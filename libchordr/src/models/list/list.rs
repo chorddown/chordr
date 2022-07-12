@@ -114,7 +114,7 @@ where
         Ok(())
     }
 
-    fn position(&mut self, id: <Self::Item as ListEntryTrait>::Id) -> Option<usize> {
+    fn position(&self, id: <Self::Item as ListEntryTrait>::Id) -> Option<usize> {
         self.0.iter().position(|s| s.id() == id)
     }
 }

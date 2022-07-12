@@ -164,7 +164,7 @@ impl ListTrait for Setlist {
         self.songs.move_entry(from, to)
     }
 
-    fn position(&mut self, song_id: <Self::Item as ListEntryTrait>::Id) -> Option<usize> {
+    fn position(&self, song_id: <Self::Item as ListEntryTrait>::Id) -> Option<usize> {
         self.songs.position(song_id)
     }
 }

@@ -92,7 +92,7 @@ where
         self.0.move_entry(from, to)
     }
 
-    fn position(&mut self, id: <Self::Item as ListEntryTrait>::Id) -> Option<usize> {
+    fn position(&self, id: <Self::Item as ListEntryTrait>::Id) -> Option<usize> {
         self.0.position(id)
     }
 }

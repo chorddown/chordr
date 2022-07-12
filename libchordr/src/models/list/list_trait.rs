@@ -43,5 +43,5 @@ pub trait ListTrait {
     fn move_entry(&mut self, from: usize, to: usize) -> Result<(), ListError>;
 
     /// Get the position of the entry with the given [Item::Id]
-    fn position(&mut self, id: <Self::Item as ListEntryTrait>::Id) -> Option<usize>;
+    fn position(&self, id: <Self::Item as ListEntryTrait>::Id) -> Option<usize>;
 }
