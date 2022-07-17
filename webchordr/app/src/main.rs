@@ -2,6 +2,7 @@
 
 use crate::routing::Main;
 pub use fetch_helper::*;
+use log::Level;
 use webchordr_common::config;
 use webchordr_common::connection;
 use webchordr_common::data_exchange;
@@ -16,6 +17,7 @@ static ALLOC: wee_alloc::WeeAlloc<'_> = wee_alloc::WeeAlloc::INIT;
 
 mod app;
 mod components;
+mod control;
 mod handler;
 mod handler_traits;
 mod ipc;
@@ -24,6 +26,12 @@ mod service;
 mod state;
 
 fn main() {
-    wasm_logger::init(wasm_logger::Config::default());
+    let config = if cfg!(debug_assertions) {
+        wasm_logger::Config::new(Level::Trace)
+    } else {
+        wasm_logger::Config::default()
+    };
+    wasm_logger::init(config.module_prefix("webchordr"));
+
     yew::start_app::<Main>();
 }

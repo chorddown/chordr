@@ -2,7 +2,7 @@ use libchordr::prelude::*;
 use std::marker::PhantomData;
 use webchordr_common::components::link::Link;
 use webchordr_common::helpers::Class;
-use webchordr_common::route::AppRoute;
+use webchordr_common::route::{AppRoute, SongIdParam};
 use yew::prelude::*;
 use yew::virtual_dom::VNode;
 use yew::Component;
@@ -75,7 +75,7 @@ impl<S: SongData + PartialEq + 'static + Clone> Component for Item<S> {
         };
 
         let to = AppRoute::Song {
-            id: ctx.props().song.id(),
+            id: SongIdParam::from_song_id(&ctx.props().song.id()),
         };
         let link = html! { <Link role="button" class="discreet" data_key={key.clone()} to={to}>{title}</Link> };
         // let link = html! { <a role="button" class="discreet" data-key={key.clone()} href={href}>{title}</a> };

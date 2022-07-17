@@ -16,7 +16,6 @@ use webchordr_persistence::prelude::*;
 use webchordr_persistence::session::SessionService;
 use webchordr_persistence::web_repository::{CatalogWebRepository, SettingsWebRepository};
 use yew::prelude::*;
-use yew_router::prelude::*;
 
 use crate::app::App;
 use crate::config::Config;
@@ -30,7 +29,6 @@ use crate::handler_traits::settings_handler::SettingsHandler;
 use crate::helpers::window;
 use crate::ipc::update_info::UpdateInfo;
 use crate::ipc::{register_ipc_handler, IpcMessage};
-use crate::service::song_id_service::SongIdService;
 use crate::session::{Session, SessionMainData};
 use crate::state::State;
 
@@ -210,11 +208,7 @@ impl Handler {
 
     fn update_state_with_route(state: &State, ctx: &Context<Self>) -> State {
         if let AppRoute::Song { id } = &ctx.props().route {
-            let song_id_service = SongIdService::new();
-            let song_id = song_id_service
-                .prepare_song_id(id.clone(), state.catalog().as_deref())
-                .unwrap_or(id.clone()); // If no correct `SongId` was found, just forward the wrong one
-            state.with_current_song_id(song_id)
+            state.with_current_song_id(id.as_song_id())
         } else {
             state.without_current_song_id()
         }
@@ -581,15 +575,18 @@ impl Component for Handler {
             Msg::UpdateInfo(v) => {
                 self.set_state(None, self.state.with_available_version(v.version), true);
             }
-            Msg::Control(control) => match control {
-                Control::Navigate(navigate) => {
-                    let navigate_result = SongNavigator::new().navigate(navigate, &self.state);
-                    match navigate_result {
-                        Some(route) => BrowserHistory::default().push(route),
-                        None => return false,
+            Msg::Control(control) => {
+                match control {
+                    Control::Navigate(navigate) => {
+                        if SongNavigator::new()
+                            .navigate(navigate, &self.state)
+                            .is_none()
+                        {
+                            return false;
+                        }
                     }
-                }
-            },
+                };
+            }
         }
         true
     }

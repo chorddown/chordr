@@ -71,7 +71,7 @@ impl App {
         debug!("Render Route: {:?}", app_route);
 
         (match app_route {
-            Some(AppRoute::Song { id }) => self.view_song(ctx, id),
+            Some(AppRoute::Song { id }) => self.view_song(ctx, id.as_song_id()),
             Some(AppRoute::SongBrowser { chars }) => self.view_song_browser(ctx, chars),
             Some(AppRoute::SongSearch) => self.view_song_search(ctx, true),
             Some(AppRoute::SetlistList) => self.view_setlist_route(ctx, SetlistRoute::List),

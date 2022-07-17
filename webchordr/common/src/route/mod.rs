@@ -1,12 +1,14 @@
-use libchordr::models::song_id::SongId;
-use yew_router::prelude::*;
-mod link_to;
 pub use link_to::LinkTo;
+pub use song_id_param::SongIdParam;
+use yew_router::prelude::*;
+
+mod link_to;
+mod song_id_param;
 
 #[derive(Routable, Debug, Clone, PartialEq)]
 pub enum AppRoute {
     #[at("/song/:id")]
-    Song { id: SongId },
+    Song { id: SongIdParam },
     #[at("/song-browser/:chars")]
     SongBrowser { chars: String },
     #[at("/song-search")]
