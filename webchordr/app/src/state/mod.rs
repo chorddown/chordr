@@ -1,13 +1,12 @@
 use crate::connection::ConnectionStatus;
 use crate::session::Session;
 use chrono::Utc;
-use libchordr::models::catalog::Catalog;
-use libchordr::models::setlist::Setlist;
-use libchordr::prelude::{CatalogTrait, ListTrait, SongId, SongSettingsMap, User};
+use libchordr::prelude::*;
 pub use song_info::SongInfo;
 use std::rc::Rc;
 use webchordr_common::errors::WebError;
 
+pub mod debug;
 mod song_info;
 
 #[allow(unused)]
@@ -168,71 +167,6 @@ impl State {
         clone.set_song_settings(song_settings_map);
 
         clone
-    }
-
-    pub(crate) fn diff(&self, other: &Self) -> String {
-        let mut output = String::new();
-        if self.catalog != other.catalog {
-            let default = "No Catalog";
-            output.push_str(&format!(
-                "Catalog \n  {}\n vs \n  {}\n",
-                self.catalog
-                    .as_ref()
-                    .map_or(default.to_owned(), |c| c.revision()),
-                other
-                    .catalog
-                    .as_ref()
-                    .map_or(default.to_owned(), |c| c.revision())
-            ));
-        }
-        if self.connection_status != other.connection_status {
-            let default = "No Catalog";
-            output.push_str(&format!(
-                "Connection status \n  {:?}\n vs \n  {:?}\n",
-                self.connection_status, other.connection_status,
-            ));
-        }
-        if self.current_song_id != other.current_song_id {
-            output.push_str(&format!(
-                "Current Song ID \n  {:?}\n vs \n  {:?}\n",
-                self.current_song_id, other.current_song_id,
-            ));
-        }
-        if self.current_setlist != other.current_setlist {
-            let default = "No Setlist";
-            let describe_setlist = |s: &Rc<Setlist>| format!("{} ({} entries)", s.name(), s.len());
-            output.push_str(&format!(
-                "Current Setlist \n  {:?}\n vs \n  {:?}\n",
-                self.current_setlist
-                    .as_ref()
-                    .map_or(default.to_owned(), describe_setlist),
-                other
-                    .current_setlist
-                    .as_ref()
-                    .map_or(default.to_owned(), describe_setlist),
-            ));
-        }
-        if !Rc::ptr_eq(&self.session, &other.session) {
-            output.push_str(&format!(
-                "{:?}\n vs \n  {:?}\n",
-                self.session, other.session
-            ));
-        }
-
-        if !Rc::ptr_eq(&self.song_settings, &other.song_settings) {
-            output.push_str(&format!(
-                "Song Settings \n  {:?}\n vs \n  {:?}\n",
-                self.song_settings, other.song_settings
-            ));
-        }
-        if self.available_version != other.available_version {
-            output.push_str(&format!(
-                "App version \n  {:?}\n vs \n  {:?}\n",
-                self.available_version, other.available_version
-            ));
-        }
-
-        output
     }
 }
 

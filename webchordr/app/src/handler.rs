@@ -195,7 +195,10 @@ impl Handler {
 
     fn set_state(&mut self, ctx: Option<&Context<Self>>, state: State, sync: bool) {
         debug!("Change state ({})", if sync { "sync" } else { "async" });
-        trace!("State diff: {}", self.state.diff(&state));
+        trace!(
+            "State diff: {}",
+            crate::state::debug::diff(&self.state, &state)
+        );
 
         if sync {
             self.state = Rc::new(state)
