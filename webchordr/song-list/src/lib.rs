@@ -66,8 +66,8 @@ impl Component for SongList {
                     ctx.props().on_setlist_change.emit(Event::SetlistEvent(
                         SetlistEvent::SortingChange(sorting_change),
                     ));
+                    // Tell the view to clear the list
                     self.clear = true;
-                    // ctx.props().songs = SongListModel::new();
                     true
                 } else {
                     false
@@ -82,18 +82,21 @@ impl Component for SongList {
         } else {
             self.make_unsortable();
         }
+        // Set clear to false to render the real Songs
+        self.clear = false;
         true
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
+        let props = ctx.props();
         let empty_list = SongListModel::new();
         let songs = if self.clear {
             &empty_list
         } else {
-            &ctx.props().songs
+            &props.songs
         };
-        let sortable = ctx.props().sortable;
-        let highlighted_song_id = &ctx.props().highlighted_song_id;
+        let sortable = props.sortable;
+        let highlighted_song_id = &props.highlighted_song_id;
         let render = |song: SetlistEntry| {
             let data_key = song.title();
             let song_id = song.id();
@@ -109,7 +112,6 @@ impl Component for SongList {
         };
 
         let entries = songs.clone().into_iter();
-        // let entries = songs.clone().into_iter().collect::<Vec<SetlistEntry>>();
 
         info!("Redraw song list {:?}", songs);
 
