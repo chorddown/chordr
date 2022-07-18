@@ -64,26 +64,25 @@ impl<S: SongData + PartialEq + 'static + Clone> Component for Item<S> {
     }
 
     fn view(&self, ctx: &Context<Self>) -> VNode {
-        let title = &ctx.props().song.title();
-        let key = &ctx.props().data_key;
-        let id = ctx.props().song.id().to_string();
+        let props = ctx.props();
+        let title = &props.song.title();
+        let key = &props.data_key;
+        let id = props.song.id().to_string();
         let class = self.get_class(ctx);
-        let draggable = if ctx.props().draggable {
-            "true"
-        } else {
-            "false"
-        };
+        let draggable = if props.draggable { Some("true") } else { None };
 
         let to = AppRoute::Song {
-            id: SongIdParam::from_song_id(&ctx.props().song.id()),
+            id: SongIdParam::from_song_id(&props.song.id()),
         };
-        let link = html! { <Link role="button" class="discreet" data_key={key.clone()} to={to}>{title}</Link> };
-        // let link = html! { <a role="button" class="discreet" data-key={key.clone()} href={href}>{title}</a> };
 
-        (if ctx.props().sortable {
-            html! { <div class={class} data-song-id={id} draggable={draggable}>{link}<span class="sortable-handle">{"::"}</span></div> }
+        let link = html! { <Link role="button" class="discreet" data_key={key.clone()} {to}>{title}</Link> };
+
+        let handle = if props.sortable {
+            html! { <span class="sortable-handle">{"::"}</span> }
         } else {
-            html! { <div class={class} data-song-id={id} draggable={draggable}>{link}</div> }
-        }) as Html
+            html! {}
+        };
+
+        html! { <div class={class} data-song-id={id} draggable={draggable}>{link}{handle}</div> }
     }
 }
