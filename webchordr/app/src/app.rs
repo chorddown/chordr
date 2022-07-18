@@ -264,14 +264,12 @@ impl App {
     }
 
     fn view_nav(&self, ctx: &Context<Self>, current_song_id: Option<SongId>) -> Html {
+        let props = ctx.props();
         let on_toggle = ctx.link().callback(|_| Msg::ToggleMenu);
-        let on_setlist_change = ctx.props().on_setlist_change.reform(|i| i);
-        let state = ctx.props().state.clone();
+        let on_setlist_change = props.on_setlist_change.reform(|i| i);
+        let state = props.state.clone();
         let current_song_info = current_song_id.and_then(|s| self.get_song_info(ctx, &s));
-        let on_settings_change = ctx
-            .props()
-            .on_event
-            .reform(App::reform_settings_change_to_event);
+        let on_settings_change = props.on_event.reform(App::reform_settings_change_to_event);
 
         html! {
             <Nav

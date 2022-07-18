@@ -601,10 +601,11 @@ impl Component for Handler {
         debug!("Redraw the handler");
         let state = self.state.clone();
         let persistence_manager = self.persistence_manager.clone();
-        let on_event = ctx.link().callback(|e| Msg::Event(Box::new(e)));
-        let on_setlist_change = ctx.link().callback(|e| Msg::Event(Box::new(e)));
-        let on_user_login_success = ctx.link().callback(Msg::SessionChanged);
-        let on_user_login_error = ctx.link().callback(|e| {
+        let link = ctx.link();
+        let on_event = link.callback(|e| Msg::Event(Box::new(e)));
+        let on_setlist_change = link.callback(|e| Msg::Event(Box::new(e)));
+        let on_user_login_success = link.callback(Msg::SessionChanged);
+        let on_user_login_error = link.callback(|e| {
             error!("{}", e);
             Msg::Ignore
         });

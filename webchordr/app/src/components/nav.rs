@@ -32,23 +32,19 @@ impl PartialEq for NavProps {
     }
 }
 
-#[allow(dead_code)]
 pub struct Nav {}
 
 impl Nav {
     fn view_song_list(&self, ctx: &Context<Self>) -> Html {
-        let state = ctx.props().state.clone();
+        let props = ctx.props();
+        let state = props.state.clone();
         let current_setlist = state.current_setlist();
         let songs = match &current_setlist {
             Some(setlist) => setlist.as_song_list(),
             None => SongListModel::new(),
         };
-        let on_setlist_change = ctx.props().on_setlist_change.reform(|e| e);
-        let highlighted_song_id = ctx
-            .props()
-            .current_song_info
-            .as_ref()
-            .map(|info| info.song.id());
+        let on_setlist_change = props.on_setlist_change.reform(|e| e);
+        let highlighted_song_id = props.current_song_info.as_ref().map(|info| info.song.id());
         let name_element = match current_setlist {
             Some(s) if !s.name().is_empty() => {
                 html! {<header class="setlist-name">{s.name()}</header>}
@@ -75,7 +71,7 @@ impl Nav {
                 <SongListView
                     {songs}
                     {on_setlist_change}
-                    sortable={ctx.props().expand}
+                    sortable={props.expand}
                     {highlighted_song_id}
                 />
             </Dropzone>
