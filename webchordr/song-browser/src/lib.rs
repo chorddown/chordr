@@ -156,6 +156,7 @@ impl SongBrowser {
                 <SongItem<Song> class="song-item grid-button"
                     key={key}
                     data_key={data_key}
+                    draggable={true}
                     song={song.clone()}/>
             }
         };
