@@ -1,10 +1,10 @@
 use std::borrow::Cow;
 use std::fs::File;
 use std::path::{Path, PathBuf};
+use std::str::FromStr;
 
-use hyper::{Method, StatusCode};
 use hyperdav::{Client, Response};
-use reqwest::Url;
+use reqwest::{Method, StatusCode, Url};
 
 use crate::error::{Error, Result};
 use crate::service::file_entry::FileEntry;
@@ -41,7 +41,7 @@ impl WebDAVService {
 
         let res = prepare_hyperdav_result(
             self.client
-                .request(Method::Extension("PROPFIND".to_string()), path)
+                .request(Method::from_str("PROPFIND").unwrap(), path)
                 .body(body)
                 .send(),
         )?;
@@ -58,7 +58,7 @@ impl WebDAVService {
 
     fn fetch_file(&self, path: String) -> Result<Response> {
         let clean_path = self.remove_overlapping_path_segments(path);
-        let res = prepare_hyperdav_result(self.client.request(Method::Get, clean_path).send())?;
+        let res = prepare_hyperdav_result(self.client.request(Method::GET, clean_path).send())?;
         self.check_status_code(&res.status())?;
 
         Ok(res)

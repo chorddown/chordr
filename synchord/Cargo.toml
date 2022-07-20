@@ -23,8 +23,7 @@ clap = "2.33.0"
 log = "0.4.8"
 simplelog = "^0.6.0"
 chrono = "^0.4.10"
-hyperdav = "0.2.0"
-hyper = "^0.11.27"
+hyperdav = { path = "../hyperdav" }
 reqwest = { version = "0.11", features = ["blocking"] }
 xml-rs = "0.3"
 serde = { version = "^1.0", features = ["derive"] }
