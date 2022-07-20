@@ -1,17 +1,14 @@
+use crate::configuration::Configuration;
+use crate::error::{Error, Result};
+use crate::task::{BuildCatalogTask, CollectionTask, DownloadTask, RecurringTaskTrait, TaskTrait};
+use clap::{App, Arg, ArgMatches};
+use configuration::reader::Reader;
+use log::{error, info};
+use simplelog::TerminalMode;
 use std::env;
 use std::path::Path;
 use std::process::exit;
 use std::{thread, time};
-
-use clap::{App, Arg, ArgMatches};
-use log::{error, info};
-use simplelog::TerminalMode;
-
-use configuration::reader::Reader;
-
-use crate::configuration::Configuration;
-use crate::error::{Error, Result};
-use crate::task::{BuildCatalogTask, CollectionTask, DownloadTask, RecurringTaskTrait, TaskTrait};
 
 mod configuration;
 mod error;

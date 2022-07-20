@@ -1,10 +1,9 @@
+use crate::configuration::Configuration;
+use crate::error::*;
 use std::error::Error as StdError;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
-
-use crate::configuration::Configuration;
-use crate::error::*;
 
 pub struct Reader {}
 

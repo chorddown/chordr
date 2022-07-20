@@ -11,7 +11,7 @@ use crate::error::Result;
 pub trait TaskTrait {
     fn with_configuration(configuration: Configuration) -> Result<Self>
     where
-        Self: std::marker::Sized;
+        Self: Sized;
 }
 
 pub trait RecurringTaskTrait: TaskTrait {

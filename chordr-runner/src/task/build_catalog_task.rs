@@ -13,7 +13,7 @@ pub struct BuildCatalogTask {
 impl TaskTrait for BuildCatalogTask {
     fn with_configuration(configuration: Configuration) -> Result<Self, Error>
     where
-        Self: std::marker::Sized,
+        Self: Sized,
     {
         let catalog_builder = CatalogBuilder::new();
         Ok(Self {
