@@ -17,7 +17,6 @@ path = "src/lib.rs"
 
 [features]
 parallel_catalog_builder = ["rayon"]
-pdf = ["printpdf"]
 
 [dependencies]
 serde = { version = "^1.0", features = ["derive"] }
