@@ -13,31 +13,17 @@ libchordr = { path = "../../libchordr" }
 webchordr-events = { path = "../events" }
 webchordr-common = { path = "../common" }
 yew = "0.19"
-js-sys = "0.3.44"
-wasm-bindgen-futures = "0.4.17"
+js-sys = "^0.3.58"
+wasm-bindgen-futures = "^0.4.31"
 
 [dependencies.wasm-bindgen]
-version = "0.2.67"
+version = "^0.2.81"
 features = ["serde-serialize"]
 
 [dependencies.web-sys]
-version = "0.3.44"
+version = "^0.3.58"
 features = [
-#    'KeyboardEvent',
-#    'HtmlElement',
-#    'Document',
-#    'HtmlDocument',
-#    'Url',
-#    'DateTimeValue',
-#    'Window',
-#    'Location',
-#    'Headers',
-#    'Request',
-#    'RequestInit',
-#    'RequestMode',
-#    'RequestCredentials',
-#    'Response',
-#    'Storage',
-#    'History',
-#    'Navigator',
+    'Headers',
+    'Request',
+    'RequestInit',
 ]

@@ -4,7 +4,7 @@ use crate::task::{BuildCatalogTask, CollectionTask, DownloadTask, RecurringTaskT
 use clap::{App, Arg, ArgMatches};
 use configuration::reader::Reader;
 use log::{error, info};
-use simplelog::TerminalMode;
+use simplelog::{ColorChoice, Config, TerminalMode};
 use std::env;
 use std::path::Path;
 use std::process::exit;
@@ -84,22 +84,11 @@ fn configure_logging(matches: &ArgMatches<'_>) -> Result<()> {
         _ => simplelog::LevelFilter::Error,
     };
 
-    let mut loggers: Vec<Box<dyn simplelog::SharedLogger>> = vec![];
-    let config = simplelog::Config {
-        time_format: Some("%H:%M:%S%.3f"),
-        ..Default::default()
-    };
-
-    if let Some(core_logger) =
-        simplelog::TermLogger::new(log_level_filter, config, TerminalMode::Mixed)
-    {
-        loggers.push(core_logger);
-    } else {
-        loggers.push(simplelog::SimpleLogger::new(log_level_filter, config));
-    }
-
-    match simplelog::CombinedLogger::init(loggers) {
-        Ok(_) => Ok(()),
-        Err(e) => Err(Error::io_error(format!("{}", e))),
-    }
+    simplelog::TermLogger::init(
+        log_level_filter,
+        Config::default(),
+        TerminalMode::Mixed,
+        ColorChoice::Auto,
+    )
+    .map_err(|e| Error::io_error(e.to_string()))
 }

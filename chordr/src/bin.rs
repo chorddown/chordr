@@ -9,7 +9,7 @@ use ansi_term::Colour;
 use atty::Stream;
 use clap::{App, Arg, ArgMatches, SubCommand};
 use log::LevelFilter;
-use simplelog::{ColorChoice, CombinedLogger, Config, TermLogger, TerminalMode};
+use simplelog::{ColorChoice, Config, TermLogger, TerminalMode};
 
 use libchordr::models::chord::fmt::Formatting;
 use libchordr::modification::transposition::TransposableTrait;
@@ -258,18 +258,13 @@ fn configure_logging(matches: &ArgMatches<'_>) -> Result<()> {
         _ => LevelFilter::Warn,
     };
 
-    match CombinedLogger::init(vec![TermLogger::new(
+    TermLogger::init(
         level_filter,
         Config::default(),
         TerminalMode::Mixed,
         ColorChoice::Auto,
-    )]) {
-        Ok(_) => Ok(()),
-        Err(e) => Err(Error::unknown_error(format!(
-            "Could not initialize logger: {}",
-            e
-        ))),
-    }
+    )
+    .map_err(|e| Error::unknown_error(format!("Could not initialize logger: {}", e)))
 }
 
 fn handle_error_output(error: CatalogBuildError) {

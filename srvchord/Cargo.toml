@@ -23,7 +23,7 @@ rust-argon2 = "^0.8.2"
 libchordr = { path = "../libchordr" }
 tri = { path = "../tri" }
 cqrs = { path = "../cqrs" }
-chrono = { version = "*", features = ["serde"] }
+chrono = { version = "^0.4.19", default-features = false, features = ["std", "clock", "serde"] }
 async-trait = "^0.1.52"
 
 [dev-dependencies]

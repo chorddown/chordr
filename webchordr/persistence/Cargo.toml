@@ -14,10 +14,10 @@ libchordr = { path = "../../libchordr" }
 webchordr-common = { path = "../common" }
 cqrs = { path = "../../cqrs" }
 yew = "0.19"
-js-sys = "0.3.44"
-wasm-bindgen-futures = "0.4.17"
+js-sys = "^0.3.58"
+wasm-bindgen-futures = "^0.4.31"
 async-trait = "^0.1.52"
-chrono = { version = "*", features = ["serde", "wasmbind"] }
+chrono = { version = "^0.4.19", default-features = false, features = ["std", "clock", "serde", "wasmbind"] }
 base64 = "^0.13.0"
 
 [dev-dependencies]
@@ -27,11 +27,8 @@ wasm-bindgen-test = "0.3"
 version = "1.15"
 features = ["rt", "macros"]
 
-[build-dependencies]
-chrono = { version = "*" }
-
 [dependencies.wasm-bindgen]
-version = "0.2.67"
+version = "^0.2.81"
 features = ["serde-serialize"]
 
 [dependencies.web-sys]
