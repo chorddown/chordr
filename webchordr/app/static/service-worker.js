@@ -118,19 +118,23 @@ const fetchFromServer = event => {
 };
 
 /**
+ * Return if the given URL is a resource
+ *
+ * @param {string} url
+ * @returns {boolean}
+ */
+const isResourceRequest = url => {
+    return /\.(png|jpe?g|woff2?|json|js|wasm)\b\?*/g.test(url)
+}
+
+/**
  * Return if the given URL is a page
  *
  * @param {string} url
  * @returns {boolean}
  */
 const isPageRequest = url => {
-    return false === (
-        url.endsWith('.json')
-        || url.endsWith('.js')
-        || url.endsWith('.woff2') || url.endsWith('.woff2?v=1.3.0')
-        || url.endsWith('.wasm')
-        || url.endsWith('.png')
-    )
+    return !isResourceRequest(url)
 }
 
 /**
