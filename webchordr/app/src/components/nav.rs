@@ -90,10 +90,10 @@ impl Nav {
 
         let home_button = match state.available_version() {
             Some(_) => html! {
-                <Link role="button" class="update" to={AppRoute::Index} title="Update">
+                <a role="button" class="update" href="/" title="Update">
                     <i class="im im-sync"></i>
                     <span>{ "Update" }</span>
-                </Link>
+                </a>
             },
             None => html! {
                 <Link role="button" class="home" to={AppRoute::Index} title="Go to home screen">
