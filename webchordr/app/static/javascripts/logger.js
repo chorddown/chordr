@@ -1,7 +1,7 @@
 /**
  * @param {boolean} enable
  * @param {string} module
- * @returns Console
+ * @returns Partial<Console>
  */
 function buildOutput(enable, module) {
     if (typeof module !== 'string') {
@@ -31,6 +31,9 @@ function buildOutput(enable, module) {
     }
 
     if (!enable) {
+        /**
+         * @var {(...args)=>void} ef
+         */
         const ef = () => {
         };
 
@@ -38,6 +41,7 @@ function buildOutput(enable, module) {
     }
 
     const root = typeof window === 'object' ? window : self;
+
     return {
         debug: root.console.debug.bind(root.console, consoleStyles.label.debug.text + '%s', consoleStyles.label.debug.style, consoleStyles.pathStyle, consoleStyles.normalStyle),
         info: root.console.info.bind(root.console, consoleStyles.label.info.text + '%s', consoleStyles.label.info.style, consoleStyles.pathStyle, consoleStyles.normalStyle),
