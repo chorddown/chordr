@@ -40,13 +40,13 @@ const handleInstall = event => {
                 .then(cache => {
                     output.debug('Add app URLs to the cache: ', appUrlsToCache);
 
-                    return cache.addAll(appUrlsToCache);
+                    return cache.addAll(appUrlsToCache.map(url => new Request(url, {cache: 'no-cache'})));
                 }),
             caches.open(ASSET_CACHE_NAME)
                 .then(cache => {
                     output.debug('Add asset URLs to the cache: ', assetUrlsToCache);
 
-                    return cache.addAll(assetUrlsToCache);
+                    return cache.addAll(assetUrlsToCache.map(url => new Request(url, {cache: 'no-cache'})));
                 })
         ])
     );
