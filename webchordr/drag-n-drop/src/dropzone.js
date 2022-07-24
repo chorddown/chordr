@@ -161,7 +161,25 @@ export class DraggableItem {
     }
 }
 
-export class Dropzone {
+/**
+ * @param {string} itemSelector
+ * @param {HTMLElement} item
+ * @return {HTMLElement|undefined}
+ * @private
+ */
+function getElementMatchingItemSelector(itemSelector, item) {
+    if (item.matches(itemSelector)) {
+        return item;
+    }
+
+    if (item.parentElement && item.parentElement.matches(itemSelector)) {
+        return item.parentElement;
+    }
+
+    return undefined;
+}
+
+class DropzoneTouch {
     /**
      * @param {HTMLElement} target
      * @param {String} itemSelector
@@ -269,15 +287,7 @@ export class Dropzone {
      * @private
      */
     getElementMatchingItemSelector(item) {
-        if (item.matches(this.itemSelector)) {
-            return item;
-        }
-
-        if (item.parentElement && item.parentElement.matches(this.itemSelector)) {
-            return item.parentElement;
-        }
-
-        return undefined;
+        return getElementMatchingItemSelector(this.itemSelector, item);
     }
 
     /**
@@ -331,6 +341,31 @@ export class Dropzone {
         this.target.classList.remove('-touch-hover');
         this.draggableItem.destroy();
         this.draggableItem = undefined;
+    }
+}
+
+export class Dropzone {
+    /**
+     * @param {HTMLElement} target
+     * @param {String} itemSelector
+     * @param {(songId:string)=>void} onDropOverTarget
+     * @param {HTMLElement} [target]
+     */
+    constructor(target, itemSelector, onDropOverTarget) {
+        if ('ontouchstart' in window) {
+            this.handler = new DropzoneTouch(target, itemSelector, onDropOverTarget);
+        } else if ('ondragstart' in window) {
+            buildOutput(true,'dropzone').warn('Native drag\'n drop not implemented');
+            // this.handler = new DropzoneNative(target, itemSelector, onDropOverTarget);
+        } else {
+            buildOutput(true,'dropzone').warn('No matching drag\'n drop implementation available');
+        }
+    }
+
+    destroy() {
+        if (this.handler) {
+            this.handler.destroy()
+        }
     }
 }
 
