@@ -35,9 +35,11 @@ features = ["serde-serialize"]
 [dependencies.web-sys]
 version = "^0.3.58"
 features = [
-    'Request',
-    'RequestMode',
-    'RequestCredentials',
-    'Response',
+    'Headers',
     'Navigator',
+    'Request',
+    'RequestCredentials',
+    'RequestInit',
+    'RequestMode',
+    'Response',
 ]
