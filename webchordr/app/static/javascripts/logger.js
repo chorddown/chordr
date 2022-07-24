@@ -1,4 +1,8 @@
 /**
+ * @example
+ * // prints `webchordr UI Log something` to the console output
+ * const output = buildOutput(true, 'UI');
+ * output.log('Log something')
  * @param {boolean} enable
  * @param {string} module
  * @returns Partial<Console>
