@@ -23,7 +23,7 @@ type OnDropPropCallback = Callback<OnDropArgument>;
 pub struct DropzoneProps {
     pub children: Children,
 
-    pub item_selector: String,
+    pub item_selectors: Vec<String>,
 
     #[prop_or_default]
     pub class: Class,
@@ -57,10 +57,7 @@ impl Component for Dropzone {
 
     fn rendered(&mut self, ctx: &Context<Self>, _first_render: bool) {
         if self.drag_n_drop_handle.is_none() {
-            let _ = self.make_dropzone(
-                ctx.props().item_selector.clone(),
-                ctx.props().on_drop.clone(),
-            );
+            let _ = self.make_dropzone(&ctx.props().item_selectors, ctx.props().on_drop.clone());
         }
     }
 
@@ -72,7 +69,7 @@ impl Component for Dropzone {
 }
 
 impl Dropzone {
-    pub fn make_dropzone(&mut self, item_selector: String, callback: OnDropPropCallback) {
+    pub fn make_dropzone(&mut self, item_selectors: &[String], callback: OnDropPropCallback) {
         if let Some(element) = self.node_ref.cast::<HtmlElement>() {
             let handler = Box::new(move |val: &JsValue| {
                 if let Ok(argument) = val.into_serde::<OnDropArgument>() {
@@ -81,8 +78,11 @@ impl Dropzone {
             });
 
             let closure = Closure::wrap(handler as Box<dyn Fn(&JsValue)>);
-            let wrapper =
-                DropzoneWrapper::new(&element, item_selector, closure.as_ref().unchecked_ref());
+            let wrapper = DropzoneWrapper::new(
+                &element,
+                item_selectors.join(","),
+                closure.as_ref().unchecked_ref(),
+            );
 
             self.drag_n_drop_handle = Some(DropzoneHandle {
                 wrapper,

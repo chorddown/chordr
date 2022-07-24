@@ -10,7 +10,7 @@ extern "C" {
     #[wasm_bindgen(constructor)]
     pub fn new(
         container: &HtmlElement,
-        item_selector: String,
+        item_selectors: String,
         on_drop: &Function,
     ) -> DropzoneWrapper;
 

@@ -179,20 +179,37 @@ function getElementMatchingItemSelector(itemSelector, item) {
     return undefined;
 }
 
+/**
+ * @param {string[]} itemSelectors
+ * @param {HTMLElement} item
+ * @return {HTMLElement|undefined}
+ * @private
+ */
+function getElementMatchingItemSelectors(itemSelectors, item) {
+    for (const itemSelector of itemSelectors) {
+        const element = getElementMatchingItemSelector(itemSelector, item);
+        if (element) {
+            return element
+        }
+    }
+
+    return undefined
+}
+
 class DropzoneTouch {
     /**
      * @param {HTMLElement} target
-     * @param {String} itemSelector
+     * @param {String[]} itemSelectors
      * @param {(songId:string)=>void} onDropOverTarget
      * @param {HTMLElement} [target]
      */
-    constructor(target, itemSelector, onDropOverTarget) {
+    constructor(target, itemSelectors, onDropOverTarget) {
         this.handleDocumentTouchStart = this.handleDocumentTouchStart.bind(this)
         this.handleDocumentTouchMove = this.handleDocumentTouchMove.bind(this)
         this.handleItemTouchMove = this.handleItemTouchMove.bind(this)
         this.handleTouchEnd = this.handleTouchEnd.bind(this)
         this.handleTouchCancel = this.handleTouchCancel.bind(this)
-        this.itemSelector = itemSelector;
+        this.itemSelectors = itemSelectors;
         this.draggableItem = undefined;
         /** @type {HTMLElement} */
         this.target = target;
@@ -216,7 +233,7 @@ class DropzoneTouch {
      * @private
      */
     handleDocumentTouchStart(event) {
-        const item = this.getElementMatchingItemSelector(event.target);
+        const item = this.getElementMatchingItemSelectors(event.target);
         if (!item) {
             return;
         }
@@ -246,7 +263,7 @@ class DropzoneTouch {
             return
         }
 
-        const item = this.getElementMatchingItemSelector(event.target);
+        const item = this.getElementMatchingItemSelectors(event.target);
         if (item) {
             /* Start handling the current interaction as a drag */
             this.draggableItem = new DraggableItem(
@@ -286,8 +303,8 @@ class DropzoneTouch {
      * @return {HTMLElement|undefined}
      * @private
      */
-    getElementMatchingItemSelector(item) {
-        return getElementMatchingItemSelector(this.itemSelector, item);
+    getElementMatchingItemSelectors(item) {
+        return getElementMatchingItemSelectors(this.itemSelectors, item);
     }
 
     /**
@@ -347,18 +364,19 @@ class DropzoneTouch {
 export class Dropzone {
     /**
      * @param {HTMLElement} target
-     * @param {String} itemSelector
+     * @param {String|String[]} itemSelectors An array of CSS-selector strings or a comma separated list of CSS-selectors
      * @param {(songId:string)=>void} onDropOverTarget
      * @param {HTMLElement} [target]
      */
-    constructor(target, itemSelector, onDropOverTarget) {
+    constructor(target, itemSelectors, onDropOverTarget) {
+        const preparedItemSelectors = Array.isArray(itemSelectors) ? itemSelectors : ('' + itemSelectors).split(',');
         if ('ontouchstart' in window) {
-            this.handler = new DropzoneTouch(target, itemSelector, onDropOverTarget);
+            this.handler = new DropzoneTouch(target, preparedItemSelectors, onDropOverTarget);
         } else if ('ondragstart' in window) {
-            buildOutput(true,'dropzone').warn('Native drag\'n drop not implemented');
-            // this.handler = new DropzoneNative(target, itemSelector, onDropOverTarget);
+            buildOutput(true, 'dropzone').warn('Native drag\'n drop not implemented');
+            // this.handler = new DropzoneNative(target, preparedItemSelectors, onDropOverTarget);
         } else {
-            buildOutput(true,'dropzone').warn('No matching drag\'n drop implementation available');
+            buildOutput(true, 'dropzone').warn('No matching drag\'n drop implementation available');
         }
     }
 
