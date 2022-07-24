@@ -63,10 +63,13 @@ impl Nav {
                 }
             }
         });
-        let item_selector = ".song-browser-song-list.song-list .grid-button".to_string();
+        let item_selectors = vec![
+            ".song-browser-song-list.song-list .grid-button".to_string(),
+            ".song-search-song-list .song-item".to_string(),
+        ];
 
         html! {
-            <Dropzone class="song-list-container" {on_drop} {item_selector}>
+            <Dropzone class="song-list-container" {on_drop} {item_selectors}>
                 {name_element}
                 <SongListView
                     {songs}
