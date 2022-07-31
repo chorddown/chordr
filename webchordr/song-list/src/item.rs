@@ -25,64 +25,47 @@ pub struct SongListItemProps<S: SongData + Clone + PartialEq> {
     pub class: Class,
 }
 
-#[allow(dead_code)]
-pub struct Item<S: SongData + PartialEq + 'static + Clone> {
-    _ph: PhantomData<S>,
-}
+fn get_class<'a, S: SongData + Clone + PartialEq>(props: &SongListItemProps<S>) -> Class {
+    let base_class = props.class.or("song-item");
+    let class = if props.highlight {
+        base_class.add("-highlight")
+    } else {
+        base_class
+    };
 
-impl<S: SongData + PartialEq + 'static + Clone> Item<S> {
-    fn get_class(&self, ctx: &Context<Self>) -> Class {
-        let base_class = ctx.props().class.or("song-item");
-        let class = if ctx.props().highlight {
-            base_class.add("-highlight")
-        } else {
-            base_class
-        };
+    let class = if props.sortable {
+        class.add("-sortable")
+    } else {
+        class
+    };
 
-        let class = if ctx.props().sortable {
-            class.add("-sortable")
-        } else {
-            class
-        };
-
-        if ctx.props().draggable {
-            class.add("-draggable")
-        } else {
-            class
-        }
+    if props.draggable {
+        class.add("-draggable")
+    } else {
+        class
     }
 }
 
-impl<S: SongData + PartialEq + 'static + Clone> Component for Item<S> {
-    type Message = ();
-    type Properties = SongListItemProps<S>;
+#[function_component(Item)]
+pub fn render_item<S: SongData + Clone + PartialEq>(props: &SongListItemProps<S>) -> Html {
+    let title = &props.song.title();
+    let key = &props.data_key;
+    let id = props.song.id().to_string();
+    let class = get_class(props);
+    let draggable = if props.draggable { Some("true") } else { None };
 
-    fn create(_ctx: &Context<Self>) -> Self {
-        Self {
-            _ph: PhantomData::default(),
-        }
-    }
+    let to = AppRoute::Song {
+        id: SongIdParam::from_song_id(&props.song.id()),
+    };
 
-    fn view(&self, ctx: &Context<Self>) -> VNode {
-        let props = ctx.props();
-        let title = &props.song.title();
-        let key = &props.data_key;
-        let id = props.song.id().to_string();
-        let class = self.get_class(ctx);
-        let draggable = if props.draggable { Some("true") } else { None };
+    let link =
+        html! { <Link role="button" class="discreet" data_key={key.clone()} {to}>{title}</Link> };
 
-        let to = AppRoute::Song {
-            id: SongIdParam::from_song_id(&props.song.id()),
-        };
+    let handle = if props.sortable {
+        html! { <span class="sortable-handle">{"::"}</span> }
+    } else {
+        html! {}
+    };
 
-        let link = html! { <Link role="button" class="discreet" data_key={key.clone()} {to}>{title}</Link> };
-
-        let handle = if props.sortable {
-            html! { <span class="sortable-handle">{"::"}</span> }
-        } else {
-            html! {}
-        };
-
-        html! { <div class={class} data-song-id={id} draggable={draggable}>{link}{handle}</div> }
-    }
+    html! { <div class={class} data-song-id={id} draggable={draggable}>{link}{handle}</div> }
 }
