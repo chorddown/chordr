@@ -12,7 +12,7 @@ impl Config {
 impl Default for Config {
     fn default() -> Self {
         Self {
-            api_url: "http://localhost:9000".to_string(),
+            api_url: "http://localhost:9000/api".to_string(),
         }
     }
 }

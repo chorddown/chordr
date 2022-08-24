@@ -50,6 +50,11 @@ async fn index(config: &State<Config>) -> io::Result<NamedFile> {
     NamedFile::open(Path::new(&config.static_files_dir).join("index.html")).await
 }
 
+#[get("/<_..>", rank = 20)]
+async fn html_fallback(config: &State<Config>) -> io::Result<NamedFile> {
+    NamedFile::open(Path::new(&config.static_files_dir).join("index.html")).await
+}
+
 #[get("/catalog.json")]
 fn catalog(config: &State<Config>) -> Result<Json<Catalog>, status::Custom<String>> {
     match CatalogBuilder::new().build_catalog_for_directory(
@@ -98,12 +103,13 @@ fn rocket_build() -> Rocket<Build> {
         ))
         .attach(AdHoc::on_ignite("Static Files config", |rocket| async {
             let config = build_application_config(&rocket);
-            rocket.mount("/", FileServer::from(config.static_files_dir))
+            rocket.mount("/", FileServer::from(config.static_files_dir).rank(1))
         }))
         .mount("/", routes![index, catalog])
-        .mount("/status", crate::routes::status::get_routes())
-        .mount("/setlist", crate::routes::setlist::get_routes())
-        .mount("/user", crate::routes::user::get_routes())
+        .mount("/api/status", routes::status::get_routes())
+        .mount("/api/setlist", routes::setlist::get_routes())
+        .mount("/api/user", routes::user::get_routes())
+        .mount("/", routes![html_fallback])
 }
 
 fn build_application_config(rocket: &Rocket<Build>) -> Config {
