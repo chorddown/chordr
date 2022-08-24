@@ -8,6 +8,7 @@ use libchordr::models::setlist::sharing_setlist_entry::SharingSetlistEntry;
 use libchordr::models::setlist::Setlist;
 use libchordr::models::user::User;
 use libchordr::prelude::{CatalogTrait, Formatting, SetlistEntry, SongData, SongSettings};
+use percent_encoding::percent_decode_str;
 
 pub struct DeserializeResult {
     pub setlist: Setlist,
@@ -23,8 +24,18 @@ impl DeserializeService {
         serialized_setlist: &str,
         catalog: &C,
     ) -> Result<DeserializeResult, WebError> {
+        // Closure that tries to percent-decode the input string and deserialize it afterwards
+        let try_percent_decoded =
+            |initial_error| match percent_decode_str(serialized_setlist).decode_utf8() {
+                Ok(decoded) => LibChordrDeserializeService::deserialize(decoded.as_ref()),
+                // We ignore the percent-decode-error and return the initial deserialize-error
+                Err(_) => Err(initial_error),
+            };
+
         let sharing_setlist = LibChordrDeserializeService::deserialize(serialized_setlist)
+            .or_else(try_percent_decoded)
             .map_err(SharingError::from)?;
+
         let (entries, errors) = Self::collect_setlist_entries(&sharing_setlist, catalog);
 
         let SharingSetlist {
