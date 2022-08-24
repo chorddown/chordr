@@ -27,7 +27,7 @@ impl<'a> cqrs::prelude::CommandExecutor for UserCommandExecutor<'_> {
         command: cqrs::prelude::Command<Self::RecordType, CqsContext>,
     ) -> Result<(), Self::Error> {
         diesel::insert_into(crate::schema::user::table)
-            .values(command.record().unwrap())
+            .values(command.record())
             .execute(self.connection)?;
         Ok(())
     }
@@ -36,7 +36,7 @@ impl<'a> cqrs::prelude::CommandExecutor for UserCommandExecutor<'_> {
         &self,
         command: cqrs::prelude::Command<Self::RecordType, CqsContext>,
     ) -> Result<(), Self::Error> {
-        let user = command.record().unwrap();
+        let user = command.record();
         let user_query = all_users.find(diesel::Identifiable::id(user));
         if user_query.get_result::<UserDb>(self.connection).is_err() {
             return Err(SrvError::persistence_error(format!(
@@ -56,7 +56,7 @@ impl<'a> cqrs::prelude::CommandExecutor for UserCommandExecutor<'_> {
         &self,
         command: cqrs::prelude::Command<Self::RecordType, CqsContext>,
     ) -> Result<(), Self::Error> {
-        diesel::delete(all_users.find(&command.id().unwrap())).execute(self.connection)?;
+        diesel::delete(all_users.find(&command.record().username)).execute(self.connection)?;
         Ok(())
     }
 }
@@ -124,13 +124,21 @@ mod test {
         run_database_test(|conn| {
             clear_database(&conn);
 
-            insert_test_user(&conn, "saul-panther-918", "Saul", "Panther");
+            let username = "saul-panther-918";
+            insert_test_user(&conn, username, "Saul", "Panther");
             insert_test_user(&conn, "roger-mulliger-8", "Roger", "Mulliger");
             assert_eq!(count_all_users(&conn), 2);
 
+            let user_to_delete = UserDb {
+                username: username.to_string(),
+                first_name: "".to_string(),
+                last_name: "".to_string(),
+                password_hash: "".to_string(),
+            };
+
             CommandExecutor::perform(
                 &UserCommandExecutor::new_with_connection(&conn),
-                Command::delete("saul-panther-918".to_string(), ()),
+                Command::delete(user_to_delete, ()),
             )
             .unwrap();
 

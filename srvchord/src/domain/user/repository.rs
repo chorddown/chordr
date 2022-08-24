@@ -65,9 +65,6 @@ impl<'a> cqrs::prelude::RepositoryTrait for UserRepository<'a> {
 
     fn delete(&self, instance: Self::ManagedType) -> Result<(), Self::Error> {
         self.get_command_executor(self.connection)
-            .perform(cqrs::prelude::Command::delete(
-                RecordTrait::id(&instance),
-                (),
-            ))
+            .perform(cqrs::prelude::Command::delete(instance, ()))
     }
 }

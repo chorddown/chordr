@@ -123,10 +123,7 @@ impl CommandBackendTrait for TransientBackend {
         &self,
         command: &Command<T, CommandContext>,
     ) -> Result<(), WebError> {
-        let id = match command.id() {
-            None => return Err(missing_record_id_error()),
-            Some(r) => r,
-        };
+        let id = &command.record().id();
         let combined_id_key = build_combined_id_key::<T>(command.context(), id);
 
         let mut borrowed = self.data.borrow_mut();
@@ -377,13 +374,13 @@ mod test {
 
         assert_eq!(backend.data().len(), 1);
 
-        assert!(backend
+        let result = backend
             .delete::<TestValue>(&Command::delete(
-                value_to_delete.id(),
-                get_test_command_context()
+                value_to_delete.clone(),
+                get_test_command_context(),
             ))
-            .await
-            .is_ok());
+            .await;
+        assert!(result.is_ok(), "{}", result.unwrap_err());
 
         let data = backend.data();
         assert!(data.is_empty());

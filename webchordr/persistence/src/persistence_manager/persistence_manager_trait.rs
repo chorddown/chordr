@@ -58,9 +58,11 @@ pub trait PersistenceManagerTrait // : BackendTrait
     /// # Errors
     ///
     /// This function will return an error if the storage operation fails
-    async fn delete<T: Serialize + RecordTrait>(
+    async fn delete<'a, T: Serialize + RecordTrait>(
         &self,
         context: CommandContext,
-        instance: &T,
-    ) -> Result<(), WebError>;
+        instance: &'a T,
+    ) -> Result<(), WebError>
+    where
+        &'a T: RecordTrait;
 }

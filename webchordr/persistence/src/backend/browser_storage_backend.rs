@@ -131,10 +131,7 @@ impl<B: BrowserStorageTrait> CommandBackendTrait for BrowserStorageBackend<B> {
         &self,
         command: &Command<T, CommandContext>,
     ) -> Result<(), WebError> {
-        let id = match command.id() {
-            None => return Err(missing_record_id_error()),
-            Some(r) => r,
-        };
+        let id = &command.record().id();
         let combined_id_key = build_combined_id_key::<T>(command.context(), id);
         let entry_does_exist = self
             .lock_for_reading()?
@@ -422,13 +419,13 @@ mod test {
         assert_eq!(storage.data().len(), 1);
         let backend = BrowserStorageBackend::new(storage);
 
-        assert!(backend
+        let result = backend
             .delete::<TestValue>(&Command::delete(
-                value_to_delete.id(),
-                get_test_command_context()
+                value_to_delete.clone(),
+                get_test_command_context(),
             ))
-            .await
-            .is_ok());
+            .await;
+        assert!(result.is_ok(), "{}", result.unwrap_err());
         let BrowserStorageBackend { browser_storage } = backend;
         let browser_storage = browser_storage
             .read()

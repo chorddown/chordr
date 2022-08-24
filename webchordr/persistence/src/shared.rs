@@ -29,10 +29,7 @@ where
     EC: Fn(&str) -> bool,
     SC: Fn(String, String) -> Result<(), WebError>,
 {
-    let record = match command.record() {
-        None => return Err(PersistenceError::general_error("No command record given").into()),
-        Some(r) => r,
-    };
+    let record = command.record();
     let combined_id_key = build_combined_id_key::<T>(command.context(), &record.id());
     let serialized_value = serde_json::to_string(record)?;
     let entry_does_exist = exists_callback(&combined_id_key);

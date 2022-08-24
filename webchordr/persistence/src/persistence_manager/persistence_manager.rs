@@ -411,13 +411,16 @@ impl<CB: CommandQueryBackendTrait, SB: CommandQueryBackendTrait, TB: CommandQuer
             .await
     }
 
-    async fn delete<T: Serialize + RecordTrait>(
+    async fn delete<'a, T: Serialize + RecordTrait>(
         &self,
         context: CommandContext,
-        instance: &T,
-    ) -> Result<(), WebError> {
-        let command: Command<T, _> = Command::delete(instance.id(), context);
-        self.perform_command(command).await
+        instance: &'a T,
+    ) -> Result<(), WebError>
+    where
+        &'a T: RecordTrait,
+    {
+        self.perform_command(Command::delete(instance, context))
+            .await
     }
 }
 
@@ -820,10 +823,10 @@ mod test {
             TransientBackend::new(),
             TransientBackend::new(),
         );
-        assert!(pm
+        let result = pm
             .delete::<TestValue>(get_test_command_context(), &value_to_delete)
-            .await
-            .is_ok());
+            .await;
+        assert!(result.is_ok(), "{}", result.unwrap_err());
         let PersistenceManager { client_backend, .. } = pm;
         let client_backend = client_backend
             .lock()

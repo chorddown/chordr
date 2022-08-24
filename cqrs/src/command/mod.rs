@@ -6,17 +6,12 @@ use crate::RecordTrait;
 mod command_executor;
 mod command_type;
 
-enum Subject<T: RecordTrait> {
-    Record(T),
-    Id(T::Id),
-}
-
 /// A `Command` defines an operation to mutate data in the system
 /// It is defined by a [`CommandType`] describing the action to perform and the subject of the
 /// operation
 pub struct Command<T: RecordTrait, C> {
     command_type: CommandType,
-    subject: Subject<T>,
+    subject: T,
     context: C,
 }
 
@@ -25,7 +20,7 @@ impl<T: RecordTrait, C> Command<T, C> {
     pub fn add(record: T, context: C) -> Self {
         Self {
             command_type: CommandType::Add,
-            subject: Subject::Record(record),
+            subject: record,
             context,
         }
     }
@@ -34,16 +29,16 @@ impl<T: RecordTrait, C> Command<T, C> {
     pub fn update(record: T, context: C) -> Self {
         Self {
             command_type: CommandType::Update,
-            subject: Subject::Record(record),
+            subject: record,
             context,
         }
     }
 
     /// Create a new command to `Delete` the record with `id` from the system
-    pub fn delete(id: T::Id, context: C) -> Self {
+    pub fn delete(record: T, context: C) -> Self {
         Self {
             command_type: CommandType::Delete,
-            subject: Subject::Id(id),
+            subject: record,
             context,
         }
     }
@@ -57,22 +52,8 @@ impl<T: RecordTrait, C> Command<T, C> {
     ///
     /// Will return a reference to the record to be added/updated in the system
     /// This is applicable for `Add` and `Update` `Command`s
-    pub fn record(&self) -> Option<&T> {
-        match self.subject {
-            Subject::Record(ref r) => Some(r),
-            Subject::Id(_) => None,
-        }
-    }
-
-    /// Return the `Command`'s subject ID
-    ///
-    /// Will return a reference to the ID to be removed from the system
-    /// This is applicable for `Delete` `Command`s
-    pub fn id(&self) -> Option<&T::Id> {
-        match self.subject {
-            Subject::Record(_) => None,
-            Subject::Id(ref r) => Some(r),
-        }
+    pub fn record(&self) -> &T {
+        &self.subject
     }
 
     /// Return the `Command`'s context
