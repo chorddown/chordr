@@ -191,6 +191,7 @@ impl Component for Login {
                             <label for="user-login-password">{"Password"}</label>
                             <input type="password"
                                    id="user-login-password"
+                                   autocomplete="current-password"
                                    value={self.password_raw.clone()}
                                    oninput={on_password_change}
                             />
@@ -208,10 +209,11 @@ impl Component for Login {
     fn rendered(&mut self, ctx: &Context<Self>, first_render: bool) {
         if first_render {
             let link = ctx.link();
-            let session_service = SessionService::new(ctx.props().config.clone());
+            let config = &ctx.props().config;
+            let session_service = SessionService::new(config.clone());
             let change_login_status = link.callback(Msg::ChangeLoginStatus);
             let change_connection_status = link.callback(Msg::ChangeConnectionStatus);
-            let connection_service = ConnectionService::new(ctx.props().config.clone());
+            let connection_service = ConnectionService::new(config.clone());
 
             spawn_local(async move {
                 if let Ok(u) = session_service.try_from_browser_storage().await {
