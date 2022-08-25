@@ -15,12 +15,20 @@ SERVICE_WORKER_FILE=$TRUNK_STAGING_DIR/service-worker.js
 RANDOM_ID=$(openssl rand -hex 12)
 perl -i -pe"s+{RANDOM_ID}+$RANDOM_ID+g" "$SERVICE_WORKER_FILE"
 
-JS_PATH=("$TRUNK_STAGING_DIR"/index-*.js)
+JS_PATH=("$TRUNK_STAGING_DIR"/webchordr-*.js)
 JS_FILE_NAME=$(basename "${JS_PATH[@]}")
+if [[ "$JS_FILE_NAME" == "index-*.wasm" ]]; then
+  echo "[ERROR] Could not find file matching 'index-*_bg.wasm'"
+  exit 1
+fi
 perl -i -pe"s+//{JS}+'/$JS_FILE_NAME',+g" "$SERVICE_WORKER_FILE"
 
-WASM_PATH=("$TRUNK_STAGING_DIR"/index-*_bg.wasm)
+WASM_PATH=("$TRUNK_STAGING_DIR"/webchordr-*_bg.wasm)
 WASM_FILE_NAME=$(basename "${WASM_PATH[@]}")
+if [[ "$WASM_FILE_NAME" == "index-*_bg.wasm" ]]; then
+  echo "[ERROR] Could not find file matching 'index-*_bg.wasm'"
+  exit 1
+fi
 perl -i -pe"s+//{WASM}+'/$WASM_FILE_NAME',+g" "$SERVICE_WORKER_FILE"
 
 SORTABLE_PATH=(snippets/webchordr-song-list-*/dist/sortable.js)
