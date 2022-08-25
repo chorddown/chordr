@@ -1,11 +1,8 @@
 use libchordr::prelude::*;
-use std::marker::PhantomData;
 use webchordr_common::components::link::Link;
 use webchordr_common::helpers::Class;
 use webchordr_common::route::{AppRoute, SongIdParam};
 use yew::prelude::*;
-use yew::virtual_dom::VNode;
-use yew::Component;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct SongListItemProps<S: SongData + Clone + PartialEq> {
