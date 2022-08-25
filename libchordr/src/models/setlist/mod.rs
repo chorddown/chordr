@@ -21,11 +21,13 @@ mod setlist_entry;
 pub mod sharing_setlist;
 pub mod sharing_setlist_entry;
 
+pub type SetlistId = i32;
+
 /// A set of Songs organized by a User
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct Setlist {
     name: String,
-    id: i32,
+    id: SetlistId,
     owner: User,
     team: Option<Team>,
     songs: List<SetlistEntry>,
@@ -37,7 +39,7 @@ pub struct Setlist {
 impl Setlist {
     pub fn new<S: Into<String>>(
         name: S,
-        id: i32,
+        id: SetlistId,
         owner: User,
         team: Option<Team>,
         gig_date: Option<DateTime<Utc>>,
@@ -199,7 +201,7 @@ impl AsRef<Setlist> for Setlist {
 }
 
 impl RecordTrait for Setlist {
-    type Id = i32;
+    type Id = SetlistId;
 
     fn id(&self) -> Self::Id {
         Setlist::id(self)
@@ -207,7 +209,7 @@ impl RecordTrait for Setlist {
 }
 
 impl RecordTrait for &Setlist {
-    type Id = i32;
+    type Id = SetlistId;
 
     fn id(&self) -> Self::Id {
         Setlist::id(self)
