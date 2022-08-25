@@ -127,8 +127,6 @@ impl FromHeader for Credentials {
             return FromHeaderResult::None;
         }
 
-        println!("{}", header);
-
         let header_chars = header.chars();
         let base64code = header_chars.into_iter().skip(6).collect::<String>();
         let decoded: String = match base64::decode(&base64code) {
