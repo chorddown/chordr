@@ -2,7 +2,7 @@
 target = "index.html"
 
 [watch]
-ignore = ["static/javascripts/bundle.js"]
+ignore = ["static/javascripts/bundle.js", ".DS_Store"]
 
 [[hooks]]
 stage = "pre_build"
