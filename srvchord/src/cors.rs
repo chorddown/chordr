@@ -2,7 +2,15 @@ use rocket::fairing::{Fairing, Info, Kind};
 use rocket::http::Header;
 use rocket::{Request, Response};
 
-pub struct Cors;
+pub struct Cors {
+    allowed_origins: Vec<&'static str>,
+}
+
+impl Cors {
+    pub fn new(allowed_origins: Vec<&'static str>) -> Self {
+        Self { allowed_origins }
+    }
+}
 
 #[rocket::async_trait]
 impl Fairing for Cors {
@@ -13,19 +21,22 @@ impl Fairing for Cors {
         }
     }
 
-    async fn on_response<'r>(&self, _request: &'r Request<'_>, response: &mut Response<'r>) {
-        response.set_header(Header::new(
-            "Access-Control-Allow-Origin",
-            "http://127.0.0.1:9000",
-        ));
-        response.set_header(Header::new(
-            "Access-Control-Allow-Methods",
-            "GET, POST, OPTIONS",
-        ));
-        response.set_header(Header::new("Access-Control-Allow-Credentials", "true"));
-        response.set_header(Header::new(
-            "Access-Control-Allow-Headers",
-            "Authorization, Accept, Content-Type",
-        ));
+    async fn on_response<'r>(&self, request: &'r Request<'_>, response: &mut Response<'r>) {
+        match request.headers().get_one("origin") {
+            Some(origin_header) if self.allowed_origins.contains(&origin_header) => {
+                response.set_header(Header::new("Access-Control-Allow-Origin", origin_header));
+                response.set_header(Header::new(
+                    "Access-Control-Allow-Methods",
+                    "GET, POST, OPTIONS",
+                ));
+                response.set_header(Header::new("Access-Control-Allow-Credentials", "true"));
+                response.set_header(Header::new(
+                    "Access-Control-Allow-Headers",
+                    "Authorization, Accept, Content-Type",
+                ));
+            }
+            Some(_) => {}
+            None => {}
+        }
     }
 }

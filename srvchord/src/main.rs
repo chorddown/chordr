@@ -91,7 +91,7 @@ async fn run_db_migrations(rocket: Rocket<Build>) -> Rocket<Build> {
 
 fn rocket_build() -> Rocket<Build> {
     rocket::build()
-        .attach(self::cors::Cors)
+        .attach(cors::Cors::new(vec!["http://localhost:8080"]))
         .attach(DbConn::fairing())
         .attach(AdHoc::on_ignite("Database Migrations", run_db_migrations))
         .attach(AdHoc::on_ignite(
