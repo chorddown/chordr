@@ -7,7 +7,7 @@ use std::process::exit;
 
 use ansi_term::Colour;
 use atty::Stream;
-use clap::{App, Arg, ArgMatches, SubCommand};
+use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 use log::LevelFilter;
 use simplelog::{ColorChoice, Config, TermLogger, TerminalMode};
 
@@ -76,6 +76,8 @@ fn main() {
         .version(env!("CARGO_PKG_VERSION"))
         .author("Daniel Corn <info@cundd.net>")
         .about("Manage chorddown files and catalogs")
+        .setting(AppSettings::ArgRequiredElseHelp)
+        .setting(AppSettings::ColoredHelp)
         .subcommand(subcommand_convert)
         .subcommand(subcommand_build_catalog)
         .get_matches();
