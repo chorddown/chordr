@@ -128,13 +128,23 @@ const isResourceRequest = url => {
 }
 
 /**
+ * Return if the given URL is an API request
+ *
+ * @param {string} url
+ * @returns {boolean}
+ */
+const isApiRequest = url => {
+    return /\/api\//g.test(url)
+}
+
+/**
  * Return if the given URL is a page
  *
  * @param {string} url
  * @returns {boolean}
  */
 const isPageRequest = url => {
-    return !isResourceRequest(url)
+    return !isApiRequest(url) && !isResourceRequest(url)
 }
 
 /**
