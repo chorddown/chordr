@@ -32,10 +32,11 @@ impl Component for AddButton {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let state = ctx.props().state.clone();
-        let clone_current = ctx.props().clone_current;
+        let props = ctx.props();
+        let state = props.state.clone();
+        let clone_current = props.clone_current;
 
-        let on_click_parent = ctx.props().on_click.reform(|i| i);
+        let on_click_parent = props.on_click.clone();
         let on_click = ctx.link().callback(move |_| {
             if let Some(setlist) = AddButton::build_new_setlist(&state, clone_current) {
                 on_click_parent.emit(setlist)

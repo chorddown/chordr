@@ -53,7 +53,6 @@ pub enum Msg {
     SemitoneNotationChange(SemitoneNotation),
 }
 
-#[allow(dead_code)]
 pub struct SongView {}
 
 impl Component for SongView {

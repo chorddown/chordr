@@ -52,9 +52,6 @@ impl PartialEq for AppProperties {
 }
 
 pub struct App {
-    /// Keep a reference to the RouteService so that it doesn't get dropped
-    // _route_service: RouteService<AppRouteState>,
-    // route: Route<AppRouteState>,
     expand: bool,
     config: Config,
 }
