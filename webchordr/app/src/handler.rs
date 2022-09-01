@@ -35,17 +35,15 @@ type InitialDataResult = Result<Box<SessionMainData>, Option<WebError>>;
 
 const TICK_INTERVAL: u32 = 300;
 
-#[allow(unused)]
 pub struct Handler {
     persistence_manager: Arc<PMType>,
     /// Keep a reference to the IntervalTask so that it doesn't get dropped
-    _clock_handle: gloo_timers::callback::Interval,
-    message_listener: Option<EventListener>,
-    keyboard_control: KeyboardControl,
-    #[allow(unused)]
-    fetching: bool,
+    _clock_handle: Interval,
+    _message_listener: Option<EventListener>,
+    _keyboard_control: KeyboardControl,
     config: Config,
     session_service: Rc<SessionService>,
+    #[allow(unused)]
     connection_service: ConnectionService,
     state: Rc<State>,
 }
@@ -515,14 +513,13 @@ impl Component for Handler {
 
         Self {
             persistence_manager,
-            fetching: false,
             _clock_handle: clock_handle,
-            message_listener,
+            _message_listener: message_listener,
             config,
             session_service,
             connection_service,
             state,
-            keyboard_control,
+            _keyboard_control: keyboard_control,
         }
     }
 
@@ -530,20 +527,16 @@ impl Component for Handler {
         trace!("Received Message {:?}", msg);
 
         match msg {
-            Msg::FetchCatalogReady(response) => {
-                self.fetching = false;
-
-                match response {
-                    Ok(catalog) => {
-                        debug!("Catalog fetched with revision: {:?}", catalog.revision());
-                        self.set_state(None, self.state.with_catalog(Some(catalog)), true);
-                    }
-                    Err(error) => {
-                        debug!("Catalog fetched with error {}", error);
-                        self.set_state(None, self.state.with_error(Some(error)), true);
-                    }
+            Msg::FetchCatalogReady(response) => match response {
+                Ok(catalog) => {
+                    debug!("Catalog fetched with revision: {:?}", catalog.revision());
+                    self.set_state(None, self.state.with_catalog(Some(catalog)), true);
                 }
-            }
+                Err(error) => {
+                    debug!("Catalog fetched with error {}", error);
+                    self.set_state(None, self.state.with_error(Some(error)), true);
+                }
+            },
             Msg::Ignore => return false,
             Msg::SessionChanged(session) => return self.update_session(ctx, session, true),
             #[cfg(feature = "server_sync")]
