@@ -1,3 +1,17 @@
+use crate::app::App;
+use crate::config::Config;
+use crate::connection::{ConnectionService, ConnectionStatus};
+use crate::control::navigate::SongNavigator;
+use crate::control::{Control, KeyboardControl};
+use crate::errors::WebError;
+use crate::handler_traits::catalog_handler::CatalogHandler;
+use crate::handler_traits::setlist_handler::SetlistHandler;
+use crate::handler_traits::settings_handler::SettingsHandler;
+use crate::helpers::window;
+use crate::ipc::update_info::UpdateInfo;
+use crate::ipc::{register_ipc_handler, IpcMessage};
+use crate::session::{Session, SessionMainData};
+use crate::state::State;
 use cqrs::prelude::AsyncRepositoryTrait;
 use gloo_events::EventListener;
 use gloo_timers::callback::Interval;
@@ -16,21 +30,6 @@ use webchordr_persistence::prelude::*;
 use webchordr_persistence::session::SessionService;
 use webchordr_persistence::web_repository::{CatalogWebRepository, SettingsWebRepository};
 use yew::prelude::*;
-
-use crate::app::App;
-use crate::config::Config;
-use crate::connection::{ConnectionService, ConnectionStatus};
-use crate::control::navigate::SongNavigator;
-use crate::control::{Control, KeyboardControl};
-use crate::errors::WebError;
-use crate::handler_traits::catalog_handler::CatalogHandler;
-use crate::handler_traits::setlist_handler::SetlistHandler;
-use crate::handler_traits::settings_handler::SettingsHandler;
-use crate::helpers::window;
-use crate::ipc::update_info::UpdateInfo;
-use crate::ipc::{register_ipc_handler, IpcMessage};
-use crate::session::{Session, SessionMainData};
-use crate::state::State;
 
 type InitialDataResult = Result<Box<SessionMainData>, Option<WebError>>;
 
