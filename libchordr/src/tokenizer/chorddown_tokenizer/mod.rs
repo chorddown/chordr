@@ -99,6 +99,44 @@ Swing [D]low, sweet [G]chari[D]ot
     }
 
     #[test]
+    fn test_tokenize_crlf() {
+        use Token::Newline;
+        let content = "\r
+# Swing Low Sweet Chariot\r
+\r
+##! Chorus\r
+Swing [D]low, sweet [G]chari[D]ot\r
+\r
+> A quote [D#m7]\r
+";
+        let token_lines = ChorddownTokenizer::new()
+            .tokenize(content.as_bytes())
+            .unwrap();
+        assert_eq!(
+            token_lines,
+            vec![
+                Newline,
+                Token::headline(1, "Swing Low Sweet Chariot", Modifier::None),
+                Newline,
+                Newline,
+                Token::headline(2, "Chorus", Modifier::Chorus),
+                Newline,
+                Token::literal("Swing "),
+                Token::chord("D"),
+                Token::literal("low, sweet "),
+                Token::chord("G"),
+                Token::literal("chari"),
+                Token::chord("D"),
+                Token::literal("ot"),
+                Newline,
+                Newline,
+                Token::quote("A quote [D#m7]"),
+                Newline
+            ]
+        );
+    }
+
+    #[test]
     fn test_tokenize_meta() {
         let content = r"Composer: Daniel Corn
 Artist: The Fantastic Corns

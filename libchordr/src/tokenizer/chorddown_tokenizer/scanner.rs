@@ -7,6 +7,7 @@ use super::keywords::{
     BRIDGE_MARK, CHORD_END, CHORD_START, CHORUS_MARK, COLON, HEADER_START, NEWLINE, QUOTE_START,
 };
 
+const CARRIAGE_RETURN: char = '\r';
 const LITERAL_BUFFER_CAPACITY: usize = 20;
 
 pub struct Scanner {
@@ -30,6 +31,7 @@ impl Scanner {
 
             for current_character in chars {
                 match current_character {
+                    CARRIAGE_RETURN => {/* ignore */}
                     NEWLINE => self.build_n_push(&mut literal_buffer, Lexeme::Newline),
                     CHORD_START => self.build_n_push(&mut literal_buffer, Lexeme::ChordStart),
                     CHORD_END => self.build_n_push(&mut literal_buffer, Lexeme::ChordEnd),
