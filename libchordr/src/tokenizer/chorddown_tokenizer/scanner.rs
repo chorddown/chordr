@@ -154,6 +154,29 @@ Swing [D]low, sweet [G]chari[D]ot,
     }
 
     #[test]
+    fn scan_crlf_test() {
+        let content = "\r
+# Swing Low Sweet Chariot\r
+
+";
+        let scanner = Scanner::new();
+        let lexemes = scanner.scan(content.as_bytes()).unwrap();
+        assert_eq!(lexemes.len(), 6);
+
+        assert_eq!(
+            lexemes,
+            [
+                NL,
+                H,
+                lit(" Swing Low Sweet Chariot"),
+                NL,
+                NL,
+                EOF,
+            ]
+        );
+    }
+
+    #[test]
     fn scan_test_complex_chords() {
         let lexemes = Scanner::new().scan("[Dm7]".as_bytes()).unwrap();
         assert_eq!(lexemes, vec![CS, lit("Dm7"), CE, EOF]);
