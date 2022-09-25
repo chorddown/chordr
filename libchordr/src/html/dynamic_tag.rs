@@ -7,14 +7,14 @@ use crate::html::content::Content;
 use super::validate_xml_identifier;
 
 #[derive(Clone, Debug)]
-pub struct DynamicTag /*<'a>*/ {
+pub struct DynamicTag {
     blank: bool,
     tag_name: Option<String>,
     content: Content,
     attributes: Option<AttributeCollection>,
 }
 
-impl<'a> DynamicTag /*<'a>*/ {
+impl DynamicTag {
     pub fn new<S: Into<String>>(
         tag_name: S,
         content: Content,
@@ -72,7 +72,7 @@ impl<'a> DynamicTag /*<'a>*/ {
     }
 }
 
-impl<'a> Display for DynamicTag /*<'a>*/ {
+impl Display for DynamicTag {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
         if self.is_blank() {
             return Ok(());

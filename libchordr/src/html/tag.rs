@@ -13,7 +13,7 @@ pub enum Tag {
     Const(ConstTag),
 }
 
-impl<'a> Tag {
+impl Tag {
     pub fn new<S: Into<String>>(
         tag_name: S,
         content: Content,
@@ -116,7 +116,7 @@ impl<'a> Tag {
     }
 }
 
-impl<'a> Display for Tag {
+impl Display for Tag {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
         match self {
             Tag::Dynamic(t) => f.write_str(&t.to_string()),

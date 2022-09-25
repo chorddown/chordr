@@ -16,7 +16,7 @@ pub struct Attribute {
     value: String,
 }
 
-impl<'a> Attribute {
+impl Attribute {
     #[allow(unused)]
     pub fn new<S: Into<String>>(name: &'static str, value: S) -> Result<Self> {
         Ok(Self {
@@ -52,27 +52,27 @@ impl<'a> Attribute {
     }
 }
 
-impl<'a> Hash for Attribute /*<'a>*/ {
+impl Hash for Attribute {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.name.hash(state);
     }
 }
 
-impl<'a> PartialEq for Attribute /*<'a>*/ {
+impl PartialEq for Attribute {
     fn eq(&self, other: &Self) -> bool {
         self.name == other.name
     }
 }
 
-impl<'a> Eq for Attribute /*<'a>*/ {}
+impl Eq for Attribute {}
 
-impl<'a> PartialOrd for Attribute /*<'a>*/ {
+impl PartialOrd for Attribute {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.name().partial_cmp(other.name())
     }
 }
 
-impl<'a> Ord for Attribute /*<'a>*/ {
+impl Ord for Attribute {
     fn cmp(&self, other: &Self) -> Ordering {
         self.name().cmp(other.name())
     }
