@@ -82,7 +82,6 @@ where
 
     async fn find_by_id(
         &self,
-
         id: <Self::ManagedType as RecordTrait>::Id,
     ) -> Tri<Self::ManagedType, Self::Error> {
         self.persistence_manager

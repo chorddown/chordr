@@ -52,12 +52,12 @@ impl Component for Dropzone {
         let class = &ctx.props().class;
         let children = &ctx.props().children;
 
-        return html! {<div {class} ref={self.node_ref.clone()}>{{ children.iter().collect::<Html>() }}</div>};
+        html! {<div {class} ref={self.node_ref.clone()}>{{ children.iter().collect::<Html>() }}</div>}
     }
 
     fn rendered(&mut self, ctx: &Context<Self>, _first_render: bool) {
         if self.drag_n_drop_handle.is_none() {
-            let _ = self.make_dropzone(&ctx.props().item_selectors, ctx.props().on_drop.clone());
+            self.make_dropzone(&ctx.props().item_selectors, ctx.props().on_drop.clone());
         }
     }
 

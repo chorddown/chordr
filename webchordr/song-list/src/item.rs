@@ -22,7 +22,7 @@ pub struct SongListItemProps<S: SongData + Clone + PartialEq> {
     pub class: Class,
 }
 
-fn get_class<'a, S: SongData + Clone + PartialEq>(props: &SongListItemProps<S>) -> Class {
+fn get_class<S: SongData + Clone + PartialEq>(props: &SongListItemProps<S>) -> Class {
     let base_class = props.class.or("song-item");
     let class = if props.highlight {
         base_class.add("-highlight")
