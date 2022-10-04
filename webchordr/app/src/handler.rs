@@ -24,6 +24,7 @@ use tri::Tri;
 use wasm_bindgen_futures::spawn_local;
 use webchordr_common::route::AppRoute;
 use webchordr_events::{Event, SetlistEvent, SettingsEvent, SortingChange};
+use webchordr_persistence::browser_storage::BrowserStorageTrait;
 use webchordr_persistence::persistence_manager::PMType;
 use webchordr_persistence::persistence_manager::PersistenceManagerFactory;
 use webchordr_persistence::prelude::*;
@@ -46,6 +47,7 @@ pub struct Handler {
     #[allow(unused)]
     connection_service: ConnectionService,
     state: Rc<State>,
+    browser_storage: BrowserStorage,
 }
 
 #[derive(Debug)]
@@ -172,7 +174,7 @@ impl Handler {
     }
 
     fn update_session(&mut self, ctx: &Context<Self>, session: Session, reload_data: bool) -> bool {
-        let session_changed = &*self.state.session() != &session;
+        let session_changed = *self.state.session() != session;
         if session_changed {
             self.set_state(None, self.state.with_session(session), true);
             self.persistence_manager =
@@ -212,6 +214,18 @@ impl Handler {
         } else {
             state.without_current_song_id()
         }
+    }
+
+    fn store_current_setlist_id(&mut self, id: i32) {
+        let _ = self
+            .browser_storage
+            .set_item("setlist.current.id", id.to_string());
+    }
+
+    fn load_current_setlist_id(&self) -> Option<i32> {
+        self.browser_storage
+            .get_item("setlist.current.id")
+            .and_then(|v| v.parse::<i32>().ok())
     }
 }
 
@@ -352,16 +366,20 @@ impl SetlistHandler for Handler {
     }
 
     fn setlist_replace(&mut self, setlist: Setlist) {
-        info!("Replace setlist");
+        let id = setlist.id();
+        info!("Replace setlist '{}'", id);
         debug!("{:?}\n=>\n{:?}", self.state.current_setlist(), setlist);
         self.set_state(None, self.state.with_current_setlist(setlist), true);
+        self.store_current_setlist_id(id);
         <Self as SetlistHandler>::commit_changes(self);
     }
 
     fn set_current_setlist(&mut self, setlist: Setlist) {
-        info!("Set current setlist");
+        let id = setlist.id();
+        info!("Set current setlist '{}'", id);
         debug!("{:?}\n=>\n{:?}", self.state.current_setlist(), setlist);
         self.set_state(None, self.state.with_current_setlist(setlist), true);
+        self.store_current_setlist_id(id);
         <Self as SetlistHandler>::commit_changes(self);
     }
 
@@ -381,21 +399,28 @@ impl SetlistHandler for Handler {
     }
 
     fn fetch_setlist(&mut self, ctx: &Context<Self>) {
-        let pm = self.persistence_manager.clone();
-        let callback = ctx
-            .link()
-            .callback(move |setlist| Msg::Event(Box::new(SetlistEvent::Replace(setlist).into())));
+        let id_to_load = self.load_current_setlist_id();
 
-        spawn_local(async move {
-            type Repository<'a> = SetlistWebRepository<'a, PMType>;
-            let result = Repository::new(&pm).load().await;
+        match id_to_load {
+            Some(id) => {
+                let pm = self.persistence_manager.clone();
+                let callback = ctx.link().callback(move |setlist| {
+                    Msg::Event(Box::new(SetlistEvent::Replace(setlist).into()))
+                });
 
-            match result {
-                Tri::Some(setlist) => callback.emit(setlist),
-                Tri::None => { /* noop */ }
-                Tri::Err(e) => error!("{}", e),
+                spawn_local(async move {
+                    type Repository<'a> = SetlistWebRepository<'a, PMType>;
+                    let result = Repository::new(&pm).find_by_id(id).await;
+
+                    match result {
+                        Tri::Some(setlist) => callback.emit(setlist),
+                        Tri::None => { /* noop */ }
+                        Tri::Err(e) => error!("{}", e),
+                    }
+                });
             }
-        });
+            None => warn!("No latest setlist ID found"),
+        }
     }
 
     fn commit_changes(&mut self) {
@@ -405,17 +430,14 @@ impl SetlistHandler for Handler {
                 type Repository<'a> = SetlistWebRepository<'a, PMType>;
                 let mut repository = Repository::new(&pm);
 
+                // Setlist v1 API
                 let result = repository.store(&s).await;
                 if let Err(e) = result {
                     error!("Could not commit setlist changes: {}", e.to_string())
                 }
 
-                let result = if repository.find_by_id(s.id()).await.is_none() {
-                    repository.add((*s).clone()).await
-                } else {
-                    repository.update((*s).clone()).await
-                };
-
+                // Setlist v2 API
+                let result = repository.save((*s).clone()).await;
                 if let Err(e) = result {
                     error!("Could not commit setlist changes (v2): {}", e.to_string())
                 }
@@ -508,9 +530,10 @@ impl Component for Handler {
             IpcMessage::UpdateInfo(i) => Msg::UpdateInfo(i),
         }));
 
-        let keyboard_control =
-            KeyboardControl::new(ctx.link().callback(|control| Msg::Control(control)));
+        let keyboard_control = KeyboardControl::new(ctx.link().callback(Msg::Control));
 
+        let browser_storage =
+            BrowserStorage::local_storage().expect("Could not create Browser Storage");
         Self {
             persistence_manager,
             _clock_handle: clock_handle,
@@ -520,6 +543,7 @@ impl Component for Handler {
             connection_service,
             state,
             _keyboard_control: keyboard_control,
+            browser_storage,
         }
     }
 
