@@ -37,11 +37,17 @@ pub trait CommandBackendTrait {
         command: &Command<T, CommandContext>,
     ) -> Result<(), WebError> {
         match command.command_type() {
+            CommandType::Upsert => self.upsert(command).await,
             CommandType::Add => self.add(command).await,
             CommandType::Update => self.update(command).await,
             CommandType::Delete => self.delete(command).await,
         }
     }
+
+    async fn upsert<T: Serialize + RecordTrait>(
+        &self,
+        command: &Command<T, CommandContext>,
+    ) -> Result<(), WebError>;
 
     async fn add<T: Serialize + RecordTrait>(
         &self,

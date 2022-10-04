@@ -53,6 +53,11 @@ impl<'a> cqrs::prelude::RepositoryTrait for UserRepository<'a> {
         }
     }
 
+    fn save(&self, instance: Self::ManagedType) -> Result<(), Self::Error> {
+        self.get_command_executor(self.connection)
+            .perform(cqrs::prelude::Command::upsert(instance, ()))
+    }
+
     fn add(&self, instance: Self::ManagedType) -> Result<(), Self::Error> {
         self.get_command_executor(self.connection)
             .perform(cqrs::prelude::Command::add(instance, ()))

@@ -1,4 +1,5 @@
 use crate::domain::setlist::db::SetlistDb;
+use crate::domain::setlist::setlist_db_id::SetlistDbId;
 use crate::error::SrvError;
 use crate::schema::setlist_entry;
 use crate::schema::setlist_entry::dsl::setlist_entry as setlist_entries;
@@ -16,14 +17,15 @@ use std::convert::{TryFrom, TryInto};
     Serialize, Identifiable, Associations, Queryable, Insertable, AsChangeset, Debug, Clone,
 )]
 #[table_name = "setlist_entry"]
+#[primary_key(uid)]
 #[belongs_to(SetlistDb)]
 pub struct SetlistDbEntry {
-    pub id: Option<i32>,
+    pub uid: Option<i32>,
     pub song_id: String,
     pub file_type: String,
     pub title: Option<String>,
     pub settings: Option<String>,
-    pub setlist_db_id: i32,
+    pub setlist_db_id: SetlistDbId,
     pub modification_date: Option<NaiveDateTime>,
 }
 
@@ -49,12 +51,12 @@ impl SetlistDbEntry {
 
     pub fn from(entry: &SetlistEntry, setlist_db: &SetlistDb) -> Self {
         Self {
-            id: None,
+            uid: None,
             song_id: entry.id().to_string(),
             file_type: entry.file_type().to_string(),
             title: Some(entry.title()),
             settings: entry.settings().map(|s| serialize_song_settings(&s)),
-            setlist_db_id: setlist_db.id,
+            setlist_db_id: setlist_db.uid as SetlistDbId,
             modification_date: None,
         }
     }

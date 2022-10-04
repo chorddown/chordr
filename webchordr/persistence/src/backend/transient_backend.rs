@@ -105,6 +105,13 @@ impl BackendTrait for TransientBackend {
 
 #[async_trait(? Send)]
 impl CommandBackendTrait for TransientBackend {
+    async fn upsert<T: Serialize + RecordTrait>(
+        &self,
+        command: &Command<T, CommandContext>,
+    ) -> Result<(), WebError> {
+        self.store_with_command(command, ExistenceCheck::DoNotCheck)
+    }
+
     async fn add<T: Serialize + RecordTrait>(
         &self,
         command: &Command<T, CommandContext>,

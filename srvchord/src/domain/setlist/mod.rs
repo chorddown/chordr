@@ -1,6 +1,7 @@
 pub mod command;
 pub mod db;
 pub mod repository;
+pub(crate) mod setlist_db_id;
 
 use crate::domain::setlist::db::SetlistDb;
 use crate::domain::setlist_entry::db::SetlistDbEntry;

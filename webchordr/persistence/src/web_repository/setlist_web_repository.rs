@@ -89,6 +89,12 @@ where
             .await
     }
 
+    async fn save(&self, instance: Self::ManagedType) -> Result<(), Self::Error> {
+        self.persistence_manager
+            .save::<Self::ManagedType>(Self::build_context(), &instance)
+            .await
+    }
+
     async fn add(&self, instance: Self::ManagedType) -> Result<(), Self::Error> {
         self.persistence_manager
             .add::<Self::ManagedType>(Self::build_context(), &instance)

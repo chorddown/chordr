@@ -113,6 +113,13 @@ impl<B: BrowserStorageTrait> BackendTrait for BrowserStorageBackend<B> {
 
 #[async_trait(? Send)]
 impl<B: BrowserStorageTrait> CommandBackendTrait for BrowserStorageBackend<B> {
+    async fn upsert<T: Serialize + RecordTrait>(
+        &self,
+        command: &Command<T, CommandContext>,
+    ) -> Result<(), WebError> {
+        self.store_with_command(command, ExistenceCheck::DoNotCheck)
+    }
+
     async fn add<T: Serialize + RecordTrait>(
         &self,
         command: &Command<T, CommandContext>,

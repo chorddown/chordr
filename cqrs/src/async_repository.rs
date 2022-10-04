@@ -22,6 +22,17 @@ pub trait AsyncRepositoryTrait {
         id: <Self::ManagedType as RecordTrait>::Id,
     ) -> Tri<Self::ManagedType, Self::Error>;
 
+    /// Save the instance of `ManagedType` to the `Repository`
+    ///
+    /// If a record with the instance's ID (= `Self::ManagedType as RecordTrait>::Id`) already
+    /// exists in the Repository, it's value will be replaced by the given instance's value.
+    /// If no such record exists, it will be added to the Repository as a new entry
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if the database operation fails
+    async fn save(&self, instance: Self::ManagedType) -> Result<(), Self::Error>;
+
     /// Add the instance of `ManagedType` to the `Repository`
     ///
     /// # Errors

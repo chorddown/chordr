@@ -13,6 +13,7 @@ use crate::storage_key_utility::build_combined_id_key;
 pub(crate) enum ExistenceCheck {
     MustExist,
     MustNotExist,
+    DoNotCheck,
 }
 
 /// Add or Update the data according to the given command
@@ -32,14 +33,16 @@ where
     let record = command.record();
     let combined_id_key = build_combined_id_key::<T>(command.context(), &record.id());
     let serialized_value = serde_json::to_string(record)?;
-    let entry_does_exist = exists_callback(&combined_id_key);
+
+    // let entry_does_exist = exists_callback(&combined_id_key);
     match existence_check {
-        ExistenceCheck::MustExist if !entry_does_exist => {
+        ExistenceCheck::MustExist if !exists_callback(&combined_id_key) => {
             return Err(record_not_found_error::<T>(&record.id()));
         }
-        ExistenceCheck::MustNotExist if entry_does_exist => {
+        ExistenceCheck::MustNotExist if exists_callback(&combined_id_key) => {
             return Err(record_exists_error::<T>(&record.id()));
         }
+        ExistenceCheck::DoNotCheck => {}
         _ => {}
     }
 

@@ -4,7 +4,7 @@ use crate::persistence_manager::CommandContext;
 use chrono::prelude::*;
 use libchordr::prelude::*;
 pub use test_value::TestValue;
-use webchordr_common::constants::{STORAGE_KEY_SETLIST, TEST_STORAGE_NAMESPACE};
+use webchordr_common::constants::{STORAGE_V2_KEY_SETLIST, TEST_STORAGE_NAMESPACE};
 
 pub fn entry<S: Into<String>>(id: S) -> SetlistEntry {
     SetlistEntry::from_song_with_settings(&test_song(id), SongSettings::default())
@@ -69,5 +69,5 @@ pub(crate) fn get_test_setlist(user: User) -> Setlist {
 }
 
 pub(super) fn get_test_command_context() -> CommandContext {
-    CommandContext::new(TEST_STORAGE_NAMESPACE, STORAGE_KEY_SETLIST)
+    CommandContext::new(TEST_STORAGE_NAMESPACE, STORAGE_V2_KEY_SETLIST)
 }

@@ -66,7 +66,7 @@ impl<CB: CommandQueryBackendTrait, SB: CommandQueryBackendTrait, TB: CommandQuer
             if self.session.is_unauthenticated() {
                 return Err(e);
             } else {
-                error!("{}", e)
+                warn!("Client command failed: {}", e)
             }
         }
 
@@ -197,9 +197,7 @@ impl<CB: CommandQueryBackendTrait, SB: CommandQueryBackendTrait, TB: CommandQuer
     where
         T: for<'a> Deserialize<'a>,
     {
-        if self.session.is_unauthenticated() {
-            return Tri::None;
-        }
+        assert!(self.session.is_authenticated());
 
         match ServerBackendType::from_context(query.context()) {
             ServerBackendType::Server => {
@@ -384,6 +382,18 @@ impl<CB: CommandQueryBackendTrait, SB: CommandQueryBackendTrait, TB: CommandQuer
         self.client_find_by_id(&command).await
     }
 
+    async fn save<'a, T: Serialize + RecordTrait>(
+        &self,
+        context: CommandContext,
+        instance: &'a T,
+    ) -> Result<(), WebError>
+    where
+        &'a T: RecordTrait,
+    {
+        self.perform_command(Command::upsert(instance, context))
+            .await
+    }
+
     async fn add<'a, T: Serialize + RecordTrait>(
         &self,
         context: CommandContext,
@@ -451,7 +461,7 @@ mod test {
 
     use crate::backend::{BrowserStorageBackend, TransientBackend};
     use crate::browser_storage::HashMapBrowserStorage;
-    use crate::constants::{STORAGE_KEY_SETLIST, TEST_STORAGE_NAMESPACE};
+    use crate::constants::TEST_STORAGE_NAMESPACE;
     use crate::prelude::BrowserStorage;
     use crate::shared::hash_map_from_context_and_slice;
     use crate::storage_key_utility::build_combined_id_key;
@@ -481,7 +491,7 @@ mod test {
 
     fn build_transient_backend_with_entries(entries: &[TestValue]) -> TransientBackend {
         TransientBackend::new_with_map(hash_map_from_context_and_slice(
-            &CommandContext::new(TEST_STORAGE_NAMESPACE, STORAGE_KEY_SETLIST),
+            &get_test_command_context(),
             entries,
         ))
     }
@@ -682,7 +692,7 @@ mod test {
 
     //#[wasm_bindgen_test]
     #[tokio::test]
-    async fn find_by_id_in_client_test() {
+    async fn find_by_id_on_server_test() {
         let test_person = TestValue::new(76, "Justin");
         let client_backend = TransientBackend::new();
         let server_backend = build_transient_backend_with_entries(&[
@@ -705,7 +715,7 @@ mod test {
 
     //#[wasm_bindgen_test]
     #[tokio::test]
-    async fn find_by_id_on_server_test() {
+    async fn find_by_id_on_client_test() {
         let test_person = TestValue::new(76, "Justin");
         let client_backend = build_transient_backend_with_entries(&[
             TestValue::new(3, "Daniel"),

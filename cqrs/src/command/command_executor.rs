@@ -12,11 +12,17 @@ pub trait CommandExecutor {
         command: Command<Self::RecordType, Self::Context>,
     ) -> Result<(), Self::Error> {
         match command.command_type() {
+            CommandType::Upsert => self.upsert(command),
             CommandType::Add => self.add(command),
             CommandType::Update => self.update(command),
             CommandType::Delete => self.delete(command),
         }
     }
+
+    /// Save the `record` to the system
+    ///
+    /// An error will be returned if the `record` already exists
+    fn upsert(&self, command: Command<Self::RecordType, Self::Context>) -> Result<(), Self::Error>;
 
     /// Add the `record` to the system
     ///

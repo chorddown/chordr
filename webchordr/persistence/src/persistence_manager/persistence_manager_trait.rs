@@ -27,6 +27,23 @@ pub trait PersistenceManagerTrait // : BackendTrait
     where
         T: for<'a> Deserialize<'a> + RecordTrait;
 
+    /// Save the instance of to the `Repository`
+    ///
+    /// If a record with the instance's ID (= `T as RecordTrait>::Id`) already exists in the
+    /// database, it's value will be replaced by the given instance's value.
+    /// If no such record exists, it will be added to the Repository as a new entry
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if the storage operation fails
+    async fn save<'a, T: Serialize + RecordTrait>(
+        &self,
+        context: CommandContext,
+        instance: &'a T,
+    ) -> Result<(), WebError>
+    where
+        &'a T: RecordTrait;
+
     /// Add the instance to the database (within the area of the given Context)
     ///
     /// # Errors
