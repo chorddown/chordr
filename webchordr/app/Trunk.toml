@@ -4,6 +4,10 @@ target = "index.html"
 [watch]
 ignore = ["static/javascripts/bundle.js", ".DS_Store"]
 
+[[proxy]]
+rewrite = "/api/"
+backend = "http://localhost:9000/api/"
+
 [[hooks]]
 stage = "pre_build"
 command = "sh"
