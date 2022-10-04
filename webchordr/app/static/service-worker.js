@@ -79,7 +79,7 @@ const handleActivate = event => {
  * @returns {boolean}
  */
 const shouldCacheRequest = (request) => {
-    return request.method !== 'POST';
+    return request.method !== 'POST' && !isApiRequest(request.url);
 }
 
 /**
