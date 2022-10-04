@@ -1,15 +1,15 @@
-use rocket::serde::json::Json;
-use rocket::{get, post};
-
-use cqrs::prelude::RepositoryTrait as CqrsRepositoryTrait;
-use libchordr::prelude::{Setlist, Username};
-
 use crate::domain::setlist::repository::SetlistRepository;
 use crate::domain::user::UserDb;
 use crate::DbConn;
+use cqrs::prelude::RepositoryTrait as CqrsRepositoryTrait;
+use libchordr::prelude::{Setlist, Username};
+use log::{debug, error, warn};
+use rocket::serde::json::Json;
+use rocket::{get, post};
 
 pub fn get_routes() -> Vec<rocket::Route> {
     routes![
+        crate::routes::setlist::setlist_options_all,
         crate::routes::setlist::setlist_index,
         crate::routes::setlist::setlist_list,
         crate::routes::setlist::setlist_get,
@@ -17,6 +17,11 @@ pub fn get_routes() -> Vec<rocket::Route> {
         crate::routes::setlist::setlist_put,
         crate::routes::setlist::setlist_delete
     ]
+}
+
+#[options("/<username>/<_..>", rank = 3)]
+pub async fn setlist_options_all(username: String) -> Option<()> {
+    Username::new(username).ok().map(|_| ())
 }
 
 #[get("/")]
@@ -141,37 +146,28 @@ pub async fn setlist_put(
     setlist: Json<Setlist>,
     user: UserDb,
 ) -> Option<Json<Setlist>> {
-    let username_instance = match check_username(&username, &user) {
-        Ok(u) => u,
-        Err(_) => return None,
-    };
+    if check_username(&username, &user).is_err() {
+        return None;
+    }
     debug!("Add/update setlist {} {:?}", username, setlist);
 
-    // Todo: Check if user did not change
     let setlist = setlist.into_inner();
+    if setlist.owner().username().as_ref() != &user.username {
+        error!(
+            "Tried to change the Setlist owner from {} to {}",
+            setlist.owner().username(),
+            user.username
+        );
+        return None;
+    }
 
     conn.run(move |conn| {
         let repo = SetlistRepository::new(conn);
-        match repo.find_by_username_and_setlist_id(&username_instance, setlist.id()) {
-            Ok(_) => {
-                info!("Perform update setlist {} #{}", username, setlist.id());
-                match repo.update(setlist.clone()) {
-                    Ok(_) => Some(Json(setlist)),
-                    Err(e) => {
-                        error!("{}", e);
-                        None
-                    }
-                }
-            }
-            Err(_) => {
-                info!("Perform add setlist {} #{}", username, setlist.id());
-                match repo.add(setlist.clone()) {
-                    Ok(_) => Some(Json(setlist)),
-                    Err(e) => {
-                        error!("{}", e);
-                        None
-                    }
-                }
+        match repo.save(setlist.clone()) {
+            Ok(_) => Some(Json(setlist)),
+            Err(e) => {
+                error!("{}", e);
+                None
             }
         }
     })
@@ -204,7 +200,7 @@ mod test {
 
     // use crate::traits::RepositoryTrait;
     use cqrs::prelude::RepositoryTrait;
-    use libchordr::prelude::ListTrait;
+    use libchordr::prelude::{ListTrait, Username};
 
     use crate::domain::setlist::repository::SetlistRepository;
     use crate::test_helpers::{
@@ -228,7 +224,7 @@ mod test {
                 Header::new("Authorization", format!("Basic {}", encoded_credentials));
 
             let get_response = client
-                .get(format!("/setlist/{}/{}", username, random_id))
+                .get(format!("/api/setlist/{}/{}", username, random_id))
                 .header(authorization_header.clone())
                 .dispatch();
             assert_eq!(get_response.status(), Status::Ok);
@@ -270,7 +266,7 @@ mod test {
             let authorization_header =
                 Header::new("Authorization", format!("Basic {}", encoded_credentials));
             let post_response = client
-                .post(format!("/setlist/{}", username))
+                .post(format!("/api/setlist/{}", username))
                 .header(ContentType::JSON)
                 .header(authorization_header.clone())
                 .body(
@@ -297,7 +293,7 @@ mod test {
 
             assert_eq!(
                 client
-                    .get(format!("/setlist/{}/{}", username, random_id))
+                    .get(format!("/api/setlist/{}/{}", username, random_id))
                     .header(authorization_header.clone())
                     .dispatch()
                     .status(),
@@ -306,14 +302,14 @@ mod test {
 
             // Ensure the setlist is what we expect
             let setlist = user_setlist_repository
-                .find_by_id(random_id)
-                .expect_some("New setlist not found");
+                .find_by_username_and_setlist_id(&Username::try_from(&username).unwrap(), random_id)
+                .expect("New setlist not found");
             assert_eq!(setlist.len(), 2);
             assert_eq!(setlist.owner().username().to_string(), username);
 
             // Issue a request to delete the setlist
             let delete_response = client
-                .delete(format!("/setlist/{}/{}", username, random_id))
+                .delete(format!("/api/setlist/{}/{}", username, random_id))
                 .header(authorization_header.clone())
                 .dispatch();
             assert_eq!(delete_response.status(), Status::Ok);
@@ -322,7 +318,7 @@ mod test {
             assert_eq!(user_setlist_repository.count_all().unwrap(), initial_count);
             assert_eq!(
                 client
-                    .get(format!("/setlist/{}/{}", username, random_id))
+                    .get(format!("/api/setlist/{}/{}", username, random_id))
                     .header(authorization_header.clone())
                     .dispatch()
                     .status(),
@@ -351,7 +347,7 @@ mod test {
             let authorization_header =
                 Header::new("Authorization", format!("Basic {}", encoded_credentials));
             let post_response = client
-                .post(format!("/setlist/{}", username))
+                .post(format!("/api/setlist/{}", username))
                 .header(ContentType::JSON)
                 .header(authorization_header.clone())
                 .body(
@@ -375,8 +371,8 @@ mod test {
 
             // Ensure the setlist is what we expect
             let setlist = user_setlist_repository
-                .find_by_id(random_id)
-                .expect_some("New setlist not found");
+                .find_by_username_and_setlist_id(&Username::try_from(&username).unwrap(), random_id)
+                .expect("New setlist not found");
             assert_eq!(setlist.len(), 0);
             assert_eq!(setlist.owner().username().to_string().as_str(), username);
         })

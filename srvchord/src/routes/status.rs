@@ -27,7 +27,7 @@ mod test {
     #[test]
     fn test_index() {
         run_test_fn(|client, _conn| {
-            let get_response = client.get("/status/").dispatch();
+            let get_response = client.get("/api/status/").dispatch();
             assert_eq!(get_response.status(), Status::Ok);
 
             let response_body = get_response.into_string().unwrap();

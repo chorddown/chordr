@@ -8,7 +8,11 @@ use rocket::get;
 use rocket::serde::json::Json;
 
 pub fn get_routes() -> Vec<rocket::Route> {
-    routes![crate::routes::user::index, crate::routes::user::data,]
+    routes![
+        crate::routes::user::index,
+        crate::routes::user::index_options,
+        crate::routes::user::data,
+    ]
 }
 
 #[get("/")]
@@ -18,6 +22,9 @@ pub fn index(user: UserDb) -> Option<Json<User>> {
         Err(_) => None,
     }
 }
+
+#[options("/")]
+pub fn index_options() -> () {}
 
 #[get("/data")]
 pub async fn data(user_db: UserDb, conn: DbConn) -> Option<Json<MainData>> {
@@ -75,7 +82,7 @@ mod test {
                 Header::new("Authorization", format!("Basic {}", encoded_credentials));
 
             let get_response = client
-                .get("/user/")
+                .get("/api/user/")
                 .header(authorization_header.clone())
                 .dispatch();
             assert_eq!(get_response.status(), Status::Ok);

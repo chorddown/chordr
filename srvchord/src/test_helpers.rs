@@ -64,7 +64,7 @@ pub fn run_test_fn<F>(test_body: F) -> ()
 where
     F: Fn(Client, DummyDb) -> (),
 {
-    let _lock = crate::test_helpers::DB_LOCK.lock();
+    let _lock = DB_LOCK.lock();
     let rocket = crate::rocket_build();
     let conn = get_database(&rocket);
     let client = Client::untracked(rocket).expect("Rocket client");
@@ -154,6 +154,15 @@ pub fn insert_test_user<S1: Into<String>, S2: Into<String>, S3: Into<String>>(
     .unwrap();
 
     new_user
+}
+
+pub fn create_test_user(username: &str) -> User {
+    User::new(
+        Username::try_from(username).unwrap(),
+        "John",
+        "Doe",
+        create_test_password(),
+    )
 }
 
 pub fn create_setlist<S: AsRef<str>>(conn: &ConnectionType, id: i32, username: S) -> Setlist {

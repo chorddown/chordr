@@ -50,6 +50,11 @@ async fn index(config: &State<Config>) -> io::Result<NamedFile> {
     NamedFile::open(Path::new(&config.static_files_dir).join("index.html")).await
 }
 
+#[get("/api/<_..>", rank = 10)]
+async fn api_not_found() -> Option<()> {
+    None
+}
+
 #[get("/<_..>", rank = 20)]
 async fn html_fallback(config: &State<Config>) -> io::Result<NamedFile> {
     NamedFile::open(Path::new(&config.static_files_dir).join("index.html")).await
@@ -109,7 +114,7 @@ fn rocket_build() -> Rocket<Build> {
         .mount("/api/status", routes::status::get_routes())
         .mount("/api/setlist", routes::setlist::get_routes())
         .mount("/api/user", routes::user::get_routes())
-        .mount("/", routes![html_fallback])
+        .mount("/", routes![api_not_found, html_fallback])
 }
 
 fn build_application_config(rocket: &Rocket<Build>) -> Config {
