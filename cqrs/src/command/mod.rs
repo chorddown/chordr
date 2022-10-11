@@ -16,6 +16,15 @@ pub struct Command<T: RecordTrait, C> {
 }
 
 impl<T: RecordTrait, C> Command<T, C> {
+    /// Create a new command to `Upsert` `record` to the system
+    pub fn upsert(record: T, context: C) -> Self {
+        Self {
+            command_type: CommandType::Upsert,
+            subject: record,
+            context,
+        }
+    }
+
     /// Create a new command to `Add` `record` to the system
     pub fn add(record: T, context: C) -> Self {
         Self {
