@@ -1,0 +1,25 @@
+[package]
+name = "cqrs-desync"
+version = "0.1.0"
+authors = ["Daniel Corn <info@cundd.net>"]
+edition = "2021"
+license = "MIT OR Apache-2.0"
+readme = "../README.md"
+repository = "https://github.com/chorddown/chordr"
+description = """
+Utility to create sync and async versions of the CQRS modules
+"""
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "libcqrs_desync"
+path = "src/lib.rs"
+
+[[bin]]
+name = "cqrs-desync"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4.0.17", features = ["derive", "cargo"] }
+chrono = { version = "^0.4.19", default-features = false, features = ["std", "clock"] }

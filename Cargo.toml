@@ -3,6 +3,7 @@ members = [
     "chordr",
     "libchordr",
     "cqrs",
+    "cqrs-desync",
     "tri",
     "webchordr/app",
     "webchordr/common",
