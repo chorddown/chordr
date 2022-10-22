@@ -1,10 +1,27 @@
+use crate::RecordTrait;
+#[deprecated(note = "Use either blocking or unblocking API")]
 pub use command_executor::CommandExecutor;
 pub use command_type::CommandType;
 
-use crate::RecordTrait;
-
 mod command_executor;
 mod command_type;
+
+// pub trait CommandTrait {
+//     type RecordType: RecordTrait;
+//     type Context;
+//
+//     /// Return the `Command`'s type
+//     fn command_type(&self) -> CommandType;
+//
+//     /// Return the `Command`'s record
+//     ///
+//     /// Will return a reference to the record to be added/updated in the system
+//     /// This is applicable for `Add` and `Update` `Command`s
+//     fn record(&self) -> &Self::RecordType;
+//
+//     /// Return the `Command`'s context
+//     fn context(&self) -> &Self::Context;
+// }
 
 /// A `Command` defines an operation to mutate data in the system
 /// It is defined by a [`CommandType`] describing the action to perform and the subject of the
