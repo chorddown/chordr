@@ -1,8 +1,6 @@
 use clap::Parser;
-use libcqrs_desync::code_updater::CodeUpdater;
-use libcqrs_desync::error::Error;
-use libcqrs_desync::file_reader::FileReader;
-use libcqrs_desync::file_writer::FileWriter;
+use libcqrs_desync::prelude::*;
+use std::error::Error as StdError;
 use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
