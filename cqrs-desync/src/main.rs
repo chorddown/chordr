@@ -6,7 +6,9 @@ use std::path::PathBuf;
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
+    /// File to analyse
     source: String,
+    /// Target path for the patched file
     target: String,
     /// Enable verbose output
     #[arg(short, long, default_value_t = false)]
