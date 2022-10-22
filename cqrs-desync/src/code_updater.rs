@@ -39,6 +39,13 @@ impl CodeUpdater {
         let buffer = delete_patterns
             .into_iter()
             .fold(buffer, |acc, item| acc.replace(item, ""));
-        Ok(buffer.replace(" async fn ", " fn "))
+
+        let replace_patterns = [(" async fn ", " fn "), ("trait Async", "trait ")];
+
+        let buffer = replace_patterns
+            .into_iter()
+            .fold(buffer, |acc, (s, r)| acc.replace(s, r));
+
+        Ok(buffer)
     }
 }
