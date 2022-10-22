@@ -34,6 +34,7 @@ impl CodeUpdater {
             "#[async_trait(?Send)]",
             "#[async_trait()]",
             "#[async_trait]",
+            ".await",
         ];
 
         let buffer = delete_patterns
