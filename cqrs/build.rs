@@ -11,6 +11,10 @@ fn main() {
             format!("{}/src/blocking/repository.rs", base_dir),
         ),
         (
+            format!("{}/src/nonblocking/query_executor.rs", base_dir),
+            format!("{}/src/blocking/query_executor.rs", base_dir),
+        ),
+        (
             format!("{}/src/nonblocking/command_executor.rs", base_dir),
             format!("{}/src/blocking/command_executor.rs", base_dir),
         ),

@@ -7,6 +7,7 @@ use webchordr_common::helpers;
 use webchordr_common::lock;
 
 pub mod backend;
+pub mod backend_v2;
 pub mod browser_storage;
 pub mod persistence_manager;
 pub mod session;
