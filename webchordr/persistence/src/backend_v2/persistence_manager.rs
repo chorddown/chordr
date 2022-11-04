@@ -10,7 +10,7 @@
 //!
 //! `Query`s will also be sent to all `QueryExecutor` backends. The first successful (non-error)
 //! result will be returned.
-use crate::persistence_manager::CommandContext;
+use crate::command_context::CommandContext;
 use async_trait::async_trait;
 use cqrs::nonblocking::{BackendTrait, CommandExecutor, QueryExecutor};
 use cqrs::prelude::{Command, Query, RecordTrait};

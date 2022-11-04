@@ -1,4 +1,4 @@
-use crate::persistence_manager::CommandContext;
+use crate::command_context::CommandContext;
 
 pub trait ContextProvider {
     /// Return the `namespace` part of the storage key
