@@ -1,5 +1,8 @@
 use crate::app::App;
 use crate::config::Config;
+#[cfg(not(feature = "server_sync"))]
+use crate::connection::ConnectionService;
+#[cfg(feature = "server_sync")]
 use crate::connection::{ConnectionService, ConnectionStatus};
 use crate::control::navigate::SongNavigator;
 use crate::control::{Control, KeyboardControl};
@@ -10,12 +13,11 @@ use crate::handler_traits::settings_handler::SettingsHandler;
 use crate::helpers::window;
 use crate::ipc::update_info::UpdateInfo;
 use crate::ipc::{register_ipc_handler, IpcMessage};
-use crate::session::{Session, SessionMainData};
+use crate::session::Session;
 use crate::state::State;
 use cqrs::prelude::AsyncRepositoryTrait;
 use gloo_events::EventListener;
 use gloo_timers::callback::Interval;
-use libchordr::models::user::MainData;
 use libchordr::prelude::*;
 use log::{debug, error, info, trace, warn};
 use std::rc::Rc;
@@ -30,8 +32,6 @@ use webchordr_persistence::web_repository::{
     CatalogWebRepository, SetlistWebRepositoryFactory, SettingsWebRepositoryFactory,
 };
 use yew::prelude::*;
-
-type InitialDataResult = Result<Box<SessionMainData>, Option<WebError>>;
 
 const TICK_INTERVAL: u32 = 300;
 
@@ -60,7 +60,6 @@ pub enum Msg {
     #[cfg(feature = "server_sync")]
     ConnectionStatusChanged(ConnectionStatus),
     StateChanged(State),
-    InitialDataLoaded(InitialDataResult),
     UpdateInfo(UpdateInfo),
     Control(Control),
 }
@@ -80,71 +79,16 @@ impl Handler {
 
     fn load_initial_data(&mut self, ctx: &Context<Self>) {
         let session_service = self.session_service.clone();
-        match session_service.get_credentials_from_session_storage() {
-            Ok(credentials) => {
-                let on_load = ctx.link().callback(Msg::InitialDataLoaded);
-                debug!("Try to login with credentials from Session Storage");
-                spawn_local(async move {
-                    match session_service.get_main_data(&credentials).await {
-                        Ok(r) => {
-                            debug!("Successful login with credentials from Session Storage");
-                            on_load.emit(Ok(Box::new(r)))
-                        }
-                        Err(e) => {
-                            debug!("Failed login with credentials from Session Storage");
-                            on_load.emit(Err(Some(e)))
-                        }
-                    }
-                });
+        let on_session_changed = ctx.link().callback(Msg::SessionChanged);
+        debug!("Try to login with credentials from Session Storage");
+        spawn_local(async move {
+            if let Ok(u) = session_service.try_from_browser_storage().await {
+                info!("Login successful");
+                on_session_changed.emit(u)
+            } else {
+                on_session_changed.emit(Session::default())
             }
-            Err(e) => ctx
-                .link()
-                .send_message(Msg::InitialDataLoaded(Err(Some(e)))),
-        }
-    }
-
-    fn handle_initial_data(&mut self, ctx: &Context<Self>, r: InitialDataResult) {
-        match r {
-            Ok(initial_data) => {
-                self.update_session(ctx, initial_data.session.clone(), false);
-                let MainData {
-                    song_settings,
-                    latest_setlist,
-                    user: _,
-                } = initial_data.main_data;
-
-                let did_fetch_setlist = latest_setlist.is_some();
-                let did_fetch_song_settings = song_settings.is_some();
-
-                self.set_state(
-                    None,
-                    State::new(
-                        self.state.catalog().map(|c| (*c).clone()),
-                        latest_setlist,
-                        None,
-                        song_settings.unwrap_or_else(SongSettingsMap::new),
-                        ConnectionStatus::OnLine,
-                        initial_data.session,
-                        None,
-                        None,
-                    ),
-                    true,
-                );
-                if !did_fetch_setlist {
-                    self.fetch_setlist(ctx);
-                }
-                if !did_fetch_song_settings {
-                    self.fetch_song_settings(ctx);
-                }
-            }
-            Err(_) => {
-                self.update_session(ctx, Session::default(), false);
-                self.fetch_setlist(ctx);
-                self.fetch_song_settings(ctx);
-                #[cfg(feature = "server_sync")]
-                self.check_connection_status(ctx);
-            }
-        }
+        });
     }
 
     #[cfg(feature = "server_sync")]
@@ -546,7 +490,6 @@ impl Component for Handler {
             }
             Msg::Event(e) => self.handle_event(*e),
             Msg::StateChanged(_state) => unreachable!(), //self.state = Rc::new(state),
-            Msg::InitialDataLoaded(r) => self.handle_initial_data(ctx, r),
             Msg::Tick => {
                 self.run_scheduled_tasks(ctx);
                 return false;
