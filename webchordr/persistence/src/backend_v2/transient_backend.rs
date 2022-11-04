@@ -3,7 +3,7 @@ use crate::persistence_manager::CommandContext;
 use crate::shared::*;
 use crate::storage_key_utility::{build_combined_id_key, build_combined_key, SEPARATOR};
 use async_trait::async_trait;
-use cqrs::blocking::{CommandExecutor, QueryExecutor};
+use cqrs::nonblocking::{CommandExecutor, QueryExecutor};
 use cqrs::prelude::{Command, Query};
 use libchordr::prelude::RecordTrait;
 use serde::de::DeserializeOwned;
@@ -48,7 +48,7 @@ impl<R: RecordTrait + Serialize + DeserializeOwned> TransientBackend<R> {
     /// database
     fn store_with_command(
         &self,
-        command: Command<R, CommandContext>,
+        command: &Command<R, CommandContext>,
         existence_check: ExistenceCheck,
     ) -> Result<(), WebError> {
         store_with_command(
@@ -65,24 +65,37 @@ impl<R: RecordTrait + Serialize + DeserializeOwned> TransientBackend<R> {
     }
 }
 
+#[async_trait(? Send)]
 impl<R: RecordTrait + Serialize + DeserializeOwned> CommandExecutor for TransientBackend<R> {
     type RecordType = R;
     type Error = WebError;
     type Context = CommandContext;
 
-    fn upsert(&self, command: Command<Self::RecordType, Self::Context>) -> Result<(), WebError> {
+    async fn upsert(
+        &self,
+        command: &Command<Self::RecordType, Self::Context>,
+    ) -> Result<(), Self::Error> {
         self.store_with_command(command, ExistenceCheck::DoNotCheck)
     }
 
-    fn add(&self, command: Command<Self::RecordType, Self::Context>) -> Result<(), WebError> {
+    async fn add(
+        &self,
+        command: &Command<Self::RecordType, Self::Context>,
+    ) -> Result<(), Self::Error> {
         self.store_with_command(command, ExistenceCheck::MustNotExist)
     }
 
-    fn update(&self, command: Command<Self::RecordType, Self::Context>) -> Result<(), WebError> {
+    async fn update(
+        &self,
+        command: &Command<Self::RecordType, Self::Context>,
+    ) -> Result<(), Self::Error> {
         self.store_with_command(command, ExistenceCheck::MustExist)
     }
 
-    fn delete(&self, command: Command<Self::RecordType, Self::Context>) -> Result<(), WebError> {
+    async fn delete(
+        &self,
+        command: &Command<Self::RecordType, Self::Context>,
+    ) -> Result<(), Self::Error> {
         let id = &command.record().id();
         let combined_id_key = build_combined_id_key::<R>(command.context(), id);
 
@@ -101,9 +114,9 @@ impl<R: RecordTrait + Serialize + DeserializeOwned> QueryExecutor for TransientB
     type Error = WebError;
     type Context = CommandContext;
 
-    fn find_all(
+    async fn find_all(
         &self,
-        query: Query<Self::RecordType, Self::Context>,
+        query: &Query<Self::RecordType, Self::Context>,
     ) -> Result<Vec<Self::RecordType>, Self::Error> {
         let combined_key = format!(
             "{}{}",
@@ -129,9 +142,9 @@ impl<R: RecordTrait + Serialize + DeserializeOwned> QueryExecutor for TransientB
             .collect())
     }
 
-    fn find_by_id(
+    async fn find_by_id(
         &self,
-        query: Query<Self::RecordType, Self::Context>,
+        query: &Query<Self::RecordType, Self::Context>,
     ) -> Tri<Self::RecordType, Self::Error> {
         let id = match query.id() {
             None => return Tri::Err(missing_record_id_error()),
@@ -168,7 +181,9 @@ mod test {
             hash_map_from_context_and_slice(&get_test_command_context(), &test_values),
         );
 
-        let result = backend.find_all(Query::all(get_test_command_context()));
+        let result = backend
+            .find_all(&Query::all(get_test_command_context()))
+            .await;
         assert!(result.is_ok());
         let all = result.unwrap();
         assert_eq!(all.len(), 4);
@@ -190,7 +205,9 @@ mod test {
                     TestValue::new(6, "Paulina"),
                 ],
             ));
-        let result = backend.find_by_id(Query::by_id("Justin".into(), get_test_command_context()));
+        let result = backend
+            .find_by_id(&Query::by_id("Justin".into(), get_test_command_context()))
+            .await;
         assert!(result.is_some());
         assert_eq!(result.unwrap(), test_person);
     }
@@ -199,7 +216,12 @@ mod test {
     async fn add_test() {
         let test_value = TestValue::new(39, "Thomas");
         let backend: TransientBackend<TestValue> = TransientBackend::new();
-        let result = backend.add(Command::add(test_value.clone(), get_test_command_context()));
+        let result = backend
+            .add(&Command::add(
+                test_value.clone(),
+                get_test_command_context(),
+            ))
+            .await;
         assert!(result.is_ok(), "{}", result.unwrap_err());
 
         assert_eq!(backend.data().len(), 1);
@@ -227,10 +249,11 @@ mod test {
         assert_eq!(backend.data().len(), 4);
 
         assert!(backend
-            .update(Command::update(
+            .update(&Command::update(
                 updated_value.clone(),
                 get_test_command_context()
             ))
+            .await
             .is_ok());
 
         let data = backend.data();
@@ -257,10 +280,12 @@ mod test {
 
         assert_eq!(backend.data().len(), 1);
 
-        let result = backend.delete(Command::delete(
-            value_to_delete.clone(),
-            get_test_command_context(),
-        ));
+        let result = backend
+            .delete(&Command::delete(
+                value_to_delete.clone(),
+                get_test_command_context(),
+            ))
+            .await;
         assert!(result.is_ok(), "{}", result.unwrap_err());
 
         let data = backend.data();

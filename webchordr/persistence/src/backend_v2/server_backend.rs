@@ -117,26 +117,29 @@ impl<R: RecordTrait + Serialize + DeserializeOwned> CommandExecutor for ServerBa
 
     async fn upsert(
         &self,
-        command: Command<Self::RecordType, Self::Context>,
-    ) -> Result<(), WebError> {
+        command: &Command<Self::RecordType, Self::Context>,
+    ) -> Result<(), Self::Error> {
         self.send_post(command.context(), command.record()).await
     }
 
-    async fn add(&self, command: Command<Self::RecordType, Self::Context>) -> Result<(), WebError> {
+    async fn add(
+        &self,
+        command: &Command<Self::RecordType, Self::Context>,
+    ) -> Result<(), Self::Error> {
         self.send_post(command.context(), command.record()).await
     }
 
     async fn update(
         &self,
-        command: Command<Self::RecordType, Self::Context>,
-    ) -> Result<(), WebError> {
+        command: &Command<Self::RecordType, Self::Context>,
+    ) -> Result<(), Self::Error> {
         self.send_post(command.context(), command.record()).await
     }
 
     async fn delete(
         &self,
-        _command: Command<Self::RecordType, Self::Context>,
-    ) -> Result<(), WebError> {
+        _command: &Command<Self::RecordType, Self::Context>,
+    ) -> Result<(), Self::Error> {
         todo!("delete() is not implemented")
     }
 }
@@ -149,7 +152,7 @@ impl<R: RecordTrait + Serialize + DeserializeOwned> QueryExecutor for ServerBack
 
     async fn find_all(
         &self,
-        query: Query<Self::RecordType, Self::Context>,
+        query: &Query<Self::RecordType, Self::Context>,
     ) -> Result<Vec<Self::RecordType>, Self::Error> {
         let headers = self.build_request_headers();
         let uri = self.build_request_uri_from_context(query.context(), None);
@@ -159,7 +162,7 @@ impl<R: RecordTrait + Serialize + DeserializeOwned> QueryExecutor for ServerBack
 
     async fn find_by_id(
         &self,
-        query: Query<Self::RecordType, Self::Context>,
+        query: &Query<Self::RecordType, Self::Context>,
     ) -> Tri<Self::RecordType, Self::Error> {
         let headers = self.build_request_headers();
         let id = match query.id() {

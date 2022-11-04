@@ -7,8 +7,8 @@ use crate::shared::{
     ExistenceCheck,
 };
 use crate::storage_key_utility::{build_combined_id_key, build_combined_key, SEPARATOR};
-use cqrs::blocking::CommandExecutor;
-use cqrs::blocking::QueryExecutor;
+use async_trait::async_trait;
+use cqrs::nonblocking::{CommandExecutor, QueryExecutor};
 use cqrs::prelude::{Command, Query, RecordTrait};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
@@ -17,6 +17,7 @@ use std::rc::Rc;
 use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 use webchordr_common::tri::Tri;
 
+#[derive(Clone)]
 pub struct BrowserStorageBackend<B, R: RecordTrait + Serialize + DeserializeOwned> {
     browser_storage: Rc<RwLock<B>>,
     _data_type: PhantomData<R>,
@@ -38,11 +39,11 @@ impl<B: BrowserStorageTrait, R: RecordTrait + Serialize + DeserializeOwned>
     /// database
     fn store_with_command(
         &self,
-        command: Command<<Self as CommandExecutor>::RecordType, CommandContext>,
+        command: &Command<<Self as CommandExecutor>::RecordType, CommandContext>,
         existence_check: ExistenceCheck,
     ) -> Result<(), WebError> {
         store_with_command(
-            &command,
+            command,
             existence_check,
             |combined_id_key| match self.lock_for_reading() {
                 Ok(l) => l.get_item(combined_id_key).is_some(),
@@ -78,6 +79,7 @@ impl<B: BrowserStorageTrait, R: RecordTrait + Serialize + DeserializeOwned>
     }
 }
 
+#[async_trait(? Send)]
 impl<B: BrowserStorageTrait, R: RecordTrait + Serialize + DeserializeOwned> CommandExecutor
     for BrowserStorageBackend<B, R>
 {
@@ -85,19 +87,31 @@ impl<B: BrowserStorageTrait, R: RecordTrait + Serialize + DeserializeOwned> Comm
     type Error = WebError;
     type Context = CommandContext;
 
-    fn upsert(&self, command: Command<Self::RecordType, Self::Context>) -> Result<(), WebError> {
+    async fn upsert(
+        &self,
+        command: &Command<Self::RecordType, Self::Context>,
+    ) -> Result<(), Self::Error> {
         self.store_with_command(command, ExistenceCheck::DoNotCheck)
     }
 
-    fn add(&self, command: Command<Self::RecordType, Self::Context>) -> Result<(), WebError> {
+    async fn add(
+        &self,
+        command: &Command<Self::RecordType, Self::Context>,
+    ) -> Result<(), Self::Error> {
         self.store_with_command(command, ExistenceCheck::MustNotExist)
     }
 
-    fn update(&self, command: Command<Self::RecordType, Self::Context>) -> Result<(), WebError> {
+    async fn update(
+        &self,
+        command: &Command<Self::RecordType, Self::Context>,
+    ) -> Result<(), Self::Error> {
         self.store_with_command(command, ExistenceCheck::MustExist)
     }
 
-    fn delete(&self, command: Command<Self::RecordType, Self::Context>) -> Result<(), WebError> {
+    async fn delete(
+        &self,
+        command: &Command<Self::RecordType, Self::Context>,
+    ) -> Result<(), Self::Error> {
         let id = &command.record().id();
         let combined_id_key = build_combined_id_key::<Self::RecordType>(command.context(), id);
         let entry_does_exist = self
@@ -111,6 +125,8 @@ impl<B: BrowserStorageTrait, R: RecordTrait + Serialize + DeserializeOwned> Comm
         self.lock_for_writing()?.remove_item(combined_id_key)
     }
 }
+
+#[async_trait(? Send)]
 impl<B: BrowserStorageTrait, R: RecordTrait + Serialize + DeserializeOwned> QueryExecutor
     for BrowserStorageBackend<B, R>
 {
@@ -118,9 +134,9 @@ impl<B: BrowserStorageTrait, R: RecordTrait + Serialize + DeserializeOwned> Quer
     type Error = WebError;
     type Context = CommandContext;
 
-    fn find_all(
+    async fn find_all(
         &self,
-        query: Query<Self::RecordType, Self::Context>,
+        query: &Query<Self::RecordType, Self::Context>,
     ) -> Result<Vec<Self::RecordType>, Self::Error> {
         let combined_key = format!(
             "{}{}",
@@ -147,9 +163,9 @@ impl<B: BrowserStorageTrait, R: RecordTrait + Serialize + DeserializeOwned> Quer
             .collect())
     }
 
-    fn find_by_id(
+    async fn find_by_id(
         &self,
-        query: Query<Self::RecordType, Self::Context>,
+        query: &Query<Self::RecordType, Self::Context>,
     ) -> Tri<Self::RecordType, Self::Error> {
         let id = match query.id() {
             None => return Tri::Err(missing_record_id_error()),
@@ -189,7 +205,9 @@ mod test {
                 hash_map_from_context_and_slice(&get_test_command_context(), &test_values),
             ));
 
-        let result = backend.find_all(Query::all(get_test_command_context()));
+        let result = backend
+            .find_all(&Query::all(get_test_command_context()))
+            .await;
         assert!(result.is_ok());
         let all = result.unwrap();
         assert_eq!(all.len(), 4);
@@ -212,7 +230,9 @@ mod test {
                 ],
             )),
         );
-        let result = backend.find_by_id(Query::by_id("Justin".into(), get_test_command_context()));
+        let result = backend
+            .find_by_id(&Query::by_id("Justin".into(), get_test_command_context()))
+            .await;
         assert!(result.is_some());
         assert_eq!(result.unwrap(), test_person);
     }
@@ -222,7 +242,12 @@ mod test {
         let test_value = TestValue::new(39, "Thomas");
         let backend: BrowserStorageBackend<_, TestValue> =
             BrowserStorageBackend::new(HashMapBrowserStorage::new());
-        let result = backend.add(Command::add(test_value.clone(), get_test_command_context()));
+        let result = backend
+            .add(&Command::add(
+                test_value.clone(),
+                get_test_command_context(),
+            ))
+            .await;
         assert!(result.is_ok(), "{}", result.unwrap_err());
 
         let BrowserStorageBackend {
@@ -258,10 +283,11 @@ mod test {
 
         let backend = BrowserStorageBackend::new(storage);
         assert!(backend
-            .update(Command::update(
+            .update(&Command::update(
                 updated_value.clone(),
                 get_test_command_context()
             ))
+            .await
             .is_ok());
         let BrowserStorageBackend {
             browser_storage, ..
@@ -293,10 +319,12 @@ mod test {
         assert_eq!(storage.data().len(), 1);
         let backend = BrowserStorageBackend::new(storage);
 
-        let result = backend.delete(Command::delete(
-            value_to_delete.clone(),
-            get_test_command_context(),
-        ));
+        let result = backend
+            .delete(&Command::delete(
+                value_to_delete.clone(),
+                get_test_command_context(),
+            ))
+            .await;
         assert!(result.is_ok(), "{}", result.unwrap_err());
         let BrowserStorageBackend {
             browser_storage, ..
