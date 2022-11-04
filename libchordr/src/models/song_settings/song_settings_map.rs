@@ -4,6 +4,8 @@ use crate::models::song_settings::SongSettings;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+const SONG_SETTINGS_ID: &'static str = "song-settings";
+
 /// A map of [SongSettings] to [SongId]s
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
 pub struct SongSettingsMap(HashMap<SongId, SongSettings>);
@@ -32,6 +34,6 @@ impl RecordTrait for SongSettingsMap {
     type Id = &'static str;
 
     fn id(&self) -> Self::Id {
-        "song-settings"
+        SONG_SETTINGS_ID
     }
 }
