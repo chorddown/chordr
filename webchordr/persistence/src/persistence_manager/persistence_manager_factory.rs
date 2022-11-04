@@ -1,13 +1,16 @@
 use webchordr_common::session::Session;
 
+#[allow(deprecated)]
 use crate::backend::{
     BrowserStorageBackend, BrowserStorageBackendFactory, ServerBackend, ServerBackendFactory,
     TransientBackend, TransientBackendFactory,
 };
 use crate::browser_storage::BrowserStorage;
 use crate::config::Config;
+#[allow(deprecated)]
 use crate::persistence_manager::PersistenceManager;
 
+#[allow(deprecated)]
 pub type PMType =
     PersistenceManager<BrowserStorageBackend<BrowserStorage>, ServerBackend, TransientBackend>;
 
@@ -18,6 +21,7 @@ impl PersistenceManagerFactory {
         Self {}
     }
 
+    #[allow(deprecated)]
     pub fn build(&self, config: &Config, session: Session) -> PMType {
         let browser_storage_backend_factory = BrowserStorageBackendFactory::new();
         let server_backend_factory = ServerBackendFactory::new();

@@ -8,10 +8,12 @@ use cqrs::prelude::{Command, Query};
 use libchordr::prelude::RecordTrait;
 use webchordr_common::tri::Tri;
 
+#[allow(deprecated)]
 use crate::backend::backend_trait::{CommandBackendTrait, QueryBackendTrait};
+#[allow(deprecated)]
 use crate::backend::{BackendTrait, CommandQueryBackendTrait};
+use crate::command_context::CommandContext;
 use crate::errors::WebError;
-use crate::persistence_manager::CommandContext;
 use crate::shared::{
     deserialize_value, missing_record_id_error, record_not_found_error, store_with_command,
     ExistenceCheck,
@@ -73,6 +75,7 @@ impl Default for TransientBackend {
     }
 }
 
+#[allow(deprecated)]
 #[async_trait(? Send)]
 impl BackendTrait for TransientBackend {
     async fn store<T: Serialize + RecordTrait, N: AsRef<str>, K: AsRef<str>>(
@@ -103,6 +106,7 @@ impl BackendTrait for TransientBackend {
     }
 }
 
+#[allow(deprecated)]
 #[async_trait(? Send)]
 impl CommandBackendTrait for TransientBackend {
     async fn upsert<T: Serialize + RecordTrait>(
@@ -142,6 +146,7 @@ impl CommandBackendTrait for TransientBackend {
     }
 }
 
+#[allow(deprecated)]
 #[async_trait(? Send)]
 impl QueryBackendTrait for TransientBackend {
     async fn find_all<T: RecordTrait>(

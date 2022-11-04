@@ -5,14 +5,15 @@ use cqrs::prelude::{Command, CommandType, Query};
 use libchordr::prelude::RecordTrait;
 use webchordr_common::tri::Tri;
 
+use crate::command_context::CommandContext;
 use crate::errors::WebError;
-use crate::persistence_manager::CommandContext;
 
 /// Trait for a persistent data Backend.
 ///
 /// It will take care of storing and loading data from it's Storage (e.g. Browser Storage,
 /// Server API)
 #[async_trait(? Send)]
+#[deprecated(note = "Replace with CommandExecutor impl")]
 pub trait BackendTrait {
     /// Store `value` with the given `key` in the `namespace`
     ///
@@ -31,6 +32,7 @@ pub trait BackendTrait {
 }
 
 #[async_trait(? Send)]
+#[deprecated(note = "Replace with CommandExecutor impl")]
 pub trait CommandBackendTrait {
     async fn perform<T: Serialize + RecordTrait>(
         &self,
@@ -66,6 +68,7 @@ pub trait CommandBackendTrait {
 }
 
 #[async_trait(? Send)]
+#[deprecated(note = "Replace with QueryExecutor impl")]
 pub trait QueryBackendTrait {
     async fn find_all<T: RecordTrait>(
         &self,
@@ -82,4 +85,5 @@ pub trait QueryBackendTrait {
         T: for<'a> Deserialize<'a>;
 }
 
+#[allow(deprecated)]
 pub trait CommandQueryBackendTrait: BackendTrait + CommandBackendTrait + QueryBackendTrait {}

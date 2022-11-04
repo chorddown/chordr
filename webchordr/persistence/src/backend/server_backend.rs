@@ -9,13 +9,15 @@ use cqrs::prelude::{Command, Query};
 use libchordr::prelude::{Credentials, RecordTrait};
 use webchordr_common::tri::Tri;
 
+#[allow(deprecated)]
 use crate::backend::backend_trait::{CommandBackendTrait, QueryBackendTrait};
+#[allow(deprecated)]
 use crate::backend::{BackendTrait, CommandQueryBackendTrait};
+use crate::command_context::CommandContext;
 use crate::errors::WebError;
 use crate::fetch_helper::{
     fetch_with_additional_headers, fetch_with_options_and_additional_headers,
 };
-use crate::persistence_manager::CommandContext;
 use crate::shared::missing_record_id_error;
 
 pub struct ServerBackend {
@@ -109,6 +111,7 @@ impl ServerBackend {
     }
 }
 
+#[allow(deprecated)]
 #[async_trait(? Send)]
 impl BackendTrait for ServerBackend {
     async fn store<T: Serialize + RecordTrait, N: AsRef<str>, K: AsRef<str>>(
@@ -153,6 +156,7 @@ impl BackendTrait for ServerBackend {
     }
 }
 
+#[allow(deprecated)]
 #[async_trait(? Send)]
 impl CommandBackendTrait for ServerBackend {
     async fn upsert<T: Serialize + RecordTrait>(
@@ -184,6 +188,7 @@ impl CommandBackendTrait for ServerBackend {
     }
 }
 
+#[allow(deprecated)]
 #[async_trait(? Send)]
 impl QueryBackendTrait for ServerBackend {
     async fn find_all<T: RecordTrait>(
