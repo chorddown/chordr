@@ -101,6 +101,7 @@ pub enum PersistenceError {
     RecordNotFoundError(String),
     RecordExistsError(String),
     MissingRecordIdError(String),
+    BackendError(String, Vec<WebError>),
     GeneralError(String),
 }
 
@@ -132,6 +133,10 @@ impl PersistenceError {
     pub fn missing_record_id_error<S: Display>(s: S) -> Self {
         Self::MissingRecordIdError(s.to_string())
     }
+
+    pub fn backend_error<S: Display>(s: S, errors: Vec<WebError>) -> Self {
+        Self::BackendError(s.to_string(), errors)
+    }
 }
 
 impl Display for PersistenceError {
@@ -143,6 +148,7 @@ impl Display for PersistenceError {
             PersistenceError::RecordNotFoundError(s) => f.write_str(s),
             PersistenceError::RecordExistsError(s) => f.write_str(s),
             PersistenceError::MissingRecordIdError(s) => f.write_str(s),
+            PersistenceError::BackendError(s, _) => f.write_str(s),
             PersistenceError::GeneralError(s) => f.write_str(s),
         }
     }
