@@ -3,7 +3,7 @@ use crate::backend_v2::persistence_manager::PersistenceManagerV2;
 use crate::backend_v2::server_backend::ServerBackend;
 use crate::backend_v2::server_backend_factory::ServerBackendFactory;
 use crate::browser_storage::BrowserStorage;
-use crate::persistence_manager::CommandContext;
+use crate::command_context::CommandContext;
 use crate::web_repository::SetlistWebRepository;
 use cqrs::nonblocking::{CommandExecutor, QueryExecutor};
 use libchordr::prelude::Setlist;

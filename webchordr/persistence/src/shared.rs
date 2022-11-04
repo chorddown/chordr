@@ -6,7 +6,7 @@ use cqrs::prelude::{Command, RecordTrait};
 use webchordr_common::errors::{PersistenceError, WebError};
 use webchordr_common::tri::Tri;
 
-use crate::persistence_manager::CommandContext;
+use crate::command_context::CommandContext;
 use crate::storage_key_utility::build_combined_id_key;
 
 #[derive(Debug)]

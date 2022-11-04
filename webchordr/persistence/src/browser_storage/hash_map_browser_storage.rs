@@ -1,14 +1,10 @@
-use std::collections::HashMap;
-
-use serde::Serialize;
-
-use cqrs::prelude::RecordTrait;
-
-use crate::errors::WebError;
-use crate::persistence_manager::CommandContext;
-use crate::shared::hash_map_from_context_and_slice;
-
 use super::browser_storage_trait::BrowserStorageTrait;
+use crate::command_context::CommandContext;
+use crate::errors::WebError;
+use crate::shared::hash_map_from_context_and_slice;
+use cqrs::prelude::RecordTrait;
+use serde::Serialize;
+use std::collections::HashMap;
 
 type Data = HashMap<String, String>;
 pub struct HashMapBrowserStorage {

@@ -1,7 +1,7 @@
 use crate::backend_v2::browser_storage_backend::BrowserStorageBackend;
 use crate::backend_v2::persistence_manager::PersistenceManagerV2;
 use crate::browser_storage::BrowserStorage;
-use crate::persistence_manager::CommandContext;
+use crate::command_context::CommandContext;
 use crate::web_repository::SettingsWebRepository;
 use cqrs::nonblocking::{CommandExecutor, QueryExecutor};
 use libchordr::prelude::SongSettingsMap;
