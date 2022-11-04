@@ -233,11 +233,9 @@ impl Handler {
 
 impl CatalogHandler for Handler {
     fn fetch_catalog(&mut self, ctx: &Context<Self>) {
-        let pm = self.persistence_manager.clone();
         let callback = ctx.link().callback(Msg::FetchCatalogReady);
 
         spawn_local(async move {
-            type Repository<'a> = CatalogWebRepository<'a, PMType>;
             let browser_storage = match BrowserStorage::local_storage() {
                 Ok(s) => s,
                 Err(e) => {
@@ -246,7 +244,7 @@ impl CatalogHandler for Handler {
                     return;
                 }
             };
-            let result = Repository::new(&pm, browser_storage).load().await;
+            let result = CatalogWebRepository::new(browser_storage).load().await;
 
             match result {
                 Tri::Some(catalog) => callback.emit(Ok(catalog)),
@@ -257,25 +255,7 @@ impl CatalogHandler for Handler {
     }
 
     fn commit_changes(&mut self) {
-        let pm = self.persistence_manager.clone();
-        let catalog = self.state.catalog();
-        spawn_local(async move {
-            type Repository<'a> = CatalogWebRepository<'a, PMType>;
-            let browser_storage = match BrowserStorage::local_storage() {
-                Ok(s) => s,
-                Err(e) => {
-                    error!("Could not commit Catalog changes: {}", e.to_string());
-                    return;
-                }
-            };
-            let result = Repository::new(&pm, browser_storage)
-                .store(&catalog.unwrap())
-                .await;
-
-            if let Err(e) = result {
-                error!("Could not commit Catalog changes: {}", e.to_string())
-            }
-        });
+        error!("Changing the Catalog is not implement")
     }
 }
 

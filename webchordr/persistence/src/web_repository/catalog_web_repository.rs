@@ -1,32 +1,19 @@
-use async_trait::async_trait;
-use wasm_bindgen::__rt::core::marker::PhantomData;
-
-use libchordr::prelude::Catalog;
-use webchordr_common::tri::Tri;
-
 use crate::backend::{BackendTrait, BrowserStorageBackend};
 use crate::browser_storage::BrowserStorage;
 use crate::constants::{STORAGE_KEY_CATALOG, STORAGE_NAMESPACE};
-use crate::errors::PersistenceError;
 use crate::fetch_helper::fetch;
-use crate::persistence_manager::{CommandContext, PersistenceManagerTrait};
 use crate::WebError;
+use libchordr::prelude::Catalog;
+use webchordr_common::tri::Tri;
 
-use super::WebRepositoryTrait;
-
-pub struct CatalogWebRepository<'a, P: PersistenceManagerTrait> {
-    _phantom: ::std::marker::PhantomData<&'a P>,
+pub struct CatalogWebRepository {
     backend: BrowserStorageBackend<BrowserStorage>,
 }
 
-impl<'a, P> CatalogWebRepository<'a, P>
-where
-    P: PersistenceManagerTrait,
-{
-    pub fn new(_persistence_manager: &'a P, browser_storage: BrowserStorage) -> Self {
+impl CatalogWebRepository {
+    pub fn new(browser_storage: BrowserStorage) -> Self {
         Self {
             backend: BrowserStorageBackend::new(browser_storage),
-            _phantom: PhantomData,
         }
     }
 
@@ -43,32 +30,8 @@ where
             Err(error) => Tri::Err(error),
         }
     }
-}
 
-#[async_trait(? Send)]
-impl<'a, P> WebRepositoryTrait for CatalogWebRepository<'a, P>
-where
-    P: PersistenceManagerTrait,
-{
-    type ManagedType = Catalog;
-
-    fn namespace() -> &'static str {
-        ""
-    }
-
-    fn key() -> &'static str {
-        ""
-    }
-
-    fn build_context() -> CommandContext {
-        CommandContext::new("", "")
-    }
-
-    async fn store(&mut self, _value: &Self::ManagedType) -> Result<(), WebError> {
-        Err(PersistenceError::general_error("Changing the Catalog is not implement").into())
-    }
-
-    async fn load(&mut self) -> Tri<Self::ManagedType, WebError> {
+    pub async fn load(&mut self) -> Tri<Catalog, WebError> {
         match self.fetch_catalog(true).await {
             Tri::Some(c) => {
                 // Store/cache the loaded Catalog
