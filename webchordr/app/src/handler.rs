@@ -19,14 +19,11 @@ use libchordr::models::user::MainData;
 use libchordr::prelude::*;
 use log::{debug, error, info, trace, warn};
 use std::rc::Rc;
-use std::sync::Arc;
 use tri::Tri;
 use wasm_bindgen_futures::spawn_local;
 use webchordr_common::route::AppRoute;
 use webchordr_events::{Event, SetlistEvent, SettingsEvent, SortingChange};
 use webchordr_persistence::browser_storage::BrowserStorageTrait;
-use webchordr_persistence::persistence_manager::PMType;
-use webchordr_persistence::persistence_manager::PersistenceManagerFactory;
 use webchordr_persistence::prelude::*;
 use webchordr_persistence::session::SessionService;
 use webchordr_persistence::web_repository::{
@@ -39,7 +36,6 @@ type InitialDataResult = Result<Box<SessionMainData>, Option<WebError>>;
 const TICK_INTERVAL: u32 = 300;
 
 pub struct Handler {
-    persistence_manager: Arc<PMType>,
     /// Keep a reference to the IntervalTask so that it doesn't get dropped
     _clock_handle: Interval,
     _message_listener: Option<EventListener>,
@@ -80,12 +76,6 @@ impl Handler {
             }
             _ => debug!("New event {:?}", e),
         }
-    }
-
-    fn build_persistence_manager(config: &Config, session: Session) -> Arc<PMType> {
-        let persistence_manager_factory = PersistenceManagerFactory::new();
-
-        Arc::new(persistence_manager_factory.build(config, session))
     }
 
     fn load_initial_data(&mut self, ctx: &Context<Self>) {
@@ -179,8 +169,6 @@ impl Handler {
         let session_changed = *self.state.session() != session;
         if session_changed {
             self.set_state(None, self.state.with_session(session), true);
-            self.persistence_manager =
-                Self::build_persistence_manager(&self.config, (*self.state.session()).clone());
         }
 
         if reload_data {
@@ -495,7 +483,6 @@ impl Component for Handler {
 
         let config = Config::default();
         let session_service = Rc::new(SessionService::new(config.clone()));
-        let persistence_manager = Handler::build_persistence_manager(&config, Session::default());
 
         let state = Rc::new(Self::update_state_with_route(&State::default(), ctx));
         let connection_service = ConnectionService::new(config.clone());
@@ -509,7 +496,6 @@ impl Component for Handler {
         let browser_storage =
             BrowserStorage::local_storage().expect("Could not create Browser Storage");
         Self {
-            persistence_manager,
             _clock_handle: clock_handle,
             _message_listener: message_listener,
             config,
@@ -594,7 +580,6 @@ impl Component for Handler {
         debug!("Redraw the handler");
         let state = self.state.clone();
         let config = self.config.clone();
-        let persistence_manager = self.persistence_manager.clone();
         let link = ctx.link();
         let on_event = link.callback(|e| Msg::Event(Box::new(e)));
         let on_setlist_change = link.callback(|e| Msg::Event(Box::new(e)));
@@ -618,7 +603,6 @@ impl Component for Handler {
                     {on_setlist_change}
                     {on_user_login_success}
                     {on_user_login_error}
-                    {persistence_manager}
                     {config}
                 />
             }) as Html

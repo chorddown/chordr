@@ -1,5 +1,4 @@
 use std::rc::Rc;
-use std::sync::Arc;
 
 use log::{debug, error, info};
 use percent_encoding::percent_decode_str;
@@ -11,7 +10,6 @@ use libchordr::prelude::*;
 use webchordr_common::config::Config;
 use webchordr_common::errors::WebError;
 use webchordr_events::{Event, SetlistEvent, SettingsEvent};
-use webchordr_persistence::persistence_manager::PMType;
 use webchordr_song_browser::SongBrowser;
 
 use crate::components::nav::Nav;
@@ -39,7 +37,6 @@ pub struct AppProperties {
     pub on_user_login_error: Callback<WebError>,
     pub state: Rc<State>,
     pub config: Config,
-    pub persistence_manager: Arc<PMType>,
 }
 
 impl PartialEq for AppProperties {
