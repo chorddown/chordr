@@ -149,7 +149,7 @@ pub fn insert_test_user<S1: Into<String>, S2: Into<String>, S3: Into<String>>(
 
     CommandExecutor::perform(
         &UserCommandExecutor::new_with_connection(conn),
-        Command::add(new_user.clone(), ()),
+        &Command::add(new_user.clone(), ()),
     )
     .unwrap();
 
@@ -190,7 +190,7 @@ pub fn create_setlist<S: AsRef<str>>(conn: &ConnectionType, id: i32, username: S
 
     CommandExecutor::perform(
         &SetlistCommandExecutor::new_with_connection(&conn),
-        Command::add(setlist.clone(), ()),
+        &Command::add(setlist.clone(), ()),
     )
     .unwrap();
 

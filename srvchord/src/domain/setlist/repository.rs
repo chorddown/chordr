@@ -127,7 +127,7 @@ impl<'a> SetlistRepository<'a> {
     }
 }
 
-impl<'a> cqrs::prelude::RepositoryTrait for SetlistRepository<'a> {
+impl<'a> RepositoryTrait for SetlistRepository<'a> {
     type ManagedType = Setlist;
     type Error = SrvError;
 
@@ -155,22 +155,22 @@ impl<'a> cqrs::prelude::RepositoryTrait for SetlistRepository<'a> {
 
     fn save(&self, instance: Self::ManagedType) -> Result<(), Self::Error> {
         self.get_command_executor(self.connection)
-            .perform(cqrs::prelude::Command::upsert(instance, ()))
+            .perform(&cqrs::prelude::Command::upsert(instance, ()))
     }
 
     fn add(&self, instance: Self::ManagedType) -> Result<(), Self::Error> {
         self.get_command_executor(self.connection)
-            .perform(cqrs::prelude::Command::add(instance, ()))
+            .perform(&cqrs::prelude::Command::add(instance, ()))
     }
 
     fn update(&self, instance: Self::ManagedType) -> Result<(), Self::Error> {
         self.get_command_executor(self.connection)
-            .perform(cqrs::prelude::Command::update(instance, ()))
+            .perform(&cqrs::prelude::Command::update(instance, ()))
     }
 
     fn delete(&self, instance: Self::ManagedType) -> Result<(), Self::Error> {
         self.get_command_executor(self.connection)
-            .perform(cqrs::prelude::Command::delete(instance, ()))
+            .perform(&cqrs::prelude::Command::delete(instance, ()))
     }
 }
 

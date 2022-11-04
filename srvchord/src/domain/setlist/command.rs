@@ -5,7 +5,6 @@ use crate::domain::setlist::setlist_db_id::ToSetlistDbId;
 use crate::domain::setlist_entry::db::SetlistDbEntry;
 use crate::error::SrvError;
 use crate::schema::setlist::dsl::setlist as all_setlists;
-use crate::schema::setlist::id;
 use crate::ConnectionType;
 use cqrs::prelude::{Command, CommandExecutor};
 use diesel::{self, prelude::*, NotFound};
@@ -45,7 +44,7 @@ impl<'a> SetlistCommandExecutor<'a> {
         let username = setlist.owner().username();
         let setlist_id = setlist.id();
         let similar_setlist: Result<SetlistDb, _> = all_setlists
-            .filter(id.eq(setlist_id))
+            .filter(crate::schema::setlist::id.eq(setlist_id))
             .get_result(self.connection);
         let description = match similar_setlist {
             Ok(similar_setlist) if &similar_setlist.owner != username.as_ref() => {
@@ -71,7 +70,10 @@ impl<'a> CommandExecutor for SetlistCommandExecutor<'_> {
     type Error = SrvError;
     type Context = CqsContext;
 
-    fn upsert(&self, command: Command<Self::RecordType, Self::Context>) -> Result<(), Self::Error> {
+    fn upsert(
+        &self,
+        command: &Command<Self::RecordType, Self::Context>,
+    ) -> Result<(), Self::Error> {
         let setlist = command.record();
         let setlist_db_query = all_setlists.find(setlist.to_setlist_db_uid());
         if let Ok(1) = setlist_db_query.count().get_result::<i64>(self.connection) {
@@ -81,7 +83,7 @@ impl<'a> CommandExecutor for SetlistCommandExecutor<'_> {
         }
     }
 
-    fn add(&self, command: Command<Self::RecordType, Self::Context>) -> Result<(), Self::Error> {
+    fn add(&self, command: &Command<Self::RecordType, Self::Context>) -> Result<(), Self::Error> {
         let setlist = command.record();
         let setlist_db = SetlistDb::from(setlist);
 
@@ -96,7 +98,10 @@ impl<'a> CommandExecutor for SetlistCommandExecutor<'_> {
         Ok(())
     }
 
-    fn update(&self, command: Command<Self::RecordType, Self::Context>) -> Result<(), Self::Error> {
+    fn update(
+        &self,
+        command: &Command<Self::RecordType, Self::Context>,
+    ) -> Result<(), Self::Error> {
         let setlist = command.record();
         let setlist_db_query = all_setlists.find(setlist.to_setlist_db_uid());
         let setlist_db_instance: SetlistDb = match setlist_db_query.get_result(self.connection) {
@@ -121,7 +126,10 @@ impl<'a> CommandExecutor for SetlistCommandExecutor<'_> {
         Ok(())
     }
 
-    fn delete(&self, command: Command<Self::RecordType, Self::Context>) -> Result<(), Self::Error> {
+    fn delete(
+        &self,
+        command: &Command<Self::RecordType, Self::Context>,
+    ) -> Result<(), Self::Error> {
         let setlist = command.record();
         diesel::delete(all_setlists.find(setlist.to_setlist_db_uid())).execute(self.connection)?;
 
@@ -164,7 +172,7 @@ mod test {
 
             CommandExecutor::perform(
                 &SetlistCommandExecutor::new_with_connection(&conn),
-                Command::add(new_setlist, ()),
+                &Command::add(new_setlist, ()),
             )
             .unwrap();
 
@@ -203,7 +211,7 @@ mod test {
 
             CommandExecutor::perform(
                 &SetlistCommandExecutor::new_with_connection(&conn),
-                Command::add(new_setlist.clone(), ()),
+                &Command::add(new_setlist.clone(), ()),
             )
             .unwrap();
 
@@ -239,7 +247,7 @@ mod test {
             );
             CommandExecutor::perform(
                 &SetlistCommandExecutor::new_with_connection(&conn),
-                Command::update(empty_setlist, ()),
+                &Command::update(empty_setlist, ()),
             )
             .unwrap();
 
@@ -259,7 +267,7 @@ mod test {
 
             let result = CommandExecutor::perform(
                 &SetlistCommandExecutor::new_with_connection(&conn),
-                Command::update(
+                &Command::update(
                     Setlist::new(
                         "My setlist #918",
                         918, // Same ID
@@ -297,7 +305,7 @@ mod test {
 
             let result = CommandExecutor::perform(
                 &SetlistCommandExecutor::new_with_connection(&conn),
-                Command::update(
+                &Command::update(
                     Setlist::new(
                         "My setlist #918",
                         918, // Same ID
@@ -326,7 +334,7 @@ mod test {
             clear_database(&conn);
             let result = CommandExecutor::perform(
                 &SetlistCommandExecutor::new_with_connection(&conn),
-                Command::update(
+                &Command::update(
                     Setlist::new(
                         "My setlist #918",
                         10001,
@@ -376,7 +384,7 @@ mod test {
 
             CommandExecutor::perform(
                 &SetlistCommandExecutor::new_with_connection(&conn),
-                Command::upsert(new_setlist.clone(), ()),
+                &Command::upsert(new_setlist.clone(), ()),
             )
             .unwrap();
 
@@ -415,7 +423,7 @@ mod test {
             );
             let result = CommandExecutor::perform(
                 &SetlistCommandExecutor::new_with_connection(&conn),
-                Command::upsert(setlist.clone(), ()),
+                &Command::upsert(setlist.clone(), ()),
             );
 
             assert!(result.is_ok(), "{}", result.unwrap_err());
@@ -449,7 +457,7 @@ mod test {
             );
             CommandExecutor::perform(
                 &SetlistCommandExecutor::new_with_connection(&conn),
-                Command::delete(setlist_to_delete.clone(), ()),
+                &Command::delete(setlist_to_delete.clone(), ()),
             )
             .unwrap();
 

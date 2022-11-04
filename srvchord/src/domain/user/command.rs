@@ -22,7 +22,10 @@ impl<'a> cqrs::prelude::CommandExecutor for UserCommandExecutor<'_> {
     type Error = SrvError;
     type Context = CqsContext;
 
-    fn upsert(&self, command: Command<Self::RecordType, Self::Context>) -> Result<(), Self::Error> {
+    fn upsert(
+        &self,
+        command: &Command<Self::RecordType, Self::Context>,
+    ) -> Result<(), Self::Error> {
         let user = command.record();
         let user_query = all_users.find(Identifiable::id(user));
         if let Ok(1) = user_query.count().get_result::<i64>(self.connection) {
@@ -32,20 +35,14 @@ impl<'a> cqrs::prelude::CommandExecutor for UserCommandExecutor<'_> {
         }
     }
 
-    fn add(
-        &self,
-        command: cqrs::prelude::Command<Self::RecordType, CqsContext>,
-    ) -> Result<(), Self::Error> {
+    fn add(&self, command: &Command<Self::RecordType, CqsContext>) -> Result<(), Self::Error> {
         diesel::insert_into(crate::schema::user::table)
             .values(command.record())
             .execute(self.connection)?;
         Ok(())
     }
 
-    fn update(
-        &self,
-        command: cqrs::prelude::Command<Self::RecordType, CqsContext>,
-    ) -> Result<(), Self::Error> {
+    fn update(&self, command: &Command<Self::RecordType, CqsContext>) -> Result<(), Self::Error> {
         let user = command.record();
         let user_query = all_users.find(diesel::Identifiable::id(user));
         if user_query.get_result::<UserDb>(self.connection).is_err() {
@@ -62,10 +59,7 @@ impl<'a> cqrs::prelude::CommandExecutor for UserCommandExecutor<'_> {
         Ok(())
     }
 
-    fn delete(
-        &self,
-        command: cqrs::prelude::Command<Self::RecordType, CqsContext>,
-    ) -> Result<(), Self::Error> {
+    fn delete(&self, command: &Command<Self::RecordType, CqsContext>) -> Result<(), Self::Error> {
         diesel::delete(all_users.find(&command.record().username)).execute(self.connection)?;
         Ok(())
     }
@@ -95,7 +89,7 @@ mod test {
 
             CommandExecutor::perform(
                 &UserCommandExecutor::new_with_connection(&conn),
-                Command::add(new_user, ()),
+                &Command::add(new_user, ()),
             )
             .unwrap();
 
@@ -113,7 +107,7 @@ mod test {
 
             CommandExecutor::perform(
                 &UserCommandExecutor::new_with_connection(&conn),
-                Command::update(
+                &Command::update(
                     UserDb {
                         username: "saul-panther-918".to_string(), // Same username
                         first_name: "Paul".to_string(),           // New name
@@ -142,7 +136,7 @@ mod test {
 
             CommandExecutor::perform(
                 &UserCommandExecutor::new_with_connection(&conn),
-                Command::upsert(new_user, ()),
+                &Command::upsert(new_user, ()),
             )
             .unwrap();
 
@@ -159,7 +153,7 @@ mod test {
 
             CommandExecutor::perform(
                 &UserCommandExecutor::new_with_connection(&conn),
-                Command::upsert(
+                &Command::upsert(
                     UserDb {
                         username: "saul-panther-918".to_string(), // Same username
                         first_name: "Paul".to_string(),           // New name
@@ -194,7 +188,7 @@ mod test {
 
             CommandExecutor::perform(
                 &UserCommandExecutor::new_with_connection(&conn),
-                Command::delete(user_to_delete, ()),
+                &Command::delete(user_to_delete, ()),
             )
             .unwrap();
 

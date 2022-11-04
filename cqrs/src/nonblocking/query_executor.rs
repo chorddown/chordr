@@ -12,11 +12,11 @@ pub trait QueryExecutor {
 
     async fn find_all(
         &self,
-        query: Query<Self::RecordType, Self::Context>,
+        query: &Query<Self::RecordType, Self::Context>,
     ) -> Result<Vec<Self::RecordType>, Self::Error>;
 
     async fn find_by_id(
         &self,
-        query: Query<Self::RecordType, Self::Context>,
+        query: &Query<Self::RecordType, Self::Context>,
     ) -> Tri<Self::RecordType, Self::Error>;
 }

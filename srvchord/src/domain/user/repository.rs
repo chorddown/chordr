@@ -1,6 +1,6 @@
 use diesel::{self, prelude::*};
 
-use cqrs::prelude::{CommandExecutor, Count};
+use cqrs::prelude::{Command, CommandExecutor, Count};
 use libchordr::prelude::RecordTrait;
 use tri::Tri;
 
@@ -55,21 +55,21 @@ impl<'a> cqrs::prelude::RepositoryTrait for UserRepository<'a> {
 
     fn save(&self, instance: Self::ManagedType) -> Result<(), Self::Error> {
         self.get_command_executor(self.connection)
-            .perform(cqrs::prelude::Command::upsert(instance, ()))
+            .perform(&Command::upsert(instance, ()))
     }
 
     fn add(&self, instance: Self::ManagedType) -> Result<(), Self::Error> {
         self.get_command_executor(self.connection)
-            .perform(cqrs::prelude::Command::add(instance, ()))
+            .perform(&Command::add(instance, ()))
     }
 
     fn update(&self, instance: Self::ManagedType) -> Result<(), Self::Error> {
         self.get_command_executor(self.connection)
-            .perform(cqrs::prelude::Command::update(instance, ()))
+            .perform(&Command::update(instance, ()))
     }
 
     fn delete(&self, instance: Self::ManagedType) -> Result<(), Self::Error> {
         self.get_command_executor(self.connection)
-            .perform(cqrs::prelude::Command::delete(instance, ()))
+            .perform(&Command::delete(instance, ()))
     }
 }

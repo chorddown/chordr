@@ -11,7 +11,7 @@ pub trait CommandExecutor {
 
     async fn perform(
         &self,
-        command: Command<Self::RecordType, Self::Context>,
+        command: &Command<Self::RecordType, Self::Context>,
     ) -> Result<(), Self::Error> {
         match command.command_type() {
             CommandType::Upsert => self.upsert(command),
@@ -25,7 +25,7 @@ pub trait CommandExecutor {
     /// Save the `record` to the system
     async fn upsert(
         &self,
-        command: Command<Self::RecordType, Self::Context>,
+        command: &Command<Self::RecordType, Self::Context>,
     ) -> Result<(), Self::Error>;
 
     /// Add the `record` to the system
@@ -33,7 +33,7 @@ pub trait CommandExecutor {
     /// An error will be returned if the `record` already exists
     async fn add(
         &self,
-        command: Command<Self::RecordType, Self::Context>,
+        command: &Command<Self::RecordType, Self::Context>,
     ) -> Result<(), Self::Error>;
 
     /// Update the `record` in the system
@@ -41,7 +41,7 @@ pub trait CommandExecutor {
     /// An error will be returned if the `record` does not exist
     async fn update(
         &self,
-        command: Command<Self::RecordType, Self::Context>,
+        command: &Command<Self::RecordType, Self::Context>,
     ) -> Result<(), Self::Error>;
 
     /// Delete the `record` from the system
@@ -49,6 +49,6 @@ pub trait CommandExecutor {
     /// An error will be returned if the `record` does not exist
     async fn delete(
         &self,
-        command: Command<Self::RecordType, Self::Context>,
+        command: &Command<Self::RecordType, Self::Context>,
     ) -> Result<(), Self::Error>;
 }
