@@ -1,11 +1,15 @@
 pub use self::catalog_web_repository::CatalogWebRepository;
 pub use self::setlist_web_repository::SetlistWebRepository;
+pub use self::setlist_web_repository_factory::SetlistWebRepositoryFactory;
 pub use self::settings_web_repository::SettingsWebRepository;
+pub use self::settings_web_repository_factory::SettingsWebRepositoryFactory;
 pub use self::web_repository_trait::WebRepositoryTrait;
 
 mod catalog_web_repository;
 mod setlist_web_repository;
+mod setlist_web_repository_factory;
 mod settings_web_repository;
+mod settings_web_repository_factory;
 mod web_repository_trait;
 
 // #[cfg(test)]

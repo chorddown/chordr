@@ -5,16 +5,17 @@ use cqrs::prelude::AsyncRepositoryTrait;
 use libchordr::prelude::{Catalog, Setlist, SetlistEntry, SongData};
 use log::{error, info};
 use std::rc::Rc;
-use std::sync::Arc;
 use wasm_bindgen_futures::spawn_local;
 use web_sys::Location;
+use webchordr_common::config::Config;
 use webchordr_common::data_exchange::SETLIST_LOAD_URL_PREFIX;
 use webchordr_common::errors::{SharingError, WebError};
 use webchordr_common::route::route;
+use webchordr_common::session::Session;
 use webchordr_events::Event;
 use webchordr_events::SetlistEvent;
-use webchordr_persistence::persistence_manager::PMType;
 use webchordr_persistence::prelude::SetlistWebRepository;
+use webchordr_persistence::web_repository::SetlistWebRepositoryFactory;
 use yew::prelude::*;
 
 #[derive(Properties, Clone)]
@@ -22,8 +23,9 @@ pub struct SetlistProps {
     pub catalog: Rc<Catalog>,
     pub serialized_setlist: String,
     pub current_setlist: Option<Rc<Setlist>>,
-    pub persistence_manager: Arc<PMType>,
     pub on_load: Callback<Event>,
+    pub config: Config,
+    pub session: Rc<Session>,
 }
 
 impl PartialEq for SetlistProps {
@@ -108,9 +110,9 @@ impl SetlistLoad {
     /// Prepare the given Setlist to be stored in the system
     fn prepare_setlist(&mut self, ctx: &Context<Self>, new_setlist: Setlist) {
         let on_load_callback = ctx.link().callback(Msg::LoadSetlist);
-        let pm = ctx.props().persistence_manager.clone();
+        let repository = self.build_setlist_repository(&ctx);
         spawn_local(async move {
-            let result = SetlistWebRepository::new(&*pm).find_all().await;
+            let result = repository.find_all().await;
             let setlist = match result {
                 Ok(lists) => get_setlist_with_unique_id(new_setlist, &lists),
                 Err(_) => new_setlist,
@@ -124,6 +126,10 @@ impl SetlistLoad {
             };
             on_load_callback.emit(setlist)
         })
+    }
+
+    fn build_setlist_repository(&self, ctx: &Context<Self>) -> SetlistWebRepository {
+        SetlistWebRepositoryFactory::build(&ctx.props().config, &ctx.props().session)
     }
 }
 

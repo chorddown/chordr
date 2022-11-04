@@ -1,20 +1,19 @@
-use super::WebRepositoryTrait;
-use crate::backend::BackendTrait;
-use crate::persistence_manager::{CommandContext, PersistenceManagerTrait};
+use crate::backend_v2::context_provider::ContextProvider;
+use crate::backend_v2::persistence_manager::PersistenceManagerV2;
 use crate::WebError;
 use async_trait::async_trait;
+use cqrs::nonblocking::{CommandExecutor, QueryExecutor, RepositoryTrait};
+use cqrs::prelude::{Command, Count, Query, RecordTrait};
 use libchordr::prelude::SongSettingsMap;
+use webchordr_common::errors::PersistenceError;
 use webchordr_common::tri::Tri;
 
-pub struct SettingsWebRepository<'a, P: PersistenceManagerTrait> {
-    persistence_manager: &'a P,
+pub struct SettingsWebRepository {
+    persistence_manager: PersistenceManagerV2<SongSettingsMap>,
 }
 
-impl<'a, P> SettingsWebRepository<'a, P>
-where
-    P: PersistenceManagerTrait,
-{
-    pub fn new(persistence_manager: &'a P) -> Self {
+impl SettingsWebRepository {
+    pub fn new(persistence_manager: PersistenceManagerV2<SongSettingsMap>) -> Self {
         Self {
             persistence_manager,
         }
@@ -22,12 +21,7 @@ where
 }
 
 #[async_trait(? Send)]
-impl<'a, P> WebRepositoryTrait for SettingsWebRepository<'a, P>
-where
-    P: PersistenceManagerTrait + BackendTrait,
-{
-    type ManagedType = SongSettingsMap;
-
+impl ContextProvider for SettingsWebRepository {
     fn namespace() -> &'static str {
         crate::constants::STORAGE_NAMESPACE
     }
@@ -35,23 +29,60 @@ where
     fn key() -> &'static str {
         crate::constants::STORAGE_KEY_SETTINGS
     }
+}
 
-    fn build_context() -> CommandContext {
-        CommandContext::new(
-            crate::constants::STORAGE_NAMESPACE,
-            crate::constants::STORAGE_KEY_SETTINGS,
-        )
-    }
+#[async_trait(? Send)]
+impl RepositoryTrait for SettingsWebRepository {
+    type ManagedType = SongSettingsMap;
+    type Error = WebError;
 
-    async fn store(&mut self, value: &Self::ManagedType) -> Result<(), WebError> {
+    async fn find_all(&self) -> Result<Vec<Self::ManagedType>, Self::Error> {
         self.persistence_manager
-            .store(Self::namespace(), Self::key(), value)
+            .find_all(&Query::all(Self::build_context()))
             .await
     }
 
-    async fn load(&mut self) -> Tri<Self::ManagedType, WebError> {
+    async fn count_all(&self) -> Result<Count, Self::Error> {
+        let result = self
+            .persistence_manager
+            .find_all(&Query::all(Self::build_context()))
+            .await?;
+
+        let count = Count::try_from(result.len());
+
+        count.map_err(|_| PersistenceError::general_error("Count is out of bounds").into())
+    }
+
+    async fn find_by_id(
+        &self,
+        id: <Self::ManagedType as RecordTrait>::Id,
+    ) -> Tri<Self::ManagedType, Self::Error> {
         self.persistence_manager
-            .load(Self::namespace(), Self::key())
+            .find_by_id(&Query::by_id(id, Self::build_context()))
+            .await
+    }
+
+    async fn save(&self, instance: Self::ManagedType) -> Result<(), Self::Error> {
+        self.persistence_manager
+            .upsert(&Command::upsert(instance, Self::build_context()))
+            .await
+    }
+
+    async fn add(&self, instance: Self::ManagedType) -> Result<(), Self::Error> {
+        self.persistence_manager
+            .add(&Command::add(instance, Self::build_context()))
+            .await
+    }
+
+    async fn update(&self, instance: Self::ManagedType) -> Result<(), Self::Error> {
+        self.persistence_manager
+            .update(&Command::update(instance, Self::build_context()))
+            .await
+    }
+
+    async fn delete(&self, instance: Self::ManagedType) -> Result<(), Self::Error> {
+        self.persistence_manager
+            .delete(&Command::delete(instance, Self::build_context()))
             .await
     }
 }

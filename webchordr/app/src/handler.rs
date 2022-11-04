@@ -29,7 +29,9 @@ use webchordr_persistence::persistence_manager::PMType;
 use webchordr_persistence::persistence_manager::PersistenceManagerFactory;
 use webchordr_persistence::prelude::*;
 use webchordr_persistence::session::SessionService;
-use webchordr_persistence::web_repository::{CatalogWebRepository, SettingsWebRepository};
+use webchordr_persistence::web_repository::{
+    CatalogWebRepository, SetlistWebRepositoryFactory, SettingsWebRepositoryFactory,
+};
 use yew::prelude::*;
 
 type InitialDataResult = Result<Box<SessionMainData>, Option<WebError>>;
@@ -348,7 +350,7 @@ impl SetlistHandler for Handler {
             .expect("No current setlist defined");
         let current_entry = match setlist.get(song_id.clone()) {
             None => {
-                warn!("Could not find song {} in setlist", song_id);
+                trace!("Could not find song {} in setlist", song_id);
                 return;
             }
             Some(c) => c,
@@ -403,14 +405,14 @@ impl SetlistHandler for Handler {
 
         match id_to_load {
             Some(id) => {
-                let pm = self.persistence_manager.clone();
                 let callback = ctx.link().callback(move |setlist| {
                     Msg::Event(Box::new(SetlistEvent::Replace(setlist).into()))
                 });
 
+                let repository =
+                    SetlistWebRepositoryFactory::build(&self.config, &self.state.session());
                 spawn_local(async move {
-                    type Repository<'a> = SetlistWebRepository<'a, PMType>;
-                    let result = Repository::new(&pm).find_by_id(id).await;
+                    let result = repository.find_by_id(id).await;
 
                     match result {
                         Tri::Some(setlist) => callback.emit(setlist),
@@ -424,19 +426,10 @@ impl SetlistHandler for Handler {
     }
 
     fn commit_changes(&mut self) {
-        let pm = self.persistence_manager.clone();
+        let repository = SetlistWebRepositoryFactory::build(&self.config, &self.state.session());
+
         match self.state.current_setlist() {
             Some(s) => spawn_local(async move {
-                type Repository<'a> = SetlistWebRepository<'a, PMType>;
-                let mut repository = Repository::new(&pm);
-
-                // Setlist v1 API
-                let result = repository.store(&s).await;
-                if let Err(e) = result {
-                    error!("Could not commit setlist changes: {}", e.to_string())
-                }
-
-                // Setlist v2 API
                 let result = repository.save((*s).clone()).await;
                 if let Err(e) = result {
                     error!("Could not commit setlist changes (v2): {}", e.to_string())
@@ -475,14 +468,15 @@ impl SettingsHandler for Handler {
     }
 
     fn fetch_song_settings(&mut self, ctx: &Context<Self>) {
-        let pm = self.persistence_manager.clone();
         let callback = ctx.link().callback(move |settings_map| {
             Msg::Event(Box::new(SettingsEvent::Replace(settings_map).into()))
         });
 
         spawn_local(async move {
-            type Repository<'a> = SettingsWebRepository<'a, PMType>;
-            let result = Repository::new(&pm).load().await;
+            let default_song_settings_id = SongSettingsMap::new().id();
+            let result = SettingsWebRepositoryFactory::build()
+                .find_by_id(default_song_settings_id)
+                .await;
 
             match result {
                 Tri::Some(settings) => callback.emit(settings),
@@ -493,11 +487,11 @@ impl SettingsHandler for Handler {
     }
 
     fn commit_changes(&mut self) {
-        let pm = self.persistence_manager.clone();
         let settings = self.state.song_settings();
         spawn_local(async move {
-            type Repository<'a> = SettingsWebRepository<'a, PMType>;
-            let result = Repository::new(&pm).store(&settings).await;
+            let result = SettingsWebRepositoryFactory::build()
+                .save((&*settings).clone())
+                .await;
 
             if let Err(e) = result {
                 error!("Could not commit setting changes: {}", e.to_string())
@@ -619,6 +613,7 @@ impl Component for Handler {
     fn view(&self, ctx: &Context<Self>) -> Html {
         debug!("Redraw the handler");
         let state = self.state.clone();
+        let config = self.config.clone();
         let persistence_manager = self.persistence_manager.clone();
         let link = ctx.link();
         let on_event = link.callback(|e| Msg::Event(Box::new(e)));
@@ -644,6 +639,7 @@ impl Component for Handler {
                     {on_user_login_success}
                     {on_user_login_error}
                     {persistence_manager}
+                    {config}
                 />
             }) as Html
         } else {

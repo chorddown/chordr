@@ -38,6 +38,7 @@ pub struct AppProperties {
     pub on_user_login_success: Callback<Session>,
     pub on_user_login_error: Callback<WebError>,
     pub state: Rc<State>,
+    pub config: Config,
     pub persistence_manager: Arc<PMType>,
 }
 
@@ -200,19 +201,22 @@ impl App {
 
     fn view_setlist_route(&self, ctx: &Context<Self>, route: SetlistRoute) -> Html {
         let state = &ctx.props().state;
+        let config = self.config.clone();
+
         match route {
             SetlistRoute::Load { serialized_setlist } => match state.catalog() {
                 None => html! {},
                 Some(catalog) => {
-                    let persistence_manager = ctx.props().persistence_manager.clone();
                     let replace = ctx.props().on_event.reform(|e| e);
                     let setlist = state.current_setlist();
+                    let session = ctx.props().state.session();
 
                     self.compose(
                         html! {
                             <SetlistLoad
-                                catalog={catalog}
-                                persistence_manager={persistence_manager}
+                                {catalog}
+                                {config}
+                                {session}
                                 serialized_setlist={serialized_setlist}
                                 on_load={replace}
                                 current_setlist={setlist}
@@ -224,12 +228,12 @@ impl App {
             },
             SetlistRoute::List => {
                 let on_event = ctx.props().on_event.reform(|e| e);
-                let persistence_manager = ctx.props().persistence_manager.clone();
+                let config = self.config.clone();
 
                 self.compose(
                     html! {
                         <SetlistList
-                            persistence_manager={persistence_manager}
+                            {config}
                             on_event={on_event}
                             setlists={vec![]}
                             state={state}

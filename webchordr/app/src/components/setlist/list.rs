@@ -1,17 +1,15 @@
-use std::rc::Rc;
-use std::sync::Arc;
-
-use gloo_dialogs::confirm;
-use log::{debug, error};
-use wasm_bindgen_futures::spawn_local;
-use yew::prelude::*;
-
 use cqrs::prelude::AsyncRepositoryTrait;
+use gloo_dialogs::confirm;
 use libchordr::models::setlist::Setlist;
+use log::{debug, error};
+use std::rc::Rc;
+use wasm_bindgen_futures::spawn_local;
+use webchordr_common::config::Config;
 use webchordr_common::errors::WebError;
 use webchordr_events::{Event, SetlistEvent};
-use webchordr_persistence::persistence_manager::PMType;
 use webchordr_persistence::prelude::SetlistWebRepository;
+use webchordr_persistence::web_repository::SetlistWebRepositoryFactory;
+use yew::prelude::*;
 
 use crate::state::State;
 
@@ -24,7 +22,7 @@ mod item;
 #[derive(Properties, Clone)]
 pub struct ListProps {
     pub setlists: Vec<Setlist>,
-    pub persistence_manager: Arc<PMType>,
+    pub config: Config,
     pub state: Rc<State>,
     pub on_event: Callback<Event>,
 }
@@ -136,7 +134,6 @@ impl Component for List {
 
 impl List {
     fn find_all_setlists(&self, ctx: &Context<Self>) {
-        let pm = ctx.props().persistence_manager.clone();
         let finished = ctx
             .link()
             .callback(|result: Result<Vec<Setlist>, _>| match result {
@@ -147,21 +144,22 @@ impl List {
                 Err(e) => Msg::LoadError(e),
             });
 
+        let repository = self.build_setlist_repository(&ctx);
         spawn_local(async move {
-            let result = SetlistWebRepository::new(&*pm).find_all().await;
+            let result = repository.find_all().await;
 
             finished.emit(result)
         });
     }
 
     fn persist_new_setlist(&mut self, ctx: &Context<Self>, setlist: Setlist) {
-        let pm = ctx.props().persistence_manager.clone();
         let on_ok = ctx
             .link()
             .batch_callback(|s| vec![Msg::FindAll, Msg::Load(s)]);
 
+        let repository = self.build_setlist_repository(&ctx);
         spawn_local(async move {
-            let result = SetlistWebRepository::new(&*pm).add(setlist.clone()).await;
+            let result = repository.add(setlist.clone()).await;
 
             match result {
                 Ok(_) => on_ok.emit(Rc::new(setlist)),
@@ -182,17 +180,18 @@ impl List {
         }
 
         let send_reload = ctx.link().callback(|_| Msg::FindAll);
-        let pm = ctx.props().persistence_manager.clone();
-
+        let repository = self.build_setlist_repository(&ctx);
         spawn_local(async move {
-            let result = SetlistWebRepository::new(&*pm)
-                .delete(setlist.clone())
-                .await;
+            let result = repository.delete(setlist.clone()).await;
 
             match result {
                 Ok(_) => send_reload.emit(()),
                 Err(e) => error!("Failed to add the new setlist {:?}: {}", setlist, e),
             }
         });
+    }
+
+    fn build_setlist_repository(&self, ctx: &Context<Self>) -> SetlistWebRepository {
+        SetlistWebRepositoryFactory::build(&ctx.props().config, &ctx.props().state.session())
     }
 }
