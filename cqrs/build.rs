@@ -7,21 +7,24 @@ fn main() {
 
     let files_to_patch = [
         (
-            format!("{}/src/nonblocking/repository.rs", base_dir),
-            format!("{}/src/blocking/repository.rs", base_dir),
+            "src/nonblocking/repository.rs",
+            "src/blocking/repository.rs",
         ),
         (
-            format!("{}/src/nonblocking/query_executor.rs", base_dir),
-            format!("{}/src/blocking/query_executor.rs", base_dir),
+            "src/nonblocking/query_executor.rs",
+            "src/blocking/query_executor.rs",
         ),
         (
-            format!("{}/src/nonblocking/command_executor.rs", base_dir),
-            format!("{}/src/blocking/command_executor.rs", base_dir),
+            "src/nonblocking/command_executor.rs",
+            "src/blocking/command_executor.rs",
         ),
     ];
 
     for (source, target) in files_to_patch {
-        if let Err(e) = patch_file(&source, &target) {
+        let source_absolute = format!("{}/{}", base_dir, source);
+        let target_absolute = format!("{}/{}", base_dir, target);
+
+        if let Err(e) = patch_file(&source_absolute, &target_absolute) {
             println!(
                 "cargo:warning=Async/Sync file could not be patched (source: '{}', target: '{}'): {}",
                 source,
@@ -29,6 +32,8 @@ fn main() {
                 e
             );
         }
+
+        println!("cargo:rerun-if-changed={}", source);
     }
 }
 
