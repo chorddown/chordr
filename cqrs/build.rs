@@ -52,7 +52,7 @@ fn patch_file(source: &str, target: &str) -> Result<(), Error> {
 
     let mut buffer = file_reader.open_file(&source)?;
     let prepared_content = code_updater.update_code(&mut buffer)?;
-    let _ = file_writer.write_generated_file(&prepared_content, &target)?;
+    file_writer.write_generated_file(&prepared_content, &target)?;
 
     Ok(())
 }
