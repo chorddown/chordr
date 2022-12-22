@@ -22,11 +22,14 @@ use webchordr_common::tri::Tri;
 
 pub trait RecordType: RecordTrait + Serialize + DeserializeOwned {}
 
+pub(crate) type CE<R> =
+    dyn CommandExecutor<RecordType = R, Error = WebError, Context = CommandContext>;
+pub(crate) type QE<R> =
+    dyn QueryExecutor<RecordType = R, Error = WebError, Context = CommandContext>;
+
 pub struct PersistenceManagerV2<R: RecordTrait + Serialize + DeserializeOwned> {
-    command_backends:
-        Vec<Box<dyn CommandExecutor<RecordType = R, Error = WebError, Context = CommandContext>>>,
-    query_backends:
-        Vec<Box<dyn QueryExecutor<RecordType = R, Error = WebError, Context = CommandContext>>>,
+    command_backends: Vec<Box<CE<R>>>,
+    query_backends: Vec<Box<QE<R>>>,
 }
 
 impl<R: RecordTrait + Serialize + DeserializeOwned> PersistenceManagerV2<R> {
