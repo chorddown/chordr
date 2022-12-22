@@ -2,6 +2,7 @@ use crate::RecordTrait;
 #[deprecated(note = "Use either blocking or unblocking API")]
 pub use command_executor::CommandExecutor;
 pub use command_type::CommandType;
+use serde::{Deserialize, Serialize};
 
 mod command_executor;
 mod command_type;
@@ -26,10 +27,11 @@ mod command_type;
 /// A `Command` defines an operation to mutate data in the system
 /// It is defined by a [`CommandType`] describing the action to perform and the subject of the
 /// operation
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Command<T: RecordTrait, C> {
-    command_type: CommandType,
-    subject: T,
-    context: C,
+    pub(crate) command_type: CommandType,
+    pub(crate) record: T,
+    pub(crate) context: C,
 }
 
 impl<T: RecordTrait, C> Command<T, C> {
@@ -37,7 +39,7 @@ impl<T: RecordTrait, C> Command<T, C> {
     pub fn upsert(record: T, context: C) -> Self {
         Self {
             command_type: CommandType::Upsert,
-            subject: record,
+            record,
             context,
         }
     }
@@ -46,7 +48,7 @@ impl<T: RecordTrait, C> Command<T, C> {
     pub fn add(record: T, context: C) -> Self {
         Self {
             command_type: CommandType::Add,
-            subject: record,
+            record,
             context,
         }
     }
@@ -55,7 +57,7 @@ impl<T: RecordTrait, C> Command<T, C> {
     pub fn update(record: T, context: C) -> Self {
         Self {
             command_type: CommandType::Update,
-            subject: record,
+            record,
             context,
         }
     }
@@ -64,7 +66,7 @@ impl<T: RecordTrait, C> Command<T, C> {
     pub fn delete(record: T, context: C) -> Self {
         Self {
             command_type: CommandType::Delete,
-            subject: record,
+            record,
             context,
         }
     }
@@ -79,11 +81,25 @@ impl<T: RecordTrait, C> Command<T, C> {
     /// Will return a reference to the record to be added/updated in the system
     /// This is applicable for `Add` and `Update` `Command`s
     pub fn record(&self) -> &T {
-        &self.subject
+        &self.record
     }
 
     /// Return the `Command`'s context
     pub fn context(&self) -> &C {
         &self.context
+    }
+}
+
+impl<T, C> Clone for Command<T, C>
+where
+    T: RecordTrait + Clone,
+    C: Clone,
+{
+    fn clone(&self) -> Self {
+        Self {
+            command_type: self.command_type,
+            record: self.record.clone(),
+            context: self.context.clone(),
+        }
     }
 }
