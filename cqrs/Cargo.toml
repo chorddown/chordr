@@ -24,3 +24,7 @@ async-trait = "^0.1.52"
 
 [build-dependencies]
 cqrs-desync = { path = "../cqrs-desync" }
+
+[dev-dependencies.tokio]
+version = "1.15"
+features = ["rt", "macros"]

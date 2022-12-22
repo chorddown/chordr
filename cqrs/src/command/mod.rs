@@ -1,9 +1,11 @@
 use crate::RecordTrait;
+pub use command_conflict::*;
 #[deprecated(note = "Use either blocking or unblocking API")]
 pub use command_executor::CommandExecutor;
 pub use command_type::CommandType;
 use serde::{Deserialize, Serialize};
 
+mod command_conflict;
 mod command_executor;
 mod command_type;
 
