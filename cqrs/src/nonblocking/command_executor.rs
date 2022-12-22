@@ -1,11 +1,10 @@
 use crate::command::{Command, CommandType};
 use crate::RecordTrait;
 use async_trait::async_trait;
-use serde::Serialize;
 
 #[async_trait(? Send)]
 pub trait CommandExecutor {
-    type RecordType: RecordTrait + Serialize;
+    type RecordType: RecordTrait;
     type Error;
     type Context;
 
