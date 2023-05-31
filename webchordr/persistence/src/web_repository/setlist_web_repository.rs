@@ -29,7 +29,7 @@ impl ContextProvider for SetlistWebRepository {
     }
 
     fn key() -> &'static str {
-        crate::constants::STORAGE_KEY_SETLIST
+        crate::constants::STORAGE_V2_KEY_SETLIST
     }
 }
 
