@@ -56,7 +56,7 @@ impl<R: RecordTrait + Serialize + DeserializeOwned> ServerBackend<R> {
         _namespace: &N,
         key: &K,
     ) -> String {
-        if key.as_ref() == webchordr_common::constants::STORAGE_V2_KEY_SETLIST {
+        if key.as_ref() == webchordr_common::constants::STORAGE_KEY_SETLIST {
             return self.build_base_request_uri(_namespace, &"setlist");
         }
 

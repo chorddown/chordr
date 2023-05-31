@@ -3,7 +3,7 @@ mod test_value;
 use crate::command_context::CommandContext;
 use libchordr::prelude::*;
 pub use test_value::TestValue;
-use webchordr_common::constants::{STORAGE_V2_KEY_SETLIST, TEST_STORAGE_NAMESPACE};
+use webchordr_common::constants::{STORAGE_KEY_SETLIST, TEST_STORAGE_NAMESPACE};
 
 pub struct TestSong {
     id: String,
@@ -29,5 +29,5 @@ impl SongData for TestSong {
 }
 
 pub(super) fn get_test_command_context() -> CommandContext {
-    CommandContext::new(TEST_STORAGE_NAMESPACE, STORAGE_V2_KEY_SETLIST)
+    CommandContext::new(TEST_STORAGE_NAMESPACE, STORAGE_KEY_SETLIST)
 }
