@@ -67,7 +67,10 @@ impl Component for List {
             Msg::Load(setlist) => self.load_setlist(ctx, (*setlist).clone()),
             Msg::Delete(setlist) => self.delete_setlist(ctx, (*setlist).clone()),
             Msg::SetlistsLoaded(v) => self.setlists = Some(v),
-            Msg::LoadError(e) => self.error = Some(e),
+            Msg::LoadError(e) => {
+                error!("Failed to load setlist(s): {}", e);
+                self.error = Some(e)
+            }
         }
         true
     }
@@ -145,7 +148,10 @@ impl List {
             });
 
         let repository = self.build_setlist_repository(&ctx);
+        debug!("Will find_all setlists");
+
         spawn_local(async move {
+            debug!("Will find_all setlists inside async");
             let result = repository.find_all().await;
 
             finished.emit(result)
