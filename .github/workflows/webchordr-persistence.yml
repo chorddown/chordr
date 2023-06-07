@@ -1,0 +1,23 @@
+name: webchordr-persistence
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build webchordr-persistence
+        run: cargo build --verbose -p webchordr-persistence
+      - name: Run tests
+        run: cargo test --verbose -p webchordr-persistence
+
