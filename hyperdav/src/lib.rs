@@ -10,10 +10,8 @@
 //! ## GET request
 //!
 //! ```rust
-//! # extern crate failure;
 //! # extern crate hyperdav;
-//! # use hyperdav::{Client};
-//! # use failure::Error;
+//! # use hyperdav::{Client, Error};
 //! #
 //! # fn run() -> Result<(), Error> {
 //! let client = Client::new()
@@ -34,10 +32,8 @@
 //! ## PUT request
 //!
 //! ```rust
-//! # extern crate failure;
 //! # extern crate hyperdav;
-//! # use hyperdav::{Client};
-//! # use failure::Error;
+//! # use hyperdav::{Client, Error};
 //! #
 //! # fn run() -> Result<(), Error> {
 //! let client = Client::new()
