@@ -16,7 +16,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      # - name: Build
-      #   run: cargo build --verbose -p srvchord
+      - name: Install trunk
+        run: cargo install --locked trunk
+      - name: Build
+        run: trunk build
+        working-directory: ./webchordr/app
       - name: Run tests
         run: cargo test --verbose -p srvchord
