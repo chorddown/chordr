@@ -62,14 +62,17 @@ where
         match msg {
             Msg::OnClick => {
                 let LinkProps { to, query, .. } = ctx.props();
-                let history = ctx.link().history().expect_throw("failed to read history");
+                let history = ctx
+                    .link()
+                    .navigator()
+                    .expect_throw("failed to read history");
                 match query {
                     None => {
-                        history.push(to.clone());
+                        history.push(to);
                     }
                     Some(data) => {
                         history
-                            .push_with_query(to.clone(), data.clone())
+                            .push_with_query(to, data)
                             .expect_throw("failed push history with query");
                     }
                 };

@@ -130,7 +130,7 @@ impl Component for SongSearch {
         }
     }
 
-    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+    fn changed(&mut self, ctx: &Context<Self>, _old_props: &Self::Properties) -> bool {
         let catalog_changed = ctx.props().catalog.revision() != self.catalog_revision;
         if catalog_changed {
             self.search_index = None;

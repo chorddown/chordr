@@ -43,7 +43,7 @@ impl Component for Modal {
         true
     }
 
-    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+    fn changed(&mut self, ctx: &Context<Self>, _old_props: &Self::Properties) -> bool {
         self.visible = ctx.props().visible;
         true
     }

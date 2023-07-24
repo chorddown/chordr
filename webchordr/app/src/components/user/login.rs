@@ -150,7 +150,7 @@ impl Component for Login {
             _ => html! {},
         };
 
-        let submit = ctx.link().callback(|e: FocusEvent| {
+        let submit = ctx.link().callback(|e: SubmitEvent| {
             e.prevent_default();
             Msg::Submit
         });

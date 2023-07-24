@@ -76,7 +76,7 @@ impl Component for SongList {
         }
     }
 
-    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+    fn changed(&mut self, ctx: &Context<Self>, _old_props: &Self::Properties) -> bool {
         if ctx.props().sortable {
             self.make_sortable(ctx.link().callback(Msg::SetlistChangeSorting));
         } else {

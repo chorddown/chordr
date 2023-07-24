@@ -4,7 +4,7 @@ use webchordr_common::route::AppRoute;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-fn switch(route: &AppRoute) -> Html {
+fn switch(route: AppRoute) -> Html {
     debug!("Switch Routes {:?}", route);
     let route = route.clone();
     html! {<Handler {route}/>}
@@ -14,7 +14,7 @@ fn switch(route: &AppRoute) -> Html {
 pub fn entry() -> Html {
     (html! {
         <BrowserRouter>
-            <Switch<AppRoute> render={Switch::render(switch)} />
+            <Switch<AppRoute> render={switch} />
         </BrowserRouter>
     }) as Html
 }

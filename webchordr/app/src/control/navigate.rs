@@ -3,7 +3,8 @@ use libchordr::prelude::{ListEntryTrait, ListTrait};
 use web_sys::ScrollToOptions;
 use webchordr_common::helpers::window;
 use webchordr_common::route::AppRoute;
-use yew_router::prelude::{BrowserHistory, History};
+use yew::Context;
+use yew_router::prelude::*;
 
 #[derive(Debug)]
 pub enum Navigate {
@@ -21,10 +22,16 @@ impl SongNavigator {
         Self {}
     }
 
-    pub fn navigate(&self, command: Navigate, state: &State) -> Option<AppRoute> {
+    pub fn navigate<T: yew::Component>(
+        &self,
+        command: Navigate,
+        state: &State,
+        ctx: &Context<T>,
+    ) -> Option<AppRoute> {
         match self.get_route(command, state) {
             Some(route) => {
-                BrowserHistory::default().push(route.clone());
+                let navigator = ctx.link().navigator().unwrap();
+                navigator.push(&route);
 
                 window().scroll_to_with_scroll_to_options(ScrollToOptions::new().top(0.0));
 

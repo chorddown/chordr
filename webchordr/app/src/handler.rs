@@ -501,7 +501,7 @@ impl Component for Handler {
                 match control {
                     Control::Navigate(navigate) => {
                         if SongNavigator::new()
-                            .navigate(navigate, &self.state)
+                            .navigate(navigate, &self.state, &ctx)
                             .is_none()
                         {
                             return false;
@@ -513,7 +513,7 @@ impl Component for Handler {
         true
     }
 
-    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+    fn changed(&mut self, ctx: &Context<Self>, _old_props: &Self::Properties) -> bool {
         self.set_state(None, Self::update_state_with_route(&self.state, ctx), true);
 
         true

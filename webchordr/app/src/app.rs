@@ -327,7 +327,7 @@ impl Component for App {
         };
 
         debug!("Redraw App");
-        let route = ctx.link().location().unwrap().route::<AppRoute>();
+        let route = ctx.link().route::<AppRoute>();
 
         (html! {
             <main class={main_classes}>

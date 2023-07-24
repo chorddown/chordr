@@ -33,5 +33,5 @@ fn main() {
     };
     wasm_logger::init(config.module_prefix("webchordr"));
 
-    yew::start_app::<Main>();
+    yew::Renderer::<Main>::new().render();
 }

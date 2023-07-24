@@ -29,7 +29,7 @@ pub fn build_indexes(songs: Vec<&Song>, root_chars: &str) -> Vec<Index> {
     let mut map: BTreeMap<String, Index> = BTreeMap::new();
     for chars in indexes {
         match map.get_mut(&chars) {
-            Some(mut index) => {
+            Some(index) => {
                 index.count += 1;
             }
             None if chars.is_empty() => { /* do nothing */ }

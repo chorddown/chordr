@@ -10,7 +10,7 @@ libchordr = { path = "../../libchordr" }
 webchordr-events = { path = "../events" }
 webchordr-song-list = { path = "../song-list" }
 webchordr-common = { path = "../common" }
-yew = "0.19"
+yew = "0.20"
 js-sys = "^0.3.58"
 wasm-bindgen-futures = "^0.4.31"
 unicode-segmentation = "1.8.0"
