@@ -82,9 +82,9 @@ main {
         &::after {
             display: block;
             content: '';
-            background: $green-darker;
-            height: 0.3em;
-            margin: 0 0 (-$std-space) 0;
+            background: var(--tool-bg);
+            height: 0.5em;
+            margin: 0 (-$std-space) (-$std-space);
         }
     }
 }
