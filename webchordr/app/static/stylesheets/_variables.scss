@@ -31,7 +31,7 @@ $dark-mode-background: $gray-ultra-dark !default;
 $text-color: $gray-ultra-dark !default;
 $dark-mode-text-color: white !default;
 
-$font: "Merriweather", "Libre Baskerville", "Times", "Times New Roman", -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji !default;
+$font: "Literata", "Merriweather", "Libre Baskerville", "Times", "Times New Roman", -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji !default;
 $font-size-web: 16px !default;
 $font-size-ui: 16px !default;
 $font-size-small: .8rem !default;
@@ -39,7 +39,7 @@ $font-size-print: 12px !default;
 $font-size-h1: 1.8em !default;
 $font-size-h2: 1em !default;
 $font-size-h3: 1em !default;
-$line-height: 1.3em !default;
+$line-height: 1.2em !default;
 
 $ui-font: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji !default;
 
@@ -153,7 +153,7 @@ $_block-style: (
 
 $chord: (
         font-color: $green,
-        font-weight: bold,
+        font-weight: 600,
         font-style: normal,
         background: transparent,
         block-width: 0,
@@ -175,7 +175,7 @@ $chord-dark: map-merge(
 
 $chorus: (
         font-color: $text-color,
-        font-weight: normal,
+        font-weight: 300,
         font-style: normal,
         background: transparent,
         block-width: .3em,
@@ -217,7 +217,7 @@ $chorus-dark: map-merge(
 
 $bridge: (
         font-color: $text-color,
-        font-weight: normal,
+        font-weight: 300,
         font-style: normal,
         background: transparent,
         block-width: .3em,
@@ -238,7 +238,7 @@ $bridge-dark: map-merge(
 
 $blockquote: (
         font-color: $text-color,
-        font-weight: bold,
+        font-weight: 500,
         font-style: normal,
         background: transparent,
         block-width: .3em,

@@ -8,7 +8,7 @@
 #chordr {
     font-family: $font;
     font-size: var(--font-size-base);
-
+    font-weight: 300;
     line-height: $line-height;
     letter-spacing: 0.05em;
     background: var(--background);
@@ -37,6 +37,7 @@
     h2,
     h3 {
         line-height: 1.3em;
+        font-weight: 500;
     }
 
     h1 {
