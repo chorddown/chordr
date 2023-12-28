@@ -26,7 +26,7 @@ impl Component for ReloadSection {
         let revision = match &ctx.props().catalog {
             None => "n/a".to_string(),
             Some(c) => match DateTime::parse_from_rfc2822(&c.revision()) {
-                Ok(d) => d.format("%a %d.%m.%y %H:%I").to_string(),
+                Ok(d) => d.format("%a %d.%m.%y %H:%M").to_string(),
                 Err(_) => c.revision(),
             },
         };
