@@ -17,10 +17,10 @@ name = "cqrs"
 path = "src/lib.rs"
 
 [dependencies]
-tri = { path = "../tri" }
+async-trait = "^0.1.52"
 serde = { version = "1", features = ["derive"] }
 serde_derive = "1"
-async-trait = "^0.1.52"
+tri = { path = "../tri" }
 
 [build-dependencies]
 cqrs-desync = { path = "../cqrs-desync" }

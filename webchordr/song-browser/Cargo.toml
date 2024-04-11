@@ -6,15 +6,15 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-libchordr = { path = "../../libchordr" }
-webchordr-events = { path = "../events" }
-webchordr-song-list = { path = "../song-list" }
-webchordr-common = { path = "../common" }
-yew = "0.20"
 js-sys = "^0.3.58"
-wasm-bindgen-futures = "^0.4.31"
+libchordr = { path = "../../libchordr" }
 serde-wasm-bindgen = "^0.6.5"
 unicode-segmentation = "1.8.0"
+wasm-bindgen-futures = "^0.4.31"
+webchordr-common = { path = "../common" }
+webchordr-events = { path = "../events" }
+webchordr-song-list = { path = "../song-list" }
+yew = "0.20"
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3"

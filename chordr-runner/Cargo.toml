@@ -20,13 +20,13 @@ yaml = ["serde_yaml"]
 default = ["yaml"]
 
 [dependencies]
-libchordr = { path = "../libchordr" }
-synchord = { path = "../synchord" }
-clap = "2.33.0"
-log = "^0.4.8"
-simplelog = "^0.12.0"
 chrono = { version = "^0.4.19", default-features = false, features = ["std", "clock"] }
+clap = "2.33.0"
+libchordr = { path = "../libchordr" }
+log = "^0.4.8"
 serde = {version ="^1.0", features = ["derive"]}
 serde_derive = "^1.0"
 serde_json = "^1.0"
 serde_yaml = {version="^0.8.11", optional=true}
+simplelog = "^0.12.0"
+synchord = { path = "../synchord" }

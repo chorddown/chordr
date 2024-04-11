@@ -19,18 +19,18 @@ path = "src/lib.rs"
 parallel_catalog_builder = ["rayon"]
 
 [dependencies]
+chrono = { version = "^0.4.19", default-features = false, features = ["std", "clock", "serde"] }
+cqrs = { path = "../cqrs" }
+log = "0.4"
+rayon = { version = "1.5.1", optional = true }
 serde = { version = "^1.0", features = ["derive"] }
 serde_derive = "^1.0"
 serde_qs = { version = "0.9.2" }
-chrono = { version = "^0.4.19", default-features = false, features = ["std", "clock", "serde"] }
-log = "0.4"
-cqrs = { path = "../cqrs" }
-rayon = { version = "1.5.1", optional = true }
 
 [dev-dependencies]
-serde_json = "^1.0"
 criterion = { version = "0.3", features = ["html_reports"] }
 pretty_assertions = "^1.2.1"
+serde_json = "^1.0"
 
 [[bench]]
 name = "parse_benchmark"

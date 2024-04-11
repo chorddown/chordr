@@ -4,24 +4,24 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+async-trait = "^0.1.52"
+base64 = "^0.13.0"
+chrono = { version = "^0.4.19", default-features = false, features = ["std", "clock", "serde", "wasmbind"] }
+js-sys = "^0.3.58"
+libchordr = { path = "../../libchordr" }
 log = "0.4"
+percent-encoding = "2.1.0"
 serde = "1"
+serde-wasm-bindgen = "^0.6.5"
 serde_derive = "1"
 serde_json = "1.0.53"
-libchordr = { path = "../../libchordr" }
 tri = { path = "../../tri" }
+unicode-segmentation = "1.8.0"
+wasm-bindgen-futures = "^0.4.31"
+wasm-logger = "0.2"
+wee_alloc = "0.4.5"
 yew = "0.20"
 yew-router = "0.17"
-percent-encoding = "2.1.0"
-wee_alloc = "0.4.5"
-wasm-logger = "0.2"
-js-sys = "^0.3.58"
-wasm-bindgen-futures = "^0.4.31"
-serde-wasm-bindgen = "^0.6.5"
-async-trait = "^0.1.52"
-chrono = { version = "^0.4.19", default-features = false, features = ["std", "clock", "serde", "wasmbind"] }
-base64 = "^0.13.0"
-unicode-segmentation = "1.8.0"
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3"
