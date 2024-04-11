@@ -130,7 +130,7 @@ where
         let json = resp.json()?;
         let json = JsFuture::from(json).await?;
 
-        Ok(json.into_serde::<OUT>()?)
+        Ok(serde_wasm_bindgen::from_value::<OUT>(json)?)
     } else {
         // TODO: If `resp.headers().get("Content-Type")` contains JSON parse the error message
         Err(WebError::response_error(uri, resp))

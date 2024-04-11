@@ -58,7 +58,7 @@ impl SortableService {
         });
 
         let closure = Closure::wrap(handler as Box<SortingChangeFn>);
-        let options_js = JsValue::from_serde(&options).unwrap();
+        let options_js = serde_wasm_bindgen::to_value(&options).unwrap();
         let wrapper = SortableWrapper::new(&element, closure.as_ref().unchecked_ref(), &options_js);
 
         Ok(SortableHandle {

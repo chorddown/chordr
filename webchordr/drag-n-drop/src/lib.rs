@@ -19,6 +19,7 @@ pub struct OnDropArgument {
 type OnDropJsCallback = dyn Fn(&JsValue);
 type OnDropClosure = Closure<OnDropJsCallback>;
 type OnDropPropCallback = Callback<OnDropArgument>;
+
 #[derive(Properties, PartialEq, Clone)]
 pub struct DropzoneProps {
     pub children: Children,
@@ -72,7 +73,8 @@ impl Dropzone {
     pub fn make_dropzone(&mut self, item_selectors: &[String], callback: OnDropPropCallback) {
         if let Some(element) = self.node_ref.cast::<HtmlElement>() {
             let handler = Box::new(move |val: &JsValue| {
-                if let Ok(argument) = val.into_serde::<OnDropArgument>() {
+                if let Ok(argument) = serde_wasm_bindgen::from_value::<OnDropArgument>(val.clone())
+                {
                     callback.emit(argument);
                 }
             });

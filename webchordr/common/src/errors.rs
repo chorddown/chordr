@@ -75,6 +75,12 @@ impl From<wasm_bindgen::JsValue> for WebError {
     }
 }
 
+impl From<serde_wasm_bindgen::Error> for WebError {
+    fn from(e: serde_wasm_bindgen::Error) -> Self {
+        WebError::JsError(format!("{:?}", e))
+    }
+}
+
 impl From<serde_json::error::Error> for WebError {
     fn from(e: serde_json::error::Error) -> Self {
         WebError::JsError(format!("{:?}", e))

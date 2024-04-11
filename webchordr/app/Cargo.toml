@@ -37,6 +37,7 @@ percent-encoding = "2.1.0"
 wee_alloc = "0.4.5"
 wasm-logger = "0.2"
 js-sys = "^0.3.58"
+serde-wasm-bindgen = "^0.6.5"
 wasm-bindgen-futures = "^0.4.31"
 async-trait = "^0.1.52"
 chrono = { version = "^0.4.19", default-features = false, features = ["std", "clock", "serde", "wasmbind"] }

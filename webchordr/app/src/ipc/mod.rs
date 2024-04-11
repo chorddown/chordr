@@ -19,7 +19,7 @@ pub fn register_ipc_handler(message_callback: Callback<IpcMessage>) -> Option<Ev
             "message",
             move |event: &web_sys::Event| {
                 if let Some(event) = event.dyn_ref::<web_sys::MessageEvent>() {
-                    match event.data().into_serde::<UpdateInfo>() {
+                    match serde_wasm_bindgen::from_value::<UpdateInfo>(event.data()) {
                         Ok(version_info) => {
                             message_callback.emit(IpcMessage::UpdateInfo(version_info))
                         }
