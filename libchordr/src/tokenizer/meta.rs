@@ -1,6 +1,6 @@
 use std::convert::TryFrom;
 
-use crate::models::meta::BNotation;
+use crate::models::meta::{BNotation, Tags};
 
 /// Meta information gathered during tokenization
 ///
@@ -25,6 +25,7 @@ pub enum Meta {
     AlternativeTitle(String),
     CCLISongId(String),
     BNotation(BNotation),
+    Tags(Tags),
 }
 
 impl Meta {
@@ -52,6 +53,7 @@ impl Meta {
             "bnotation" | "b_notation" | "b notation" | "b-notation" => {
                 Some(Self::b_notation(content))
             }
+            "tags" => Some(Self::tags(content)),
             _ => None,
         }
     }
@@ -75,28 +77,30 @@ impl Meta {
             Self::AlternativeTitle(_) => "Alternative Title",
             Self::CCLISongId(_) => "CCLI Song #",
             Self::BNotation(_) => "B-Notation",
+            Self::Tags(_) => "Tags",
         }
     }
 
-    pub fn content(&self) -> &str {
+    pub fn content(&self) -> String {
         match self {
-            Self::Artist(c) => c,
-            Self::Composer(c) => c,
-            Self::Lyricist(c) => c,
-            Self::Copyright(c) => c,
-            Self::Album(c) => c,
-            Self::Year(c) => c,
-            Self::Key(c) => c,
-            Self::OriginalKey(c) => c,
-            Self::Time(c) => c,
-            Self::Tempo(c) => c,
-            Self::Duration(c) => c,
-            Self::Subtitle(c) => c,
-            Self::Capo(c) => c,
-            Self::OriginalTitle(c) => c,
-            Self::AlternativeTitle(c) => c,
-            Self::CCLISongId(c) => c,
-            Self::BNotation(c) => c.as_str(),
+            Self::Artist(c) => c.to_owned(),
+            Self::Composer(c) => c.to_owned(),
+            Self::Lyricist(c) => c.to_owned(),
+            Self::Copyright(c) => c.to_owned(),
+            Self::Album(c) => c.to_owned(),
+            Self::Year(c) => c.to_owned(),
+            Self::Key(c) => c.to_owned(),
+            Self::OriginalKey(c) => c.to_owned(),
+            Self::Time(c) => c.to_owned(),
+            Self::Tempo(c) => c.to_owned(),
+            Self::Duration(c) => c.to_owned(),
+            Self::Subtitle(c) => c.to_owned(),
+            Self::Capo(c) => c.to_owned(),
+            Self::OriginalTitle(c) => c.to_owned(),
+            Self::AlternativeTitle(c) => c.to_owned(),
+            Self::CCLISongId(c) => c.to_owned(),
+            Self::BNotation(c) => c.to_string(),
+            Self::Tags(c) => c.to_string(),
         }
     }
 
@@ -165,6 +169,13 @@ impl Meta {
 
     pub fn b_notation<S: AsRef<str>>(content: S) -> Self {
         Self::BNotation(match BNotation::try_from(content.as_ref()) {
+            Ok(n) => n,
+            Err(_) => Default::default(),
+        })
+    }
+
+    pub fn tags<S: AsRef<str>>(content: S) -> Self {
+        Self::Tags(match Tags::try_from(content.as_ref()) {
             Ok(n) => n,
             Err(_) => Default::default(),
         })

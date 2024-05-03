@@ -1,6 +1,7 @@
-use crate::models::meta::BNotation;
+use crate::models::meta::tags::Tag;
+use crate::models::meta::{BNotation, Tags};
 use crate::parser::{MetaInformation, Node, SectionType};
-use crate::tokenizer::{Modifier, Token};
+use crate::tokenizer::{Meta, Modifier, Token};
 
 /// Return a small example set of Tokens
 ///
@@ -93,6 +94,12 @@ pub fn get_test_tokens() -> Vec<Token> {
         Token::headline(1, "Swing Low Sweet Chariot", Modifier::None),
         Token::newline(),
         Token::newline(),
+        Token::Meta(Meta::Tags(Tags::from(vec![
+            Tag::new("oldie"),
+            Tag::new("Jordan"),
+        ]))),
+        Token::newline(),
+        Token::newline(),
         Token::headline(2, "Chorus", Modifier::Chorus),
         Token::newline(),
         Token::literal("Swing "),
@@ -168,7 +175,14 @@ pub fn get_test_ast() -> Node {
             1,
             "Swing Low Sweet Chariot",
             Modifier::None,
-            vec![Node::newline()],
+            vec![
+                Node::newline(),
+                Node::Meta(Meta::Tags(Tags::from(vec![
+                    Tag::new("oldie"),
+                    Tag::new("Jordan"),
+                ]))),
+                Node::newline(),
+            ],
         ),
         Node::section(
             2,
@@ -307,5 +321,6 @@ pub fn get_test_metadata() -> MetaInformation {
         alternative_title: None,
         ccli_song_id: None,
         b_notation: BNotation::B,
+        tags: Tags::from(vec![Tag::new("oldie"), Tag::new("Jordan")]),
     }
 }

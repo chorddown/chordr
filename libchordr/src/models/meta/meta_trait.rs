@@ -5,7 +5,7 @@ pub use MetaTrait as SongMetaTrait;
 
 use crate::models::chord::Chord;
 
-use super::b_notation::BNotation;
+use super::{b_notation::BNotation, Tags};
 
 pub trait MetaTrait: Debug {
     fn title(&self) -> Option<String>;
@@ -26,4 +26,5 @@ pub trait MetaTrait: Debug {
     fn alternative_title(&self) -> Option<String>;
     fn ccli_song_id(&self) -> Option<String>;
     fn b_notation(&self) -> BNotation;
+    fn tags(&self) -> Tags;
 }

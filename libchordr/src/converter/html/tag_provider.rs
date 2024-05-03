@@ -205,6 +205,13 @@ fn get_song_metadata_content(
         Meta::AlternativeTitle(_) => song_metadata.alternative_title(),
         Meta::CCLISongId(_) => song_metadata.ccli_song_id(),
         Meta::BNotation(_) => Some(song_metadata.b_notation().to_string()),
+        Meta::Tags(_) => {
+            if !song_metadata.tags().is_empty() {
+                Some(song_metadata.tags().to_string())
+            } else {
+                None
+            }
+        }
     }
 }
 
@@ -236,6 +243,7 @@ const fn class_name_for_metadata_keyword(metadata_token: &Meta) -> &'static str 
         Meta::AlternativeTitle(_) => "meta-keyword -alternative-title",
         Meta::CCLISongId(_) => "meta-keyword -ccli-song-id",
         Meta::BNotation(_) => "meta-keyword -b-notation",
+        Meta::Tags(_) => "meta-keyword -tags",
     }
 }
 
@@ -258,5 +266,6 @@ const fn class_name_for_metadata_value(metadata_token: &Meta) -> &'static str {
         Meta::AlternativeTitle(_) => "meta-value -alternative-title",
         Meta::CCLISongId(_) => "meta-value -ccli-song-id",
         Meta::BNotation(_) => "meta-value -b-notation",
+        Meta::Tags(_) => "meta-value -tags",
     }
 }

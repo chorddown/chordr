@@ -1,6 +1,6 @@
 use crate::models::chord::Chord;
 use crate::models::meta::b_notation::BNotation;
-use crate::models::meta::MetaTrait;
+use crate::models::meta::{MetaTrait, Tags};
 use crate::modification::transposition::TransposableTrait;
 use crate::tokenizer::Meta;
 
@@ -27,6 +27,7 @@ pub struct MetaInformation {
     pub(crate) alternative_title: Option<String>,
     pub(crate) ccli_song_id: Option<String>,
     pub(crate) b_notation: BNotation,
+    pub(crate) tags: Tags,
 }
 
 impl MetaInformation {
@@ -50,6 +51,7 @@ impl MetaInformation {
             Meta::Key(content) => self.set_key(content.clone()),
             Meta::OriginalKey(content) => self.set_original_key(content.clone()),
             Meta::BNotation(notation) => self.b_notation = *notation,
+            Meta::Tags(content) => self.tags = content.clone(),
         }
     }
 
@@ -145,6 +147,10 @@ impl MetaTrait for MetaInformation {
 
     fn b_notation(&self) -> BNotation {
         self.b_notation
+    }
+
+    fn tags(&self) -> Tags {
+        self.tags.clone()
     }
 }
 

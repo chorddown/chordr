@@ -46,7 +46,8 @@ impl Tokenizer for ChorddownTokenizer {
 
 #[cfg(test)]
 mod tests {
-    use crate::models::meta::BNotation;
+    use crate::models::meta::tags::Tag;
+    use crate::models::meta::{BNotation, Tags};
     use crate::test_helpers::get_test_tokens;
     use crate::tokenizer::{Meta, Modifier};
 
@@ -266,6 +267,25 @@ Key: C#m
                 Some(&Token::Meta(Meta::BNotation(BNotation::B)))
             );
         }
+    }
+
+    #[test]
+    fn test_tokenize_meta_tags() {
+        let content = r"Tags: #tag1 #tag2";
+        let (token_lines, _warnings) = ChorddownTokenizer::new()
+            .tokenize(content.as_bytes())
+            .unwrap();
+        assert_eq!(1, token_lines.len());
+        assert_eq!(
+            token_lines,
+            vec![
+                // Some(&Token::Meta(Meta::tags("#tag1 #tag2")))
+                Token::Meta(Meta::Tags(Tags::from(vec![
+                    Tag::new("tag1"),
+                    Tag::new("tag2")
+                ])))
+            ]
+        );
     }
 
     #[test]

@@ -31,7 +31,7 @@ impl Scanner {
 
             for current_character in chars {
                 match current_character {
-                    CARRIAGE_RETURN => {/* ignore */}
+                    CARRIAGE_RETURN => { /* ignore */ }
                     NEWLINE => self.build_n_push(&mut literal_buffer, Lexeme::Newline),
                     CHORD_START => self.build_n_push(&mut literal_buffer, Lexeme::ChordStart),
                     CHORD_END => self.build_n_push(&mut literal_buffer, Lexeme::ChordEnd),
@@ -165,14 +165,7 @@ Swing [D]low, sweet [G]chari[D]ot,
 
         assert_eq!(
             lexemes,
-            [
-                NL,
-                H,
-                lit(" Swing Low Sweet Chariot"),
-                NL,
-                NL,
-                EOF,
-            ]
+            [NL, H, lit(" Swing Low Sweet Chariot"), NL, NL, EOF,]
         );
     }
 
@@ -224,5 +217,37 @@ Swing [D]low, sweet [G]chari[D]ot,
         assert_eq!(lexemes.len(), 7);
 
         assert_eq!(lexemes, vec![H, H, CM, lit(" Chorus Loud"), CM, CM, EOF,]);
+    }
+
+    #[test]
+    fn scan_tags_test() {
+        let content = r"
+# Swing Low Sweet Chariot
+
+Tags: #low #sweet
+";
+        let scanner = Scanner::new();
+        let lexemes = scanner.scan(content.as_bytes()).unwrap();
+        assert_eq!(lexemes.len(), 14);
+
+        assert_eq!(
+            lexemes,
+            vec![
+                NL,
+                H,
+                lit(" Swing Low Sweet Chariot"),
+                NL,
+                NL,
+                lit("Tags"),
+                Lexeme::Colon,
+                lit(" "),
+                Lexeme::HeaderStart,
+                lit("low "),
+                Lexeme::HeaderStart,
+                lit("sweet"),
+                NL,
+                EOF,
+            ]
+        );
     }
 }
