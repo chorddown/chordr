@@ -21,7 +21,7 @@ pub fn token_lines_to_tokens(token_lines: Vec<Vec<Token>>) -> Vec<Token> {
 }
 
 pub fn parse_content<R: BufRead>(contents: R) -> Result<ParserResult> {
-    let tokens = build_tokenizer().tokenize(contents)?;
+    let (tokens, _warnings) = build_tokenizer().tokenize(contents)?;
     Parser::new().parse(tokens)
 }
 

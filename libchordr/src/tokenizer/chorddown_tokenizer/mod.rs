@@ -2,6 +2,7 @@ use std::io::BufRead;
 
 use crate::error::Error;
 
+use super::tokenizer_error::TokenizerError;
 use super::{Token, Tokenizer};
 
 use self::scanner::Scanner;
@@ -22,7 +23,7 @@ impl ChorddownTokenizer {
 }
 
 impl Tokenizer for ChorddownTokenizer {
-    fn tokenize<R: BufRead>(&self, input: R) -> Result<Vec<Token>, Error> {
+    fn tokenize<R: BufRead>(&self, input: R) -> Result<(Vec<Token>, Vec<TokenizerError>), Error> {
         let lexemes_vec = Scanner::new().scan(input)?;
         let lexemes = lexemes_vec.iter().peekable();
         let mut tokens: Vec<Token> = vec![];
@@ -39,7 +40,7 @@ impl Tokenizer for ChorddownTokenizer {
             }
         }
 
-        Ok(tokens)
+        Ok((tokens, fsm.warnings))
     }
 }
 
@@ -54,7 +55,7 @@ mod tests {
     #[test]
     fn test_tokenize_long() {
         let content = include_str!("../../../tests/resources/swing_low_sweet_chariot.chorddown");
-        let token_lines = ChorddownTokenizer::new()
+        let (token_lines, _warnings) = ChorddownTokenizer::new()
             .tokenize(content.as_bytes())
             .unwrap();
         assert_eq!(token_lines, get_test_tokens());
@@ -71,7 +72,7 @@ Swing [D]low, sweet [G]chari[D]ot
 
 > A quote [D#m7]
 ";
-        let token_lines = ChorddownTokenizer::new()
+        let (token_lines, _warnings) = ChorddownTokenizer::new()
             .tokenize(content.as_bytes())
             .unwrap();
         assert_eq!(
@@ -109,7 +110,7 @@ Swing [D]low, sweet [G]chari[D]ot\r
 \r
 > A quote [D#m7]\r
 ";
-        let token_lines = ChorddownTokenizer::new()
+        let (token_lines, _warnings) = ChorddownTokenizer::new()
             .tokenize(content.as_bytes())
             .unwrap();
         assert_eq!(
@@ -142,7 +143,7 @@ Swing [D]low, sweet [G]chari[D]ot\r
 Artist: The Fantastic Corns
 Key: Cm
 ";
-        let tokens = ChorddownTokenizer::new()
+        let (tokens, _warnings) = ChorddownTokenizer::new()
             .tokenize(content.as_bytes())
             .unwrap();
         assert_eq!(
@@ -162,7 +163,7 @@ Key: Cm
     #[test]
     fn test_tokenize_newline() {
         let content = "\n\n\n";
-        let tokens = ChorddownTokenizer::new()
+        let (tokens, _warnings) = ChorddownTokenizer::new()
             .tokenize(content.as_bytes())
             .unwrap();
         assert_eq!(tokens.len(), 3);
@@ -174,7 +175,7 @@ Key: Cm
         let content = r"
 Key: C#m
 ";
-        let tokens = ChorddownTokenizer::new()
+        let (tokens, _warnings) = ChorddownTokenizer::new()
             .tokenize(content.as_bytes())
             .unwrap();
 
@@ -190,7 +191,7 @@ Key: C#m
 
     #[test]
     fn test_tokenize_meta_with_inline_sharp() {
-        let tokens = ChorddownTokenizer::new()
+        let (tokens, _warnings) = ChorddownTokenizer::new()
             .tokenize("Album: Song in C#m".as_bytes())
             .unwrap();
         assert_eq!(tokens, vec![Token::Meta(Meta::album("Song in C#m"))]);
@@ -201,7 +202,7 @@ Key: C#m
         let tokenizer = ChorddownTokenizer::new();
         // H
         {
-            let tokens = tokenizer.tokenize("B Notation: H".as_bytes()).unwrap();
+            let (tokens, _warnings) = tokenizer.tokenize("B Notation: H".as_bytes()).unwrap();
 
             assert_eq!(
                 tokens.get(0),
@@ -209,7 +210,7 @@ Key: C#m
             );
         }
         {
-            let tokens = tokenizer.tokenize("B_Notation: H".as_bytes()).unwrap();
+            let (tokens, _warnings) = tokenizer.tokenize("B_Notation: H".as_bytes()).unwrap();
 
             assert_eq!(
                 tokens.get(0),
@@ -217,7 +218,7 @@ Key: C#m
             );
         }
         {
-            let tokens = tokenizer.tokenize("BNotation: H".as_bytes()).unwrap();
+            let (tokens, _warnings) = tokenizer.tokenize("BNotation: H".as_bytes()).unwrap();
 
             assert_eq!(
                 tokens.get(0),
@@ -225,7 +226,7 @@ Key: C#m
             );
         }
         {
-            let tokens = tokenizer.tokenize("B-Notation: H".as_bytes()).unwrap();
+            let (tokens, _warnings) = tokenizer.tokenize("B-Notation: H".as_bytes()).unwrap();
 
             assert_eq!(
                 tokens.get(0),
@@ -234,7 +235,7 @@ Key: C#m
         }
         // B
         {
-            let tokens = tokenizer.tokenize("B Notation: B".as_bytes()).unwrap();
+            let (tokens, _warnings) = tokenizer.tokenize("B Notation: B".as_bytes()).unwrap();
 
             assert_eq!(
                 tokens.get(0),
@@ -242,7 +243,7 @@ Key: C#m
             );
         }
         {
-            let tokens = tokenizer.tokenize("B_Notation: B".as_bytes()).unwrap();
+            let (tokens, _warnings) = tokenizer.tokenize("B_Notation: B".as_bytes()).unwrap();
 
             assert_eq!(
                 tokens.get(0),
@@ -250,7 +251,7 @@ Key: C#m
             );
         }
         {
-            let tokens = tokenizer.tokenize("BNotation: B".as_bytes()).unwrap();
+            let (tokens, _warnings) = tokenizer.tokenize("BNotation: B".as_bytes()).unwrap();
 
             assert_eq!(
                 tokens.get(0),
@@ -258,7 +259,7 @@ Key: C#m
             );
         }
         {
-            let tokens = tokenizer.tokenize("B-Notation: B".as_bytes()).unwrap();
+            let (tokens, _warnings) = tokenizer.tokenize("B-Notation: B".as_bytes()).unwrap();
 
             assert_eq!(
                 tokens.get(0),
@@ -270,7 +271,7 @@ Key: C#m
     #[test]
     fn test_tokenize_pre_chorus() {
         let content = r"##- Pre-chorus";
-        let token_lines = ChorddownTokenizer::new()
+        let (token_lines, _warnings) = ChorddownTokenizer::new()
             .tokenize(content.as_bytes())
             .unwrap();
         assert_eq!(
@@ -282,7 +283,7 @@ Key: C#m
     #[test]
     fn test_tokenize_chorus_with_exclamation_marks() {
         let content = r"##! Chorus Loud!!";
-        let token_lines = ChorddownTokenizer::new()
+        let (token_lines, _warnings) = ChorddownTokenizer::new()
             .tokenize(content.as_bytes())
             .unwrap();
         assert_eq!(
@@ -294,7 +295,7 @@ Key: C#m
     #[test]
     fn test_tokenize_bride_with_exclamation_marks() {
         let content = r"##- Bride Loud!!";
-        let token_lines = ChorddownTokenizer::new()
+        let (token_lines, _warnings) = ChorddownTokenizer::new()
             .tokenize(content.as_bytes())
             .unwrap();
         assert_eq!(
@@ -306,7 +307,7 @@ Key: C#m
     #[test]
     fn test_tokenize_chorus_with_exclamation_marks_at_end() {
         let content = r"## Play Loud!!";
-        let token_lines = ChorddownTokenizer::new()
+        let (token_lines, _warnings) = ChorddownTokenizer::new()
             .tokenize(content.as_bytes())
             .unwrap();
         assert_eq!(

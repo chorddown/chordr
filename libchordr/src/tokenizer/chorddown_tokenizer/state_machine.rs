@@ -1,7 +1,6 @@
 use std::convert::TryFrom;
-use std::error::Error;
-use std::fmt::{Display, Formatter, Result};
 
+use crate::tokenizer::tokenizer_error::TokenizerError;
 use crate::tokenizer::{Meta, Modifier, Token};
 
 use super::lexeme::Lexeme;
@@ -12,7 +11,7 @@ pub(crate) struct Fsm {
     literal_buffer: String,
     header_level: u8,
     header_modifier: Option<Modifier>,
-    warnings: Vec<StateError>,
+    pub warnings: Vec<TokenizerError>,
 }
 
 impl Fsm {
@@ -39,7 +38,7 @@ impl Fsm {
                 Lexeme::Newline => Some(Mode::Newline),
                 Lexeme::ChordStart => Some(Mode::Chord),
                 Lexeme::ChordEnd => {
-                    self.warnings.push(StateError::UnexpectedChordEnd);
+                    self.warnings.push(TokenizerError::UnexpectedChordEnd);
 
                     Some(Mode::Literal)
                 }
@@ -60,13 +59,13 @@ impl Fsm {
                     }
                     Lexeme::Newline => {
                         // Unclosed chord
-                        self.warnings.push(StateError::UnclosedChord);
+                        self.warnings.push(TokenizerError::UnclosedChord);
                         Some(Mode::Newline)
                     }
                     Lexeme::ChordStart => {
                         // Nested chord
                         self.append_lexeme(lexeme);
-                        self.warnings.push(StateError::NestedChord);
+                        self.warnings.push(TokenizerError::NestedChord);
                         None
                     }
                     Lexeme::ChordEnd => Some(Mode::Literal),
@@ -75,7 +74,7 @@ impl Fsm {
                     | Lexeme::ChorusMark
                     | Lexeme::BridgeMark => {
                         self.append_lexeme(lexeme);
-                        self.warnings.push(StateError::InvalidChordCharacter);
+                        self.warnings.push(TokenizerError::InvalidChordCharacter);
                         None
                     }
                     Lexeme::Literal(_) => {
@@ -83,7 +82,7 @@ impl Fsm {
                         None
                     }
                     Lexeme::Eof => {
-                        self.warnings.push(StateError::UnexpectedEndOfFile);
+                        self.warnings.push(TokenizerError::UnexpectedEndOfFile);
                         Fsm::build_eof()
                     }
                 }
@@ -151,7 +150,7 @@ impl Fsm {
                 match lexeme {
                     Lexeme::Newline => Some(Mode::Newline),
                     Lexeme::HeaderStart => {
-                        self.warnings.push(StateError::UnexpectedHeaderStart);
+                        self.warnings.push(TokenizerError::UnexpectedHeaderStart);
                         self.append_lexeme(lexeme);
                         None
                     }
@@ -159,7 +158,7 @@ impl Fsm {
                     Lexeme::ChordStart => Some(Mode::Chord),
                     Lexeme::ChordEnd => {
                         // Chord End without an opening bracket
-                        self.warnings.push(StateError::UnexpectedChordEnd);
+                        self.warnings.push(TokenizerError::UnexpectedChordEnd);
 
                         None
                     }
@@ -172,7 +171,7 @@ impl Fsm {
                         None
                     }
                     Lexeme::Eof => {
-                        self.warnings.push(StateError::UnexpectedEndOfFile);
+                        self.warnings.push(TokenizerError::UnexpectedEndOfFile);
                         Fsm::build_eof()
                     }
                 }
@@ -244,28 +243,3 @@ impl Fsm {
         }
     }
 }
-
-#[derive(Debug)]
-enum StateError {
-    UnclosedChord,
-    NestedChord,
-    InvalidChordCharacter,
-    UnexpectedChordEnd,
-    UnexpectedHeaderStart,
-    UnexpectedEndOfFile,
-}
-
-impl Display for StateError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        match self {
-            StateError::UnclosedChord => f.write_str("UnclosedChord"),
-            StateError::NestedChord => f.write_str("NestedChord"),
-            StateError::InvalidChordCharacter => f.write_str("InvalidChordCharacter"),
-            StateError::UnexpectedChordEnd => f.write_str("UnexpectedChordEnd"),
-            StateError::UnexpectedHeaderStart => f.write_str("UnexpectedHeaderStart"),
-            StateError::UnexpectedEndOfFile => f.write_str("UnexpectedEndOfFile"),
-        }
-    }
-}
-
-impl Error for StateError {}
