@@ -99,7 +99,7 @@ impl Display for Tags {
                 .iter()
                 .map(|t: &Tag| t.to_string())
                 .collect::<Vec<String>>()
-                .join(", ")
+                .join(" ")
                 .as_str(),
         )
     }
