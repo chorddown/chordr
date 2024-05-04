@@ -35,7 +35,7 @@ pub struct SongMeta {
     alternative_title: Option<String>,
     ccli_song_id: Option<String>,
     b_notation: BNotation,
-    tags: Tags,
+    tags: Option<Tags>,
 }
 
 impl SongMeta {
@@ -92,7 +92,7 @@ impl SongMeta {
             alternative_title: meta.alternative_title(),
             ccli_song_id: meta.ccli_song_id(),
             b_notation: meta.b_notation(),
-            tags: meta.tags(),
+            tags: Some(meta.tags()),
         }
     }
 }
@@ -170,7 +170,7 @@ impl MetaTrait for SongMeta {
     }
 
     fn tags(&self) -> Tags {
-        self.tags.clone()
+        self.tags.clone().unwrap_or_default()
     }
 }
 
