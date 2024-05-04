@@ -133,7 +133,7 @@ fn convert(args: &ArgMatches<'_>) -> Result<()> {
     };
     log::debug!("Did open file");
 
-    let tokens = build_tokenizer().tokenize(BufReader::new(file))?;
+    let (tokens, _warnings) = build_tokenizer().tokenize(BufReader::new(file))?;
     log::debug!("Did tokenize content");
 
     let parser_result = Parser::new().parse(tokens)?;
