@@ -1,13 +1,14 @@
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 use std::fmt::{Display, Error, Formatter};
+use std::slice::Iter;
 use std::str::FromStr;
 
 #[derive(Deserialize, Serialize, PartialEq, PartialOrd, Clone, Debug)]
 pub struct Tag(String);
 
 impl Tag {
-    pub fn new<S: Into<String>>(content: S) -> Self {
+    pub(crate) fn new<S: Into<String>>(content: S) -> Self {
         Tag(content.into())
     }
 
@@ -52,6 +53,10 @@ impl Tags {
     pub(crate) fn is_empty(&self) -> bool {
         self.0.is_empty()
     }
+
+    pub(crate) fn iter(&self) -> Iter<Tag> {
+        self.0.iter()
+    }
 }
 
 impl Default for Tags {
@@ -88,7 +93,7 @@ impl FromStr for Tags {
             }
         }
 
-        return Ok(Tags(tags));
+        Ok(Tags(tags))
     }
 }
 
