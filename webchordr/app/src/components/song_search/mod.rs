@@ -1,6 +1,8 @@
 use std::rc::Rc;
 
 use gloo_timers::callback::Timeout;
+use libchordr::models::meta::tags::Tag;
+use libchordr::models::meta::MetaTrait;
 use log::{debug, info};
 use web_sys::HtmlInputElement;
 use yew::prelude::*;
@@ -76,6 +78,42 @@ impl SongSearch {
                        placeholder="Search"/>
             </>
         }) as Html
+    }
+
+    fn render_tags(&self, ctx: &Context<Self>) -> Html {
+        let render_tag = |tag: Tag| {
+            let tag_string = tag.to_string();
+            let on_click = ctx
+                .link()
+                .callback(move |_: MouseEvent| Msg::SearchChange(tag_string.clone()));
+
+            html! {
+                <button type="button" role="button" onclick={on_click} key={tag.to_string()}>
+                    {tag.to_string_without_hashtag()}
+                </button>
+            }
+        };
+
+        let catalog = &ctx.props().catalog;
+        if catalog.is_empty() {
+            return html! {};
+        };
+
+        let mut unique_tags: Vec<Tag> = catalog
+            .iter()
+            .into_iter()
+            .flat_map(|s| s.meta().tags())
+            .collect::<std::collections::HashSet<Tag>>()
+            .into_iter()
+            .collect::<Vec<_>>();
+        unique_tags.sort_unstable();
+
+        html! {
+            <div class="song-search-tags">
+                <div class="song-search-tags-caption">{"Tags"}</div>
+                { for unique_tags.into_iter().map(render_tag) }
+            </div>
+        }
     }
 }
 
@@ -170,10 +208,12 @@ impl Component for SongSearch {
 
         let filter = self.render_filter(ctx);
         let back = self.get_back_link(ctx);
+        let tags = self.render_tags(ctx);
 
         html! {
             <div class="song-search-song-list song-list">
                 {filter}
+                {tags}
                 {inner}
                 {back}
             </div>

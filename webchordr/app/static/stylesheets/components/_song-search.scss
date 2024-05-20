@@ -6,8 +6,8 @@
 }
 
 .song-search-song-list {
-    input[type=text],
-    input[type=search],
+    input[type="text"],
+    input[type="search"],
     .song-item {
         margin-bottom: $song-item-space;
 
@@ -21,8 +21,8 @@
         padding: 0;
     }
 
-    input[type=text],
-    input[type=search] {
+    input[type="text"],
+    input[type="search"] {
         line-height: $song-search-line-height;
         padding: $song-search-padding;
         color: var(--song-search-color);
@@ -34,5 +34,28 @@
         width: 100%;
         border-radius: 0;
         background: transparent;
+    }
+}
+
+.song-search-tags {
+    display: flex;
+    flex-flow: row wrap;
+    button,
+    .song-search-tags-caption {
+        padding: 0.5 * nth($button-padding, 1) 0.5 * nth($button-padding, 2);
+        font-size: 0.8rem;
+    }
+
+    .song-search-tags-caption {
+        color: var(--link-hover-color);
+        line-height: $button-line-height;
+        padding-left: 2px;
+    }
+
+    button {
+        width: auto;
+        margin-bottom: $song-item-space;
+        margin-left: 0.5 * $song-item-space;
+        margin-right: 0.5 * $song-item-space;
     }
 }

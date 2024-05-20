@@ -4,7 +4,7 @@ use std::fmt::{Display, Error, Formatter};
 use std::slice::Iter;
 use std::str::FromStr;
 
-#[derive(Deserialize, Serialize, PartialEq, PartialOrd, Clone, Debug)]
+#[derive(Deserialize, Serialize, PartialEq, Eq, PartialOrd, Clone, Debug, Hash, Ord)]
 pub struct Tag(String);
 
 impl Tag {
@@ -14,6 +14,10 @@ impl Tag {
 
     pub fn as_str(&self) -> &str {
         self.0.as_str()
+    }
+
+    pub fn to_string_without_hashtag(&self) -> String {
+        self.0.clone()
     }
 }
 
@@ -107,6 +111,16 @@ impl Display for Tags {
                 .join(" ")
                 .as_str(),
         )
+    }
+}
+
+impl IntoIterator for Tags {
+    type Item = Tag;
+
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
     }
 }
 
