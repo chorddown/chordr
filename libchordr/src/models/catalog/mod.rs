@@ -1,4 +1,5 @@
 use std::slice::Iter;
+use std::vec::IntoIter;
 
 use serde::{Deserialize, Serialize};
 
@@ -46,6 +47,16 @@ impl CatalogTrait<Song> for Catalog {
 
     fn revision(&self) -> String {
         self.revision.clone()
+    }
+}
+
+impl IntoIterator for Catalog {
+    type Item = Song;
+
+    type IntoIter = IntoIter<Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.songs.into_iter()
     }
 }
 
