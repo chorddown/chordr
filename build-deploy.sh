@@ -45,4 +45,4 @@ if [[ $* == *--verbose* ]] && type twiggy &>/dev/null; then
 fi
 popd >/dev/null
 echo "[TASK] Upload to $1"
-rsync -i --exclude '*.scss' -rzu webchordr/app/dist/ $1
+rsync -i --exclude '*.scss' -rzu webchordr/app/dist/ "$1"
