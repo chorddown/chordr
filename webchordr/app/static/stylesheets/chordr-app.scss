@@ -1,7 +1,7 @@
-@import 'prelude';
-@import 'css-inline-workaround';
-@import 'variables-apply';
-@import 'fonts';
+@import "prelude";
+@import "css-inline-workaround";
+@import "variables-apply";
+@import "fonts";
 
 *,
 *::before,
@@ -51,7 +51,7 @@ main {
     font-size: 0.8em;
 }
 
-@import 'components';
+@import "components";
 
 .content {
     background: var(--background);
@@ -75,13 +75,13 @@ main {
 
     #chordr {
         min-height: 100vh;
-        @if ($song-tools-style == 'navbar') {
+        @if ($song-tools-style == "navbar") {
             margin-top: $song-tools-navbar-height;
         }
 
         &::after {
             display: block;
-            content: '';
+            content: "";
             background: var(--tool-bg);
             height: 0.5em;
             margin: 0 (-$std-space) (-$std-space);
