@@ -1,7 +1,5 @@
 use self::chorddown::ChorddownConverter;
 use self::html::HtmlConverter;
-#[cfg(feature = "pdf")]
-use self::pdf::PdfConverter;
 use crate::converter::songbeamer::SongBeamerConverter;
 use crate::converter::text::TextConverter;
 use crate::error::Result;
@@ -11,8 +9,6 @@ use crate::prelude::*;
 
 mod chorddown;
 mod html;
-#[cfg(feature = "pdf")]
-mod pdf;
 mod songbeamer;
 mod text;
 
@@ -43,8 +39,6 @@ impl Converter {
             Format::Chorddown => Box::new(ChorddownConverter {}),
             Format::SongBeamer => Box::new(SongBeamerConverter {}),
             Format::Text => Box::new(TextConverter {}),
-            #[cfg(feature = "pdf")]
-            Format::PDF => Box::new(PdfConverter {}),
         }
     }
 }

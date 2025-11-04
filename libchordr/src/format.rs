@@ -10,20 +10,11 @@ pub enum Format {
     Chorddown,
     SongBeamer,
     Text,
-    #[cfg(feature = "pdf")]
-    PDF,
 }
 
 impl Format {
     pub fn get_all() -> &'static [Format] {
-        &[
-            Self::HTML,
-            Self::Chorddown,
-            Self::SongBeamer,
-            Self::Text,
-            #[cfg(feature = "pdf")]
-            Self::PDF,
-        ]
+        &[Self::HTML, Self::Chorddown, Self::SongBeamer, Self::Text]
     }
 }
 
@@ -34,8 +25,6 @@ impl Display for Format {
             Self::Chorddown => f.write_str("Chorddown"),
             Self::SongBeamer => f.write_str("SongBeamer"),
             Self::Text => f.write_str("Text"),
-            #[cfg(feature = "pdf")]
-            Self::PDF => f.write_str("PDF"),
         }
     }
 }
@@ -57,8 +46,6 @@ impl FromStr for Format {
             "chorddown" => Ok(Self::Chorddown),
             "songbeamer" => Ok(Self::SongBeamer),
             "text" => Ok(Self::Text),
-            #[cfg(feature = "pdf")]
-            "pdf" => Ok(Self::PDF),
             _ => Err(()),
         }
     }
