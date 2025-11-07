@@ -185,10 +185,6 @@ impl CatalogHandler for Handler {
             }
         });
     }
-
-    fn commit_changes(&mut self) {
-        error!("Changing the Catalog is not implement")
-    }
 }
 
 impl SetlistHandler for Handler {
@@ -402,7 +398,7 @@ impl SettingsHandler for Handler {
         let settings = self.state.song_settings();
         spawn_local(async move {
             let result = SettingsWebRepositoryFactory::build()
-                .save((&*settings).clone())
+                .save((*settings).clone())
                 .await;
 
             if let Err(e) = result {
@@ -501,7 +497,7 @@ impl Component for Handler {
                 match control {
                     Control::Navigate(navigate) => {
                         if SongNavigator::new()
-                            .navigate(navigate, &self.state, &ctx)
+                            .navigate(navigate, &self.state, ctx)
                             .is_none()
                         {
                             return false;

@@ -54,7 +54,7 @@ wasm-bindgen-test = "0.3"
 chrono = { version = "^0.4.19", default-features = false, features = ["std", "clock"] }
 
 [dependencies.wasm-bindgen]
-version = "^0.2.81"
+version = "^0.2.88"
 features = ["serde-serialize"]
 
 [dependencies.web-sys]

@@ -4,9 +4,7 @@ use std::vec::IntoIter;
 use crate::models::chord::Chords;
 use crate::tokenizer::Token;
 
-pub use super::meta_information::MetaInformation;
 pub use super::node::Node;
-pub use super::parser_result::ParserResult;
 pub use super::section_type::SectionType;
 pub use super::*;
 
@@ -44,11 +42,10 @@ impl NodeParser {
         match token {
             Token::Chord(_) => self.visit_chord(token, tokens),
             Token::Headline {
-                level,
+                level: _,
                 text: _,
                 modifier,
             } => {
-                if level == 1 {}
                 let head = Box::new(Node::Headline(token));
 
                 if tokens.peek().is_some() {

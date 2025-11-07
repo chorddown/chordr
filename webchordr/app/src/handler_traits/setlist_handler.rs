@@ -2,6 +2,7 @@ use libchordr::prelude::{Setlist, SetlistEntry, SongId, SongSettings};
 use webchordr_events::{SetlistEvent, SortingChange};
 use yew::Component;
 
+#[allow(unused)]
 pub trait SetlistHandler: Component {
     /// Handle the given [`Setlist`] related event
     fn handle_setlist_event(&mut self, event: SetlistEvent);

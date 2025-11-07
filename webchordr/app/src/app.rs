@@ -2,7 +2,6 @@ use std::rc::Rc;
 
 use log::{debug, error, info};
 use percent_encoding::percent_decode_str;
-use serde::{Deserialize, Serialize};
 use yew::{html, Callback, Component, Context, Html, Properties};
 use yew_router::prelude::*;
 
@@ -25,9 +24,6 @@ use crate::service::song_info_service::SongInfoService;
 use crate::session::Session;
 use crate::state::{SongInfo, State};
 use webchordr_common::route::{AppRoute, SetlistRoute, UserRoute};
-
-#[derive(Serialize, Deserialize, Clone, Debug, Default)]
-pub struct AppRouteState {}
 
 #[derive(Properties, Clone)]
 pub struct AppProperties {
@@ -290,12 +286,12 @@ impl App {
 
     /// Wrap `content` and `navigation` blocks into the required HTML structure
     fn compose(&self, content: Html, nav: Html) -> Html {
-        return html! {
+        html! {
             <>
                 { nav }
                 <div class="content">{ content }</div>
             </>
-        };
+        }
     }
 }
 

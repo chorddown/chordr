@@ -40,7 +40,7 @@ impl FromStr for Tag {
             return Err(TagError::InnerHashTag);
         }
 
-        return Ok(Tag(normalized_tag.to_owned()));
+        Ok(Tag(normalized_tag.to_owned()))
     }
 }
 
@@ -50,7 +50,7 @@ impl Display for Tag {
     }
 }
 
-#[derive(Deserialize, Serialize, PartialEq, PartialOrd, Clone, Debug)]
+#[derive(Deserialize, Serialize, PartialEq, PartialOrd, Clone, Debug, Default)]
 pub struct Tags(Vec<Tag>);
 
 impl Tags {
@@ -58,14 +58,8 @@ impl Tags {
         self.0.is_empty()
     }
 
-    pub(crate) fn iter(&self) -> Iter<Tag> {
+    pub(crate) fn iter(&'_ self) -> Iter<'_, Tag> {
         self.0.iter()
-    }
-}
-
-impl Default for Tags {
-    fn default() -> Self {
-        Self(vec![])
     }
 }
 

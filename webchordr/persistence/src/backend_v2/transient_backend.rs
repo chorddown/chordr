@@ -38,7 +38,7 @@ impl<R: RecordTrait + Serialize + DeserializeOwned> TransientBackend<R> {
 
     /// Allow access to the data
     #[cfg(test)]
-    pub(crate) fn data(&self) -> std::cell::Ref<Data> {
+    pub(crate) fn data(&'_ self) -> std::cell::Ref<'_, Data> {
         self.data.borrow()
     }
 
@@ -52,7 +52,7 @@ impl<R: RecordTrait + Serialize + DeserializeOwned> TransientBackend<R> {
         existence_check: ExistenceCheck,
     ) -> Result<(), WebError> {
         store_with_command(
-            &command,
+            command,
             existence_check,
             |combined_id_key| self.data.borrow().get(combined_id_key).is_some(),
             |combined_id_key, serialized_value| {
@@ -188,7 +188,7 @@ mod test {
         let all = result.unwrap();
         assert_eq!(all.len(), 4);
         for test_value in test_values {
-            assert!(all.iter().find(|v| v == &&test_value).is_some())
+            assert!(all.iter().any(|v| v == &test_value))
         }
     }
 
@@ -275,7 +275,7 @@ mod test {
         let backend: TransientBackend<TestValue> =
             TransientBackend::new_with_map(hash_map_from_context_and_slice(
                 &get_test_command_context(),
-                &[value_to_delete.clone()],
+                std::slice::from_ref(&value_to_delete),
             ));
 
         assert_eq!(backend.data().len(), 1);

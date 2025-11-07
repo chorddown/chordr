@@ -69,7 +69,7 @@ mod bs {
         }
 
         /// Acquire a lock for reading
-        fn lock_for_reading(&self) -> Result<RwLockReadGuard<BrowserStorage>, WebError> {
+        fn lock_for_reading(&'_ self) -> Result<RwLockReadGuard<'_, BrowserStorage>, WebError> {
             match self.browser_storage.read() {
                 Ok(l) => Ok(l),
                 Err(_) => Err(PersistenceError::general_error(
@@ -80,7 +80,7 @@ mod bs {
         }
 
         /// Acquire a lock for reading
-        fn lock_for_writing(&self) -> Result<RwLockWriteGuard<BrowserStorage>, WebError> {
+        fn lock_for_writing(&'_ self) -> Result<RwLockWriteGuard<'_, BrowserStorage>, WebError> {
             match self.browser_storage.write() {
                 Ok(l) => Ok(l),
                 Err(_) => Err(PersistenceError::general_error(

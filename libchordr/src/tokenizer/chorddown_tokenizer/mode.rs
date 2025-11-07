@@ -13,82 +13,14 @@ pub enum Mode {
 
 const NEWLINE: char = '\n';
 const CHORD_START: char = '[';
+#[allow(dead_code)]
 const CHORD_END: char = ']';
 const HEADER_START: char = '#';
+#[allow(dead_code)]
 const HEADER_END: char = NEWLINE;
 const QUOTE_START: char = '>';
+#[allow(dead_code)]
 const QUOTE_END: char = NEWLINE;
-
-pub(crate) trait ModePartner {
-    fn is_end_of(&self, mode: Mode) -> bool;
-    fn is_signal(&self, last_mode: Mode) -> bool;
-    fn is_terminator(&self, mode: Mode) -> bool;
-}
-
-impl ModePartner for char {
-    fn is_end_of(&self, mode: Mode) -> bool {
-        match mode {
-            Mode::Chord => self == &CHORD_END,
-            Mode::Header => self == &HEADER_END,
-            Mode::Newline => true,
-            Mode::Quote => self == &QUOTE_END,
-            Mode::Literal => self == &NEWLINE,
-            Mode::Bof => unreachable!(),
-            Mode::Eof => unreachable!(),
-        }
-    }
-
-    #[allow(unreachable_patterns)]
-    fn is_signal(&self, last_mode: Mode) -> bool {
-        // If the last mode was Chord the # should not be treated as signal
-        if last_mode == Mode::Chord && *self == HEADER_START {
-            return false;
-        }
-        matches!(
-            *self,
-            NEWLINE | CHORD_START | CHORD_END | HEADER_START | HEADER_END | QUOTE_START | QUOTE_END
-        )
-    }
-
-    fn is_terminator(&self, mode: Mode) -> bool {
-        self.is_end_of(mode) || mode.is_terminated_by(self.into())
-    }
-}
-
-impl ModePartner for Lexeme {
-    fn is_end_of(&self, mode: Mode) -> bool {
-        match mode {
-            Mode::Chord => self == &Lexeme::ChordEnd,
-            Mode::Header => self == &Lexeme::Newline,
-            Mode::Newline => true,
-            Mode::Quote => self == &Lexeme::Newline,
-            Mode::Literal => self == &Lexeme::Newline,
-            Mode::Bof => unreachable!(),
-            Mode::Eof => unreachable!(),
-        }
-    }
-
-    #[allow(unreachable_patterns)]
-    fn is_signal(&self, last_mode: Mode) -> bool {
-        // If the last mode was Chord the # should not be treated as signal
-        if last_mode == Mode::Chord && *self == Lexeme::HeaderStart {
-            return false;
-        }
-
-        matches!(
-            *self,
-            Lexeme::Newline
-                | Lexeme::ChordStart
-                | Lexeme::ChordEnd
-                | Lexeme::HeaderStart
-                | Lexeme::QuoteStart
-        )
-    }
-
-    fn is_terminator(&self, mode: Mode) -> bool {
-        self.is_end_of(mode) || mode.is_terminated_by(self.into())
-    }
-}
 
 impl Mode {
     pub fn from_char(character: char) -> Self {
@@ -111,6 +43,7 @@ impl Mode {
         }
     }
 
+    #[allow(unused)]
     pub fn is_terminated_by(self, mode: Mode) -> bool {
         // Newline is special: it can terminate any mode, but will also be terminated by any other mode
         if self == Mode::Newline {

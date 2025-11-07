@@ -59,7 +59,7 @@ impl<B: BrowserStorageTrait, R: RecordTrait + Serialize + DeserializeOwned>
     }
 
     /// Acquire a lock for reading
-    fn lock_for_reading(&self) -> Result<RwLockReadGuard<B>, WebError> {
+    fn lock_for_reading(&'_ self) -> Result<RwLockReadGuard<'_, B>, WebError> {
         match self.browser_storage.read() {
             Ok(l) => Ok(l),
             Err(_) => {
@@ -69,7 +69,7 @@ impl<B: BrowserStorageTrait, R: RecordTrait + Serialize + DeserializeOwned>
     }
 
     /// Acquire a lock for writing
-    fn lock_for_writing(&self) -> Result<RwLockWriteGuard<B>, WebError> {
+    fn lock_for_writing(&'_ self) -> Result<RwLockWriteGuard<'_, B>, WebError> {
         match self.browser_storage.write() {
             Ok(l) => Ok(l),
             Err(_) => {

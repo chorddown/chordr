@@ -1,9 +1,6 @@
 use crate::tokenizer::{Meta, Token};
 
 pub use super::meta_information::MetaInformation;
-pub use super::node::Node;
-pub use super::parser_result::ParserResult;
-pub use super::section_type::SectionType;
 pub use super::*;
 
 pub struct MetaParser {}
@@ -48,12 +45,6 @@ impl MetaParser {
                     meta
                 }
             }
-            // Token::Meta(Meta::BNotation(notation)) => {
-            //     let mut new_meta = meta;
-            //     new_meta.reinterpret_keys_with_b_notation(*notation);
-            //     // new_meta.assign_from_token(token_meta);
-            //     new_meta
-            // }
             Token::Meta(token_meta) => {
                 let mut new_meta = meta;
                 new_meta.assign_from_token(token_meta);
