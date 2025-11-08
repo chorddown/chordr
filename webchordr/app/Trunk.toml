@@ -2,7 +2,8 @@
 target = "index.html"
 
 [watch]
-ignore = ["static/javascripts/bundle.js", ".DS_Store"]
+watch = ["src"]
+ignore = ["dist", "static/javascripts/bundle.js"]
 
 [[proxy]]
 rewrite = "/api/"
