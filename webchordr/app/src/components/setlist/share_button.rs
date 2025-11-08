@@ -78,12 +78,14 @@ impl Component for SetlistShareButton {
 
 impl SetlistShareButton {
     fn build_share_url(&self, setlist: &Setlist) -> Result<String, WebError> {
-        let host = crate::helpers::window().location().host()?;
+        let location = crate::helpers::window().location();
+        let protocol = location.protocol()?;
+        let host = location.host()?;
         let serialized = SetlistSerializeService::serialize(setlist)?;
 
         Ok(format!(
-            "{}/{}{}",
-            host, SETLIST_LOAD_URL_PREFIX, serialized
+            "{}//{}/{}{}",
+            protocol, host, SETLIST_LOAD_URL_PREFIX, serialized
         ))
     }
 
