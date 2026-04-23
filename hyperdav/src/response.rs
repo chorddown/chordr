@@ -1,4 +1,3 @@
-use std;
 use std::error::Error;
 use xml::reader::Error as XmlError;
 
@@ -27,23 +26,19 @@ impl From<XmlError> for PropfindParseError {
 
 impl std::fmt::Display for PropfindParseError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{}", self.to_string())
+        let description = match self {
+            PropfindParseError::UnknownDocument => "not a propfind response",
+            PropfindParseError::InvalidFieldValue => "field must only contain text",
+            PropfindParseError::UnknownElement => "document must only contain responses",
+            PropfindParseError::UnknownField => "unsupported field",
+            PropfindParseError::ExpectedEndOfDocument => "expected end of document",
+            PropfindParseError::Xml(ref e) => &e.msg(),
+        };
+        write!(f, "{}", description)
     }
 }
 
 impl Error for PropfindParseError {
-    fn description(&self) -> &str {
-        use self::PropfindParseError::*;
-        match *self {
-            UnknownDocument => "not a propfind response",
-            InvalidFieldValue => "field must only contain text",
-            UnknownElement => "document must only contain responses",
-            UnknownField => "unsupported field",
-            ExpectedEndOfDocument => "expected end of document",
-            Xml(ref e) => e.msg(),
-        }
-    }
-
     fn cause(&self) -> Option<&dyn Error> {
         use self::PropfindParseError::*;
         match *self {
@@ -52,4 +47,3 @@ impl Error for PropfindParseError {
         }
     }
 }
-
