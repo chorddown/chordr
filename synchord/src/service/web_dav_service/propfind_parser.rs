@@ -28,14 +28,11 @@ pub fn parse_propfind_response<R: Read>(read: R) -> Result<Vec<TempFileEntry>> {
         End,
     }
 
-    let parser = EventReader::new_with_config(
-        read,
-        ParserConfig {
-            trim_whitespace: true,
-            cdata_to_characters: true,
-            ..Default::default()
-        },
-    );
+    let config = ParserConfig::new()
+        .trim_whitespace(true)
+        .cdata_to_characters(true);
+
+    let parser = EventReader::new_with_config(read, config);
     let mut items = Vec::new();
     let mut state = State::Start;
 
