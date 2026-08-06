@@ -95,10 +95,10 @@ impl<R: RecordTrait + Serialize + DeserializeOwned> ServerBackend<R> {
         let serialized_json_string = serde_json::to_string(value)?;
         let js_value = JsValue::from_str(&serialized_json_string);
 
-        let mut options = RequestInit::new();
-        options.method("POST");
-        options.mode(RequestMode::Cors);
-        options.body(Some(&js_value));
+        let options = RequestInit::new();
+        options.set_method("POST");
+        options.set_mode(RequestMode::Cors);
+        options.set_body(&js_value);
 
         let result = fetch_with_options_and_additional_headers::<
             HashMap<String, serde_json::Value>,

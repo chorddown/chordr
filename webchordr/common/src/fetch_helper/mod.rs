@@ -138,8 +138,8 @@ where
 }
 
 fn get_default_options() -> RequestInit {
-    let mut options = RequestInit::new();
-    options.method("GET");
-    options.mode(RequestMode::Cors);
+    let options = RequestInit::new();
+    options.set_method("GET");
+    options.set_mode(RequestMode::Cors);
     options
 }

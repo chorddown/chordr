@@ -33,7 +33,9 @@ impl SongNavigator {
                 let navigator = ctx.link().navigator().unwrap();
                 navigator.push(&route);
 
-                window().scroll_to_with_scroll_to_options(ScrollToOptions::new().top(0.0));
+                let options = ScrollToOptions::new();
+                options.set_top(0.0);
+                window().scroll_to_with_scroll_to_options(&options);
 
                 Some(route)
             }
