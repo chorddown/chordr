@@ -20,8 +20,8 @@ unicode-segmentation = "1.8.0"
 wasm-bindgen-futures = "^0.4.31"
 wasm-logger = "0.2"
 wee_alloc = "0.4.5"
-yew = "0.20"
-yew-router = "0.17"
+yew = { workspace = true }
+yew-router = { workspace = true }
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3"

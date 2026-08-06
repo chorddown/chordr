@@ -20,5 +20,9 @@ members = [
 
 resolver = "2"
 
+[workspace.dependencies]
+yew = "0.20"
+yew-router = "0.17"
+
 [profile.release.package.webchordr]
 opt-level = 's'

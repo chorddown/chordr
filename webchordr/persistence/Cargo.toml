@@ -18,7 +18,7 @@ serde_derive = "1"
 serde_json = "1.0.53"
 wasm-bindgen-futures = "^0.4.31"
 webchordr-common = { path = "../common" }
-yew = "0.20"
+yew = { workspace = true }
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3"

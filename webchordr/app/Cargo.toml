@@ -44,8 +44,8 @@ webchordr-persistence = { path = "../persistence" }
 webchordr-song-browser = { path = "../song-browser" }
 webchordr-song-list = { path = "../song-list" }
 wee_alloc = "0.4.5"
-yew = { version = "0.20", features = ["csr"] }
-yew-router = "0.17"
+yew = { workspace = true, features = ["csr"] }
+yew-router = { workspace = true }
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3"

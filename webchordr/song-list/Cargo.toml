@@ -18,7 +18,7 @@ serde_derive = "1"
 wasm-bindgen-futures = "^0.4.31"
 webchordr-common = { path = "../common" }
 webchordr-events = { path = "../events" }
-yew = "0.20"
+yew = { workspace = true }
 
 [dependencies.wasm-bindgen]
 version = "^0.2.81"

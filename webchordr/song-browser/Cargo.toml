@@ -14,7 +14,7 @@ wasm-bindgen-futures = "^0.4.31"
 webchordr-common = { path = "../common" }
 webchordr-events = { path = "../events" }
 webchordr-song-list = { path = "../song-list" }
-yew = "0.20"
+yew = { workspace = true }
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3"
