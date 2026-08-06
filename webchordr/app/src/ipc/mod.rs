@@ -37,9 +37,14 @@ pub fn register_ipc_handler(message_callback: Callback<IpcMessage>) -> Option<Ev
     }
 }
 
-/// This check relies on the debug-representation to check if the Service Worker Container contains
-/// a valid ServiceWorker instance
 fn has_service_worker(service_worker: &ServiceWorkerContainer) -> bool {
-    "ServiceWorkerContainer { obj: EventTarget { obj: Object { obj: JsValue(undefined) } } }"
-        != &format!("{:?}", service_worker)
+    if service_worker.is_undefined() {
+        return false;
+    }
+
+    if let Some(c) = service_worker.controller() {
+        !c.is_null() && !c.is_undefined()
+    } else {
+        false
+    }
 }
