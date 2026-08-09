@@ -1,4 +1,4 @@
-@import "prelude";
+@use "prelude" as *;
 
 a {
     color: var(--link-color);

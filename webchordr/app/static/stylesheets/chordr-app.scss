@@ -1,57 +1,8 @@
-@import "prelude";
-@import "css-inline-workaround";
-@import "variables-apply";
-@import "fonts";
-
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-}
-
-:focus {
-    outline: none;
-}
-
-img {
-    display: block;
-}
-
-body {
-    font-family: $ui-font;
-    font-size: var(--font-size-base); // $font-size-ui;
-    line-height: $line-height;
-    margin: 0;
-    color: var(--text-color);
-    background: var(--background);
-}
-
-label {
-    display: block;
-    margin: 0;
-}
-
-input {
-    font-size: $font-size-ui;
-    font-family: $ui-font;
-    display: inline-block;
-    margin: 0;
-
-    &:focus {
-        outline: none;
-    }
-}
-
-main {
-    display: flex;
-    flex-flow: row wrap;
-}
-
-.im {
-    font-size: 0.8em;
-}
-
-@import "components";
+@use "prelude" as *;
+@use "css-inline-workaround";
+@use "variables-apply";
+@use "fonts";
+@use "components";
 
 .content {
     background: var(--background);

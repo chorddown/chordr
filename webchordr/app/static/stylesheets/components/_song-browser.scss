@@ -1,4 +1,4 @@
-@import "prelude";
+@use "prelude" as *;
 
 .song-browser-home {
     display: inline-block;
@@ -7,7 +7,7 @@
 
 .song-browser-header-suffix {
     text-transform: uppercase;
-    margin-left: .3em;
+    margin-left: 0.3em;
 }
 
 .song-browser-index-list {
@@ -22,7 +22,7 @@
 
     .index-item-count {
         display: block;
-        font-size: .6em;
+        font-size: 0.6em;
     }
 }
 

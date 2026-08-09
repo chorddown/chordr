@@ -1,4 +1,4 @@
-@import "prelude";
+@use "prelude" as *;
 
 .center-fullscreen {
     position: fixed;

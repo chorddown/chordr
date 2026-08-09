@@ -1,4 +1,4 @@
-@import "variables";
-@import "functions";
-@import "mixins";
-@import "partials";
+@forward "variables";
+@forward "functions";
+@forward "mixins";
+@forward "partials";

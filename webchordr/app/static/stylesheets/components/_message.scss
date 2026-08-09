@@ -1,4 +1,4 @@
-@import "prelude";
+@use "prelude" as *;
 
 $message-padding: $std-space !default;
 

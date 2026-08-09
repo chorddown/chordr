@@ -1,18 +1,18 @@
-@import "prelude";
+@use "prelude" as *;
 
 .song-tools {
     position: fixed;
     bottom: 0;
     background: var(--tool-bg);
     color: var(--button-color);
-    padding: (1+$std-half) $std-half;
+    padding: (1 + $std-half) $std-half;
     line-height: $button-line-height;
     font-size: $button-font-size;
     right: $nav-width-xs;
     @include min-screen-tablet {
         right: $nav-width;
         bottom: auto;
-        @if ($song-tools-style == 'navbar') {
+        @if ($song-tools-style == "navbar") {
             left: 0;
             display: flex;
             justify-content: space-between;
@@ -49,7 +49,7 @@
         color: var(--button-color);
     }
 
-    a[role=button].discreet,
+    a[role="button"].discreet,
     button.discreet {
         $button-size: 30px;
         display: inline-block;
@@ -80,7 +80,7 @@
             padding: 0 $std-half;
             line-height: $button-size;
             display: none;
-            @if ($song-tools-style == 'navbar') {
+            @if ($song-tools-style == "navbar") {
                 @include min-screen-tablet {
                     display: block;
                 }
@@ -90,7 +90,7 @@
 
     @at-root main.-menu-hidden #{&} {
         right: $nav-collapsed-width;
-        @if ($song-tools-style != 'navbar') {
+        @if ($song-tools-style != "navbar") {
             display: none;
         }
     }

@@ -1,6 +1,8 @@
-@import "prelude";
+@use "sass:list";
+@use "prelude" as *;
 
 $sort-handle-width: 40px !default;
+
 nav {
     background: var(--nav-bg);
     order: 2;
@@ -12,19 +14,12 @@ nav {
     top: 0;
     bottom: 0;
     padding-left: $song-item-space;
-    //height: 100vh;
     min-height: -webkit-fill-available;
     @include print-hidden;
-    //@include if-dark-mode {
-    //    background: $dark-mode-nav-bg;
-    //}
-
-    &.-hidden {
-        //width: $nav-collapsed-width + 2px; // from padding
-    }
 
     &.-visible {
         width: $nav-width-xs;
+
         @include min-screen-tablet {
             width: $nav-width;
         }
@@ -72,19 +67,12 @@ nav {
             background: var(--button-bg);
         }
 
-        //@include if-dark-mode {
-        //    &:focus {
-        //        color: $dark-mode-button-color;
-        //        background: $dark-mode-button-bg;
-        //    }
-        //}
-
         &.-separator {
             height: $std-half;
         }
 
         .sortable-handle,
-        a[role=button] {
+        a[role="button"] {
             padding: $button-padding;
 
             @include if-hover-enabled {
@@ -98,14 +86,11 @@ nav {
         &.-highlight {
             color: var(--button-hover-color);
             background: var(--button-hover-bg);
-            //@include if-dark-mode {
-            //    color: $dark-mode-button-hover-color;
-            //    background: $dark-mode-button-hover-bg;
-            //}
         }
 
-        &.-sortable a[role=button] {
+        &.-sortable a[role="button"] {
             width: $nav-width-xs - $sort-handle-width;
+
             @include min-screen-tablet {
                 width: $nav-width - $sort-handle-width;
             }
@@ -122,11 +107,11 @@ nav {
     }
 
     &.-hidden {
-        .song-item a[role=button] {
+        .song-item a[role="button"] {
             width: $nav-collapsed-width;
             overflow: hidden;
             white-space: nowrap;
-            padding: nth($button-padding, 1);
+            padding: list.nth($button-padding, 1);
         }
     }
 
@@ -137,6 +122,7 @@ nav {
         order: 200;
         border-top: $nav-footer-border-width solid $nav-footer-border-color;
         flex-flow: column;
+
         @include max-screen-xs {
             .toggle-menu {
                 order: 10;
@@ -156,10 +142,10 @@ nav {
         }
 
         .im + span {
-            margin-left: .3em;
+            margin-left: 0.3em;
         }
 
-        a[role=button],
+        a[role="button"],
         button {
             float: left;
             width: 50%;
@@ -178,7 +164,7 @@ nav {
             }
         }
 
-        a[role=button].reload-songs,
+        a[role="button"].reload-songs,
         button.reload-songs {
             margin-bottom: 0;
 
@@ -196,11 +182,13 @@ nav {
                         from {
                             transform: rotate(0) scaleX(-1);
                         }
+
                         to {
                             transform: rotate(360deg) scaleX(-1);
                         }
                     }
                 }
+
                 transform: scaleX(-1);
                 animation: rotate-mirrored 2s ease-in-out;
                 height: 14px;
@@ -215,4 +203,3 @@ nav {
         width: $nav-collapsed-width;
     }
 }
-

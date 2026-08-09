@@ -1,11 +1,10 @@
-@import "prelude";
+@use "prelude" as *;
 
 .reload-button-fallback {
     text-align: center;
     display: block;
     width: 100%;
 }
-
 
 @keyframes fade_in {
     from {

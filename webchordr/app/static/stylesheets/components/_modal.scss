@@ -1,4 +1,4 @@
-@import "prelude";
+@use "prelude" as *;
 
 .modal-outer {
     z-index: 100;
@@ -10,9 +10,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(white, .8);
+    background: rgba(white, 0.8);
     @include if-dark-mode {
-        background: rgba(black, .8);
+        background: rgba(black, 0.8);
     }
 
     .modal {

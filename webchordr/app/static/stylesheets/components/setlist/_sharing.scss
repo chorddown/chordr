@@ -1,14 +1,7 @@
-@import "prelude";
+@use "prelude" as *;
 
-.setlist-share.modal {
-    .modal-body {
-        input {
-        }
-
-        button {
-            width: 42px;
-        }
-    }
+.setlist-share.modal .modal-body button {
+    width: 42px;
 }
 
 .setlist-load-preview-container {

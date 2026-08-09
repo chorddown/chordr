@@ -1,14 +1,15 @@
 @use "sass:math";
-@import "prelude";
+@use "sass:map";
+@use "prelude" as *;
 
 @mixin build-row() {
     @include clearfix;
-    margin: 0 (-$grid-gutter-width * .5);
+    margin: 0 (-$grid-gutter-width * 0.5);
     display: flex;
     flex-flow: row wrap;
 }
 
-@mixin build-columns($grid-columns, $screen: '') {
+@mixin build-columns($grid-columns, $screen: "") {
     @include _build-columns-default($grid-columns, $screen);
     @include _build-columns-width($grid-columns, $screen);
     @include _build-grid($grid-columns, $screen);
@@ -19,14 +20,14 @@
     @for $i from 1 through $grid-columns {
         $list: "#{$list}.col-#{$screen}#{$i}";
         @if $i < $grid-columns {
-            $list: "#{$list},"
+            $list: "#{$list},";
         }
     }
 
     #{$list} {
         width: 100%;
-        padding-left: ceil($grid-gutter-width * .5);
-        padding-right: floor($grid-gutter-width * .5);
+        padding-left: math.ceil($grid-gutter-width * 0.5);
+        padding-right: math.floor($grid-gutter-width * 0.5);
     }
 }
 
@@ -35,7 +36,7 @@
     @for $i from 1 through $grid-columns {
         $list: "#{$list}.col-#{$screen}#{$i}";
         @if $i < $grid-columns {
-            $list: "#{$list},"
+            $list: "#{$list},";
         }
     }
 
@@ -64,9 +65,8 @@
 
 @include build-columns($grid-columns);
 
-@each $screen in map-keys($grid-breakpoints) {
+@each $screen in map.keys($grid-breakpoints) {
     @include max-screen($screen) {
-        @include build-columns($grid-columns, '#{$screen}-');
+        @include build-columns($grid-columns, "#{$screen}-");
     }
 }
-

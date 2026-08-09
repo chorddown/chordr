@@ -1,4 +1,5 @@
-@import "prelude";
+@use "sass:list";
+@use "prelude" as *;
 
 .song-search-home {
     display: inline-block;
@@ -42,7 +43,8 @@
     flex-flow: row wrap;
     button,
     .song-search-tags-caption {
-        padding: 0.5 * nth($button-padding, 1) 0.5 * nth($button-padding, 2);
+        padding: 0.5 * list.nth($button-padding, 1) 0.5 *
+            list.nth($button-padding, 2);
         font-size: 0.8rem;
     }
 

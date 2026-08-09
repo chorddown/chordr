@@ -1,4 +1,4 @@
-@import "prelude";
+@use "prelude" as *;
 
 .transpose-tool {
     @include song-tool;

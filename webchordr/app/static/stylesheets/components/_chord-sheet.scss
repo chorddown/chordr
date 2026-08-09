@@ -1,8 +1,7 @@
-@import "prelude";
+@use "prelude" as *;
 
 @page {
-    size: auto;   //* auto is the initial value */
-    //margin: 0mm;  //* this affects the margin in the printer settings */
+    size: auto; //* auto is the initial value */
 }
 
 #chordr {
@@ -47,7 +46,7 @@
 
     h2 {
         font-size: $font-size-h2;
-        margin-bottom: $std-half * .5;
+        margin-bottom: $std-half * 0.5;
     }
 
     h3 {
@@ -106,9 +105,9 @@
         float: left;
 
         &:last-child::after {
-            content: ' ';
+            content: " ";
             display: block;
-            clear: both
+            clear: both;
         }
     }
 

@@ -1,4 +1,4 @@
-@import "prelude";
+@use "prelude" as *;
 
 .song-notes {
     padding: $song-item-space 0;

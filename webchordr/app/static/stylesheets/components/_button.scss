@@ -1,6 +1,6 @@
-@import "prelude";
+@use "prelude" as *;
 
-a[role=button],
+a[role="button"],
 button,
 .button {
     @include button();
@@ -20,7 +20,7 @@ button,
     }
 }
 
-a[role=button].disabled,
+a[role="button"].disabled,
 button:disabled,
 .button.disabled {
     &:not(.discreet) {
@@ -35,7 +35,7 @@ button:disabled,
     @include button();
     @include button-default();
 
-    a[role=button],
+    a[role="button"],
     button {
         display: flex;
         align-items: center;

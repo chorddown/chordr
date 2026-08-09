@@ -1,22 +1,22 @@
-@import "variables";
-@import "functions";
+@use "sass:map";
+@use "variables" as *;
+@use "functions" as *;
 
 @mixin debug-screen-breakpoints() {
     body::after {
         position: fixed;
         right: 0;
         top: 0;
-        background: rgba(white, .4);
+        background: rgba(white, 0.4);
         padding: 4px;
         font-size: 12px;
         pointer-events: none;
         font-family: Menlo, monospace;
-        opacity: .3;
+        opacity: 0.3;
         @each $name, $min in $grid-breakpoints {
             @include screen($name) {
                 $max: max-screen($name);
-                content: '[#{$min}] < #{$name} > [#{$max}]';
-
+                content: "[#{$min}] < #{$name} > [#{$max}]";
             }
         }
     }
@@ -26,27 +26,27 @@
     &::before,
     &::after {
         clear: both;
-        content: '';
+        content: "";
         display: table-cell;
     }
 }
 
 @mixin apply-styles($styles) {
-    color: map-get($styles, font-color);
-    font-weight: map-get($styles, font-weight);
-    font-style: map-get($styles, font-style);
-    background: map-get($styles, background);
-    margin: map-get($styles, margin);
+    color: map.get($styles, font-color);
+    font-weight: map.get($styles, font-weight);
+    font-style: map.get($styles, font-style);
+    background: map.get($styles, background);
+    margin: map.get($styles, margin);
     @include apply-block-styles($styles);
 }
 
 @mixin apply-block-styles($styles) {
-    $color: map-get($styles, block-color);
-    $width: map-get($styles, block-width);
+    $color: map.get($styles, block-color);
+    $width: map.get($styles, block-width);
     @if $width > 0 and $color != transparent {
         border-left: $width $color solid;
-        @if map-has-key($styles, block-style) {
-            border-left-style: map-get($styles, block-style);
+        @if map.has-key($styles, block-style) {
+            border-left-style: map.get($styles, block-style);
         }
         padding: 0 $std-half;
     }
@@ -71,11 +71,11 @@
 
 /// Mixin for Song detail tools (like transpose and setlist tool)
 @mixin song-tool() {
-    @if $song-tools-style != 'navbar' {
-    margin-bottom: $std-half;
-    &:last-child {
-        margin-bottom: 0;
-    }
+    @if $song-tools-style != "navbar" {
+        margin-bottom: $std-half;
+        &:last-child {
+            margin-bottom: 0;
+        }
     }
 }
 
@@ -159,7 +159,7 @@
         font-variant: normal;
         font-style: normal;
         //noinspection CssNoGenericFontName
-        font-family: 'iconmonstr-iconic-font';
+        font-family: "iconmonstr-iconic-font";
         font-size: 1em;
         line-height: 1;
         vertical-align: bottom;

@@ -1,0 +1,49 @@
+@use "prelude" as *;
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+:focus {
+    outline: none;
+}
+
+img {
+    display: block;
+}
+
+body {
+    font-family: $ui-font;
+    font-size: var(--font-size-base);
+    line-height: $line-height;
+    margin: 0;
+    color: var(--text-color);
+    background: var(--background);
+}
+
+label {
+    display: block;
+    margin: 0;
+}
+
+input {
+    font-size: $font-size-ui;
+    font-family: $ui-font;
+    display: inline-block;
+    margin: 0;
+
+    &:focus {
+        outline: none;
+    }
+}
+
+main {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+.im {
+    font-size: 0.8em;
+}
