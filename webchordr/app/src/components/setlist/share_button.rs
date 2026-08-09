@@ -116,7 +116,7 @@ impl SetlistShareButton {
                         visible={true}
                         header_text="Error building Share-URL"
                         class="setlist-share">
-                        {e}
+                        <>{e}</>
                     </Modal>
                 }
             }

@@ -43,9 +43,9 @@ fn get_class<S: SongData + Clone + PartialEq>(props: &SongListItemProps<S>) -> C
     }
 }
 
-#[function_component(Item)]
+#[component(Item)]
 pub fn render_item<S: SongData + Clone + PartialEq>(props: &SongListItemProps<S>) -> Html {
-    let title = &props.song.title();
+    let title = Some(props.song.title().clone());
     let key = &props.data_key;
     let id = props.song.id().to_string();
     let class = get_class(props);
@@ -55,8 +55,7 @@ pub fn render_item<S: SongData + Clone + PartialEq>(props: &SongListItemProps<S>
         id: SongIdParam::from_song_id(&props.song.id()),
     };
 
-    let link =
-        html! { <Link role="button" class="discreet" data_key={key.clone()} {to}>{title}</Link> };
+    let link = html! { <Link role="button" class="discreet" data_key={key.clone()} {to}><>{title}</></Link> };
 
     let handle = if props.sortable {
         html! { <span class="sortable-handle">{"::"}</span> }

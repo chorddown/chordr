@@ -120,7 +120,7 @@ impl Component for Login {
             if let SessionUser::LoggedIn(user) = session.user() {
                 return (html! {
                     <DetailView close_route={AppRoute::Index}>
-                        {format!("Successfully logged in as {}", user.username())}
+                        <>{format!("Successfully logged in as {}", user.username())}</>
                     </DetailView>
                 }) as Html;
             }
@@ -130,7 +130,7 @@ impl Component for Login {
         if let SessionUser::LoggedIn(user) = &ctx.props().user {
             return (html! {
                 <DetailView close_route={AppRoute::Index}>
-                    {format!("Already logged in as {}", user.username())}
+                    <>{format!("Already logged in as {}", user.username())}</>
                 </DetailView>
             }) as Html;
         }

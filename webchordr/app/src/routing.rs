@@ -10,7 +10,7 @@ fn switch(route: AppRoute) -> Html {
     html! {<Handler {route}/>}
 }
 
-#[function_component(Main)]
+#[component(Main)]
 pub fn entry() -> Html {
     (html! {
         <BrowserRouter>

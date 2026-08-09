@@ -2,7 +2,7 @@ use webchordr_common::components::link::Link;
 use webchordr_common::route::AppRoute;
 use yew::prelude::*;
 
-#[function_component(SongSearchLink)]
+#[component(SongSearchLink)]
 pub(crate) fn song_search_link() -> Html {
     let to = AppRoute::SongSearch;
 

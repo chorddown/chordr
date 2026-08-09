@@ -1,7 +1,7 @@
 use webchordr_common::prelude::*;
 use yew::prelude::*;
 
-#[function_component(HomeTool)]
+#[component(HomeTool)]
 pub fn home_tool() -> Html {
     (html! {
         <div class="home-tool">

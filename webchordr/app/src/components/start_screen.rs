@@ -1,6 +1,6 @@
 use yew::prelude::*;
 
-#[function_component(StartScreen)]
+#[component(StartScreen)]
 pub(crate) fn start_screen() -> Html {
     (html! {
         <div class="start-screen">
