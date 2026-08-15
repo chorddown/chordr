@@ -39,7 +39,11 @@ pub fn Link(props: &LinkProps) -> Html {
 
     let navigator = use_navigator().unwrap();
     let href: AttrValue = LinkTo::from(to.clone()).to_string().into();
-    let onclick = Callback::from(move |_| navigator.push(&to));
+    let onclick = Callback::from(move |e: MouseEvent| {
+        e.prevent_default();
+
+        navigator.push(&to)
+    });
 
     html! {
         <a {class}
