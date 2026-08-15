@@ -41,6 +41,9 @@
 .song-search-tags {
     display: flex;
     flex-flow: row wrap;
+    justify-content: space-between;
+    gap: $song-item-space;
+
     button,
     .song-search-tags-caption {
         padding: 0.5 * list.nth($button-padding, 1) 0.5 *
@@ -56,8 +59,13 @@
 
     button {
         width: auto;
-        margin-bottom: $song-item-space;
-        margin-left: 0.5 * $song-item-space;
-        margin-right: 0.5 * $song-item-space;
+
+        &:last-child {
+            margin-right: auto;
+        }
     }
+}
+
+.song-search-results.-no-results {
+    padding-bottom: $std-space;
 }
