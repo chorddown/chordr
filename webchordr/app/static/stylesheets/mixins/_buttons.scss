@@ -12,6 +12,7 @@
     text-decoration: none;
     touch-action: manipulation;
     cursor: pointer;
+    border-radius: var(--border-radius);
 
     @include helpers.if-hover-enabled {
         &:focus,

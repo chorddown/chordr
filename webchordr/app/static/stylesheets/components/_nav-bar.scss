@@ -106,12 +106,16 @@ nav {
         }
     }
 
-    &.-hidden {
-        .song-item a[role="button"] {
+    &.-hidden .song-item {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+
+        a[role="button"] {
             width: $nav-collapsed-width;
             overflow: hidden;
             white-space: nowrap;
-            padding: list.nth($button-padding, 1);
+            padding: list.nth($button-padding, 1) 0 list.nth($button-padding, 1)
+                list.nth($button-padding, 2);
         }
     }
 

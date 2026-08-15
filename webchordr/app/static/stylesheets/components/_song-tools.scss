@@ -63,6 +63,8 @@
         height: $button-size;
         line-height: $button-line-height;
         min-width: $button-size;
+        padding-left: var(--button-padding-horizontal);
+        padding-right: var(--button-padding-horizontal);
 
         @include if-hover-enabled {
             &:hover {

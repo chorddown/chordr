@@ -31,7 +31,7 @@ impl Component for SemitoneNotationTool {
 
         html! {
             <div class="semitone-notation-tool">
-                <div title="Select the semitone notation">
+                <div title="Select the semitone notation" class="button-group -compact">
                     <button class={sharp_class} onclick={select_sharp}>{SemitoneNotation::Sharp.to_string()}</button>
                     <button class={flat_class} onclick={select_flat}>{SemitoneNotation::Flat.to_string()}</button>
                 </div>

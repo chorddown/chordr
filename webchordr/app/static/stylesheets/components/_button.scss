@@ -59,21 +59,27 @@ div.grid-button {
 .button-group {
     display: flex;
     flex-flow: row;
-    margin-left: -$std-half;
-    margin-right: -$std-half;
-
-    > button {
-        margin-left: $std-half;
-        margin-right: $std-half;
-    }
+    gap: $std-space;
 
     &.-compact {
-        margin-left: 0;
-        margin-right: 0;
+        gap: 0;
 
         > button {
-            margin-left: 0;
-            margin-right: 0;
+            border-radius: 0;
+
+            &:first-child {
+                border-top-left-radius: var(--border-radius);
+                border-bottom-left-radius: var(--border-radius);
+            }
+
+            &:last-child {
+                border-top-right-radius: var(--border-radius);
+                border-bottom-right-radius: var(--border-radius);
+            }
         }
     }
+}
+
+input + button:last-child {
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
 }
