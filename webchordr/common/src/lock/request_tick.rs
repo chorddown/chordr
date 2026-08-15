@@ -11,6 +11,7 @@ use crate::errors::WebError;
 use crate::helpers::window;
 
 type ClosureHandleClosure = Closure<dyn Fn()>;
+#[allow(dead_code)]
 pub struct ClosureHandle(Rc<RefCell<Option<ClosureHandleClosure>>>);
 
 pub async fn request_tick_after_timeout(
