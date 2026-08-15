@@ -1,3 +1,4 @@
+@use "sass:map";
 @use "prelude" as *;
 
 .song-browser-home {
@@ -11,6 +12,20 @@
 }
 
 .song-browser-index-list {
+    .song-browser-index-list-grid {
+        display: grid;
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+        gap: $grid-gutter-width;
+
+        @include min-screen(sm) {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        @include min-screen(md) {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+    }
+
     .grid-button {
         text-transform: uppercase;
         flex-flow: column;
@@ -27,6 +42,8 @@
 }
 
 .song-browser-song-list .song-item.grid-button {
+    margin-bottom: 0.5 * $grid-gutter-width;
+
     a {
         text-align: left;
     }

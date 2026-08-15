@@ -125,11 +125,9 @@ impl SongBrowser {
             let key = index.chars.clone();
 
             html! {
-                <div class="col-xs-12 col-sm-6 col-3">
-                    <IndexItem class="song-browser-index-item grid-button"
-                        key={key}
-                        index={index}/>
-                </div>
+                <IndexItem class="song-browser-index-item grid-button"
+                    key={key}
+                    index={index}/>
             }
         };
 
@@ -138,7 +136,7 @@ impl SongBrowser {
         html! {
             <div class="song-browser-index-list">
                 {self.render_header(ctx)}
-                <div class="row grid">
+                <div class="song-browser-index-list-grid">
                     { for indexes_for_filtered_songs.into_iter().map(render_index_item) }
                 </div>
                 {self.get_back_link(ctx)}
