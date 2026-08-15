@@ -1,5 +1,6 @@
-@use "variables" as *;
-@use "mixins" as *;
+// stylelint-disable custom-property-empty-line-before
+@use "../variables" as *;
+@use "../mixins" as *;
 
 @mixin apply-variables-dark-mode {
     @media screen and (prefers-color-scheme: dark) {

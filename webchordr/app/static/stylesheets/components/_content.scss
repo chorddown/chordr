@@ -1,0 +1,41 @@
+@use "prelude" as *;
+
+.content {
+    background: var(--background);
+    order: 1;
+    padding: $std-space;
+    width: calc(100% - #{$nav-width-xs});
+    @include min-screen-tablet {
+        width: calc(100% - #{$nav-width});
+    }
+
+    @media print {
+        width: 100%;
+        padding: 0;
+    }
+
+    .song-image {
+        height: auto;
+        width: auto;
+        max-width: 100%;
+    }
+
+    #chordr {
+        min-height: 100vh;
+        @if ($song-tools-style == "navbar") {
+            margin-top: $song-tools-navbar-height;
+        }
+
+        &::after {
+            display: block;
+            content: "";
+            background: var(--tool-bg);
+            height: 0.5em;
+            margin: 0 (-$std-space) (-$std-space);
+        }
+    }
+}
+
+main.-menu-hidden .content {
+    width: calc(100% - #{$nav-collapsed-width});
+}
