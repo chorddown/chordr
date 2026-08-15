@@ -13,6 +13,8 @@
         pointer-events: none;
         font-family: Menlo, monospace;
         opacity: 0.3;
+        z-index: 100;
+
         @each $name, $min in $grid-breakpoints {
             @include screen($name) {
                 $max: max-screen($name);
