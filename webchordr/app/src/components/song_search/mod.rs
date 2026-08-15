@@ -35,14 +35,13 @@ pub struct SongSearchProps {
 impl SongSearch {
     /// Return the [Song]s from the [Catalog] filtered by [self.search]
     fn get_filtered_songs<'a>(&'a self, props: &'a SongSearchProps) -> Vec<&'a Song> {
-        if self.search.is_empty() || self.search_index.is_none() {
-            self.get_all_songs(props)
-        } else {
-            self.search_index
-                .as_ref()
-                .expect("Search index not built yet")
-                .search_by_term(&self.search)
-                .sort_by_title()
+        if self.search.is_empty() {
+            return self.get_all_songs(props);
+        }
+
+        match &self.search_index {
+            Some(index) => index.search_by_term(&self.search).sort_by_title(),
+            None => self.get_all_songs(props),
         }
     }
 
@@ -65,7 +64,7 @@ impl SongSearch {
     fn render_filter(&self, ctx: &Context<Self>) -> Html {
         let oninput = ctx.link().callback(|e: InputEvent| {
             // You must KNOW target is a HtmlInputElement, otherwise
-            // the call to value would be Undefined Behaviour (UB).
+            // the call to value would be Undefined Behavior (UB).
             Msg::SearchChange(e.target_unchecked_into::<HtmlInputElement>().value())
         });
 
@@ -101,7 +100,6 @@ impl SongSearch {
 
         let mut unique_tags: Vec<Tag> = catalog
             .iter()
-            .into_iter()
             .flat_map(|s| s.meta().tags())
             .collect::<std::collections::HashSet<Tag>>()
             .into_iter()
