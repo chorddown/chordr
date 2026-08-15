@@ -1,4 +1,30 @@
+@use "sass:map";
 @use "prelude" as *;
+
+@mixin apply-styles($styles) {
+    color: map.get($styles, font-color);
+    font-weight: map.get($styles, font-weight);
+    font-style: map.get($styles, font-style);
+    background: map.get($styles, background);
+    margin: map.get($styles, margin);
+
+    @include apply-block-styles($styles);
+}
+
+@mixin apply-block-styles($styles) {
+    $color: map.get($styles, block-color);
+    $width: map.get($styles, block-width);
+
+    @if $width > 0 and $color != transparent {
+        border-left: $width $color solid;
+
+        @if map.has-key($styles, block-style) {
+            border-left-style: map.get($styles, block-style);
+        }
+
+        padding: 0 $std-half;
+    }
+}
 
 @page {
     size: auto; // auto is the initial value

@@ -1,0 +1,19 @@
+@mixin icon($content: normal) {
+    &::before {
+        content: $content;
+        display: inline-block;
+        font-weight: normal;
+        font-variant: normal;
+        font-style: normal;
+        // stylelint-disable font-family-no-missing-generic-family-keyword
+        // stylelint-disable-next-line scss/double-slash-comment-whitespace-inside
+        //noinspection CssNoGenericFontName
+        font-family: iconmonstr-iconic-font;
+        font-size: 1em;
+        line-height: 1;
+        vertical-align: bottom;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+}

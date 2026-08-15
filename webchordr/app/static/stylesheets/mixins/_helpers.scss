@@ -1,0 +1,36 @@
+@use "../variables" as *;
+
+@mixin if-dark-mode {
+    @media screen and (prefers-color-scheme: dark) {
+        @at-root html:not(.light-mode) & {
+            @content;
+        }
+    }
+
+    @at-root html.dark-mode & {
+        @content;
+    }
+}
+
+@mixin print-hidden {
+    @media print {
+        display: none !important;
+    }
+}
+
+/// Mixin for Song detail tools (like transpose and setlist tool)
+@mixin song-tool() {
+    @if $song-tools-style != "navbar" {
+        margin-bottom: $std-half;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+}
+
+@mixin if-hover-enabled {
+    @media (hover: hover) and (pointer: fine) {
+        @content;
+    }
+}

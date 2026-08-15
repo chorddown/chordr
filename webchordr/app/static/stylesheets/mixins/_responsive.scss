@@ -1,0 +1,37 @@
+@use "../functions" as *;
+
+@mixin min-screen($screen) {
+    @media screen and (min-width: min-screen($screen)) {
+        @content;
+    }
+}
+
+@mixin screen($screen) {
+    @media screen and (min-width: min-screen($screen)) and (max-width: max-screen($screen)) {
+        @content;
+    }
+}
+
+@mixin max-screen($screen) {
+    @media screen and (max-width: max-screen($screen)) {
+        @content;
+    }
+}
+
+@mixin max-screen-xs {
+    @include max-screen(xs) {
+        @content;
+    }
+}
+
+@mixin min-screen-tablet {
+    @include min-screen(md) {
+        @content;
+    }
+}
+
+@mixin screen-tablet {
+    @include screen(md) {
+        @content;
+    }
+}

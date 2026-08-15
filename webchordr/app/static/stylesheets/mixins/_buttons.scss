@@ -1,0 +1,74 @@
+@use "sass:map";
+@use "../variables" as *;
+@use "../functions" as *;
+@use "helpers";
+
+@mixin button($display: block) {
+    display: $display;
+    appearance: none;
+    line-height: $button-line-height;
+    font-size: $button-font-size;
+    font-family: $ui-font;
+    text-decoration: none;
+    touch-action: manipulation;
+    cursor: pointer;
+
+    @include helpers.if-hover-enabled {
+        &:focus,
+        &:hover {
+            outline: none;
+        }
+    }
+}
+
+@mixin button-default($padding: $button-padding, $border: auto, $width: 100%) {
+    background: var(--control-bg);
+
+    @if $border != auto {
+        border: $border;
+    } @else {
+        border: var(--control-border);
+    }
+
+    color: var(--control-color);
+    width: $width;
+    padding: $padding;
+    text-align: center;
+    letter-spacing: $button-letter-spacing;
+    cursor: pointer;
+
+    @include helpers.if-hover-enabled {
+        &:focus,
+        &:hover {
+            color: var(--control-hover-color);
+            background: var(--control-hover-bg);
+            border: var(--control-hover-border);
+        }
+    }
+}
+
+@mixin button-disabled($padding: $button-padding, $border: auto, $width: 100%) {
+    background: var(--control-disabled-bg);
+
+    @if $border != auto {
+        border: $border;
+    } @else {
+        border: var(--control-border);
+    }
+
+    color: var(--control-disabled-color);
+    width: $width;
+    padding: $padding;
+    text-align: center;
+    letter-spacing: $button-letter-spacing;
+    cursor: pointer;
+
+    @include helpers.if-hover-enabled {
+        &:focus,
+        &:hover {
+            color: var(--control-disabled-hover-color);
+            background: var(--control-disabled-hover-bg);
+            border: var(--control-disabled-hover-border);
+        }
+    }
+}

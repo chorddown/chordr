@@ -2,6 +2,12 @@
 @use "../variables" as *;
 @use "../mixins" as *;
 
+@mixin assign-variables($prefix, $styles) {
+    @each $key, $value in $styles {
+        --#{$prefix}-#{$key}: #{$value};
+    }
+}
+
 @mixin apply-variables-dark-mode {
     @media screen and (prefers-color-scheme: dark) {
         html {
