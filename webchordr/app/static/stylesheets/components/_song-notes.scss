@@ -2,11 +2,10 @@
 
 .song-notes {
     padding: $song-item-space 0;
-    width: $nav-width-xs;
+    width: 100%;
     height: calc(50vh - #{3 * $nav-button-height + $nav-footer-border-width});
 
     @include min-screen-tablet {
-        width: $nav-width;
         height: calc(50vh - #{$nav-button-height + $nav-footer-border-width});
     }
 
@@ -22,7 +21,7 @@
         // stylelint-disable-next-line property-no-vendor-prefix
         -webkit-appearance: none;
         appearance: none;
-        width: $nav-width;
+        width: calc($nav-width - $nav-left-border-width);
         height: 100%;
 
         @include if-dark-mode {
@@ -32,5 +31,5 @@
 }
 
 nav.-hidden .song-notes {
-    width: $nav-collapsed-width + 2px;
+    width: $nav-collapsed-width + $nav-left-border-width;
 }

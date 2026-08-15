@@ -13,7 +13,7 @@ nav {
     right: 0;
     top: 0;
     bottom: 0;
-    padding-left: $song-item-space;
+    padding-left: $nav-left-border-width;
     min-height: -webkit-fill-available;
 
     @include print-hidden;

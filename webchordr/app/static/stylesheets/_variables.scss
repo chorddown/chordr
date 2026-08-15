@@ -27,6 +27,7 @@ $grid-breakpoints: (
     xl: 1200px,
     xxl: 1400px,
 ) !default;
+$small-item-space: 2px !default;
 
 $std-transition-duration: 300ms !default;
 
@@ -166,6 +167,7 @@ $nav-footer-border-color: $gray-dark !default;
 $nav-width: 300px !default;
 $nav-width-xs: 140px !default;
 $nav-collapsed-width: $nav-button-height !default;
+$nav-left-border-width: $small-item-space !default;
 
 $tool-top-space: $nav-button-height + 5px;
 
@@ -297,7 +299,7 @@ $clipboard-input-letter-spacing: $button-letter-spacing !default;
 $dark-mode-clipboard-input-bg: $dark-mode-button-bg !default;
 $dark-mode-clipboard-input-color: $dark-mode-button-color !default;
 
-$song-item-space: 2px !default;
+$song-item-space: $small-item-space !default;
 
 $song-tools-style: "navbar" !default; // 'navbar' or 'box'
 $song-tools-navbar-height: $button-line-height + 6px + $std-space !default;
