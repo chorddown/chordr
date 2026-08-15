@@ -4,16 +4,20 @@
 $sort-handle-width: 40px !default;
 
 nav {
+    --nav-padding-left: calc(
+        var(--nav-padding-horizontal) + var(--nav-left-border-width)
+    );
+
     background: var(--nav-bg);
     order: 2;
     display: flex;
     flex-flow: column;
     position: fixed;
     z-index: 20;
+    gap: var(--nav-spacing);
     right: 0;
     top: 0;
     bottom: 0;
-    padding-left: $nav-left-border-width;
     min-height: -webkit-fill-available;
 
     @include print-hidden;
@@ -29,10 +33,15 @@ nav {
     .song-list-container {
         height: calc(100% - #{$nav-button-height});
         transition: transform $std-transition-duration;
+        padding: 0 0 0 var(--nav-padding-left);
 
         &.-touch-hover {
             transform: scale(1.02);
         }
+    }
+
+    &.-visible .song-list-container {
+        padding: 0 var(--nav-padding-horizontal) 0 var(--nav-padding-left);
     }
 
     &.-w-notes .song-list-container {
@@ -126,6 +135,9 @@ nav {
         order: 200;
         border-top: $nav-footer-border-width solid $nav-footer-border-color;
         flex-flow: column;
+        gap: var(--nav-footer-gap, 0);
+        padding: 0 var(--nav-padding-horizontal) var(--nav-padding-vertical)
+            var(--nav-padding-left);
 
         @include max-screen-xs {
             .toggle-menu {
@@ -151,9 +163,6 @@ nav {
 
         a[role="button"],
         button {
-            float: left;
-            width: 50%;
-            margin-bottom: 0;
             height: $nav-button-height;
 
             &:only-child {

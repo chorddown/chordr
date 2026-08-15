@@ -88,6 +88,11 @@ html {
     --button-padding: #{$button-padding};
     --button-padding-horizontal: #{list.nth($button-padding, 2)};
     --button-padding-vertical: #{list.nth($button-padding, 1)};
+    --nav-padding-horizontal: #{$std-half};
+    --nav-padding-vertical: #{$std-half};
+    --nav-spacing: var(--nav-padding-vertical);
+    --nav-left-border-width: #{$nav-left-border-width};
+    --nav-footer-gap: #{0.5 * $std-half};
 
     @include light-mode;
 }

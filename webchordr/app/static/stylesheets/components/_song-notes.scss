@@ -1,7 +1,13 @@
+// stylelint-disable property-no-vendor-prefix, scss/operator-no-newline-after
 @use "prelude" as *;
 
 .song-notes {
-    padding: $song-item-space 0;
+    --nav-padding-left: calc(
+        var(--nav-padding-horizontal) + var(--nav-left-border-width)
+    );
+
+    padding: $song-item-space var(--nav-padding-horizontal) $song-item-space
+        var(--nav-padding-left);
     width: 100%;
     height: calc(50vh - #{3 * $nav-button-height + $nav-footer-border-width});
 
@@ -18,10 +24,12 @@
         padding: $std-half;
         font-family: $ui-font;
         font-size: $font-size-web;
-        // stylelint-disable-next-line property-no-vendor-prefix
         -webkit-appearance: none;
         appearance: none;
-        width: calc($nav-width - $nav-left-border-width);
+        width: calc(
+            $nav-width - 2 *
+                var(--nav-padding-horizontal) - var(--nav-left-border-width)
+        );
         height: 100%;
 
         @include if-dark-mode {
