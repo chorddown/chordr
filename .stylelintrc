@@ -1,0 +1,12 @@
+{
+    "extends": ["stylelint-config-standard-scss"],
+    "rules": {
+        "no-descending-specificity": null,
+        "selector-class-pattern": ["^([-a-z][a-z0-9]*)([-_]*[a-z0-9]+)*$"],
+        "custom-property-pattern": ["^([a-z][a-z0-9]*)([-_]*[a-z0-9]+)*$"],
+        "selector-id-pattern": ["^([a-z][a-zA-Z0-9]*)([-_][a-z0-9]+)*$"],
+        "selector-not-notation": "simple",
+        "color-function-notation": null,
+        "scss/dollar-variable-empty-line-before": null
+    }
+}

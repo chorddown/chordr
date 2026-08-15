@@ -3,10 +3,10 @@
 a[role="button"],
 button,
 .button {
-    @include button();
+    @include button;
 
     &:not(.discreet) {
-        @include button-default();
+        @include button-default;
     }
 
     &.-inline {
@@ -24,7 +24,7 @@ a[role="button"].disabled,
 button:disabled,
 .button.disabled {
     &:not(.discreet) {
-        @include button-disabled();
+        @include button-disabled;
     }
 }
 
@@ -32,8 +32,9 @@ button:disabled,
     height: 100%;
     align-items: center;
     justify-content: center;
-    @include button();
-    @include button-default();
+
+    @include button;
+    @include button-default;
 
     a[role="button"],
     button {

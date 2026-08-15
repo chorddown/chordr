@@ -8,6 +8,7 @@
             @content;
         }
     }
+
     @at-root html.dark-mode {
         @content;
     }
@@ -86,6 +87,6 @@ html {
 }
 
 // Allow to force light-mode
-@at-root html.light-mode {
+html.light-mode {
     @include light-mode;
 }

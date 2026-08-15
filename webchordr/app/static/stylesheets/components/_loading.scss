@@ -6,6 +6,7 @@ $loading-size: 40px !default;
     from {
         transform: rotate(0);
     }
+
     to {
         transform: rotate(360deg);
     }
@@ -18,11 +19,11 @@ $loading-size: 40px !default;
     animation: rotate 3s linear infinite;
 
     .im {
-        //line-height: 1;
         line-height: 49px;
         display: inline-block;
         font-size: $loading-size;
         color: $gray-dark;
+
         @include if-dark-mode {
             color: $dark-mode-text-color;
         }

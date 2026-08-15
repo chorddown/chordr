@@ -5,6 +5,7 @@
     order: 1;
     padding: $std-space;
     width: calc(100% - #{$nav-width-xs});
+
     @include min-screen-tablet {
         width: calc(100% - #{$nav-width});
     }
@@ -22,7 +23,8 @@
 
     #chordr {
         min-height: 100vh;
-        @if ($song-tools-style == "navbar") {
+
+        @if $song-tools-style == "navbar" {
             margin-top: $song-tools-navbar-height;
         }
 

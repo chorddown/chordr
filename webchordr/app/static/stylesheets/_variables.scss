@@ -1,3 +1,4 @@
+// stylelint-disable value-keyword-case, alpha-value-notation, scss/dollar-variable-pattern
 @use "sass:color";
 @use "sass:map";
 
@@ -220,26 +221,26 @@ $chorus-dark: map.merge(
     )
 ) !default;
 
-//$verse: (
-//    font-color: $text-color,
-//    font-weight: normal,
-//    font-style: normal,
-//    background: transparent,
-//    block-width: .3em,
-//    block-color: #777,
-//) !default;
-//
-//$verse-dark: map.merge(
-//        $verse,
-//        (
-//            font-color: $text-color-dark-mode,
-//            // font-weight: value,
-//            // font-style: value,
-//            // background: value,
-//            // block-width: value,
-//            // block-color: value,
-//        )
-//) !default;
+// $verse: (
+//     font-color: $text-color,
+//     font-weight: normal,
+//     font-style: normal,
+//     background: transparent,
+//     block-width: .3em,
+//     block-color: #777,
+// ) !default;
+
+// $verse-dark: map.merge(
+//         $verse,
+//         (
+//             font-color: $text-color-dark-mode,
+//             // font-weight: value,
+//             // font-style: value,
+//             // background: value,
+//             // block-width: value,
+//             // block-color: value,
+//         )
+// ) !default;
 
 $bridge: (
     font-color: $text-color,

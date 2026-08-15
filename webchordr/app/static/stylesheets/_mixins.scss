@@ -18,6 +18,7 @@
         @each $name, $min in $grid-breakpoints {
             @include screen($name) {
                 $max: max-screen($name);
+
                 content: "[#{$min}] < #{$name} > [#{$max}]";
             }
         }
@@ -30,17 +31,21 @@
     font-style: map.get($styles, font-style);
     background: map.get($styles, background);
     margin: map.get($styles, margin);
+
     @include apply-block-styles($styles);
 }
 
 @mixin apply-block-styles($styles) {
     $color: map.get($styles, block-color);
     $width: map.get($styles, block-width);
+
     @if $width > 0 and $color != transparent {
         border-left: $width $color solid;
+
         @if map.has-key($styles, block-style) {
             border-left-style: map.get($styles, block-style);
         }
+
         padding: 0 $std-half;
     }
 }
@@ -51,6 +56,7 @@
             @content;
         }
     }
+
     @at-root html.dark-mode & {
         @content;
     }
@@ -66,6 +72,7 @@
 @mixin song-tool() {
     @if $song-tools-style != "navbar" {
         margin-bottom: $std-half;
+
         &:last-child {
             margin-bottom: 0;
         }
@@ -92,11 +99,13 @@
 
 @mixin button-default($padding: $button-padding, $border: auto, $width: 100%) {
     background: var(--control-bg);
+
     @if $border != auto {
         border: $border;
     } @else {
         border: var(--control-border);
     }
+
     color: var(--control-color);
     width: $width;
     padding: $padding;
@@ -116,11 +125,13 @@
 
 @mixin button-disabled($padding: $button-padding, $border: auto, $width: 100%) {
     background: var(--control-disabled-bg);
+
     @if $border != auto {
         border: $border;
     } @else {
         border: var(--control-border);
     }
+
     color: var(--control-disabled-color);
     width: $width;
     padding: $padding;
@@ -151,8 +162,10 @@
         font-weight: normal;
         font-variant: normal;
         font-style: normal;
+        // stylelint-disable font-family-no-missing-generic-family-keyword
+        // stylelint-disable-next-line scss/double-slash-comment-whitespace-inside
         //noinspection CssNoGenericFontName
-        font-family: "iconmonstr-iconic-font";
+        font-family: iconmonstr-iconic-font;
         font-size: 1em;
         line-height: 1;
         vertical-align: bottom;

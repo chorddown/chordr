@@ -9,18 +9,22 @@
     line-height: $button-line-height;
     font-size: $button-font-size;
     right: $nav-width-xs;
+
     @include min-screen-tablet {
         right: $nav-width;
         bottom: auto;
-        @if ($song-tools-style == "navbar") {
+
+        @if $song-tools-style == "navbar" {
             left: 0;
             display: flex;
             justify-content: space-between;
             transition: top $std-transition-duration;
             top: -($song-tools-navbar-height);
+
             @at-root html.direction-up #{&} {
                 top: 0;
             }
+
             @at-root html.attached #{&} {
                 top: 0;
             }
@@ -42,6 +46,7 @@
     input {
         background: transparent;
         border: none;
+        // stylelint-disable-next-line property-no-vendor-prefix
         -webkit-appearance: none;
         appearance: none;
         width: 4 * $std-space;
@@ -52,6 +57,7 @@
     a[role="button"].discreet,
     button.discreet {
         $button-size: 30px;
+
         display: inline-block;
         color: var(--button-color);
         height: $button-size;
@@ -71,6 +77,7 @@
 
         &.-active {
             background: var(--button-bg);
+
             @include if-dark-mode {
                 background: var(--button-hover-bg);
             }
@@ -80,7 +87,8 @@
             padding: 0 $std-half;
             line-height: $button-size;
             display: none;
-            @if ($song-tools-style == "navbar") {
+
+            @if $song-tools-style == "navbar" {
                 @include min-screen-tablet {
                     display: block;
                 }
@@ -90,7 +98,8 @@
 
     @at-root main.-menu-hidden #{&} {
         right: $nav-collapsed-width;
-        @if ($song-tools-style != "navbar") {
+
+        @if $song-tools-style != "navbar" {
             display: none;
         }
     }

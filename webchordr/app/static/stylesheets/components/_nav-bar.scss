@@ -15,6 +15,7 @@ nav {
     bottom: 0;
     padding-left: $song-item-space;
     min-height: -webkit-fill-available;
+
     @include print-hidden;
 
     &.-visible {
@@ -57,7 +58,7 @@ nav {
     .song-item {
         @include button(flex);
         @include button-default($padding: 0);
-        display: flex;
+
         flex-flow: row nowrap;
         align-items: center;
         margin-bottom: $song-item-space;
@@ -102,7 +103,6 @@ nav {
             margin-top: -4px;
             border-left: none;
             cursor: move;
-            cursor: -webkit-grabbing;
         }
     }
 

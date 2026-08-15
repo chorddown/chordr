@@ -2,9 +2,9 @@
 @use "mixins" as *;
 
 %button {
-    @include button();
+    @include button;
 }
 
 %button-default {
-    @include button-default();
+    @include button-default;
 }

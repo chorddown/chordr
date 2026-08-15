@@ -6,8 +6,9 @@
     flex-flow: row nowrap;
 
     input {
+        @include button;
+
         flex: 1 1 auto;
-        @include button();
         background: var(--clipboard-input-bg);
         color: var(--clipboard-input-color);
         border: $button-border;
@@ -16,11 +17,6 @@
         text-align: center;
         letter-spacing: $clipboard-input-letter-spacing;
         border-radius: 0;
-
-        //@include if-dark-mode {
-        //    background: $dark-mode-clipboard-input-bg;
-        //    color: $dark-mode-clipboard-input-color;
-        //}
     }
 
     button {

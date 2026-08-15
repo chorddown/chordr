@@ -1,7 +1,7 @@
 @use "prelude" as *;
 
 @page {
-    size: auto; //* auto is the initial value */
+    size: auto; // auto is the initial value
 }
 
 #chordr {
@@ -76,6 +76,7 @@
 
     .chordr-chord {
         @include apply-styles($chord);
+
         @include if-dark-mode {
             @include apply-styles($chord-dark);
         }
@@ -90,6 +91,7 @@
 
             &:not(.-last-in-line)::after {
                 $combinator: "-" !default;
+
                 // Em dash: $combinator: "—" !default;
                 content: $combinator;
                 position: absolute;
@@ -113,7 +115,9 @@
 
     blockquote {
         margin: $std-half 0;
+
         @include apply-styles($blockquote);
+
         @include if-dark-mode {
             @include apply-styles($blockquote-dark);
         }
@@ -123,6 +127,7 @@
         margin: $std-space 0;
         clear: both;
         page-break-inside: avoid;
+
         @if $section-border-length == 100% {
             border-bottom: $section-border;
         } @else {
@@ -145,21 +150,23 @@
 
         &.chorus {
             @include apply-styles($chorus);
+
             @include if-dark-mode {
                 @include apply-styles($chorus-dark);
             }
         }
 
         // Not implemented
-        //&.verse {
-        //    @include apply-styles($verse);
-        //    @include if-dark-mode {
-        //        @include apply-styles($verse-dark);
-        //    }
-        //}
+        // &.verse {
+        //     @include apply-styles($verse);
+        //     @include if-dark-mode {
+        //         @include apply-styles($verse-dark);
+        //     }
+        // }
 
         &.bridge {
             @include apply-styles($bridge);
+
             @include if-dark-mode {
                 @include apply-styles($bridge-dark);
             }

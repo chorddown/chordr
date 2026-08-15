@@ -1,3 +1,4 @@
+// stylelint-disable property-no-vendor-prefix
 @use "sass:list";
 @use "prelude" as *;
 
@@ -46,8 +47,10 @@
 
     button,
     .song-search-tags-caption {
-        padding: 0.5 * list.nth($button-padding, 1) 0.5 *
-            list.nth($button-padding, 2);
+        $padding-vertical: 0.5 * list.nth($button-padding, 1);
+        $padding-horizontal: 0.5 * list.nth($button-padding, 2);
+
+        padding: $padding-vertical $padding-horizontal;
         font-size: 0.8rem;
     }
 

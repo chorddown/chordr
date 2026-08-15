@@ -3,6 +3,7 @@
 .sortable-ghost {
     color: $button-hover-color !important;
     background: $button-hover-bg !important;
+
     @include if-dark-mode {
         color: $dark-mode-button-hover-color !important;
         background: $dark-mode-button-hover-bg !important;

@@ -9,9 +9,9 @@
         background: var(--control-bg);
 
         .close-button {
-            margin-left: auto;
-
             @include button-default($border: auto, $width: 42px);
+
+            margin-left: auto;
             border-color: transparent;
         }
     }
