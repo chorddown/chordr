@@ -16,7 +16,7 @@
         padding: 0 0 0 list.nth($clipboard-input-padding, 2);
         text-align: center;
         letter-spacing: $clipboard-input-letter-spacing;
-        border-radius: 0;
+        border-radius: var(--input-border-radius) 0 0 var(--input-border-radius);
     }
 
     button {

@@ -36,7 +36,7 @@
         appearance: none;
         border: var(--song-search-border);
         width: 100%;
-        border-radius: 0;
+        border-radius: var(--input-border-radius);
         background: transparent;
     }
 }
