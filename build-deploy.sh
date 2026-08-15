@@ -7,8 +7,37 @@ if ! command -v trunk &>/dev/null; then
   exit 1
 fi
 
+usage() {
+  echo "Script to build and deploy Chorddown Web
+
+Usage: $0 [DESTINATION] [OPTIONS]
+
+Arguments:
+  [DESTINATION]  rsync destination
+                 e.g. user@server:remote_path
+                 e.g. ./local/path
+
+Options:
+  -h, --held                       Show this message
+      --verbose                    Run 'trunk' with verbose output
+      --dev                        Create a debug build
+"
+}
+
+if [[ $* == *-h* ]] || [[ $* == *--help** ]]; then
+  usage
+  exit 1
+fi
+
 if [[ "$1" == "" ]]; then
-  echo "[ERROR] Missing argument 1 'rsync target'"
+  echo "[ERROR] Missing argument 1 'DESTINATION'"
+  echo
+  usage
+  exit 1
+elif [[ "$1" == -* ]]; then
+  echo "[ERROR] Invalid argument 1 'DESTINATION'
+
+Hint: the destination must be the first argument "
   exit 1
 fi
 
@@ -21,7 +50,10 @@ if pgrep trunk >/dev/null; then
   echo
 fi
 echo "[TASK] Build the catalog"
-cargo run --bin chordr -- build-catalog webchordr/app/static/songs webchordr/app/static/catalog.json
+cargo run --bin chordr --release -- \
+  build-catalog \
+  webchordr/app/static/songs \
+  webchordr/app/static/catalog.json
 
 echo "[TASK] Create deploy-build"
 pushd webchordr/app || exit 1
