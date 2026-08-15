@@ -19,13 +19,15 @@
     margin-right: -($grid-gutter-width * 0.5);
     display: flex;
     flex-flow: row wrap;
+    justify-content: space-between;
 }
 
 .reload-button,
 .reload-section-catalog-revision,
-.reload-section-version {
+.app-version-section-version {
     display: inline-block;
     letter-spacing: $button-letter-spacing;
+
     @include min-screen-tablet {
         line-height: 40px;
     }
@@ -33,28 +35,21 @@
 
 .reload-button-container,
 .reload-section-catalog-revision,
-.reload-section-version {
+.app-version-section-version {
     padding-left: $grid-gutter-width * 0.5;
     padding-right: $grid-gutter-width * 0.5;
-    flex: 1 1 auto;
 }
 
-.reload-button-container {
-    @include max-screen(md) {
-        flex: 1 0 100%;
-    }
-}
-
-.reload-section-version {
-    @include min-screen(sm) {
-        text-align: right;
-    }
+.app-version-section-version {
+    display: block;
+    text-align: right;
 }
 
 .reload-section-catalog-revision,
-.reload-section-version {
+.app-version-section-version {
     color: $gray;
     font-size: $font-size-small;
+
     @include min-screen(lg) {
         flex-grow: 0;
     }

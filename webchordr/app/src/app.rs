@@ -11,6 +11,7 @@ use webchordr_common::errors::WebError;
 use webchordr_events::{Event, SetlistEvent, SettingsEvent};
 use webchordr_song_browser::SongBrowser;
 
+use crate::components::app_version::AppVersion;
 use crate::components::nav::Nav;
 use crate::components::reload_section::ReloadSection;
 use crate::components::setlist::List as SetlistList;
@@ -87,7 +88,8 @@ impl App {
                     <StartScreen />
                     {self.render_song_browser(ctx,"")}
                     <ReloadSection catalog={ctx.props().state.catalog()} />
-                    {self.render_song_search(ctx,false)}
+                    {self.render_song_search(ctx, false)}
+                    <AppVersion />
                 </>
             },
             self.view_nav(ctx, None),

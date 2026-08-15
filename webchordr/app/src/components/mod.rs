@@ -1,3 +1,4 @@
+pub mod app_version;
 pub mod detail_view;
 pub mod modal;
 pub mod nav;

@@ -22,12 +22,6 @@ pub fn ReloadSection(ReloadSectionProps { catalog }: &ReloadSectionProps) -> Htm
         },
     };
 
-    let app_version = format!(
-        "{}-{}",
-        env!("CARGO_PKG_VERSION"),
-        env!("CUNDD_BUILD_REVISION")
-    );
-
     html! {
         <div class="reload-section">
             <div class="reload-button-container">
@@ -39,10 +33,6 @@ pub fn ReloadSection(ReloadSectionProps { catalog }: &ReloadSectionProps) -> Htm
             </div>
             <div class="reload-section-catalog-revision">
                 {"Catalog revision: "}{revision}
-            </div>
-
-            <div class="reload-section-version">
-                {"App version: "}{app_version}
             </div>
         </div>
     }
