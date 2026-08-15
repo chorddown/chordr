@@ -170,10 +170,7 @@ nav {
             }
 
             > span {
-                font-size: 0;
-                position: absolute;
-                height: 0;
-                width: 0;
+                @include visually-hidden;
             }
         }
 

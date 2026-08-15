@@ -1,9 +1,5 @@
 @use "prelude" as *;
 
 .sr-only {
-    text-indent: -10000px;
-    font-size: 0;
-    height: 0;
-    width: 0;
-    position: absolute;
+    @include visually-hidden;
 }
