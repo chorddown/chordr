@@ -41,10 +41,9 @@ impl IndexEntry {
     }
 
     fn contains(&self, search: &str) -> bool {
-        if search.starts_with('#') {
-            if self.search_in_tags(search) {
-                return true;
-            }
+        // Search for tags
+        if search.starts_with('#') && self.search_in_tags(search) {
+            return true;
         }
 
         self.text.contains(search)
