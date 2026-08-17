@@ -30,6 +30,7 @@
         max-height: 40vh;
         overflow-y: scroll;
         position: relative;
+        border-radius: var(--border-radius);
 
         ul {
             margin: 0;

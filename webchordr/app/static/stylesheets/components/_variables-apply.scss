@@ -1,4 +1,4 @@
-// stylelint-disable custom-property-empty-line-before
+// stylelint-disable custom-property-empty-line-before, scss/operator-no-newline-after
 @use "sass:list";
 @use "../variables" as *;
 @use "../mixins" as *;
@@ -81,8 +81,8 @@
     --song-search-color: #{$dark-mode-song-search-color};
 }
 
-// Default styles (=light-mode)
 html {
+    --item-space-small: #{$item-space-small};
     --font-size-base: #{$font-size-web};
     --border-radius: #{0.5 * $std-space};
     --input-border-radius: var(--border-radius);
@@ -94,9 +94,31 @@ html {
     --nav-padding-vertical: #{$std-half};
     --nav-spacing: var(--nav-padding-vertical);
     --nav-left-border-width: #{$nav-left-border-width};
-    --nav-footer-gap: #{0.5 * $std-half};
+    --nav-footer-gap: var(--item-space-small);
+    --nav-button-height: #{$nav-button-height};
+    --nav-sort-handle-width: 40px;
+    --song-item-space: var(--item-space-small);
 
+    // Default styles (=light-mode)
     @include light-mode;
+}
+
+main {
+    --nav-width: #{$nav-width-xs};
+    --nav-expanded-width: #{$nav-width-xs};
+    --nav-collapsed-width: calc(
+        var(--nav-left-border-width) + 2 * var(--nav-padding-horizontal) +
+            var(--nav-button-height)
+    );
+
+    @include min-screen-tablet {
+        --nav-width: #{$nav-width};
+        --nav-expanded-width: #{$nav-width};
+    }
+
+    &.-menu-hidden {
+        --nav-width: var(--nav-collapsed-width);
+    }
 }
 
 // Automatically switch to dark-mode via `prefers-color-scheme` or `html.dark-mode`

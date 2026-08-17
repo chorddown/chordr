@@ -10,7 +10,7 @@
 .song-search-song-list {
     display: flex;
     flex-flow: column;
-    gap: $song-item-space;
+    gap: var(--song-item-space);
 
     input[type="text"],
     input[type="search"],
@@ -45,7 +45,7 @@
     display: flex;
     flex-flow: row wrap;
     justify-content: space-between;
-    gap: $song-item-space;
+    gap: var(--song-item-space);
 
     button,
     .song-search-tags-caption {
@@ -74,7 +74,7 @@
 .song-search-results {
     display: flex;
     flex-flow: row wrap;
-    gap: $song-item-space;
+    gap: var(--song-item-space);
 
     &.-no-results {
         padding-bottom: $std-space;

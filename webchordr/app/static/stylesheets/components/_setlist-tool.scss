@@ -1,8 +1,6 @@
 @use "prelude" as *;
 
 .setlist-tool {
-    @include song-tool;
-
     button {
         width: 100%;
     }

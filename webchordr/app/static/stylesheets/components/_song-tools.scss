@@ -9,12 +9,18 @@
     line-height: $button-line-height;
     font-size: $button-font-size;
     right: $nav-width-xs;
+    display: flex;
+    flex-flow: column;
+    gap: $std-half;
+    border-top-left-radius: var(--border-radius);
 
     @include min-screen-tablet {
-        right: $nav-width;
+        right: var(--nav-width);
         bottom: auto;
+        border-top-left-radius: 0;
 
         @if $song-tools-style == "navbar" {
+            flex-flow: row;
             left: 0;
             display: flex;
             justify-content: space-between;
@@ -30,6 +36,7 @@
             }
         } @else {
             top: 0;
+            border-bottom-left-radius: var(--border-radius);
         }
     }
 
@@ -88,18 +95,21 @@
         &.home {
             padding: 0 $std-half;
             line-height: $button-size;
-            display: none;
+        }
+    }
 
-            @if $song-tools-style == "navbar" {
-                @include min-screen-tablet {
-                    display: block;
-                }
+    .home-tool {
+        display: none;
+
+        @if $song-tools-style == "navbar" {
+            @include min-screen-tablet {
+                display: block;
             }
         }
     }
 
     @at-root main.-menu-hidden #{&} {
-        right: $nav-collapsed-width;
+        right: var(--nav-collapsed-width);
 
         @if $song-tools-style != "navbar" {
             display: none;

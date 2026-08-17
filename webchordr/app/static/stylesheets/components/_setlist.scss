@@ -13,13 +13,17 @@ nav .setlist-name {
     font-size: $font-size-small;
     text-align: center;
     height: $setlist-name-height;
-    padding: 0 ($std-half + 8px) 0 $std-half;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+
+    // Move the text slightly to the left to visually align it better with the
+    // button text
+    padding-right: calc(0.25 * var(--nav-sort-handle-width));
 }
 
 nav.-hidden .setlist-name {
-    width: $nav-collapsed-width;
-    padding: 0 0 0 $song-item-space;
+    width: var(--nav-inner-width);
+    padding-left: var(--song-item-space);
+    padding-right: 0;
 }

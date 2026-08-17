@@ -7,6 +7,11 @@ nav {
     --nav-padding-left: calc(
         var(--nav-padding-horizontal) + var(--nav-left-border-width)
     );
+    --nav-inner-width: calc(
+        var(--nav-width) - var(--nav-padding-horizontal) - var(
+                --nav-padding-left
+            )
+    );
 
     background: var(--nav-bg);
     order: 2;
@@ -19,16 +24,9 @@ nav {
     top: 0;
     bottom: 0;
     min-height: -webkit-fill-available;
+    width: var(--nav-width);
 
     @include print-hidden;
-
-    &.-visible {
-        width: $nav-width-xs;
-
-        @include min-screen-tablet {
-            width: $nav-width;
-        }
-    }
 
     .song-list-container {
         height: calc(100% - #{$nav-button-height});
@@ -70,7 +68,7 @@ nav {
 
         flex-flow: row nowrap;
         align-items: center;
-        margin-bottom: $song-item-space;
+        margin-bottom: var(--song-item-space);
 
         &:focus {
             color: var(--button-color);
@@ -99,11 +97,7 @@ nav {
         }
 
         &.-sortable a[role="button"] {
-            width: $nav-width-xs - $sort-handle-width;
-
-            @include min-screen-tablet {
-                width: $nav-width - $sort-handle-width;
-            }
+            width: calc(var(--nav-width) - var(--nav-sort-handle-width));
         }
 
         .sortable-handle {
@@ -120,7 +114,7 @@ nav {
         border-bottom-right-radius: 0;
 
         a[role="button"] {
-            width: $nav-collapsed-width;
+            width: var(--nav-inner-width);
             overflow: hidden;
             white-space: nowrap;
             padding: list.nth($button-padding, 1) 0 list.nth($button-padding, 1)
@@ -210,6 +204,6 @@ nav {
 
     &.-hidden footer button {
         max-width: 100%;
-        width: $nav-collapsed-width;
+        width: var(--nav-inner-width);
     }
 }

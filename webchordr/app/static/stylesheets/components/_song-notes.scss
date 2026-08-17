@@ -6,8 +6,8 @@
         var(--nav-padding-horizontal) + var(--nav-left-border-width)
     );
 
-    padding: $song-item-space var(--nav-padding-horizontal) $song-item-space
-        var(--nav-padding-left);
+    padding: var(--song-item-space) var(--nav-padding-horizontal)
+        var(--song-item-space) var(--nav-padding-left);
     width: 100%;
     height: calc(50vh - #{3 * $nav-button-height + $nav-footer-border-width});
 
@@ -27,7 +27,7 @@
         -webkit-appearance: none;
         appearance: none;
         width: calc(
-            $nav-width - 2 *
+            var(--nav-expanded-width) - 2 *
                 var(--nav-padding-horizontal) - var(--nav-left-border-width)
         );
         height: 100%;
@@ -40,4 +40,5 @@
 
 nav.-hidden .song-notes {
     width: $nav-collapsed-width + $nav-left-border-width;
+    width: var(--nav-collapsed-width);
 }

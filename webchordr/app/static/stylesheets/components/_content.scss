@@ -4,11 +4,7 @@
     background: var(--background);
     order: 1;
     padding: $std-space;
-    width: calc(100% - #{$nav-width-xs});
-
-    @include min-screen-tablet {
-        width: calc(100% - #{$nav-width});
-    }
+    width: calc(100% - var(--nav-width));
 
     @media print {
         width: 100%;
@@ -39,5 +35,5 @@
 }
 
 main.-menu-hidden .content {
-    width: calc(100% - #{$nav-collapsed-width});
+    width: calc(100% - var(--nav-collapsed-width));
 }
