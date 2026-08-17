@@ -8,9 +8,11 @@ let isAttached = false;
 
 /* Initialize */
 export function initialize() {
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener("DOMContentLoaded", function () {
         addScrollClasses();
-        window.addEventListener("scroll", throttle(addScrollClasses), {passive: true});
+        window.addEventListener("scroll", throttle(addScrollClasses), {
+            passive: true,
+        });
     });
 }
 
@@ -23,36 +25,36 @@ function addScrollClasses() {
 function checkIfAttached(currentScrollPosition) {
     if (currentScrollPosition < detachThreshold) {
         if (!isAttached) {
-            classList.add('attached')
-            classList.remove('detached')
-            isAttached = true
+            classList.add("attached");
+            classList.remove("detached");
+            isAttached = true;
         }
     } else {
         if (isAttached) {
-            classList.remove('attached')
-            classList.add('detached')
-            isAttached = false
+            classList.remove("attached");
+            classList.add("detached");
+            isAttached = false;
         }
     }
 }
 
 function checkDirection(currentScrollPosition) {
-    let scrollDirection = '';
+    let scrollDirection = "";
     const diff = lastScrollPosition - currentScrollPosition;
     if (Math.abs(diff) > threshold) {
         if (diff > 0) {
-            scrollDirection = 'direction-up';
+            scrollDirection = "direction-up";
         } else {
-            scrollDirection = 'direction-down';
+            scrollDirection = "direction-down";
         }
 
         if (lastScrollDirection !== scrollDirection) {
-            classList.remove(lastScrollDirection)
-            classList.add(scrollDirection)
+            classList.remove(lastScrollDirection);
+            classList.add(scrollDirection);
             lastScrollDirection = scrollDirection;
         }
     }
-    lastScrollPosition = currentScrollPosition
+    lastScrollPosition = currentScrollPosition;
 }
 
 function throttle(callback, limit) {
@@ -65,5 +67,5 @@ function throttle(callback, limit) {
                 waiting = false;
             }, limit || 20);
         }
-    }
+    };
 }
