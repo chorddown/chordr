@@ -66,7 +66,7 @@ nav {
 
     .song-item {
         @include button(flex);
-        @include button-default($padding: 0);
+        @include button-default($padding: 0, $text-align: left);
 
         flex-flow: row nowrap;
         align-items: center;

@@ -22,7 +22,12 @@
     }
 }
 
-@mixin button-default($padding: $button-padding, $border: auto, $width: 100%) {
+@mixin button-default(
+    $padding: $button-padding,
+    $border: auto,
+    $width: 100%,
+    $text-align: center
+) {
     background: var(--control-bg);
 
     @if $border != auto {
@@ -34,7 +39,7 @@
     color: var(--control-color);
     width: $width;
     padding: $padding;
-    text-align: center;
+    text-align: $text-align;
     letter-spacing: $button-letter-spacing;
     cursor: pointer;
 
