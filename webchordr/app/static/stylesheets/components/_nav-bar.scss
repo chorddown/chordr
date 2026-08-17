@@ -12,6 +12,11 @@ nav {
                 --nav-padding-left
             )
     );
+    --nav-inner-expanded-width: calc(
+        var(--nav-expanded-width) - var(--nav-padding-horizontal) - var(
+                --nav-padding-left
+            )
+    );
 
     background: var(--nav-bg);
     order: 2;
@@ -51,8 +56,12 @@ nav {
     .song-list {
         display: flex;
         flex-flow: column;
-        overflow: scroll;
+        overflow: hidden scroll;
         height: 100%;
+
+        .song-item {
+            flex-shrink: 0;
+        }
 
         &:focus,
         & > div:focus {
@@ -71,6 +80,7 @@ nav {
         flex-flow: row nowrap;
         align-items: center;
         margin-bottom: var(--song-item-space);
+        width: var(--nav-inner-expanded-width);
 
         &:focus {
             color: var(--button-color);
@@ -83,6 +93,7 @@ nav {
 
         .sortable-handle,
         a[role="button"] {
+            width: var(--nav-inner-expanded-width);
             padding: $button-padding;
 
             @include if-hover-enabled {
@@ -99,7 +110,9 @@ nav {
         }
 
         &.-sortable a[role="button"] {
-            width: calc(var(--nav-width) - var(--nav-sort-handle-width));
+            width: calc(
+                var(--nav-inner-expanded-width) - var(--nav-sort-handle-width)
+            );
         }
 
         .sortable-handle {
@@ -114,14 +127,6 @@ nav {
     &.-hidden .song-item {
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;
-
-        a[role="button"] {
-            width: var(--nav-inner-width);
-            overflow: hidden;
-            white-space: nowrap;
-            padding: list.nth($button-padding, 1) 0 list.nth($button-padding, 1)
-                list.nth($button-padding, 2);
-        }
     }
 
     footer {
