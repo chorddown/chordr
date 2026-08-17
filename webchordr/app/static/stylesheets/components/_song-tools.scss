@@ -8,14 +8,16 @@
     padding: (1 + $std-half) $std-half;
     line-height: $button-line-height;
     font-size: $button-font-size;
-    right: $nav-width-xs;
+    right: var(--nav-width);
     display: flex;
     flex-flow: column;
     gap: $std-half;
     border-top-left-radius: var(--border-radius);
+    transition-property: width, right;
+    transition-duration: var(--nav-transition-duration);
+    transition-timing-function: var(--nav-transition-timing-function);
 
     @include min-screen-tablet {
-        right: var(--nav-width);
         bottom: auto;
         border-top-left-radius: 0;
 
@@ -24,7 +26,7 @@
             left: 0;
             display: flex;
             justify-content: space-between;
-            transition: top $std-transition-duration;
+            transition-property: width, right, top;
             top: -($song-tools-navbar-height);
 
             @at-root html.direction-up #{&} {

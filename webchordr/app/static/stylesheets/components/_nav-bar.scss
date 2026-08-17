@@ -25,12 +25,14 @@ nav {
     bottom: 0;
     min-height: -webkit-fill-available;
     width: var(--nav-width);
+    transition: width var(--nav-transition-duration)
+        var(--nav-transition-timing-function);
 
     @include print-hidden;
 
     .song-list-container {
         height: calc(100% - #{$nav-button-height});
-        transition: transform $std-transition-duration;
+        transition: transform var(--default-transition-duration);
         padding: 0 0 0 var(--nav-padding-left);
 
         &.-touch-hover {

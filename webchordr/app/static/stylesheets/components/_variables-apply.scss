@@ -82,6 +82,7 @@
 }
 
 html {
+    --default-transition-duration: #{$std-transition-duration};
     --item-space-small: #{$item-space-small};
     --font-size-base: #{$font-size-web};
     --border-radius: #{0.5 * $std-space};
@@ -97,6 +98,8 @@ html {
     --nav-footer-gap: var(--item-space-small);
     --nav-button-height: #{$nav-button-height};
     --nav-sort-handle-width: 40px;
+    --nav-transition-duration: calc(0.25 * var(--default-transition-duration));
+    --nav-transition-timing-function: linear;
     --song-item-space: var(--item-space-small);
 
     // Default styles (=light-mode)
