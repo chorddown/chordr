@@ -1,5 +1,13 @@
 @use "prelude" as *;
 
+:root {
+    --modal-backdrop: #{rgba(white, 0.8)};
+
+    @include if-dark-mode {
+        --modal-backdrop: #{rgba(black, 0.8)};
+    }
+}
+
 .modal-outer {
     z-index: 100;
     position: fixed;
@@ -7,11 +15,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(white, 0.8);
-
-    @include if-dark-mode {
-        background: rgba(black, 0.8);
-    }
+    background: var(--modal-backdrop);
 
     .modal {
         width: 100%;
