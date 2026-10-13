@@ -1,14 +1,22 @@
 // stylelint-disable declaration-no-important
+@use "sass:selector";
+@use "sass:string";
 @use "../variables" as *;
 
 @mixin if-dark-mode {
+    $selector: #{&};
+
+    @if string.index($selector, ":root") == 1 {
+        $selector: "";
+    }
+
     @media screen and (prefers-color-scheme: dark) {
-        @at-root html:not(.light-mode) & {
+        @at-root html:not(.light-mode) #{$selector} {
             @content;
         }
     }
 
-    @at-root html.dark-mode & {
+    @at-root html.dark-mode #{$selector} {
         @content;
     }
 }
